@@ -271,6 +271,7 @@ h1,h2,h3{margin:0; font-family:var(--font-display);}
 }
 
 /* ---------- projects ---------- */
+.project-list{display:flex; flex-direction:column; gap:32px;}
 .project-card{
   border:1px solid var(--ink-line);
   padding:40px;
