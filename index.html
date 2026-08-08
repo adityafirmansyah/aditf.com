@@ -24,9 +24,10 @@
   <nav class="nav__links" id="navLinks">
     <a href="#about"><span class="idx">01</span>About</a>
     <a href="#skills"><span class="idx">02</span>Skills</a>
-    <a href="#experience"><span class="idx">03</span>Experience</a>
-    <a href="#certifications"><span class="idx">04</span>Certs</a>
-    <a href="#contact"><span class="idx">05</span>Contact</a>
+    <a href="#projects"><span class="idx">03</span>Projects</a>
+    <a href="#experience"><span class="idx">04</span>Experience</a>
+    <a href="#certifications"><span class="idx">05</span>Certs</a>
+    <a href="#contact"><span class="idx">06</span>Contact</a>
   </nav>
 </header>
 
@@ -137,6 +138,42 @@
         <div class="crate__items">
           <span>API Integration</span><span>Code Review</span><span>Agile Development</span><span>Software Architecture</span>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section class="section" id="projects">
+    <div class="section__head">
+      <p class="eyebrow">Cargo Log &mdash; Personal Freight</p>
+      <h2>Projects</h2>
+    </div>
+
+    <div class="project-card reveal">
+      <div class="project-card__top">
+        <div>
+          <p class="project-card__eyebrow">Solo Build &mdash; Full-Stack Rust</p>
+          <h3>GainForge <span>Gamified Fitness RPG</span></h3>
+        </div>
+        <a class="project-card__badge" href="https://gainforgeapp.com" target="_blank" rel="noopener noreferrer">
+          <i class="dot" aria-hidden="true"></i>LIVE
+        </a>
+      </div>
+
+      <p class="project-card__lede">GainForge turns real workouts into RPG quests &mdash; users earn XP, level up a character, and grow four stats (STR, END, AGI, FLX) by completing daily strength, cardio, flexibility, and endurance sessions. Built solo end-to-end: product design, schema, API, frontend, and production deployment.</p>
+
+      <ul class="project-card__points">
+        <li>Full Rust stack front-to-back &mdash; Leptos (WASM) frontend and an Axum backend share a single DTO crate, keeping types identical across client and server.</li>
+        <li>Designed the quest/XP/leveling system and a 4-stat character model, plus an admin panel for managing training programs, exercises, and weekly schedules.</li>
+        <li>Shipped and self-hosted on a VPS with Docker and PostgreSQL &mdash; 15 schema migrations, 100+ commits, with iterative mobile-UX polish (drawer navigation, responsive schedule grid).</li>
+      </ul>
+
+      <div class="project-card__stack">
+        <span>Rust</span><span>Leptos (WASM)</span><span>Axum</span><span>PostgreSQL</span><span>Docker</span><span>Self-hosted VPS</span>
+      </div>
+
+      <div class="project-card__actions">
+        <a class="btn btn--stamp" href="https://gainforgeapp.com" target="_blank" rel="noopener noreferrer">Visit GainForge &rarr;</a>
       </div>
     </div>
   </section>
