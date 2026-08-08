@@ -107,7 +107,7 @@ h1,h2,h3{margin:0; font-family:var(--font-display);}
     max-height:0; overflow:hidden;
     transition:max-height .3s ease;
   }
-  .nav__links.is-open{max-height:320px;}
+  .nav__links.is-open{max-height:calc(100vh - 64px); overflow-y:auto;}
   .nav__links a{padding:16px var(--edge); border-top:1px solid var(--ink-line);}
 }
 
@@ -286,18 +286,13 @@ h1,h2,h3{margin:0; font-family:var(--font-display);}
 .project-card__top h3{
   font-size:22px; text-transform:none; font-weight:600; color:var(--paper); margin:0;
 }
-.project-card__top h3 span{
-  display:block; font-family:var(--font-mono); font-size:13px;
-  color:var(--steel); font-weight:400; text-transform:uppercase;
-  letter-spacing:.04em; margin-top:4px;
-}
 .project-card__badge{
   display:flex; align-items:center; gap:8px;
   font-family:var(--font-mono); font-size:12px; letter-spacing:.08em;
   text-transform:uppercase; color:var(--amber);
   text-decoration:none; white-space:nowrap;
   border:1px solid var(--amber); padding:6px 12px; border-radius:2px;
-  transition:background .18s ease, color .18s ease;
+  transition:background .18s ease;
 }
 .project-card__badge:hover{background:var(--amber-soft);}
 .project-card__lede{
@@ -307,22 +302,9 @@ h1,h2,h3{margin:0; font-family:var(--font-display);}
   list-style:none; display:flex; flex-direction:column; gap:10px;
   max-width:680px; margin:0 0 28px;
 }
-.project-card__points li{
-  position:relative; padding-left:18px; color:var(--paper-dim); font-size:15px;
-}
-.project-card__points li::before{
-  content:"›"; position:absolute; left:0; color:var(--amber);
-}
 .project-card__stack{
   display:flex; flex-wrap:wrap; gap:8px; margin-bottom:28px;
 }
-.project-card__stack span{
-  font-family:var(--font-mono); font-size:11.5px;
-  color:var(--kraft); background:var(--amber-soft);
-  border:1px solid rgba(232,135,30,.35);
-  padding:4px 9px; border-radius:2px;
-}
-.project-card__actions{display:flex; flex-wrap:wrap; gap:16px;}
 
 /* ---------- timeline ---------- */
 .timeline{
@@ -360,7 +342,7 @@ h1,h2,h3{margin:0; font-family:var(--font-display);}
   font-size:20px; text-transform:none; font-weight:600;
   margin-bottom:14px; color:var(--paper);
 }
-.timeline__card h3 span{
+.timeline__card h3 span, .project-card__top h3 span{
   display:block; font-family:var(--font-mono); font-size:13px;
   color:var(--steel); font-weight:400; text-transform:uppercase;
   letter-spacing:.04em; margin-top:4px;
@@ -369,16 +351,16 @@ h1,h2,h3{margin:0; font-family:var(--font-display);}
   list-style:none; display:flex; flex-direction:column; gap:8px;
   max-width:640px;
 }
-.timeline__card li{
+.timeline__card li, .project-card__points li{
   position:relative; padding-left:18px; color:var(--paper-dim); font-size:15px;
 }
-.timeline__card li::before{
+.timeline__card li::before, .project-card__points li::before{
   content:"›"; position:absolute; left:0; color:var(--amber);
 }
 .timeline__stack{
   display:flex; flex-wrap:wrap; gap:8px; margin-top:18px;
 }
-.timeline__stack span{
+.timeline__stack span, .project-card__stack span{
   font-family:var(--font-mono); font-size:11.5px;
   color:var(--kraft); background:var(--amber-soft);
   border:1px solid rgba(232,135,30,.35);
