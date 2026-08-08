@@ -149,31 +149,61 @@
       <h2>Projects</h2>
     </div>
 
-    <div class="project-card reveal">
-      <div class="project-card__top">
-        <div>
-          <p class="project-card__eyebrow">Solo Build &mdash; Full-Stack Rust</p>
-          <h3>GainForge <span>Gamified Fitness RPG</span></h3>
+    <div class="project-list">
+      <div class="project-card reveal">
+        <div class="project-card__top">
+          <div>
+            <p class="project-card__eyebrow">Solo Build &mdash; Full-Stack Rust</p>
+            <h3>GainForge <span>Gamified Fitness RPG</span></h3>
+          </div>
+          <a class="project-card__badge" href="https://gainforgeapp.com" target="_blank" rel="noopener noreferrer" aria-label="GainForge — visit live site">
+            <i class="dot" aria-hidden="true"></i>LIVE
+          </a>
         </div>
-        <a class="project-card__badge" href="https://gainforgeapp.com" target="_blank" rel="noopener noreferrer" aria-label="GainForge — visit live site">
-          <i class="dot" aria-hidden="true"></i>LIVE
-        </a>
+
+        <p class="project-card__lede">GainForge turns real workouts into RPG quests &mdash; users earn XP, level up a character, and grow four stats (STR, END, AGI, FLX) by completing daily strength, cardio, flexibility, and endurance sessions. Built solo end-to-end: product design, schema, API, frontend, and production deployment.</p>
+
+        <ul class="project-card__points">
+          <li>Full Rust stack front-to-back &mdash; Leptos (WASM) frontend and an Axum backend share a single DTO crate, keeping types identical across client and server.</li>
+          <li>Designed the quest/XP/leveling system and a 4-stat character model, plus an admin panel for managing training programs, exercises, and weekly schedules.</li>
+          <li>Shipped and self-hosted on a VPS with Docker and PostgreSQL &mdash; 15 schema migrations, 100+ commits, with iterative mobile-UX polish (drawer navigation, responsive schedule grid).</li>
+        </ul>
+
+        <div class="project-card__stack">
+          <span>Rust</span><span>Leptos (WASM)</span><span>Axum</span><span>PostgreSQL</span><span>Docker</span><span>Self-hosted VPS</span>
+        </div>
+
+        <div class="hero__actions">
+          <a class="btn btn--stamp" href="https://gainforgeapp.com" target="_blank" rel="noopener noreferrer">Visit GainForge &rarr;</a>
+        </div>
       </div>
 
-      <p class="project-card__lede">GainForge turns real workouts into RPG quests &mdash; users earn XP, level up a character, and grow four stats (STR, END, AGI, FLX) by completing daily strength, cardio, flexibility, and endurance sessions. Built solo end-to-end: product design, schema, API, frontend, and production deployment.</p>
+      <div class="project-card reveal">
+        <div class="project-card__top">
+          <div>
+            <p class="project-card__eyebrow">Solo Build &mdash; Full-Stack JavaScript</p>
+            <h3>Upwork Proposal Generator <span>AI Cover Letter Tool</span></h3>
+          </div>
+          <a class="project-card__badge" href="https://uclg.aditf.com" target="_blank" rel="noopener noreferrer" aria-label="Upwork Proposal Generator — visit live site">
+            <i class="dot" aria-hidden="true"></i>LIVE
+          </a>
+        </div>
 
-      <ul class="project-card__points">
-        <li>Full Rust stack front-to-back &mdash; Leptos (WASM) frontend and an Axum backend share a single DTO crate, keeping types identical across client and server.</li>
-        <li>Designed the quest/XP/leveling system and a 4-stat character model, plus an admin panel for managing training programs, exercises, and weekly schedules.</li>
-        <li>Shipped and self-hosted on a VPS with Docker and PostgreSQL &mdash; 15 schema migrations, 100+ commits, with iterative mobile-UX polish (drawer navigation, responsive schedule grid).</li>
-      </ul>
+        <p class="project-card__lede">Freelancers on Upwork build a profile (skills, bio, experience), paste a job listing URL, and get a tailored, editable cover letter back &mdash; turning &ldquo;found a job I want&rdquo; into &ldquo;submitted a proposal that gets a reply&rdquo; in the time it takes to read the posting.</p>
 
-      <div class="project-card__stack">
-        <span>Rust</span><span>Leptos (WASM)</span><span>Axum</span><span>PostgreSQL</span><span>Docker</span><span>Self-hosted VPS</span>
-      </div>
+        <ul class="project-card__points">
+          <li>Backend scrapes the pasted Upwork listing (Express + cheerio) with SSRF hardening &mdash; validates and blocks requests to localhost, private/reserved IP ranges, and cloud metadata endpoints before fetching a user-submitted URL.</li>
+          <li>Job summary and user profile feed a prompt builder that calls an LLM gateway (Claude Haiku) to draft the cover letter, which the user can edit before saving.</li>
+          <li>Full auth/profile/letter-history schema in PostgreSQL (users, profiles, projects, cover_letters with draft/saved status) behind JWT auth; self-hosted on a VPS via git-push deploy (bare repo + post-receive hook + systemd + nginx).</li>
+        </ul>
 
-      <div class="hero__actions">
-        <a class="btn btn--stamp" href="https://gainforgeapp.com" target="_blank" rel="noopener noreferrer">Visit GainForge &rarr;</a>
+        <div class="project-card__stack">
+          <span>React</span><span>Vite</span><span>Tailwind</span><span>Node.js</span><span>Express</span><span>PostgreSQL</span><span>Self-hosted VPS</span>
+        </div>
+
+        <div class="hero__actions">
+          <a class="btn btn--stamp" href="https://uclg.aditf.com" target="_blank" rel="noopener noreferrer">Visit Upwork Proposal Generator &rarr;</a>
+        </div>
       </div>
     </div>
   </section>
