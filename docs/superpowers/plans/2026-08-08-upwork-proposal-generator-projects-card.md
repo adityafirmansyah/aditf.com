@@ -1,6 +1,6 @@
 # Upwork Proposal Generator Projects Card Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [x]`) syntax for tracking.
 
 **Goal:** Add a second case-study card to the Projects section of the aditf portfolio site for the Upwork Proposal Generator (a solo-built, full-stack-JavaScript AI cover-letter tool, live at `https://uclg.aditf.com`), stacked below the existing GainForge card.
 
@@ -28,7 +28,7 @@
 **Interfaces:**
 - Produces: a `.project-list` wrapper class that Task 2's CSS must define, and reuses existing class names (`project-card`, `project-card__top`, `project-card__eyebrow`, `project-card__badge`, `project-card__lede`, `project-card__points`, `project-card__stack`, `hero__actions`, `btn btn--stamp`, `reveal`) already styled by existing CSS.
 
-- [ ] **Step 1: Replace the Projects section body**
+- [x] **Step 1: Replace the Projects section body**
 
 Replace this block (`index.html:152-178`):
 
@@ -124,7 +124,7 @@ with (the same GainForge card, now nested inside `.project-list`, plus the new s
     </div>
 ```
 
-- [ ] **Step 2: Verify structure**
+- [x] **Step 2: Verify structure**
 
 Run (from the repo root):
 
@@ -143,7 +143,7 @@ print('parsed ok')
 
 Expected output: `2`, `2`, `2`, then `parsed ok` with no exceptions.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add index.html
@@ -166,7 +166,7 @@ EOF
 - Consumes: the `.project-list` class produced by Task 1.
 - Produces: vertical `32px` gap between sibling `.project-card` elements, consumed visually by Task 3's browser check.
 
-- [ ] **Step 1: Insert the CSS rule**
+- [x] **Step 1: Insert the CSS rule**
 
 Insert directly above `.project-card{` (styles.css:274):
 
@@ -185,7 +185,7 @@ So the surrounding block reads:
 }
 ```
 
-- [ ] **Step 2: Verify no CSS syntax errors**
+- [x] **Step 2: Verify no CSS syntax errors**
 
 Run (from the repo root):
 
@@ -200,7 +200,7 @@ grep -c '\.project-list' styles.css   # expect: 1
 
 Expected: `braces balanced: <N>` with no assertion error, and a count of `1`.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add styles.css
@@ -221,7 +221,7 @@ EOF
 **Interfaces:**
 - Consumes: the rendered page at `#projects` produced by Tasks 1–2.
 
-- [ ] **Step 1: Serve the site locally**
+- [x] **Step 1: Serve the site locally**
 
 ```bash
 python3 -m http.server 8793 >/tmp/aditf-preview-upwork.log 2>&1 &
@@ -232,7 +232,7 @@ curl -sf http://localhost:8793/index.html >/dev/null && echo "server up"
 
 Expected: `server up`. (Port 8793 used to avoid clashing with any other preview server that might already be running on 8791/8792.)
 
-- [ ] **Step 2: Visually inspect the Projects section**
+- [x] **Step 2: Visually inspect the Projects section**
 
 Use the gstack `/browse` skill to open `http://localhost:8793/#projects` and confirm, at both desktop (~1280px) and mobile (~390px) widths:
 - Both cards render, GainForge first, Upwork Proposal Generator second, with a clear visible gap between them (not touching borders).
@@ -243,7 +243,7 @@ Use the gstack `/browse` skill to open `http://localhost:8793/#projects` and con
 
 If any issue is found, fix it in `index.html`/`styles.css` and re-run Step 2 until clean, then commit the fix with its own descriptive message.
 
-- [ ] **Step 3: Stop the local server**
+- [x] **Step 3: Stop the local server**
 
 ```bash
 kill "$(cat /tmp/aditf-preview-upwork.pid)" 2>/dev/null
