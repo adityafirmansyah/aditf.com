@@ -30,7 +30,7 @@
 **Interfaces:**
 - Produces: a new anchor target `id="projects"` that Task 3's visual check navigates to via `#projects`, and CSS class names (`project-card`, `project-card__top`, `project-card__eyebrow`, `project-card__badge`, `project-card__lede`, `project-card__points`, `project-card__stack`, `project-card__actions`) that Task 2's CSS must define.
 
-- [ ] **Step 1: Update the nav links block**
+- [x] **Step 1: Update the nav links block**
 
 Replace the current nav block:
 
@@ -57,7 +57,7 @@ with:
   </nav>
 ```
 
-- [ ] **Step 2: Insert the Projects section**
+- [x] **Step 2: Insert the Projects section**
 
 Immediately before the `<!-- EXPERIENCE -->` comment (right after the Skills section's closing `</section>`), insert:
 
@@ -100,7 +100,7 @@ Immediately before the `<!-- EXPERIENCE -->` comment (right after the Skills sec
 
 ```
 
-- [ ] **Step 3: Verify structure**
+- [x] **Step 3: Verify structure**
 
 Run (from the worktree root):
 
@@ -118,7 +118,7 @@ print('parsed ok')
 
 Expected output: `1`, `6`, then `parsed ok` with no exceptions.
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add index.html
@@ -140,7 +140,7 @@ EOF
 **Interfaces:**
 - Consumes: class names produced by Task 1 (`project-card`, `project-card__top`, `project-card__eyebrow`, `project-card__badge`, `project-card__lede`, `project-card__points`, `project-card__stack`, `project-card__actions`), and existing global tokens/classes (`--ink-line`, `--paper`, `--paper-dim`, `--steel`, `--amber`, `--amber-soft`, `--kraft`, `--font-mono`, `.dot`, `.btn`, `.btn--stamp`).
 
-- [ ] **Step 1: Insert the CSS block**
+- [x] **Step 1: Insert the CSS block**
 
 Insert after line 271 (the closing `}` of `.crate__items span`) and before the `/* ---------- timeline ---------- */` comment:
 
@@ -201,7 +201,7 @@ Insert after line 271 (the closing `}` of `.crate__items span`) and before the `
 .project-card__actions{display:flex; flex-wrap:wrap; gap:16px;}
 ```
 
-- [ ] **Step 2: Verify no CSS syntax errors**
+- [x] **Step 2: Verify no CSS syntax errors**
 
 Run (from the worktree root):
 
@@ -216,7 +216,7 @@ grep -c '\.project-card' styles.css   # expect: at least 9 (one per selector var
 
 Expected: `braces balanced: <N>` with no assertion error, and a count ≥ 9.
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add styles.css
@@ -237,7 +237,7 @@ EOF
 **Interfaces:**
 - Consumes: the rendered page at `#projects` produced by Tasks 1–2.
 
-- [ ] **Step 1: Serve the site locally**
+- [x] **Step 1: Serve the site locally**
 
 ```bash
 python3 -m http.server 8792 >/tmp/aditf-preview-worktree.log 2>&1 &
@@ -248,7 +248,7 @@ curl -sf http://localhost:8792/index.html >/dev/null && echo "server up"
 
 Expected: `server up`. (Port 8792 used instead of 8791 to avoid clashing with any preview server the original checkout might be running.)
 
-- [ ] **Step 2: Visually inspect the Projects section**
+- [x] **Step 2: Visually inspect the Projects section**
 
 Use the gstack `/browse` skill to open `http://localhost:8792/#projects` and confirm, at both desktop (~1280px) and mobile (~390px) widths:
 - The nav shows `03 Projects` between Skills and Projects, and Experience/Certs/Contact read `04`/`05`/`06`.
@@ -259,7 +259,7 @@ Use the gstack `/browse` skill to open `http://localhost:8792/#projects` and con
 
 If any issue is found, fix it in `index.html`/`styles.css` and re-run Step 2 until clean, then commit the fix with its own descriptive message.
 
-- [ ] **Step 3: Stop the local server**
+- [x] **Step 3: Stop the local server**
 
 ```bash
 kill "$(cat /tmp/aditf-preview-worktree.pid)" 2>/dev/null
