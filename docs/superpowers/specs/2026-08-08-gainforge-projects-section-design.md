@@ -44,13 +44,14 @@ Reuse existing design tokens and patterns from `styles.css` — no new colors, f
 
 - Card background/border styled like `.label-card` (kraft card) is NOT used — instead the card sits on the dark `--ink` background like `.timeline__card`, since Projects sits among dark sections, not the kraft-toned About section.
 - New `.project-card` block:
-  - `.project-card__top` — flex row: title block on the left, `.project-card__badge` (reuses `.waybill__status` + `.dot` pulse animation, amber) on the right
-  - `.project-card__eyebrow` — same treatment as `.eyebrow`
+  - `.project-card__top` — flex row: title block on the left, `.project-card__badge` on the right
+  - `.project-card__eyebrow` — styled like `.crate__label` (steel color, `.08em` letter-spacing) rather than `.eyebrow` (amber, `.1em`) — the section already has an amber `.eyebrow` above the heading ("Cargo Log — Personal Freight"), so a second amber eyebrow directly inside the card would read as repetitive; the steel treatment keeps it visually subordinate
+  - `.project-card__badge` — a bordered pill/chip (new style) that reuses the shared `.dot` pulse animation, amber-colored; not `.waybill__status`, since that treatment has no border or hover state and the badge needed to be a clickable link
   - Title (`h3`) styled like `.timeline__card h3`, with the subtitle in a `<span>` styled like the existing `h3 span` (steel-colored, mono, uppercase)
   - `.project-card__lede` — body copy, same size/color as `.hero__lede`
   - `.project-card__points` — reuses the `›`-bullet list styling from `.timeline__card ul/li`
   - `.project-card__stack` — reuses `.timeline__stack` chip styling
-  - `.project-card__actions` — reuses `.hero__actions` + `.btn btn--stamp`
+  - Actions row uses the `.hero__actions` class directly (no separate `.project-card__actions` class) + `.btn btn--stamp`
 - Card gets a `1px solid var(--ink-line)` border and generous padding (`40px`) to read as a distinct, contained artifact — similar weight to `.crate-grid` but as a single block rather than a grid.
 - `reveal` class applied for the existing scroll-reveal behavior, consistent with every other content block on the page.
 
