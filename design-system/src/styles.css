@@ -1,5 +1,10 @@
 @import './tokens/index.css';
 @import './components/Button/Button.css';
+@import './components/SectionHead/SectionHead.css';
+@import './components/Waybill/Waybill.css';
+@import './components/Barcode/Barcode.css';
+@import './components/Seal/Seal.css';
+@import './components/LangChip/LangChip.css';
 
 * { box-sizing: border-box; }
 body {
