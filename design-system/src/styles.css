@@ -1,4 +1,5 @@
 @import './tokens/index.css';
+@import './components/Button/Button.css';
 
 * { box-sizing: border-box; }
 body {

@@ -1,0 +1,26 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 28px;
+  text-decoration: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  font-weight: 500;
+  border-radius: 2px;
+  transition: transform .18s ease, background .18s ease, color .18s ease;
+}
+.btn--stamp {
+  background: var(--amber);
+  color: var(--ink);
+  border: 1px solid var(--amber);
+}
+.btn--stamp:hover { transform: rotate(-1.5deg) scale(1.02); }
+.btn--ghost {
+  background: transparent;
+  color: var(--paper);
+  border: 1px solid var(--ink-line);
+}
+.btn--ghost:hover { border-color: var(--amber); color: var(--amber); }
