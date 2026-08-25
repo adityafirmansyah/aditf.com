@@ -5,6 +5,8 @@
 @import './components/Barcode/Barcode.css';
 @import './components/Seal/Seal.css';
 @import './components/LangChip/LangChip.css';
+@import './components/RouteProgress/RouteProgress.css';
+@import './components/Reveal/Reveal.css';
 
 * { box-sizing: border-box; }
 body {

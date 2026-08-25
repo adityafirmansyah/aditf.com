@@ -1,0 +1,9 @@
+.route-progress {
+  position: fixed; top: 0; left: 0; right: 0; height: 3px;
+  background: var(--ink-line); z-index: 200;
+}
+.route-progress span {
+  display: block; height: 100%; width: 0%;
+  background: var(--amber);
+  transition: width .1s linear;
+}
