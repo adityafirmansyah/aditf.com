@@ -182,19 +182,19 @@
         <div class="project-card__top">
           <div>
             <p class="project-card__eyebrow">Solo Build &mdash; Full-Stack JavaScript</p>
-            <h3>Upwork Proposal Generator <span>AI Cover Letter Tool</span></h3>
+            <h3>Cover Letter Generator <span>AI Cover Letter Tool</span></h3>
           </div>
-          <a class="project-card__badge" href="https://uclg.aditf.com" target="_blank" rel="noopener noreferrer" aria-label="Upwork Proposal Generator — visit live site">
+          <a class="project-card__badge" href="https://cover.aditf.com" target="_blank" rel="noopener noreferrer" aria-label="Cover Letter Generator — visit live site">
             <i class="dot" aria-hidden="true"></i>LIVE
           </a>
         </div>
 
-        <p class="project-card__lede">Freelancers on Upwork build a profile (skills, bio, experience), paste a job listing URL, and get a tailored, editable cover letter back &mdash; turning &ldquo;found a job I want&rdquo; into &ldquo;submitted a proposal that gets a reply&rdquo; in the time it takes to read the posting.</p>
+        <p class="project-card__lede">Users build a profile (skills, bio, experience), type in a job title and description, and get a tailored, editable cover letter back. Originally built Upwork-specific with URL-based job scraping; broadened to a general-purpose tool once Upwork shipped its own in-house AI proposal writer, making an external Upwork-only tool redundant.</p>
 
         <ul class="project-card__points">
-          <li>Backend scrapes the pasted Upwork listing (Express + cheerio) with SSRF hardening &mdash; validates and blocks requests to localhost, private/reserved IP ranges, and cloud metadata endpoints before fetching a user-submitted URL.</li>
-          <li>Job summary and user profile feed a prompt builder that calls an LLM gateway (Claude Haiku) to draft the cover letter, which the user can edit before saving.</li>
-          <li>Full auth/profile/letter-history schema in PostgreSQL (users, profiles, projects, cover_letters with draft/saved status) behind JWT auth; self-hosted on a VPS via git-push deploy (bare repo + post-receive hook + systemd + nginx).</li>
+          <li>User profile and job details feed a prompt builder that calls an LLM API to draft the letter, followed by a humanization pass that strips AI-writing tells (em dashes, buzzwords, promotional filler) before the user reviews and saves it.</li>
+          <li>Full auth/profile/letter-history schema in PostgreSQL (users, profiles, projects, cover_letters with draft/saved status) behind JWT auth.</li>
+          <li>AI backend (endpoint + model) is env-configurable rather than hardcoded &mdash; swapped providers in production without a code change when the original vendor's model was discontinued. Self-hosted via git-push deploy (bare repo + post-receive hook + systemd + nginx).</li>
         </ul>
 
         <div class="project-card__stack">
@@ -202,7 +202,7 @@
         </div>
 
         <div class="hero__actions">
-          <a class="btn btn--stamp" href="https://uclg.aditf.com" target="_blank" rel="noopener noreferrer">Visit Upwork Proposal Generator &rarr;</a>
+          <a class="btn btn--stamp" href="https://cover.aditf.com" target="_blank" rel="noopener noreferrer">Visit Cover Letter Generator &rarr;</a>
         </div>
       </div>
     </div>
