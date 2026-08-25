@@ -13,3 +13,4 @@ export * from './components/LabelCard';
 export * from './components/StatRow';
 export * from './components/CrateGrid';
 export * from './components/Hero';
+export * from './components/ProjectCard';
