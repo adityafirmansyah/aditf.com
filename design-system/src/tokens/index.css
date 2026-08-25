@@ -1,0 +1,21 @@
+:root {
+  --ink: #14181B;
+  --ink-soft: #1B2023;
+  --ink-line: #2B3236;
+  --paper: #EDE6D6;
+  --paper-dim: #9CA3A0;
+  --kraft: #D9C8A8;
+  --kraft-line: #B8A47D;
+  --kraft-ink: #2A2116;
+  --amber: #E8871E;
+  --amber-soft: rgba(232, 135, 30, .14);
+  --steel: #7FA9C4;
+  --stamp-red: #C24B3B;
+
+  --font-display: 'Oswald', 'Arial Narrow', sans-serif;
+  --font-body: 'Inter', -apple-system, sans-serif;
+  --font-mono: 'IBM Plex Mono', 'SFMono-Regular', monospace;
+
+  --max: 1080px;
+  --edge: clamp(20px, 6vw, 64px);
+}
