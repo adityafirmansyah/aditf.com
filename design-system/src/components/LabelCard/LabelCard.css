@@ -1,0 +1,15 @@
+.label-card {
+  position: relative;
+  background: var(--kraft); color: var(--kraft-ink);
+  padding: 36px 40px; max-width: 760px;
+  border: 1px solid var(--kraft-line);
+  font-size: 17px; line-height: 1.75;
+}
+.label-card p { margin: 0; }
+.label-card__tape {
+  position: absolute; top: -14px; left: 36px;
+  width: 70px; height: 26px;
+  background: rgba(237,230,214,.55);
+  border: 1px solid rgba(184,164,125,.7);
+  transform: rotate(-4deg);
+}

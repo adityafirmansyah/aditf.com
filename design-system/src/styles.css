@@ -8,6 +8,9 @@
 @import './components/RouteProgress/RouteProgress.css';
 @import './components/Reveal/Reveal.css';
 @import './components/Nav/Nav.css';
+@import './components/LabelCard/LabelCard.css';
+@import './components/StatRow/StatRow.css';
+@import './components/CrateGrid/CrateGrid.css';
 
 * { box-sizing: border-box; }
 body {
