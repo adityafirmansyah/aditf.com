@@ -12,3 +12,4 @@ export * from './components/Nav';
 export * from './components/LabelCard';
 export * from './components/StatRow';
 export * from './components/CrateGrid';
+export * from './components/Hero';
