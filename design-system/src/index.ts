@@ -8,3 +8,4 @@ export * from './components/Seal';
 export * from './components/LangChip';
 export * from './components/RouteProgress';
 export * from './components/Reveal';
+export * from './components/Nav';
