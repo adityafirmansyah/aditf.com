@@ -38,5 +38,41 @@ describe('ProjectCard', () => {
       />
     );
     expect(screen.queryByText('LIVE')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /visit live site/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: /→/ })).not.toBeInTheDocument();
+  });
+
+  it('renders badge link when provided but omits CTA', () => {
+    render(
+      <ProjectCard
+        eyebrow="Solo Build"
+        title="GainForge"
+        subtitle="Gamified Fitness RPG"
+        badge={{ label: 'LIVE', href: 'https://gainforgeapp.com' }}
+        lede="GainForge turns real workouts into RPG quests."
+        points={['Full Rust stack front-to-back.']}
+        stack={['Rust']}
+      />
+    );
+    expect(screen.getByText('LIVE')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /visit live site/i })).toHaveAttribute('href', 'https://gainforgeapp.com');
+    expect(screen.queryByRole('link', { name: /→/ })).not.toBeInTheDocument();
+  });
+
+  it('renders CTA link when provided but omits badge', () => {
+    render(
+      <ProjectCard
+        eyebrow="Solo Build"
+        title="GainForge"
+        subtitle="Gamified Fitness RPG"
+        lede="GainForge turns real workouts into RPG quests."
+        points={['Full Rust stack front-to-back.']}
+        stack={['Rust']}
+        cta={{ label: 'Visit GainForge', href: 'https://gainforgeapp.com' }}
+      />
+    );
+    expect(screen.queryByText('LIVE')).not.toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /Visit GainForge/ })).toHaveAttribute('href', 'https://gainforgeapp.com');
+    expect(screen.queryByRole('link', { name: /visit live site/i })).not.toBeInTheDocument();
   });
 });
