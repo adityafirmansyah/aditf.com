@@ -1,9 +1,10 @@
+// @vitest-environment node
 import { describe, expect, it } from 'vitest';
 import { readFileSync } from 'node:fs';
-import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { colors, fonts, layout } from './index';
 
-const cssPath = path.join(process.cwd(), 'src/tokens/index.css');
+const cssPath = fileURLToPath(new URL('./index.css', import.meta.url));
 const css = readFileSync(cssPath, 'utf-8');
 
 describe('design tokens', () => {
