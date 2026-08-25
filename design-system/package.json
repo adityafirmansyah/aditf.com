@@ -8,7 +8,7 @@
   "module": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "build": "node scripts/build.mjs && tsc --emitDeclarationOnly --outDir dist",
+    "build": "node scripts/build.mjs && tsc --project tsconfig.build.json --emitDeclarationOnly --outDir dist",
     "test": "vitest run",
     "typecheck": "tsc --noEmit"
   },
