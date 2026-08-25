@@ -1,5 +1,5 @@
-// Component exports are added here one `export * from './components/<Name>';`
-// line at a time as each component lands (see later tasks).
+// Package barrel: design tokens first (foundational), then all 16 components.
+export * from './tokens';
 export * from './components/Button';
 export * from './components/SectionHead';
 export * from './components/Waybill';

@@ -37,6 +37,7 @@ export function ProjectCard({ eyebrow, title, subtitle, badge, lede, points, sta
             rel="noopener noreferrer"
             aria-label={`${title} — visit live site`}
           >
+            {/* .dot is defined in shared.css, not ProjectCard.css — shared with Waybill's status indicator */}
             <i className="dot" aria-hidden="true" />
             {badge.label}
           </a>
