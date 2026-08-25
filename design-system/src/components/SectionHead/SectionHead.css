@@ -1,0 +1,16 @@
+.section__head { margin-bottom: 48px; }
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--amber);
+  margin: 0 0 12px;
+}
+.section__head h2 {
+  font-size: clamp(28px, 4vw, 42px);
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: -.005em;
+  color: var(--paper);
+}
