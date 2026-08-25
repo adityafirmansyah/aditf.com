@@ -1,0 +1,11 @@
+{
+  "projectId": "67f8c231-67dc-4895-bd0d-09efc33e1639",
+  "shape": "package",
+  "pkg": "@aditf/design-system",
+  "buildCmd": "npm run build",
+  "runtimeFontPrefixes": ["Oswald", "Inter", "IBM Plex Mono"],
+  "overrides": {
+    "Hero": { "cardMode": "column" }
+  },
+  "readmeHeader": ".design-sync/conventions.md"
+}
