@@ -11,6 +11,7 @@
 @import './components/LabelCard/LabelCard.css';
 @import './components/StatRow/StatRow.css';
 @import './components/CrateGrid/CrateGrid.css';
+@import './components/Hero/Hero.css';
 
 * { box-sizing: border-box; }
 body {
