@@ -6,3 +6,5 @@ export * from './components/Waybill';
 export * from './components/Barcode';
 export * from './components/Seal';
 export * from './components/LangChip';
+export * from './components/RouteProgress';
+export * from './components/Reveal';
