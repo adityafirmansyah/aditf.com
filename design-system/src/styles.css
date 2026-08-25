@@ -1,4 +1,6 @@
 @import './tokens/index.css';
+@import './layout.css';
+@import './shared.css';
 @import './components/Button/Button.css';
 @import './components/SectionHead/SectionHead.css';
 @import './components/Waybill/Waybill.css';

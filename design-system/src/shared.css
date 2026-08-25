@@ -1,0 +1,10 @@
+.dot {
+  width: 7px; height: 7px; border-radius: 50%; background: var(--amber);
+  box-shadow: 0 0 0 0 rgba(232,135,30,.6);
+  animation: waybill-pulse 2.2s infinite;
+}
+@keyframes waybill-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(232,135,30,.55); }
+  70% { box-shadow: 0 0 0 8px rgba(232,135,30,0); }
+  100% { box-shadow: 0 0 0 0 rgba(232,135,30,0); }
+}
