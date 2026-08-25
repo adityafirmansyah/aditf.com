@@ -14,3 +14,5 @@ export * from './components/StatRow';
 export * from './components/CrateGrid';
 export * from './components/Hero';
 export * from './components/ProjectCard';
+export * from './components/Timeline';
+export * from './components/ContactGrid';
