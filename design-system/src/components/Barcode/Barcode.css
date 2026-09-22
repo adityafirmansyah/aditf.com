@@ -1,8 +1,0 @@
-.barcode {
-  height: 8px; width: 100%;
-  background-image: repeating-linear-gradient(90deg,
-    var(--kraft) 0 2px, transparent 2px 4px,
-    var(--kraft) 4px 7px, transparent 7px 9px,
-    var(--kraft) 9px 10px, transparent 10px 14px);
-  opacity: .55;
-}

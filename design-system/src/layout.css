@@ -1,9 +1,0 @@
-.section{
-  max-width:var(--max); margin:0 auto;
-  padding:100px var(--edge);
-  border-top:1px solid var(--ink-line);
-}
-.section--contact{position:relative; padding-bottom:120px;}
-.project-list{display:flex; flex-direction:column; gap:32px;}
-.seal-row{display:flex; flex-wrap:wrap; gap:20px; margin-bottom:40px;}
-.lang-row{display:flex; flex-wrap:wrap; gap:14px;}

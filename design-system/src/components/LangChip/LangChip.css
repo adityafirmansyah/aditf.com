@@ -1,8 +1,0 @@
-.lang-chip {
-  display: flex; align-items: center; gap: 10px;
-  border: 1px solid var(--ink-line); padding: 12px 18px;
-  font-family: var(--font-mono); font-size: 12.5px;
-}
-.lang-chip__name { color: var(--paper); text-transform: uppercase; letter-spacing: .05em; }
-.lang-chip__level { color: var(--paper-dim); }
-.lang-chip__level::before { content: "— "; color: var(--ink-line); }
