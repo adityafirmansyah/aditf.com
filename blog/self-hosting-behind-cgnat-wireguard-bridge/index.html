@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Self-Hosting Behind CGNAT: A WireGuard Bridge That Actually Works — Field Notes</title>
+<meta name="description" content="Port forwarding stopped working and it wasn&#x27;t your router&#x27;s fault. Here&#x27;s the outbound WireGuard tunnel pattern that gets a homelab back on the public internet under CGNAT.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2314181B'/%3E%3Ctext x='50' y='68' font-size='58' font-family='monospace' font-weight='700' fill='%23E8871E' text-anchor='middle'%3EAF%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Self-Hosting Behind CGNAT: A WireGuard Bridge That Actually Works — Field Notes">
+<meta property="og:description" content="Port forwarding stopped working and it wasn&#x27;t your router&#x27;s fault. Here&#x27;s the outbound WireGuard tunnel pattern that gets a homelab back on the public internet under CGNAT.">
+<meta property="og:url" content="https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Self-Hosting Behind CGNAT: A WireGuard Bridge That Actually Works — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Self-Hosting Behind CGNAT: A WireGuard Bridge That Actually Works — Field Notes">
+<meta name="twitter:description" content="Port forwarding stopped working and it wasn&#x27;t your router&#x27;s fault. Here&#x27;s the outbound WireGuard tunnel pattern that gets a homelab back on the public internet under CGNAT.">
+<meta name="twitter:image" content="https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-09-23T00:00:00+00:00">
+<meta property="article:tag" content="self-hosting">
+<meta property="article:tag" content="homelab">
+<meta property="article:tag" content="networking">
+<meta property="article:tag" content="wireguard">
+<meta property="article:tag" content="cgnat">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Self-Hosting Behind CGNAT: A WireGuard Bridge That Actually Works", "description": "Port forwarding stopped working and it wasn't your router's fault. Here's the outbound WireGuard tunnel pattern that gets a homelab back on the public internet under CGNAT.", "datePublished": "2026-09-23T00:00:00+00:00", "dateModified": "2026-09-23T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/"}, "keywords": "self-hosting, homelab, networking, wireguard, cgnat", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1114, "image": ["https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>23 Sep 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Self-Hosting Behind CGNAT: A WireGuard Bridge That Actually Works</h1>
+    <div class="post__tags"><span>self-hosting</span><span>homelab</span><span>networking</span><span>wireguard</span><span>cgnat</span></div>
+    <div class="post__content reveal is-visible">
+<p>Port forwarding stopped working and it wasn't your router's fault. Your ISP quietly moved you behind a second NAT layer you can't see, can't configure, and definitely can't port-forward through. This is CGNAT, and if you're running a homelab on Indonesian residential fiber, you've probably already hit it without knowing what it was called.</p>
+<p>David Álvarez Rosa's writeup on self-hosting behind CGNAT went to #1 on lobste.rs this week, and the HN thread picked it up too, because the problem is structural and getting worse everywhere IPv4 addresses stay scarce. I run a Celeron J4105 box on Biznet fiber, and CGNAT is common enough on Indonesian ISPs that this isn't a hypothetical for most homelabbers here.</p>
+<h2>Why your router can't fix this</h2>
+<p>Normal NAT happens once, at your router: your devices share one public IP, and port forwarding tells the router which internal machine gets traffic on a given port. CGNAT inserts a second, hidden NAT layer inside your ISP's own network, upstream of your router entirely. Your router's WAN address isn't public anymore; it's a private address, shared with a whole neighborhood of other customers on the same carrier-grade device. Port forwarding rules in your router's admin panel simply never fire, because the inbound packet never reaches your router to trigger them. There's no setting anywhere in your router that changes this. The packet dies upstream, in equipment you don't control and can't log into.</p>
+<h2>The bridge: tunnel out, not in</h2>
+<p>The trick that works under CGNAT is to stop trying to accept inbound connections entirely. Your homelab instead opens an outbound WireGuard tunnel to a cheap VPS that has a real public IP, and once that tunnel is up, the VPS pushes traffic back down it. Outbound connections sail straight through CGNAT without issue, so routing everything through one already-open tunnel sidesteps the entire problem.</p>
+<p>On the VPS side, iptables DNAT rules forward incoming traffic to the homelab's tunnel address. DNAT only rewrites the destination; the source address on each packet survives the trip, so your homelab still sees real client IPs in its logs instead of one flat address for every visitor. That matters the moment you need anything IP-based: rate limiting, geo-blocking, abuse tracking. Latency through a bridge like this measures at roughly 39ms of added round-trip time in the original writeup, small enough that most self-hosted services never notice it, though a game server would.</p>
+<pre><code># Exempt the WireGuard port and the VPS's own SSH from DNAT first
+iptables -t nat -A PREROUTING -i ens3 -p udp --dport 51820 -j RETURN
+iptables -t nat -A PREROUTING -i ens3 -p tcp --dport 2222 -j RETURN
+
+# Forward everything else to the homelab over the tunnel
+iptables -t nat -A PREROUTING -i ens3 -j DNAT --to-destination 10.0.0.2
+
+# Allow the forwarded traffic through in both directions
+iptables -A FORWARD -i wg0 -o ens3 -s 10.0.0.2 -j ACCEPT
+iptables -A FORWARD -i ens3 -o wg0 -d 10.0.0.2 -j ACCEPT
+</code></pre>
+<p>Skip those RETURN rules and things go wrong fast. The DNAT catch-all doesn't discriminate: it also swallows the WireGuard handshake port and your own SSH session into the VPS, which locks you out of the exact box you're trying to configure. People handle this by moving the VPS's own SSH off port 22 first, onto something like 2222, before touching iptables at all.</p>
+<h2>The routing subtlety that breaks most first attempts</h2>
+<p>Here's where people get bitten. Once the tunnel is up, every reply from your homelab has to travel back down that same tunnel toward the VPS. Send it out through the regular home connection instead, and the client receives a reply from an IP address it never contacted, so the connection just hangs there without ever completing.</p>
+<p>The fix is <code>Table = off</code> on the homelab's WireGuard interface, which stops WireGuard from installing its own default route, paired with a separate routing table (table 200 in the original writeup) that carries only the traffic for your exposed services back through the tunnel. Everything else on the box, your own SSH session, apt updates, whatever else you're doing, keeps riding the normal home connection untouched. <code>PersistentKeepalive = 25</code> sits on top of all that, pinging often enough to keep the CGNAT mapping from expiring on its own schedule.</p>
+<h2>Does the math actually work out for you</h2>
+<p>A static IP from the original author's Spanish ISP runs about €20 a month. A VPS with a public IP and enough bandwidth for a bridge costs a fraction of that, often under $5. The Indonesian comparison lands in the same place: a business-tier static-IP add-on from most residential ISPs costs more per month than a basic low-cost VPS, and you'd be paying that premium indefinitely just to undo something CGNAT did to you for free. For most homelabbers here, the bridge wins on price before you even count the upside of owning a real Linux box sitting in the middle of your own traffic.</p>
+<p>Resilience is the part people skip and then regret. Three things can fail here, and each has a cheap fix: the homelab itself can go down, so a cron job that pings SSH and reboots the box if it stops answering catches that. The bridge VPS can go down, so keep a fallback entry point, Tailscale or a Cloudflare Tunnel pointed straight at the homelab, that doesn't depend on the bridge being alive. The tunnel itself can drop, but WireGuard re-handshakes on its own for short blips, and the other two mitigations cover anything longer.</p>
+<h2>When you don't need any of this</h2>
+<p>Not every homelab needs a full bridge. If you only need to reach your own services from your own devices, Tailscale is simpler, free for personal use, and skips the VPS entirely, no public exposure required because it's a private mesh, not a public tunnel. If you're only exposing web apps over HTTP or HTTPS, Cloudflare Tunnel does that for free with zero VPS and zero iptables. Pangolin, the open-source alternative that picked up 500 points on HN recently, sits between the two if you want Cloudflare Tunnel's ergonomics without handing Cloudflare the keys.</p>
+<p>The WireGuard bridge earns its complexity specifically when you need arbitrary TCP ports reachable from the whole public internet under CGNAT: a game server, a raw protocol that isn't HTTP, or a service where the client genuinely needs to see a real public IP on its own connection. Everything short of that is better served by Tailscale or Cloudflare Tunnel. Setup for the bridge itself runs under an hour once the iptables rules are right, and the VPS costs less per month than most people spend on lunch twice.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
