@@ -33,4 +33,4 @@ Self-hosting is not free. You are the on-call engineer. When the ISP drops packe
 
 Four years of cloud spend for this stack would exceed the hardware cost in year one. Break-even arrived around month eight, including a dead SSD replacement.
 
-If your workload is bursty and latency-tolerant — CI runners, agents, batch jobs, internal tools — a used mini PC behind fiber is hard to beat. If you need five-nines availability for customers, pay the cloud tax and stop reading blogs from people who self-host.
+If your workload is bursty and latency-tolerant (CI runners, agents, batch jobs, internal tools), a used mini PC behind fiber is hard to beat. If you need five-nines availability for customers, pay the cloud tax and stop reading blogs from people who self-host.
