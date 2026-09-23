@@ -1,0 +1,64 @@
+#!/usr/bin/env bash
+# post-receive — deploy aditf.com on push to main.
+#
+# VERSION-CONTROLLED: this file is the source of truth for the hook installed at
+# /opt/aditf.git/hooks/post-receive on the VPS. Edit it here, review it in a PR,
+# then install it (see deploy/README.md). Never edit the VPS copy directly.
+#
+# WHY TREE-DERIVED, NOT AN ALLOWLIST:
+# An explicit allowlist silently drops any file nobody remembered to add. That
+# happened twice: sitemap.xml was added to the repo but the hook never archived
+# it, and favicon.ico/favicon.svg were dropped the same way. Deriving the path
+# list from the pushed commit's own tree means a new top-level file ships the
+# moment it is committed, and `git archive` can never fail on a missing path
+# (every path comes from the tree, so it exists by construction).
+set -euo pipefail
+
+DEPLOY_DIR=/var/www/aditf.com
+GIT_DIR=/opt/aditf.git
+BRANCH=main
+
+# Repo paths that must NOT be served publicly. `deploy/` is this hook's own home
+# (infra-as-code, not site payload); .gitignore is repo metadata.
+DENY=".gitignore deploy"
+
+is_denied() {
+  local p="$1" d
+  for d in $DENY; do
+    [ "$p" = "$d" ] && return 0
+  done
+  return 1
+}
+
+while read -r oldrev newrev refname; do
+  [ "$refname" = "refs/heads/$BRANCH" ] || continue
+
+  echo "[deploy] Deploying $BRANCH ($newrev) to $DEPLOY_DIR..."
+
+  # Derive the payload from the commit tree itself.
+  PATHS=""
+  while IFS= read -r p; do
+    [ -n "$p" ] || continue
+    is_denied "$p" && continue
+    PATHS="$PATHS $p"
+  done < <(git --git-dir="$GIT_DIR" ls-tree --name-only "$newrev")
+
+  PATHS="${PATHS# }"
+  if [ -z "$PATHS" ]; then
+    echo "[deploy] ERROR: no deployable paths in $newrev (denylist=$DENY) — aborting" >&2
+    exit 1
+  fi
+
+  echo "[deploy] archiving: $PATHS"
+  git --git-dir="$GIT_DIR" archive "$newrev" -- $PATHS | tar -x -C "$DEPLOY_DIR"
+
+  # Validate before reloading: a broken config must not take down the site.
+  sudo nginx -t
+  sudo systemctl reload nginx
+
+  echo "[deploy] Done. Live at https://aditf.com"
+done
+
+# NOTE: `tar -x` only adds and overwrites; it never prunes. A file deleted from
+# the repo lingers in the webroot. Deliberate — an rsync --delete here could
+# remove certbot- or nginx-managed paths. Clean up deletions manually.
