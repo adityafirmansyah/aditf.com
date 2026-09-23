@@ -199,7 +199,8 @@ def head(title, description, extra="", url=None, image=None, locale="en_US",
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>{esc(title)}</title>
 <meta name="description" content="{esc(description)}">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%2314181B'/%3E%3Ctext x='50' y='68' font-size='58' font-family='monospace' font-weight='700' fill='%23E8871E' text-anchor='middle'%3EAF%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -419,23 +420,46 @@ def build_sitemap(posts):
 
     Regenerated on every build so it can never go stale when the daily pipeline
     adds a post. Uses lastmod from the post date (or now for the index pages).
+
+    Bilingual posts get xhtml:link hreflang alternates. Google's rule is that
+    every URL in a cluster must carry the SAME complete set of alternates
+    (including itself and x-default), and the cluster must be reciprocal — a
+    one-sided annotation is ignored. The <head> hreflang tags emitted by
+    build_post() and these sitemap alternates must therefore agree.
     """
     now = datetime.now(timezone.utc).strftime("%Y-%m-%d")
-    urls = [(SITE_URL + "/", now, "weekly", "1.0"),
-            (BLOG_URL, now, "daily", "0.9")]
+
+    def alt(hreflang, href):
+        return (f'<xhtml:link rel="alternate" hreflang="{esc(hreflang)}" '
+                f'href="{esc(href)}"/>')
+
+    # (loc, lastmod, changefreq, priority, alternates)
+    entries = [
+        (SITE_URL + "/", now, "weekly", "1.0", []),
+        (BLOG_URL, now, "daily", "0.9", []),
+    ]
     for e in posts:
         d = e["en"]["meta"]["date"]
-        urls.append((f"{BLOG_URL}{e['slug']}/", d, "monthly", "0.8"))
+        en_url = f"{BLOG_URL}{e['slug']}/"
         if "id" in e:
-            urls.append((f"{BLOG_URL}{e['slug']}/id/", d, "monthly", "0.7"))
+            id_url = f"{BLOG_URL}{e['slug']}/id/"
+            # one shared cluster, emitted on BOTH members -> reciprocal by construction
+            cluster = [alt("en", en_url), alt("id", id_url), alt("x-default", en_url)]
+            entries.append((en_url, d, "monthly", "0.8", cluster))
+            entries.append((id_url, d, "monthly", "0.7", cluster))
+        else:
+            entries.append((en_url, d, "monthly", "0.8",
+                            [alt("en", en_url), alt("x-default", en_url)]))
 
     body = "\n".join(
-        f"""  <url>
-    <loc>{esc(u)}</loc>
-    <lastmod>{esc(lm)}</lastmod>
-    <changefreq>{cf}</changefreq>
-    <priority>{pr}</priority>
-  </url>""" for u, lm, cf, pr in urls)
+        "  <url>\n"
+        f"    <loc>{esc(loc)}</loc>\n"
+        + "".join(f"    {a}\n" for a in alts)
+        + f"    <lastmod>{esc(lm)}</lastmod>\n"
+        + f"    <changefreq>{cf}</changefreq>\n"
+        + f"    <priority>{pr}</priority>\n"
+        "  </url>"
+        for loc, lm, cf, pr, alts in entries)
 
     xml = f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
@@ -444,7 +468,7 @@ def build_sitemap(posts):
 </urlset>
 """
     (REPO_DIR / "sitemap.xml").write_text(xml, encoding="utf-8")
-    return len(urls)
+    return len(entries)
 
 
 def build_robots():
