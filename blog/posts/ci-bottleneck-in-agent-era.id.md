@@ -61,4 +61,20 @@ Cache `node_modules` punya Linear makan waktu sekitar 28 detik buat di-restore. 
 
 Thread HN di bawah post Linear kebagi jadi dua kubu. Satu komentator, yieldcrv, bilang unit test secara umum udah jadi kosmetik yang nggembungin angka coverage, dan bikin poin yang layak direnungin: dia nggak lihat agent make test beda dari developer junior atau mid-level, karena manusia juga sebenarnya nggak rigorous-rigorous amat soal itu. Komentator lain, sz4kerto, bikin poin praktisi yang lebih tajam: review diam-diam bergeser dari review kode ke review test, karena di situlah sekarang letak klaim beneran soal correctness dari agent. Solomon Hykes, founder Docker, bilang build dan test harus dijadwalin sebagai satu sistem yang jalan bareng, bukan dua proses terpisah.
 
-Setelah jalanin fleet ini tiap hari, pandangan gue simpel: gate ketat di alur yang langsung nyangkut duit masuk, sekelompok kecil flow yang beneran bikin bisnis rusak kalau sampai gagal, dan biarin semua yang lain murah dan cepat. Test hasil agent yang hijau nggak otomatis berarti hal yang dia test itu beneran nyata. Agent bakal terus buka PR di kecepatan mereka sendiri, mau pipeline kamu siap atau enggak. Punya kita nggak siap. Kita baru sadar di minggu yang sama sebulan jatah menit GitHub Actions ludes dalam sembilan hari, dan fix yang beneran nempel itu nganggep runner starts dan kebijakan isolasi sebagai keputusan engineering yang direncanain dari awal. Bukan sekadar hiasan yang ditempel belakangan di atas checkmark hijau.
+Setelah jalanin fleet ini tiap hari, gue akhirnya punya satu prinsip sederhana:
+
+Gate ketat itu cuma perlu dipasang di flow yang benar-benar berhubungan langsung sama duit masuk, atau flow kecil yang kalau gagal bisa bikin bisnis berantakan. Sisanya? Bikin semurah dan secepat mungkin.
+
+Satu hal yang cukup cepat gue pelajari: test yang hijau dari agent bukan berarti apa yang dites itu otomatis benar di dunia nyata.
+
+Agent bakal terus bikin PR dengan speed mereka sendiri. Pipeline kita mau siap atau nggak, mereka tetap jalan.
+
+Dan ternyata pipeline kita nggak siap. 😅
+
+Kita baru sadar ketika jatah GitHub Actions untuk sebulan habis cuma dalam sembilan hari.
+
+Fix-nya ternyata bukan sekadar nambah check sampai semuanya hijau. Yang lebih penting adalah dari awal memperlakukan runner startup dan isolation policy sebagai bagian dari engineering design.
+
+Bukan sesuatu yang baru ditempel belakangan karena kita butuh lebih banyak checkmark hijau.
+
+Menurut gue, ini salah satu perbedaan penting ketika mulai menjalankan AI agent dalam skala fleet: masalahnya bukan cuma "apakah agent bisa menghasilkan code yang benar?", tapi juga "apakah sistem kita siap menghadapi seberapa cepat mereka bisa menghasilkan code?"
