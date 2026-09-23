@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Crawl-delay kept low: static site, no backend load.
+Crawl-delay: 1
+
+Sitemap: https://aditf.com/sitemap.xml
