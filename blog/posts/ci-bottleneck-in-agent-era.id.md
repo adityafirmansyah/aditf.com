@@ -81,6 +81,7 @@ Thread HN di bawah post Linear kebagi jadi dua kubu. Satu komentator, yieldcrv, 
 
 Komentator lain, sz4kerto, bikin poin praktisi yang lebih tajam: review diam-diam bergeser dari review kode ke review test, karena di situlah sekarang letak klaim beneran soal correctness dari agent. Solomon Hykes, founder Docker, bilang build dan test harus dijadwalin sebagai satu sistem yang jalan bareng, bukan dua proses terpisah.
 
+<!-- owner-prose:start -->
 Setelah jalanin fleet ini tiap hari, gue akhirnya punya satu prinsip sederhana:
 
 Gate ketat itu cuma perlu dipasang di flow yang benar-benar berhubungan langsung sama duit masuk, atau flow kecil yang kalau gagal bisa bikin bisnis berantakan. Sisanya? Bikin semurah dan secepat mungkin.
@@ -98,4 +99,4 @@ Fix-nya ternyata bukan sekadar nambah check sampai semuanya hijau. Yang lebih pe
 Bukan sesuatu yang baru ditempel belakangan karena kita butuh lebih banyak checkmark hijau.
 
 Menurut gue, ini salah satu perbedaan penting ketika mulai menjalankan AI agent dalam skala fleet: masalahnya bukan cuma "apakah agent bisa menghasilkan code yang benar?", tapi juga "apakah sistem kita siap menghadapi seberapa cepat mereka bisa menghasilkan code?"
-
+<!-- owner-prose:end -->
