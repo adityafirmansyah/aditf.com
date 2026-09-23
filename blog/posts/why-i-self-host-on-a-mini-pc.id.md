@@ -2,35 +2,37 @@
 title: Kenapa Gue Self-Host Semua di Mini PC
 slug: why-i-self-host-on-a-mini-pc
 date: 2026-09-22
-excerpt: Satu box Celeron RAM 14GB di pojok kamar — itu yang jalanin toko gue, agent AI, dan blog ini. Ini hitung-hitungannya kenapa tagihan cloud udah nggak masuk akal.
+excerpt: Toko online, agent AI, sampe blog yang lagi lo baca ini jalan semua di satu box Celeron RAM 14GB yang nangkring di pojok kamar. Ini itung-itungan kenapa tagihan cloud udah nggak masuk akal lagi buat gue.
 tags: self-hosting, infrastruktur, homelab
 ---
 
-## Tagihan cloud yang nggak pernah turun
+## Tagihan Cloud yang Nggak Ada Abisnya
 
-Kebanyakan side project mati dengan cara yang sama: idenya bertahan, tagihan bulanannya enggak. Satu VPS kecil emang murah, sampai lo butuh tiga, ditambah managed database, dan bucket object storage yang diam-diam membengkak.
+Side project itu jarang mati gara-gara idenya jelek. Yang bikin mati biasanya tagihan cloud yang makin lama makin ngelunjak: dari satu VPS kecil yang tadinya murah, terus kepaksa nambah jadi tiga, ditambah managed database, ditambah lagi bucket storage yang diam-diam ngegembung tiap bulan.
 
-Gue milih jalan sebaliknya. Satu box Intel Celeron J4105, RAM 14GB, SSD, dan koneksi Biznet fiber sekitar 280/160 Mbps. Harga belinya lebih murah dari satu tahun biaya cloud yang setara. Semua itu jalan di satu box, sampai sekarang.
+Makanya gue milih jalan yang beda. Modal cuma satu box: Intel Celeron J4105, RAM 14GB, SSD, plus koneksi Biznet fiber sekitar 280/160 Mbps. Harganya masih lebih murah dari biaya cloud setahun aja, dan sampai sekarang semua kerjaan gue jalan di situ.
 
-## Apa aja yang jalan di box itu
+## Isinya Apa Aja
 
-- Platform e-commerce (frontend Next.js, backend FastAPI, PostgreSQL, worker)
-- Sekumpulan gateway AI agent yang nulis kode, mereview PR, dan jalanin QA
-- Caddy sebagai reverse proxy buat semuanya, dengan TLS otomatis
-- Blog ini, HTML statis yang digenerate script Python terus di-push ke GitHub
+Nih, yang jalan di satu box itu:
 
-J4105 bukan prosesor kencang. Dan emang nggak perlu. Workload web di skala proyek pribadi itu I/O bound, dan kombinasi SSD plus RAM 14GB ternyata sanggup nanganin beban yang jauh lebih besar dari dugaan orang.
+- Platform e-commerce (frontend Next.js, backend FastAPI, database PostgreSQL, plus worker-workernya)
+- Sekumpulan gateway agent AI yang kerjaannya nulis kode, review PR, sampe jalanin QA
+- Satu Caddy buat reverse proxy semuanya, TLS-nya otomatis beres sendiri
+- Blog yang lagi lo baca ini, HTML statis digenerate script Python terus tinggal di-push ke GitHub
 
-## Trade-off yang jarang disebut orang
+Soal prosesor, J4105 emang bukan barang kencang. Tapi buat apa juga kenceng-kenceng? Workload proyek pribadi kayak gini kerjanya lebih banyak nunggu I/O, bukan mikir berat di CPU. SSD sama RAM 14GB aja udah cukup buat nutupinnya.
 
-Self-hosting itu nggak gratis. Lo sendiri yang jadi on-call engineer. Kalau ISP drop paket jam 2 pagi, nggak ada status page yang bisa disalahin. Mitigasi gue:
+## Ongkos yang Jarang Dibahas Orang
 
-1. **Systemd di mana-mana.** Semua service restart otomatis.
-2. **Backup offsite tiap malam.** Box-nya boleh mati; datanya enggak boleh.
-3. **VPS murah sebagai endpoint publik** buat workload yang sensitif latensi atau DNS.
+Nah, self-hosting itu ada harganya juga, cuma bukan dalam bentuk duit. Kalau ISP tiba-tiba drop koneksi jam 2 pagi, lo sendiri yang harus bangun benerin, nggak ada status page orang lain buat disalahin. Ini cara gue jaga-jaga:
 
-## Hitungannya
+1. **Systemd di semua service.** Kalau ada yang crash, langsung restart sendiri tanpa gue pencet apa-apa.
+2. **Backup ke luar box, tiap malam.** Box-nya boleh koit, datanya nggak boleh ikutan.
+3. **VPS murah sebagai endpoint publik** buat kerjaan yang sensitif soal latensi atau DNS.
 
-Empat tahun biaya cloud buat stack ini bakal ngelewatin harga hardware di tahun pertama. Break-even tercapai sekitar bulan kedelapan, termasuk satu kali ganti SSD yang mati.
+## Itung-Itungannya
 
-Kalau workload lo bursty dan toleran latensi (CI runner, agent, batch job, tool internal), mini PC bekas dengan koneksi fiber itu udah lebih dari cukup. Kalau lo butuh uptime 99,999% buat pelanggan, ya udah, bayar mahal ke cloud provider managed dan nggak usah pusing baca blog self-hosting kayak punya gue ini.
+Itung punya itung, biaya cloud buat stack sebesar ini dalam empat tahun bakal jauh ngelewatin harga hardware yang gue keluarin di tahun pertama. Break-even-nya kecapai sekitar bulan kedelapan, udah termasuk sekali ganti SSD yang tiba-tiba mati.
+
+Intinya gini: kalau workload lo sifatnya bursty dan nggak rewel soal latensi (semacam CI runner, agent, batch job, atau tool internal), mini PC bekas dengan koneksi fiber udah lebih dari cukup. Tapi kalau lo butuh uptime 99,999% buat pelanggan beneran, mendingan bayar mahal ke cloud provider managed aja, dan nggak usah pusing baca blog self-hosting kayak punya gue ini.
