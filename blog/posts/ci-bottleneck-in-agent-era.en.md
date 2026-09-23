@@ -6,13 +6,25 @@ excerpt: Coding agents made writing PRs nearly free, which means your pipeline i
 tags: ci-cd, ai-agents, developer-productivity, testing, github-actions
 ---
 
-Fourteen PRs sitting in the queue on a Tuesday morning, all from agents, none from a human who typed a single line. That's the Hermes fleet I run against dagango.com and a couple of client repos on a normal week. Coding and QA agents don't sleep, don't get tired of writing tests, and don't feel bad opening PR #15 while #12 is still running CI. The thing that broke first wasn't the codebase. It was the pipeline validating it.
+Fourteen PRs sitting in the queue on a Tuesday morning, all from agents, none from a human who typed a single line. That's the Hermes fleet I run against dagango.com and a couple of client repos on a normal week. Coding and QA agents don't sleep, don't get tired of writing tests, and don't feel bad opening PR #15 while #12 is still running CI.
 
-Linear posted about this exact problem on September 21st ("AI coding has made CI a bottleneck, so we reworked ours to keep up"), and it climbed past 230 points and 250-plus comments on Hacker News within a day. Every team running agents at scale seems to have hit the same wall around the same time. Linear's own product data tells the wider story: teams that connected a coding agent roughly tripled weekly PRs over two years, from 21 to 65, while AI moved from under one issue in a thousand to just under half of everything created in Linear. In their CI post specifically, they said internal test suites had nearly quadrupled since January. None of this is Linear-specific. It's what happens to any pipeline built for humans once your "junior developers" are agents running in parallel around the clock.
+The thing that broke first wasn't the codebase. It was the pipeline validating it.
+
+Linear posted about this exact problem on September 21st ("AI coding has made CI a bottleneck, so we reworked ours to keep up"). It climbed past 230 points and 250-plus comments on Hacker News within a day. Every team running agents at scale seems to have hit the same wall around the same time.
+
+Linear's own numbers show the shape of it:
+
+- Weekly PRs from teams running a coding agent roughly tripled over two years, from 21 to 65.
+- AI-authored issues went from under one in a thousand to just under half of everything created in Linear.
+- Internal test suites nearly quadrupled since January, according to their CI post.
+
+None of this is Linear-specific. It's what happens to any pipeline built for humans once your "junior developers" are agents running in parallel around the clock.
 
 ## The bottleneck moved from writing code to verifying it
 
-For years, the constraint in software delivery was authoring: writing the code, writing the tests, writing the PR description nobody reads. Agents collapsed that cost close to zero. CI capacity didn't collapse with it, because CI was sized for how fast humans produce PRs, and agents produce them at an entirely different pace. Linear held PR wait time around 5-6 minutes despite the test suite explosion, but only because they actively cut runner time per test roughly in half. Verification capacity is now something you have to engineer for, the same way you'd engineer for database load or API rate limits.
+For years, the constraint in software delivery was authoring: writing the code, writing the tests, writing the PR description nobody reads. Agents collapsed that cost close to zero. CI capacity didn't collapse with it, because CI was sized for how fast humans produce PRs, and agents produce them at an entirely different pace.
+
+Linear held PR wait time around 5-6 minutes despite the test suite explosion, but only because they actively cut runner time per test roughly in half. Verification capacity is now something you have to engineer for, the same way you'd engineer for database load or API rate limits.
 
 I felt this directly the week I turned three coding agents loose on the dagango.com repo. GitHub Actions minutes on our plan burned through a month's worth in nine days. The code quality wasn't the problem. The pipeline choking on job count was.
 
@@ -20,11 +32,13 @@ I felt this directly the week I turned three coding agents loose on the dagango.
 
 Linear's first lever cost them zero pipeline changes: swapping GitHub Actions for faster third-party runners made jobs 34% faster on average, with `tsc` type-checking dropping 52%. The workflow files themselves didn't change at all.
 
-For a small team or UMKM-budget setup, premium hosted runners get expensive fast once job count is exploding instead of shrinking, because per-minute billing punishes exactly the volume agents create. Self-hosted runners on commodity hardware change that math. Mine live on a homelab box I'd be embarrassed to mention in a hardware forum, and they still win on wall-clock time to first result, purely because there's no queue and no meter running against every job.
+For a small team or UMKM-budget setup, premium hosted runners get expensive fast once job count is exploding instead of shrinking, because per-minute billing punishes exactly the volume agents create. Self-hosted runners on commodity hardware change that math. Mine live on a homelab box I'd be embarrassed to mention in a hardware forum. They still win on wall-clock time to first result, purely because there's no queue and no meter running against every job.
 
 ## Count runner starts, not seconds
 
-Linear's second lesson: fix your critical path before you micro-optimize anything inside it. Capping git fetch depth took their slowest gate job from 94 seconds down to 20. Batching seven tiny checks into two jobs saved roughly 87,000 runner-minutes a month, 11.8% of their total CI spend. Neither change touched test logic. Both wins came from counting how many jobs ran, regardless of how long each one took.
+Linear's second lesson: fix your critical path before you micro-optimize anything inside it. Capping git fetch depth took their slowest gate job from 94 seconds down to 20. Batching seven tiny checks into two jobs saved roughly 87,000 runner-minutes a month, 11.8% of their total CI spend.
+
+Neither change touched test logic. Both wins came from counting how many jobs ran, regardless of how long each one took.
 
 ```yaml
 # Before: 7 jobs = 7x cold-start tax
@@ -45,20 +59,28 @@ jobs:
     run: pnpm test:unit
 ```
 
-Every job start carries fixed overhead (checkout, dependency restore, environment setup) before it runs a single assertion. Multiply that by agent-generated PR volume and it stops being a rounding error. On our own pipeline the shape was different, five jobs instead of Linear's seven, but the fix was identical: folding them into two cut our average PR gate time by almost a third without touching a single test.
+Every job start carries fixed overhead (checkout, dependency restore, environment setup) before it runs a single assertion. Multiply that by agent-generated PR volume and it stops being a rounding error. On our own pipeline the shape was different: five jobs instead of Linear's seven. But the fix was identical: folding them into two cut our average PR gate time by almost a third without touching a single test.
 
 ## Test isolation is now a cost center, and agents make it riskier
 
 Vitest's default per-file isolation rebuilds the module graph for every test file. Safe, and expensive at scale. Linear's `isolate: false` opt-in was their single biggest saving, around 17% of monthly CI cost, dropping their API shard runtime from 32.8 to 22 minutes. It's also the riskiest change on the list: turning off isolation means tests can leak state into each other if they're not written carefully.
 
-Your agents write most of your tests now, and they don't reliably know when a test needs isolation. A human who's been burned by shared mutable state writes defensive tests out of scar tissue. An agent optimizing for "make CI green" will happily write a test that passes in isolation and corrupts the next test's fixtures when isolation is off. Linear gated this with explicit opt-in comments and per-file teardown requirements: mark tests as isolation-safe one at a time, and review those markings like a security-sensitive diff. On our Next.js projects, that means pure-function unit tests with zero shared module state. Anything touching a database fixture or a mocked API client keeps isolation on, full stop.
+Your agents write most of your tests now, and they don't reliably know when a test needs isolation. A human who's been burned by shared mutable state writes defensive tests out of scar tissue. An agent optimizing for "make CI green" will happily write a test that passes in isolation and corrupts the next test's fixtures when isolation is off.
+
+Linear gated this with explicit opt-in comments and per-file teardown requirements: mark tests as isolation-safe one at a time, and review those markings like a security-sensitive diff. On our Next.js projects, that means pure-function unit tests with zero shared module state. Anything touching a database fixture or a mocked API client keeps isolation on, full stop.
 
 ## Don't cache what's cheaper to rebuild
 
-Linear's `node_modules` cache took about 28 seconds to restore. A filtered `pnpm install` took 7.5. They deleted the cache. Caching feels like a free win because it's the default advice everywhere, but it carries a restore cost that almost nobody benchmarks against the alternative. The lesson generalizes past node_modules: a cache is a bet that restore time beats rebuild time, and that bet doesn't always pay off.
+Linear's `node_modules` cache took about 28 seconds to restore. A filtered `pnpm install` took 7.5. They deleted the cache.
+
+Caching feels like a free win because it's the default advice everywhere, but it carries a restore cost that almost nobody benchmarks against the alternative. The lesson generalizes past node_modules: a cache is a bet that restore time beats rebuild time, and that bet doesn't always pay off.
 
 ## What should agent-era CI actually gate on?
 
-The HN thread under Linear's post split into two camps. One commenter, yieldcrv, argued that unit tests in general have become cosmetics that inflate coverage numbers, and made a point worth sitting with: he doesn't see agents using tests any differently than a junior or mid-level developer does, because humans weren't exactly rigorous about it either. Another, sz4kerto, made the sharper practitioner point: review has quietly shifted from reviewing the code to reviewing the tests, because that's where an agent's actual claims about correctness now live. Solomon Hykes, Docker's founder, argued build and test need to be scheduled as one system rather than run as two separate processes.
+The HN thread under Linear's post split into two camps. One commenter, yieldcrv, argued that unit tests in general have become cosmetics that inflate coverage numbers. He also made a point worth sitting with: he doesn't see agents using tests any differently than a junior or mid-level developer does, because humans weren't exactly rigorous about it either.
 
-Running this fleet daily, my read is simple: gate hard on the money path, the handful of flows that actually break your business if they break, and let everything else be cheap and fast. An agent-generated test that's green doesn't mean the thing it tests is real. The agents will keep opening PRs at whatever pace they run at, pipeline ready or not. Ours wasn't. We found out the same week a month of GitHub Actions minutes vanished in nine days, and the fix that actually stuck was treating runner starts and isolation policy as engineering decisions instead of an afterthought bolted onto a green checkmark.
+Another, sz4kerto, made the sharper practitioner point: review has quietly shifted from reviewing the code to reviewing the tests, because that's where an agent's actual claims about correctness now live. Solomon Hykes, Docker's founder, argued build and test need to be scheduled as one system rather than run as two separate processes.
+
+Running this fleet daily, my read is simple: gate hard on the money path, the handful of flows that actually break your business if they break, and let everything else be cheap and fast. An agent-generated test that's green doesn't mean the thing it tests is real. The agents will keep opening PRs at whatever pace they run at, pipeline ready or not. Ours wasn't.
+
+We found out the same week a month of GitHub Actions minutes vanished in nine days. The fix that actually stuck was treating runner starts and isolation policy as engineering decisions instead of an afterthought bolted onto a green checkmark.
