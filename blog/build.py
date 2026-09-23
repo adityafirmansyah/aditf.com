@@ -12,8 +12,16 @@ Output:
     blog/<slug>/index.html       EN post
     blog/<slug>/id/index.html    ID post (when .id.md exists)
     blog/rss.xml                 EN feed (last 20)
+    sitemap.xml                  every HTML URL (repo root, auto-regenerated)
+    robots.txt                   crawler rules + sitemap pointer (repo root)
+    blog/<slug>/og.png           social share card (when Pillow is available)
+
+SEO: every page carries canonical, Open Graph, twitter:card and JSON-LD.
+sitemap.xml/robots.txt are GENERATED, not hand-written — a hand-maintained
+sitemap goes stale the moment a post is added, so they are rebuilt on every run.
 """
 import html as h
+import json
 import re
 import sys
 from datetime import datetime, timezone
@@ -21,12 +29,45 @@ from pathlib import Path
 
 import markdown
 
+# Pillow is optional: without it the build still succeeds, it just skips the
+# social share cards. Never let an image dependency break publishing.
+try:
+    from PIL import Image, ImageDraw, ImageFont
+    HAVE_PIL = True
+except ImportError:  # bind the names so linters see them as always-defined
+    Image = ImageDraw = ImageFont = None
+    HAVE_PIL = False
+
 BLOG_DIR = Path(__file__).resolve().parent          # .../blog
 REPO_DIR = BLOG_DIR.parent                          # repo root
 POSTS_DIR = BLOG_DIR / "posts"
 SITE_URL = "https://aditf.com"
 BLOG_URL = SITE_URL + "/blog/"
 WORDS_PER_MIN = 200
+
+# --- site identity (used by Open Graph + JSON-LD) ---------------------------
+SITE_NAME = "Aditya Firmansyah"
+BLOG_NAME = "Field Notes"
+AUTHOR = "Aditya Firmansyah"
+AUTHOR_JOB = "Senior Software Engineer — Full-Stack Developer"
+AUTHOR_URL = SITE_URL + "/"
+SAME_AS = [
+    "https://github.com/adityafirmansyah",
+    "https://linkedin.com/in/aditya-firmansyah-21940845",
+]
+SITE_DESCRIPTION = ("Aditya Firmansyah — Senior Software Engineer & Full-Stack Developer. "
+                    "13+ years building logistics platforms, microservices, and cloud-native "
+                    "applications.")
+BLOG_DESCRIPTION = ("Practitioner notes on software engineering, AI agents, e-commerce, and "
+                    "self-hosting by Aditya Firmansyah.")
+
+# Waybill design tokens (mirrors styles.css :root)
+INK = "#14181B"
+INK_SOFT = "#1B2023"
+PAPER = "#EDE6D6"
+PAPER_DIM = "#9CA3A0"
+AMBER = "#E8871E"
+OG_W, OG_H = 1200, 630
 
 # ---------------------------------------------------------------- frontmatter
 
@@ -74,7 +115,73 @@ def esc(s):
     return h.escape(str(s), quote=True)
 
 
-def head(title, description, extra=""):
+def iso_date(iso):
+    """YYYY-MM-DD -> full ISO-8601 with UTC offset (required by JSON-LD/sitemap)."""
+    try:
+        return datetime.strptime(iso, "%Y-%m-%d").replace(tzinfo=timezone.utc).isoformat()
+    except (ValueError, TypeError):
+        return datetime.now(timezone.utc).isoformat()
+
+
+def og_block(title, description, url, image=None, locale="en_US",
+             og_type="website", site_name=None, published=None, author=None,
+             tags=None, jsonld=None):
+    """Open Graph + twitter:card + JSON-LD for one page."""
+    out = []
+    sn = site_name or f"{BLOG_NAME} — {SITE_NAME}"
+    out.append(f'<meta property="og:site_name" content="{esc(sn)}">')
+    out.append(f'<meta property="og:type" content="{esc(og_type)}">')
+    out.append(f'<meta property="og:title" content="{esc(title)}">')
+    out.append(f'<meta property="og:description" content="{esc(description)}">')
+    out.append(f'<meta property="og:url" content="{esc(url)}">')
+    out.append(f'<meta property="og:locale" content="{esc(locale)}">')
+    if image:
+        out.append(f'<meta property="og:image" content="{esc(image)}">')
+        out.append(f'<meta property="og:image:width" content="{OG_W}">')
+        out.append(f'<meta property="og:image:height" content="{OG_H}">')
+        out.append(f'<meta property="og:image:alt" content="{esc(title)}">')
+    # twitter — summary_large_image needs the card type set explicitly
+    out.append('<meta name="twitter:card" content="summary_large_image">')
+    out.append(f'<meta name="twitter:title" content="{esc(title)}">')
+    out.append(f'<meta name="twitter:description" content="{esc(description)}">')
+    if image:
+        out.append(f'<meta name="twitter:image" content="{esc(image)}">')
+    out.append(f'<meta name="author" content="{esc(author or AUTHOR)}">')
+    out.append('<meta name="theme-color" content="#14181B">')
+    if published:
+        out.append(f'<meta property="article:published_time" content="{esc(published)}">')
+    for t in (tags or []):
+        out.append(f'<meta property="article:tag" content="{esc(t)}">')
+    if jsonld:
+        out.append('<script type="application/ld+json">'
+                   + json.dumps(jsonld, ensure_ascii=False) + '</script>')
+    return "\n".join(out)
+
+
+def person_jsonld():
+    return {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": AUTHOR,
+        "jobTitle": AUTHOR_JOB,
+        "url": AUTHOR_URL,
+        "sameAs": SAME_AS,
+        "address": {"@type": "PostalAddress", "addressLocality": "Surakarta",
+                    "addressRegion": "Central Java", "addressCountry": "ID"},
+    }
+
+
+def head(title, description, extra="", url=None, image=None, locale="en_US",
+         og_type="website", published=None, tags=None, jsonld=None,
+         site_name=None):
+    """Build <head>. SEO tags are emitted only when `url` is supplied, so legacy
+    callers that omit it still produce valid pages."""
+    seo = ""
+    if url:
+        seo = og_block(title, description, url, image=image, locale=locale,
+                       og_type=og_type, site_name=site_name, published=published,
+                       tags=tags, jsonld=jsonld)
+        seo = "\n<link rel=\"canonical\" href=\"" + esc(url) + "\">\n" + seo
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -90,10 +197,12 @@ def head(title, description, extra=""):
 <link rel="stylesheet" href="/blog/blog.css">
 <link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="{BLOG_URL}rss.xml">
 <script>document.documentElement.classList.add('js');</script>
+{seo}
 {extra}
 </head>
 <body>
 """
+
 
 
 NAV = """<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
@@ -138,7 +247,7 @@ def reading_time(body):
 
 # ---------------------------------------------------------------------- pages
 
-def build_listing(posts):
+def build_listing(posts, og_url=None):
     cards = []
     for e in posts:
         meta = e["en"]["meta"]
@@ -163,8 +272,23 @@ def build_listing(posts):
       <span class="label-card__tape" aria-hidden="true"></span>
       <p>No shipments logged yet. Field notes are on their way.</p>
     </div>""")
-    page = head("Field Notes — Aditya Firmansyah",
-                "Practitioner notes on software engineering, AI agents, e-commerce, and self-hosting by Aditya Firmansyah.")
+    page = head(f"{BLOG_NAME} — {SITE_NAME}", BLOG_DESCRIPTION,
+                url=BLOG_URL, image=og_url,
+                locale="en_US", og_type="website", jsonld={
+                    "@context": "https://schema.org",
+                    "@type": "Blog",
+                    "name": f"{BLOG_NAME} — {SITE_NAME}",
+                    "description": BLOG_DESCRIPTION,
+                    "url": BLOG_URL,
+                    "inLanguage": ["en-US", "id-ID"],
+                    "publisher": {"@type": "Person", "name": AUTHOR, "url": AUTHOR_URL},
+                    "blogPost": [{
+                        "@type": "BlogPosting",
+                        "headline": e["en"]["meta"]["title"],
+                        "url": f"{BLOG_URL}{e['slug']}/",
+                        "datePublished": iso_date(e["en"]["meta"]["date"]),
+                    } for e in posts],
+                })
     page += NAV
     page += f"""<main id="top">
   <section class="section blog-hero">
@@ -194,28 +318,62 @@ def build_post(e, lang):
     meta, body = entry["meta"], entry["body"]
     slug = e["slug"]
     other = "id" if lang == "en" else "en"
-    lang_href = (f"/blog/{slug}/id/" if lang == "en"
-                 else f"/blog/{slug}/") if other in e or lang == "id" else None
-    if lang == "id" and "en" in e:
-        lang_href = f"/blog/{slug}/"
-    if lang == "en" and "id" not in e:
-        lang_href = None
+    has_other = other in e
+    # ABSOLUTE urls only: Google ignores hreflang/canonical with relative hrefs
+    # (the previous version emitted a relative EN alternate, so the pairing was
+    # silently broken).
     url = BLOG_URL + (f"{slug}/" if lang == "en" else f"{slug}/id/")
-    extra = [f'<link rel="canonical" href="{url}">']
-    if lang_href:
-        label = "Bahasa Indonesia" if lang == "en" else "English"
-        extra.append(f'<link rel="alternate" hreflang="{other if lang=="en" else "en"}" href="{lang_href}">')
-    extra.append(f'<link rel="alternate" hreflang="{lang}" href="{url}">')
-    title = f"{meta['title']} — Field Notes"
-    page = head(title, meta.get("excerpt", title), "\n".join(extra))
-    page += f'<html lang="{lang}"'  # placeholder replaced below
+    alt_url = BLOG_URL + (f"{slug}/id/" if lang == "en" else f"{slug}/")
+
+    extra = []
+    if has_other:
+        extra.append(f'<link rel="alternate" hreflang="{other}" href="{esc(alt_url)}">')
+    extra.append(f'<link rel="alternate" hreflang="{lang}" href="{esc(url)}">')
+    # x-default helps Google pick a version for unmatched locales
+    extra.append(f'<link rel="alternate" hreflang="x-default" href="{esc(BLOG_URL + slug + "/")}">')
+
+    title = f"{meta['title']} — {BLOG_NAME}"
+    description = meta.get("excerpt", title)
+    og_image = build_og_image(slug, meta["title"], fmt_date(meta["date"]), lang)
+    published = iso_date(meta["date"])
+
+    jsonld = {
+        "@context": "https://schema.org",
+        "@type": "BlogPosting",
+        "headline": meta["title"],
+        "description": description,
+        "datePublished": published,
+        "dateModified": published,
+        "inLanguage": "id-ID" if lang == "id" else "en-US",
+        "mainEntityOfPage": {"@type": "WebPage", "@id": url},
+        "keywords": ", ".join(meta["tags"]),
+        "author": {"@type": "Person", "name": AUTHOR, "url": AUTHOR_URL,
+                   "jobTitle": AUTHOR_JOB},
+        "publisher": {"@type": "Person", "name": AUTHOR, "url": AUTHOR_URL},
+        "articleSection": "Software Engineering",
+        "wordCount": len(re.findall(r"\S+", body)),
+    }
+    if og_image:
+        jsonld["image"] = [og_image]
+    if has_other:
+        # schema.org hasTranslation makes the bilingual pairing machine-readable
+        jsonld["hasTranslation"] = {
+            "@type": "BlogPosting", "url": alt_url,
+            "inLanguage": "id-ID" if lang == "en" else "en-US"}
+
+    page = head(title, description, "\n".join(extra), url=url, image=og_image,
+                locale="id_ID" if lang == "id" else "en_US", og_type="article",
+                published=published, tags=meta["tags"], jsonld=jsonld,
+                site_name=f"{BLOG_NAME} — {SITE_NAME}")
+    # set the lang attribute correctly on the real <html> element (the previous
+    # implementation appended a stray '<html lang="id"' fragment into <body>)
     page = page.replace('<html lang="en">', f'<html lang="{lang}">', 1)
     page += NAV
     tags = "".join(f"<span>{esc(t)}</span>" for t in meta["tags"])
     switch = ""
-    if lang_href:
+    if has_other:
         label = "Baca dalam Bahasa Indonesia" if lang == "en" else "Read in English"
-        switch = f'<a class="btn btn--ghost post-lang-switch" href="{lang_href}">{label}</a>'
+        switch = f'<a class="btn btn--ghost post-lang-switch" href="{alt_url}">{label}</a>'
     body_html = markdown.markdown(
         body, extensions=["fenced_code", "tables", "sane_lists", "attr_list"])
     page += f"""<main id="top">
@@ -243,6 +401,146 @@ def build_post(e, lang):
     out = BLOG_DIR / slug / ("index.html" if lang == "en" else "id/index.html")
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(page, encoding="utf-8")
+
+
+
+def build_sitemap(posts):
+    """Generate sitemap.xml at repo root covering every HTML URL.
+
+    Regenerated on every build so it can never go stale when the daily pipeline
+    adds a post. Uses lastmod from the post date (or now for the index pages).
+    """
+    now = datetime.now(timezone.utc).strftime("%Y-%m-%d")
+    urls = [(SITE_URL + "/", now, "weekly", "1.0"),
+            (BLOG_URL, now, "daily", "0.9")]
+    for e in posts:
+        d = e["en"]["meta"]["date"]
+        urls.append((f"{BLOG_URL}{e['slug']}/", d, "monthly", "0.8"))
+        if "id" in e:
+            urls.append((f"{BLOG_URL}{e['slug']}/id/", d, "monthly", "0.7"))
+
+    body = "\n".join(
+        f"""  <url>
+    <loc>{esc(u)}</loc>
+    <lastmod>{esc(lm)}</lastmod>
+    <changefreq>{cf}</changefreq>
+    <priority>{pr}</priority>
+  </url>""" for u, lm, cf, pr in urls)
+
+    xml = f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xhtml="http://www.w3.org/1999/xhtml">
+{body}
+</urlset>
+"""
+    (REPO_DIR / "sitemap.xml").write_text(xml, encoding="utf-8")
+    return len(urls)
+
+
+def build_robots():
+    """robots.txt at repo root: allow everything, point at the sitemap."""
+    txt = f"""User-agent: *
+Allow: /
+
+# Crawl-delay kept low: static site, no backend load.
+Crawl-delay: 1
+
+Sitemap: {SITE_URL}/sitemap.xml
+"""
+    (REPO_DIR / "robots.txt").write_text(txt, encoding="utf-8")
+
+
+FONT_CANDIDATES = [
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf",
+    "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf",
+    "/usr/share/fonts/truetype/liberation/LiberationSans-Regular.ttf",
+]
+
+
+def _font(size):
+    for path in FONT_CANDIDATES:
+        if Path(path).exists():
+            try:
+                return ImageFont.truetype(path, size)
+            except Exception:
+                continue
+    return ImageFont.load_default()
+
+
+def _wrap(draw, text, font, max_w):
+    """Greedy word wrap to a pixel width."""
+    words, lines, cur = text.split(), [], ""
+    for w in words:
+        trial = (cur + " " + w).strip()
+        if draw.textlength(trial, font=font) <= max_w or not cur:
+            cur = trial
+        else:
+            lines.append(cur)
+            cur = w
+    if cur:
+        lines.append(cur)
+    return lines
+
+
+def build_og_image(slug, title, date_str, lang):
+    """Render a 1200x630 waybill-style share card. Returns the public URL or None.
+
+    Text-only (no photo) — matches the site's design language. Skipped silently
+    when Pillow is unavailable so publishing never depends on it.
+    """
+    if not HAVE_PIL:
+        return None
+    out_dir = BLOG_DIR / slug
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out = out_dir / f"og.{lang}.png"
+
+    img = Image.new("RGB", (OG_W, OG_H), INK)
+    d = ImageDraw.Draw(img)
+
+    # left amber rule + waybill band
+    d.rectangle([0, 0, 10, OG_H], fill=AMBER)
+    d.rectangle([60, 58, OG_W - 60, 112], outline="#2B3236", width=2)
+    d.rectangle([60, 58, 64, 112], fill=AMBER)
+
+    eyebrow = f"FIELD NOTES  ·  {date_str}  ·  {'EN' if lang == 'en' else 'ID'}"
+    d.text((84, 74), eyebrow, font=_font(24), fill=PAPER_DIM)
+
+    # title, wrapped
+    tf = _font(64)
+    lines = _wrap(d, title, tf, OG_W - 150)[:4]
+    y = 170
+    for ln in lines:
+        d.text((64, y), ln, font=tf, fill=PAPER)
+        y += 78
+
+    # author block pinned near the bottom
+    d.text((64, OG_H - 130), AUTHOR, font=_font(34), fill=AMBER)
+    d.text((64, OG_H - 84), AUTHOR_JOB, font=_font(24), fill=PAPER_DIM)
+    d.text((64, OG_H - 50), SITE_URL, font=_font(22), fill="#5A6469")
+
+    img.save(out, "PNG", optimize=True)
+    return f"{SITE_URL}/blog/{slug}/og.{lang}.png"
+
+
+def build_blog_og_image():
+    """Share card for the /blog/ listing itself. Returns public URL or None."""
+    if not HAVE_PIL:
+        return None
+    out = BLOG_DIR / "og.png"
+    img = Image.new("RGB", (OG_W, OG_H), INK)
+    d = ImageDraw.Draw(img)
+    d.rectangle([0, 0, 10, OG_H], fill=AMBER)
+    d.rectangle([60, 58, OG_W - 60, 112], outline="#2B3236", width=2)
+    d.rectangle([60, 58, 64, 112], fill=AMBER)
+    d.text((84, 74), "CARGO LOG  ·  ADITF.COM", font=_font(24), fill=PAPER_DIM)
+    d.text((64, 180), "Field Notes", font=_font(96), fill=PAPER)
+    for i, ln in enumerate(_wrap(d, BLOG_DESCRIPTION, _font(34), OG_W - 160)[:3]):
+        d.text((64, 300 + i * 46), ln, font=_font(34), fill=PAPER_DIM)
+    d.text((64, OG_H - 130), AUTHOR, font=_font(34), fill=AMBER)
+    d.text((64, OG_H - 84), AUTHOR_JOB, font=_font(24), fill=PAPER_DIM)
+    d.text((64, OG_H - 50), SITE_URL, font=_font(22), fill="#5A6469")
+    img.save(out, "PNG", optimize=True)
+    return f"{SITE_URL}/blog/og.png"
 
 
 def build_rss(posts):
@@ -277,14 +575,22 @@ def build_rss(posts):
 def main():
     POSTS_DIR.mkdir(parents=True, exist_ok=True)
     posts = load_posts()
-    build_listing(posts)
+    blog_og = build_blog_og_image()
+    build_listing(posts, og_url=blog_og)
     for e in posts:
         build_post(e, "en")
         if "id" in e:
             build_post(e, "id")
     build_rss(posts)
+    n_urls = build_sitemap(posts)
+    build_robots()
     print(f"built: listing + {len(posts)} post(s) "
-          f"({sum(1 for e in posts if 'id' in e)} bilingual), rss.xml")
+          f"({sum(1 for e in posts if 'id' in e)} bilingual), rss.xml, "
+          f"sitemap.xml ({n_urls} URLs), robots.txt, "
+          f"og images={'yes' if (HAVE_PIL and blog_og) else 'skipped (no Pillow)'}")
+    if not HAVE_PIL:
+        print("  note: Pillow unavailable — social share cards skipped; "
+              "pages still carry all other SEO tags.", file=sys.stderr)
 
 
 if __name__ == "__main__":
