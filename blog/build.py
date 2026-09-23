@@ -84,7 +84,17 @@ def parse_frontmatter(text):
                 meta[k.strip().lower()] = v.strip()
     tags = [t.strip() for t in meta.get("tags", "").split(",") if t.strip()]
     meta["tags"] = tags
-    return meta, body
+    return meta, strip_owner_markers(body)
+
+
+# Owner-authored prose is marked in the markdown source so fmt_check.py and the
+# auditor can exempt it from the formatting limits. The markers are an authoring
+# aid only — strip them before rendering so they never reach published HTML.
+def strip_owner_markers(body):
+    body = body.replace("<!-- owner-prose:start -->", "")
+    body = body.replace("<!-- owner-prose:end -->", "")
+    # collapse any blank-line pair the markers left behind
+    return re.sub(r"\n{3,}", "\n\n", body)
 
 
 def load_posts():
