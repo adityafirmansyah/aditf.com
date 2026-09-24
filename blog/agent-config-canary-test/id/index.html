@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Config Agent Lo Gagal Diam-Diam? Ini Cara Ngeceknya — Field Notes</title>
+<meta name="description" content="Claude Code sempat ngeload AGENTS.md cuma kalau telemetry nyala, gara-gara digantung ke remote flag. Ini tes lima detik yang bisa nangkep bug sejenis di setup agent apapun.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/agent-config-canary-test/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Config Agent Lo Gagal Diam-Diam? Ini Cara Ngeceknya — Field Notes">
+<meta property="og:description" content="Claude Code sempat ngeload AGENTS.md cuma kalau telemetry nyala, gara-gara digantung ke remote flag. Ini tes lima detik yang bisa nangkep bug sejenis di setup agent apapun.">
+<meta property="og:url" content="https://aditf.com/blog/agent-config-canary-test/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/agent-config-canary-test/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Config Agent Lo Gagal Diam-Diam? Ini Cara Ngeceknya — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Config Agent Lo Gagal Diam-Diam? Ini Cara Ngeceknya — Field Notes">
+<meta name="twitter:description" content="Claude Code sempat ngeload AGENTS.md cuma kalau telemetry nyala, gara-gara digantung ke remote flag. Ini tes lima detik yang bisa nangkep bug sejenis di setup agent apapun.">
+<meta name="twitter:image" content="https://aditf.com/blog/agent-config-canary-test/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-09-24T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="claude-code">
+<meta property="article:tag" content="developer-tooling">
+<meta property="article:tag" content="debugging">
+<meta property="article:tag" content="llm-workflows">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Config Agent Lo Gagal Diam-Diam? Ini Cara Ngeceknya", "description": "Claude Code sempat ngeload AGENTS.md cuma kalau telemetry nyala, gara-gara digantung ke remote flag. Ini tes lima detik yang bisa nangkep bug sejenis di setup agent apapun.", "datePublished": "2026-09-24T00:00:00+00:00", "dateModified": "2026-09-24T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/agent-config-canary-test/id/"}, "keywords": "ai-agents, claude-code, developer-tooling, debugging, llm-workflows", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 988, "image": ["https://aditf.com/blog/agent-config-canary-test/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/agent-config-canary-test/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/agent-config-canary-test/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/agent-config-canary-test/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/agent-config-canary-test/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>24 Sep 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Config Agent Lo Gagal Diam-Diam? Ini Cara Ngeceknya</h1>
+    <div class="post__tags"><span>ai-agents</span><span>claude-code</span><span>developer-tooling</span><span>debugging</span><span>llm-workflows</span></div>
+    <div class="post__content reveal is-visible">
+<p>Bayangin ada file markdown di repo lo, tapi agent coding lo jalan lewat gitu aja. Nggak ada error. Nggak ada warning juga. Output-nya cuma jadi lebih bodoh dari yang seharusnya, tanpa lo sadar kenapa.</p>
+<p>Ini yang kejadian ke sebagian user Claude Code begitu mereka matiin telemetry. Bug ini nongol di Hacker News tanggal 23 September dan dalam sehari udah tembus 466 poin dan 267 komentar. Penyebabnya? Konyol banget kalau dipikir: baca file lokal doang, tapi digantung ke remote flag yang user telemetry-off nggak bakal pernah bisa akses.</p>
+<h2>Yang Sebenarnya Rusak</h2>
+<p>Claude Code versi 2.1.277 ngeluarin dukungan AGENTS.md lewat built-in plugin. Plugin ini defaultnya mati (<code>isOnByDefault = false</code>), dan buat nyalain dia harus cek dulu satu remote flag namanya <code>tengu_agents_md_mod</code>. Kalau flag itu gagal diambil, fallback-nya ke <code>false</code>.</p>
+<p>Padahal baca file markdown dari folder kerja itu nggak butuh internet sama sekali. Tapi izin buat baca file-nya malah digantung ke sesuatu yang butuh internet.</p>
+<p>Kalau telemetry mati, request buat ambil flag itu nggak pernah jalan, fallback-nya nyala, dan AGENTS.md nggak pernah kebaca. Diam-diam. Di setiap sesi.</p>
+<p>Bagian paling nyebelinnya, cara-cara yang keliatan logis buat benerin ini malah nggak ngefek:</p>
+<ul>
+<li><code>CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1</code> bikin flag-nya gagal diambil.</li>
+<li><code>DISABLE_TELEMETRY=1</code> juga sama, bikin gagal.</li>
+<li>Nyetel salah satu variabel itu ke <code>0</code> <strong>nggak nolong</strong>, soalnya cara Claude Code baca env-var itu nganggep asal ada nilai berarti "aktif", nggak peduli isinya <code>true</code> atau <code>false</code>.</li>
+<li>Nambahin config di <code>.claude/settings.json</code> buat clear dua variabel itu juga nggak ngefek apa-apa. Nggak ada opsi opt-in per-repo.</li>
+</ul>
+<p>Satu-satunya yang beneran jalan itu override level-session lewat <code>claude --settings '{"env":{...}}'</code>, dan itu pun baru ngefek mulai sesi kedua, karena sesi pertama itu yang justru ngambil flag-nya. Third-party gateway kayak Bedrock sama Vertex juga kena masalah yang sama, karena remote flag-nya tetap nggak bisa resolve jadi <code>true</code> lewat jalur manapun.</p>
+<h2>Ngakunya Cepet, Fix-nya Juga Cepet</h2>
+<p>Yang menarik, kecepatan orang ngaku salah di sini justru ngalahin kecepatan bug-nya nyebar. Issue di GitHub-nya baru dibuat tiga hari sebelum post HN ini muncul, lengkap sama data pengukuran dari penulisnya sendiri. Terus ada engineer Anthropic, <code>mpoteat</code>, langsung nongol di thread dan ngaku: "ini murni kesalahan manusia dari pihak gue."</p>
+<p>Ternyata mekanismenya itu kill-switch buat rollout darurat, yang harusnya bisa dimatiin dari jarak jauh kalau ada masalah. Masalahnya, user yang telemetry-nya mati justru nggak akan pernah bisa nerima sinyal itu.</p>
+<p>Fix-nya keluar di versi 2.1.281, di hari yang sama. Ngaku salah secara terbuka, pakai nama, dan langsung fix di hari yang sama itu bagian dari cerita ini yang sama pentingnya sama bug-nya sendiri.</p>
+<h2>Tes Canary yang Bisa Lo Coba Sekarang</h2>
+<p>Hal paling berguna dari kejadian ini bukan bug-nya, tapi cara si penulis buktiinnya. Caranya: taruh satu kata unik di file instruksi lo, terus suruh agent-nya nyebutin kata itu, sambil dilarang keras baca file buat nyari jawabannya.</p>
+<pre><code>echo 'The canary word is PERIWINKLE.' &gt; AGENTS.md
+</code></pre>
+<p>Abis itu, di sesi baru, tanya ke agent lo: "Kata canary-nya apa? Jawab NONE kalau nggak ada." Lakuin dua kali. Soalnya sesi pertama biasanya yang justru ngambil flag atau nge-refresh cache, jadi tes yang beneran valid itu di sesi kedua.</p>
+<p>Pola ini bisa lo pake ke mana-mana, bukan cuma buat AGENTS.md. Tiap permukaan instruksi di setup multi-agent lo layak dicek pake cara yang sama:</p>
+<ul>
+<li>Hermes skill yang bisa aja ke-prune dari context.</li>
+<li>File CLAUDE.md atau AGENTS.md yang diam-diam gagal keload.</li>
+<li>System prompt yang bisa aja kepotong atau ketuker.</li>
+<li>Config MCP yang nunjuk ke server yang sebenarnya nggak pernah nyambung.</li>
+</ul>
+<p>Intinya, "file-nya ada" itu bukan bukti kalau "agent-nya nerima file itu." Dua klaim itu beda, dan jarak antara keduanya itu persis tempat bug ini ngumpet, entah berapa sesi lamanya sampai ketahuan.</p>
+<h2>Solusi Kalau Lo Gabungin Beberapa Tool Sekaligus</h2>
+<p>Kalau lo pakai Claude Code sama Codex di repo yang sama, import pakai <code>@path</code> itu nggak kena gate yang sama, jadi ini jalan pintasnya:</p>
+<pre><code>echo '@AGENTS.md' &gt; CLAUDE.md
+</code></pre>
+<p>Konsekuensinya, lo balik lagi butuh file per-tool, padahal AGENTS.md tadinya justru dibikin buat nyingkirin itu. Tapi setidaknya cara ini beneran jalan, di saat plugin bawaannya nggak.</p>
+<p>Masalah serupa juga ada di shared skills. Codex baca folder <code>.agents/skills</code> secara native, tapi Claude Code versi 2.1.280 cuma ngenalin path itu lewat perintah <code>/import</code>, yang justru nge-copy file-nya, bukan nge-link. Begitu ada perubahan di salah satu sisi, copy-nya langsung ketinggalan zaman.</p>
+<p>Solusi dari penulisnya: bikin symlink, <code>.claude/skills</code> diarahin ke <code>../.agents/skills</code>, biar dua tool itu baca file yang sama persis di disk, nggak perlu maintain dua versi yang lama-lama beda sendiri. Ada komentator HN, <code>vorticalbox</code>, yang ngelaporin masalah duplikasi yang sama persis antara Cursor sama Claude, jadi ini bukan masalah satu tool doang.</p>
+<h2>Kalau Lo Jalanin Fleet, Bukan Cuma Satu CLI</h2>
+<p>Ada dua komentar HN yang ngerangkum pelajaran desainnya lebih jelas dari yang bisa gue jelasin sendiri:</p>
+<ul>
+<li><code>mgaldys4</code> bilang, baca file lokal itu seharusnya nggak pernah tergantung ke remote flag, dan diam-diam skip tanpa warning itu jauh lebih parah.</li>
+<li><code>nfRfqX5n</code> nambahin observasi yang lebih tajam: orang aja sampe nggak bisa mastiin ini bug atau emang disengaja.</li>
+</ul>
+<p>Ketidakjelasan kayak gitu justru jadi masalah tersendiri, karena sistem yang didesain dengan baik nggak seharusnya ninggalin pertanyaan kayak gitu menggantung.</p>
+<p>Kalau lo lagi bangun atau ngejalanin harness agent apapun, aturan mainnya sebenarnya simpel:</p>
+<ol>
+<li>Gate hal yang sifatnya remote di remote. Gate hal yang sifatnya lokal di lokal. Jangan dicampur.</li>
+<li>Kalau terpaksa skip loading sesuatu, kasih warning. Skip diam-diam itu penyebab bug ini bisa lolos beberapa rilis tanpa ketahuan.</li>
+<li>Version-pin harness lo. Perubahan behavior yang diam-diam pas upgrade itu jauh lebih bahaya dibanding gagal keras pas install.</li>
+</ol>
+<p>Gue sendiri jalanin fleet Hermes multi-agent buat coding, QA, sama PR review lewat provider custom. Kejadian ini jadi pengingat langsung buat gue: cek ulang delivery instruksi di CI, jangan cuma asumsi kalau file config-nya udah ke-commit berarti udah kebaca beneran.</p>
+<p>"Agent-nya kelakuannya aneh" itu pertanyaan soal delivery config duluan, baru soal model. Coba jalanin tes canary ini di setup lo minggu ini. Waktunya lebih singkat dibanding baca tulisan ini sampai selesai.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/agent-config-canary-test/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

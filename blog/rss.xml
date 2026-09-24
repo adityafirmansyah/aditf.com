@@ -7,6 +7,14 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Your Agent&#x27;s Config Silently Failed: The Canary Test That Catches It</title>
+      <link>https://aditf.com/blog/agent-config-canary-test/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/agent-config-canary-test/</guid>
+      <pubDate>Thu, 24 Sep 2026 00:00:00 +0000</pubDate>
+      <description>Claude Code shipped AGENTS.md support gated behind a remote flag, so telemetry-off users got silent failures. Here&#x27;s the five-second test that catches this class of bug in any agent setup.</description>
+      <enclosure url="" length="0" type="text/html"/>
+    </item>
+    <item>
       <title>Self-Hosting Behind CGNAT: A WireGuard Bridge That Actually Works</title>
       <link>https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/</link>
       <guid isPermaLink="true">https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/</guid>
