@@ -32,7 +32,7 @@
 <meta name="twitter:image" content="https://aditf.com/blog/og.png">
 <meta name="author" content="Aditya Firmansyah">
 <meta name="theme-color" content="#14181B">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Blog", "name": "Field Notes — Aditya Firmansyah", "description": "Practitioner notes on software engineering, AI agents, e-commerce, and self-hosting by Aditya Firmansyah.", "url": "https://aditf.com/blog/", "inLanguage": ["en-US", "id-ID"], "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "blogPost": [{"@type": "BlogPosting", "headline": "Your Agent's Config Silently Failed: The Canary Test That Catches It", "url": "https://aditf.com/blog/agent-config-canary-test/", "datePublished": "2026-09-24T00:00:00+00:00"}, {"@type": "BlogPosting", "headline": "Self-Hosting Behind CGNAT: A WireGuard Bridge That Actually Works", "url": "https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/", "datePublished": "2026-09-23T00:00:00+00:00"}, {"@type": "BlogPosting", "headline": "AI Agents Flooded Our PR Queue: Fixing CI Before It Breaks", "url": "https://aditf.com/blog/ci-bottleneck-in-agent-era/", "datePublished": "2026-09-22T00:00:00+00:00"}, {"@type": "BlogPosting", "headline": "Why I Self-Host Everything on a Mini PC", "url": "https://aditf.com/blog/why-i-self-host-on-a-mini-pc/", "datePublished": "2026-09-22T00:00:00+00:00"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Blog", "name": "Field Notes — Aditya Firmansyah", "description": "Practitioner notes on software engineering, AI agents, e-commerce, and self-hosting by Aditya Firmansyah.", "url": "https://aditf.com/blog/", "inLanguage": ["en-US", "id-ID"], "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "blogPost": [{"@type": "BlogPosting", "headline": "Why Your Postgres LIKE Query Silently Seq Scans (And the One-Line Fix)", "url": "https://aditf.com/blog/postgres-like-queries-seq-scan-fix/", "datePublished": "2026-09-25T00:00:00+00:00"}, {"@type": "BlogPosting", "headline": "Your Agent's Config Silently Failed: The Canary Test That Catches It", "url": "https://aditf.com/blog/agent-config-canary-test/", "datePublished": "2026-09-24T00:00:00+00:00"}, {"@type": "BlogPosting", "headline": "Self-Hosting Behind CGNAT: A WireGuard Bridge That Actually Works", "url": "https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/", "datePublished": "2026-09-23T00:00:00+00:00"}, {"@type": "BlogPosting", "headline": "AI Agents Flooded Our PR Queue: Fixing CI Before It Breaks", "url": "https://aditf.com/blog/ci-bottleneck-in-agent-era/", "datePublished": "2026-09-22T00:00:00+00:00"}, {"@type": "BlogPosting", "headline": "Why I Self-Host Everything on a Mini PC", "url": "https://aditf.com/blog/why-i-self-host-on-a-mini-pc/", "datePublished": "2026-09-22T00:00:00+00:00"}]}</script>
 
 </head>
 <body>
@@ -64,6 +64,18 @@
       <p>Practitioner notes from 13+ years of shipping software &mdash; logistics platforms, e-commerce, AI agents, and the self-hosted infrastructure underneath. English and Bahasa Indonesia.</p>
     </div>
     <div class="post-list">
+    <a class="post-card reveal" href="/blog/postgres-like-queries-seq-scan-fix/">
+      <div class="post-card__date">
+        <span class="post-card__day">25 Sep 2026</span>
+        <span class="post-card__rt">4 min read</span>
+      </div>
+      <div class="post-card__body">
+        <h3>Why Your Postgres LIKE Query Silently Seq Scans (And the One-Line Fix) <span class="post-card__lang" title="Bahasa Indonesia version available">ID</span></h3>
+        <p>On a default en_US.UTF-8 Postgres, a UNIQUE (tenant_id, slug) index cannot serve LIKE &#x27;prefix%&#x27; queries. Here are the benchmark numbers at 20,000 rows and the varchar_pattern_ops index that fixes it.</p>
+        <div class="post-card__tags"><span>postgresql</span><span>database</span><span>backend</span><span>performance</span><span>optimization</span></div>
+      </div>
+      <span class="post-card__go" aria-hidden="true">&rarr;</span>
+    </a>
     <a class="post-card reveal" href="/blog/agent-config-canary-test/">
       <div class="post-card__date">
         <span class="post-card__day">24 Sep 2026</span>

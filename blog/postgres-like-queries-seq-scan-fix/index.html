@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why Your Postgres LIKE Query Silently Seq Scans (And the One-Line Fix) — Field Notes</title>
+<meta name="description" content="On a default en_US.UTF-8 Postgres, a UNIQUE (tenant_id, slug) index cannot serve LIKE &#x27;prefix%&#x27; queries. Here are the benchmark numbers at 20,000 rows and the varchar_pattern_ops index that fixes it.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Why Your Postgres LIKE Query Silently Seq Scans (And the One-Line Fix) — Field Notes">
+<meta property="og:description" content="On a default en_US.UTF-8 Postgres, a UNIQUE (tenant_id, slug) index cannot serve LIKE &#x27;prefix%&#x27; queries. Here are the benchmark numbers at 20,000 rows and the varchar_pattern_ops index that fixes it.">
+<meta property="og:url" content="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Why Your Postgres LIKE Query Silently Seq Scans (And the One-Line Fix) — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Why Your Postgres LIKE Query Silently Seq Scans (And the One-Line Fix) — Field Notes">
+<meta name="twitter:description" content="On a default en_US.UTF-8 Postgres, a UNIQUE (tenant_id, slug) index cannot serve LIKE &#x27;prefix%&#x27; queries. Here are the benchmark numbers at 20,000 rows and the varchar_pattern_ops index that fixes it.">
+<meta name="twitter:image" content="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-09-25T00:00:00+00:00">
+<meta property="article:tag" content="postgresql">
+<meta property="article:tag" content="database">
+<meta property="article:tag" content="backend">
+<meta property="article:tag" content="performance">
+<meta property="article:tag" content="optimization">
+<meta property="article:tag" content="sql">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Why Your Postgres LIKE Query Silently Seq Scans (And the One-Line Fix)", "description": "On a default en_US.UTF-8 Postgres, a UNIQUE (tenant_id, slug) index cannot serve LIKE 'prefix%' queries. Here are the benchmark numbers at 20,000 rows and the varchar_pattern_ops index that fixes it.", "datePublished": "2026-09-25T00:00:00+00:00", "dateModified": "2026-09-25T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/postgres-like-queries-seq-scan-fix/"}, "keywords": "postgresql, database, backend, performance, optimization, sql", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 900, "image": ["https://aditf.com/blog/postgres-like-queries-seq-scan-fix/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/postgres-like-queries-seq-scan-fix/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>25 Sep 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">4 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Why Your Postgres LIKE Query Silently Seq Scans (And the One-Line Fix)</h1>
+    <div class="post__tags"><span>postgresql</span><span>database</span><span>backend</span><span>performance</span><span>optimization</span><span>sql</span></div>
+    <div class="post__content reveal is-visible">
+<p>You created a <code>UNIQUE (tenant_id, slug)</code> index and assumed <code>WHERE slug LIKE 'kaos%'</code> would use it. On a stock Ubuntu Postgres, you assumed wrong.</p>
+<p>Here is the trap. Your query is fast in dev. Your SQLite-backed unit tests pass in microseconds. Then the production catalog crosses ten thousand rows, and every slug lookup quietly becomes a full table scan.</p>
+<p>I hit this when building readable product slugs for a multi-tenant e-commerce platform. The collision check ran a prefix query, and it looked instant locally. On a real Postgres 18.6 database with 20,000 products for one tenant, it did this instead:</p>
+<pre><code>Seq Scan on products
+  Filter: tenant_id = 1 AND slug ~~ 'kaos%'
+  Rows Removed by Filter: 22000
+  Buffers: shared hit=256
+  Execution Time: 4.52 ms
+</code></pre>
+<p>Every row, every request. The index existed. Postgres simply refused to use it.</p>
+<h2>The Index Was Never Eligible</h2>
+<p>The reason is collation, and it is not a Postgres bug.</p>
+<p>A standard B-tree index on a <code>text</code> or <code>varchar</code> column is built using the database's collation. On most Linux distributions the default is <code>en_US.UTF-8</code>, a linguistic collation. It sorts by language rules, not by raw bytes.</p>
+<p><code>LIKE</code>, meanwhile, is strictly byte-based matching. Postgres cannot use an index whose ordering is linguistic to answer a question about byte ranges, so it falls back to a full scan.</p>
+<ul>
+<li>In linguistic collation, case and accented characters interleave by cultural convention, so byte order and index order diverge.</li>
+<li><code>LIKE 'prefix%'</code> needs a contiguous byte range to work as an index scan.</li>
+<li>Once the index order is not byte order, no range guarantee exists, and the planner gives up on the index.</li>
+</ul>
+<p>The fix is to give Postgres a byte-ordered index for that column specifically. You are telling it: for this column, sort by raw bytes, so prefix ranges line up.</p>
+<h2>The Fix Is One Line</h2>
+<p>Postgres ships an operator class built for exactly this: <code>varchar_pattern_ops</code>.</p>
+<pre><code class="language-sql">CREATE INDEX idx_products_tenant_slug_prefix
+  ON products (tenant_id, slug varchar_pattern_ops);
+</code></pre>
+<p>This is not a replacement for your unique constraint. It is an additional index, and the plan changes immediately:</p>
+<pre><code>Index Only Scan using idx_products_tenant_slug_prefix on products
+  Index Cond: (tenant_id = 1 AND slug ~&gt;=~ 'kaos' AND slug ~&lt;~ 'kaot')
+  Heap Fetches: 0
+  Buffers: shared hit=3
+  Execution Time: 0.39 ms
+</code></pre>
+<p>Watch what the planner did to your <code>LIKE</code>. It rewrote it as a range comparison, <code>slug ~&gt;=~ 'kaos' AND slug ~&lt;~ 'kaot'</code>, where <code>~&gt;=~</code> and <code>~&lt;~</code> are the byte-ordering operators <code>pattern_ops</code> owns. The scan touches three buffers, not 256.</p>
+<p>Against the Seq Scan above, that is an <strong>11.6x speedup</strong>, and it is flat. The old query got more expensive as the table grew. This one stays O(log N), no matter how many products a tenant adds.</p>
+<h2>Why Your Tests Never Caught This</h2>
+<p>Two reasons, and both hide the bug until production.</p>
+<p>The first is scale. A Seq Scan over 50 rows finishes in roughly 0.05 ms. That is not slow. It only gets slow once the table is large, so a small dev database will never show you the problem.</p>
+<p>The second is SQLite. If your FastAPI or SQLAlchemy suite runs against in-memory SQLite, you are not testing Postgres index behaviour at all. SQLite has no locale-dependent B-tree operator classes, so the same query that Seq Scans on Postgres runs fine there.</p>
+<p>Your test suite was green. Your staging database was empty. The bug shipped, and nobody saw it until the catalog was big enough to hurt.</p>
+<p>The lesson is not that Postgres is slow. It is that an index on the column you query is not the same as an index that can answer your query. Collation decides whether those two things match.</p>
+<h2>Two Edge Cases That Bite Later</h2>
+<p><strong>You still need both indexes.</strong> A <code>varchar_pattern_ops</code> index cannot enforce uniqueness under linguistic collation, and a standard B-tree cannot do prefix matching. The jobs are different:</p>
+<ul>
+<li><code>UNIQUE (tenant_id, slug)</code> protects data integrity.</li>
+<li><code>varchar_pattern_ops</code> makes prefix lookups fast.</li>
+</ul>
+<p>Keep both if you need both guarantees. Under a non-C collation, no single index does both jobs.</p>
+<p><strong>Capped slugs break naive prefixes.</strong> If you cap slugs at 70 characters, you might back off to the last hyphen so you do not cut a word. That means a <code>-2</code> candidate is not always a strict prefix of the base. Query against a stable stem instead:</p>
+<pre><code class="language-sql">SELECT slug FROM products
+WHERE tenant_id = :t AND slug LIKE :stem || '%'
+</code></pre>
+<p>Use <code>base[:62]</code> as the stem, not the full capped base. Otherwise your collision check misses candidates it should catch, and you ship a duplicate.</p>
+<h2>What To Do This Week</h2>
+<p>Check whether any <code>LIKE 'prefix%'</code> query on a text column has a matching <code>pattern_ops</code> index. On a default <code>en_US.UTF-8</code> database, it probably does not.</p>
+<p>You can list the indexes on your slug column and confirm the operator class in use:</p>
+<pre><code class="language-sql">SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'products';
+</code></pre>
+<p>If your unique composite index shows up without <code>varchar_pattern_ops</code>, your prefix query is not using it. Add the operator-class index alongside it, then run <code>EXPLAIN (ANALYZE, BUFFERS)</code> before and after. The plan should move from a <code>Seq Scan</code> with a filter count that grows with your table, to an <code>Index Only Scan</code> with single-digit buffer reads.</p>
+<p>One line, one index, and the scan disappears. The index you already had was never eligible in the first place.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

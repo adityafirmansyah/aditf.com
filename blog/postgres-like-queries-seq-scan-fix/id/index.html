@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kenapa Query LIKE di Postgres Diam-Diam Seq Scan (dan Fix Satu Barisnya) — Field Notes</title>
+<meta name="description" content="Di Postgres default en_US.UTF-8, index UNIQUE (tenant_id, slug) nggak bisa dipakai buat query LIKE &#x27;prefix%&#x27;. Ini angka benchmark di 20.000 baris dan index varchar_pattern_ops yang benerin semuanya.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kenapa Query LIKE di Postgres Diam-Diam Seq Scan (dan Fix Satu Barisnya) — Field Notes">
+<meta property="og:description" content="Di Postgres default en_US.UTF-8, index UNIQUE (tenant_id, slug) nggak bisa dipakai buat query LIKE &#x27;prefix%&#x27;. Ini angka benchmark di 20.000 baris dan index varchar_pattern_ops yang benerin semuanya.">
+<meta property="og:url" content="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kenapa Query LIKE di Postgres Diam-Diam Seq Scan (dan Fix Satu Barisnya) — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kenapa Query LIKE di Postgres Diam-Diam Seq Scan (dan Fix Satu Barisnya) — Field Notes">
+<meta name="twitter:description" content="Di Postgres default en_US.UTF-8, index UNIQUE (tenant_id, slug) nggak bisa dipakai buat query LIKE &#x27;prefix%&#x27;. Ini angka benchmark di 20.000 baris dan index varchar_pattern_ops yang benerin semuanya.">
+<meta name="twitter:image" content="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-09-25T00:00:00+00:00">
+<meta property="article:tag" content="postgresql">
+<meta property="article:tag" content="database">
+<meta property="article:tag" content="backend">
+<meta property="article:tag" content="performance">
+<meta property="article:tag" content="optimization">
+<meta property="article:tag" content="sql">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Kenapa Query LIKE di Postgres Diam-Diam Seq Scan (dan Fix Satu Barisnya)", "description": "Di Postgres default en_US.UTF-8, index UNIQUE (tenant_id, slug) nggak bisa dipakai buat query LIKE 'prefix%'. Ini angka benchmark di 20.000 baris dan index varchar_pattern_ops yang benerin semuanya.", "datePublished": "2026-09-25T00:00:00+00:00", "dateModified": "2026-09-25T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/postgres-like-queries-seq-scan-fix/id/"}, "keywords": "postgresql, database, backend, performance, optimization, sql", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 944, "image": ["https://aditf.com/blog/postgres-like-queries-seq-scan-fix/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/postgres-like-queries-seq-scan-fix/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>25 Sep 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Kenapa Query LIKE di Postgres Diam-Diam Seq Scan (dan Fix Satu Barisnya)</h1>
+    <div class="post__tags"><span>postgresql</span><span>database</span><span>backend</span><span>performance</span><span>optimization</span><span>sql</span></div>
+    <div class="post__content reveal is-visible">
+<p>Lo punya index <code>UNIQUE (tenant_id, slug)</code> dan lo nyangka query <code>WHERE slug LIKE 'kaos%'</code> otomatis bakal pakai index itu. Di Postgres standar Ubuntu, anggapan itu salah. Jebakan ini mahal, dan gue udah kena.</p>
+<p>Query lo kencang di dev. Unit test berbasis SQLite lo lewat dalam mikrodetik, jadi nggak ada satu pun yang curiga ada yang salah. Semua lampu hijau.</p>
+<p>Terus katalog produksi lewat sepuluh ribu baris, dan tiap lookup slug diam-diam berubah jadi full table scan.</p>
+<p>Gue kena persis di titik ini waktu bikin slug produk yang readable buat platform e-commerce multi-tenant. Query pengecekan collision-nya jalan normal, di lokal keliatan instan.</p>
+<p>Baru pas dites di Postgres 18.6 beneran, dengan 20.000 produk buat satu tenant, yang keluar malah ini:</p>
+<pre><code>Seq Scan on products
+  Filter: tenant_id = 1 AND slug ~~ 'kaos%'
+  Rows Removed by Filter: 22000
+  Buffers: shared hit=256
+  Execution Time: 4.52 ms
+</code></pre>
+<p>Semua baris, tiap request. Index-nya ada di situ. Postgres cuma nolak pakai.</p>
+<h2>Index-nya Memang Nggak Eligible</h2>
+<p>Penyebabnya collation. Dan buat jelas dari awal: ini bukan bug Postgres.</p>
+<p>Index B-tree standar di kolom <code>text</code> atau <code>varchar</code> dibangun pakai collation database. Di mayoritas distro Linux, default-nya <code>en_US.UTF-8</code>. Itu collation linguistik, artinya dia ngurutin sesuai aturan bahasa, bukan byte mentah.</p>
+<p>Nah, <code>LIKE</code> itu murni byte-based. Postgres nggak mungkin pakai index yang urutannya linguistik buat jawab pertanyaan soal rentang byte. Jadi ya dia jatuh ke scan penuh.</p>
+<ul>
+<li>Di collation linguistik, huruf besar-kecil dan aksen saling nyempil sesuai aturan budaya, jadi urutan byte beda dari urutan index.</li>
+<li><code>LIKE 'prefix%'</code> butuh rentang byte yang contiguous.</li>
+<li>Begitu urutan index bukan urutan byte, nggak ada rentang yang bisa dijamin, dan planner milih nyerah.</li>
+</ul>
+<p>Jadi solusinya bukan "bikin index lagi yang sama". Solusinya ngasih Postgres satu index yang urutannya byte, khusus buat kolom itu. Intinya lo bilang gini: buat kolom ini, urutin pakai byte mentah, biar rentang prefix-nya klop.</p>
+<h2>Fix-nya Cuma Satu Baris</h2>
+<p>Postgres udah nyediain operator class buat kasus ini, namanya <code>varchar_pattern_ops</code>.</p>
+<pre><code class="language-sql">CREATE INDEX idx_products_tenant_slug_prefix
+  ON products (tenant_id, slug varchar_pattern_ops);
+</code></pre>
+<p>Ini bukan pengganti unique constraint lo. Ini index tambahan, dan plan-nya langsung berubah begitu dia dibuat:</p>
+<pre><code>Index Only Scan using idx_products_tenant_slug_prefix on products
+  Index Cond: (tenant_id = 1 AND slug ~&gt;=~ 'kaos' AND slug ~&lt;~ 'kaot')
+  Heap Fetches: 0
+  Buffers: shared hit=3
+  Execution Time: 0.39 ms
+</code></pre>
+<p>Perhatiin apa yang planner lakuin ke <code>LIKE</code> lo. Dia tulis ulang jadi perbandingan rentang, <code>slug ~&gt;=~ 'kaos' AND slug ~&lt;~ 'kaot'</code>. Operator <code>~&gt;=~</code> dan <code>~&lt;~</code> itu byte-ordering yang dipunya pattern_ops. Scan-nya cuma nyentuh tiga buffer, bukan 256.</p>
+<p>Dibandingin Seq Scan tadi, itu <strong>speedup 11,6x</strong>. Yang lebih penting: sifatnya flat. Query lama biayanya naik terus seiring tabel membesar. Yang ini tetap O(log N), berapapun produk yang ditambah tenant.</p>
+<h2>Kenapa Test Lo Nggak Pernah Nangkep</h2>
+<p>Ada dua alasan, dan dua-duanya bareng-bareng nyembunyiin bug itu sampai ke produksi.</p>
+<p>Yang pertama soal ukuran. Seq Scan di 50 baris selesai dalam sekitar 0,05 ms. Nggak ada yang lambat di situ. Dia baru lambat pas skalanya udah gede, jadi database dev yang kecil nggak akan pernah nunjukin masalahnya ke lo.</p>
+<p>Yang kedua SQLite. Kalau suite FastAPI atau SQLAlchemy lo jalan di SQLite in-memory, lo sebenernya nggak lagi nguji perilaku index Postgres sama sekali. SQLite nggak punya operator class B-tree yang bergantung locale. Query yang di Postgres jadi Seq Scan, di situ jalan lancar-lancar aja.</p>
+<p>Test lo hijau, staging lo kosong, dan bug-nya lolos rilis tanpa ada yang sadar.</p>
+<p>Pelajaran-nya bukan "Postgres lambat". Pelajaran-nya lebih halus dari itu: index di kolom yang lo query nggak sama dengan index yang bisa jawab query lo. Collation yang nentuin apakah dua hal itu cocok.</p>
+<h2>Dua Edge Case yang Nanti Gigit</h2>
+<p><strong>Lo tetap butuh dua-duanya.</strong> Index <code>varchar_pattern_ops</code> nggak bisa njamin uniqueness di collation linguistik. B-tree standar nggak bisa ngerjain prefix matching. Kerjaannya beda:</p>
+<ul>
+<li>Constraint <code>UNIQUE (tenant_id, slug)</code> ngelindungin integritas data.</li>
+<li>Index <code>varchar_pattern_ops</code> bikin prefix lookup kencang.</li>
+</ul>
+<p>Butuh dua jaminan itu? Ya simpen dua index. Di collation non-C, nggak ada satu index yang bisa ngerjain dua-duanya sekaligus.</p>
+<p><strong>Slug yang di-cap bikin prefix naif kacau.</strong> Misal slug lo dibatasi 70 karakter, terus lo mundur ke hyphen terakhir biar nggak motong kata. Efeknya, kandidat <code>-2</code> nggak selalu jadi prefix persis dari base-nya. Jadi query-nya arahin ke batang yang stabil:</p>
+<pre><code class="language-sql">SELECT slug FROM products
+WHERE tenant_id = :t AND slug LIKE :stem || '%'
+</code></pre>
+<p>Pakai <code>base[:62]</code> sebagai <code>:stem</code>, bukan base penuh yang udah di-cap. Kalau nggak, pengecekan collision lo nggak bisa lihat kandidat yang seharusnya ketemu, dan lo rilis data duplikat tanpa sadar.</p>
+<h2>Yang Bisa Lo Cek Minggu Ini</h2>
+<p>Cek apakah ada query <code>LIKE 'prefix%'</code> di kolom text yang punya index <code>pattern_ops</code> pasangannya. Di database <code>en_US.UTF-8</code> default, kemungkinan besar nggak ada.</p>
+<p>Lo bisa lihat daftar index di kolom slug lo, sekalian mastiin operator class yang kepakai:</p>
+<pre><code class="language-sql">SELECT indexname, indexdef
+FROM pg_indexes
+WHERE tablename = 'products';
+</code></pre>
+<p>Kalau index unique composite-nya muncul tanpa <code>varchar_pattern_ops</code>, artinya query prefix lo nggak pakai dia. Tambahin index operator-class di sebelahnya, terus jalanin <code>EXPLAIN (ANALYZE, BUFFERS)</code> sebelum dan sesudah. Plan-nya harusnya pindah dari <code>Seq Scan</code> dengan jumlah baris yang naik terus, jadi <code>Index Only Scan</code> dengan buffer read satu digit.</p>
+<p>Satu baris, satu index, dan scan-nya hilang. Index yang dari awal lo punya memang nggak pernah eligible.</p>
+<p>Dan lo nggak akan pernah tau kalau nggak ngecek plan-nya. Query yang tetap "jalan" itu justru yang paling bahaya. Nggak ada error, nggak ada warning. Cuma latency yang naik pelan-pelan seiring katalog lo tumbuh, dan waktu akhirnya ada yang sadar, semuanya udah kelihatan lambat dan nggak ada yang tau kenapa.</p>
+<p>Makanya gue sekarang selalu jalanin <code>EXPLAIN (ANALYZE, BUFFERS)</code> buat tiap query prefix sebelum naik ke produksi. Bukan pas udah lambat. Sebelum. Kebiasaan kecil, tapi nyelametin banyak insiden tengah malam.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

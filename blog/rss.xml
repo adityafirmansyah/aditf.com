@@ -7,6 +7,14 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Why Your Postgres LIKE Query Silently Seq Scans (And the One-Line Fix)</title>
+      <link>https://aditf.com/blog/postgres-like-queries-seq-scan-fix/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/postgres-like-queries-seq-scan-fix/</guid>
+      <pubDate>Fri, 25 Sep 2026 00:00:00 +0000</pubDate>
+      <description>On a default en_US.UTF-8 Postgres, a UNIQUE (tenant_id, slug) index cannot serve LIKE &#x27;prefix%&#x27; queries. Here are the benchmark numbers at 20,000 rows and the varchar_pattern_ops index that fixes it.</description>
+      <enclosure url="" length="0" type="text/html"/>
+    </item>
+    <item>
       <title>Your Agent&#x27;s Config Silently Failed: The Canary Test That Catches It</title>
       <link>https://aditf.com/blog/agent-config-canary-test/</link>
       <guid isPermaLink="true">https://aditf.com/blog/agent-config-canary-test/</guid>
