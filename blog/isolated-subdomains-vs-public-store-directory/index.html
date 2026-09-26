@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why We Built Isolated Subdomains Instead of a Public Store Directory — Field Notes</title>
+<meta name="description" content="A public /stores directory would have made ecompy behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Why We Built Isolated Subdomains Instead of a Public Store Directory — Field Notes">
+<meta property="og:description" content="A public /stores directory would have made ecompy behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.">
+<meta property="og:url" content="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Why We Built Isolated Subdomains Instead of a Public Store Directory — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Why We Built Isolated Subdomains Instead of a Public Store Directory — Field Notes">
+<meta name="twitter:description" content="A public /stores directory would have made ecompy behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.">
+<meta name="twitter:image" content="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-09-26T00:00:00+00:00">
+<meta property="article:tag" content="multi-tenancy">
+<meta property="article:tag" content="nextjs">
+<meta property="article:tag" content="seo">
+<meta property="article:tag" content="e-commerce">
+<meta property="article:tag" content="architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Why We Built Isolated Subdomains Instead of a Public Store Directory", "description": "A public /stores directory would have made ecompy behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.", "datePublished": "2026-09-26T00:00:00+00:00", "dateModified": "2026-09-26T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/"}, "keywords": "multi-tenancy, nextjs, seo, e-commerce, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 940, "image": ["https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>26 Sep 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Why We Built Isolated Subdomains Instead of a Public Store Directory</h1>
+    <div class="post__tags"><span>multi-tenancy</span><span>nextjs</span><span>seo</span><span>e-commerce</span><span>architecture</span></div>
+    <div class="post__content reveal is-visible">
+<p>Every multi-tenant commerce platform hits the same fork. Either every merchant lives behind one storefront directory, or each one gets a domain of their own.</p>
+<p>We took the second road in ecompy. PR #50 proposed exactly the first option: a <code>GET /stores</code> endpoint plus a <code>/stores</code> landing directory listing every registered merchant. The verdict came back short: "PR #50: declined. we do not need public listings for our stores."</p>
+<h2>The directory is the marketplace</h2>
+<p>Shopee, Tokopedia, and Amazon aggregate sellers because buyer aggregation is their actual product. Every checkout routes through their take-rate.</p>
+<p>An independent seller platform runs on the opposite economics. Merchants keep their own brand, take bank transfer or WhatsApp orders directly, and never see a competitor's listing underneath their own product page.</p>
+<p>A shared public catalog takes all of that back. Put every merchant in one directory and you have rebuilt the marketplace they left, minus the traffic.</p>
+<p>That is the trap. A store directory does not read as an architectural choice while you are building it. It reads as a feature you could ship in an afternoon, and it quietly redefines what your platform is for.</p>
+<p>For Indonesian UMKM leaving marketplace commissions behind, the relocation is the whole pitch. They already know what the shared catalog costs them. Building a new one on our own platform would have made us the fourth marketplace in their life instead of the exit from it.</p>
+<h2>What we shipped instead</h2>
+<p>PR #51 through #53 replaced the directory idea with host-based tenancy across the monorepo. Four pieces made it work:</p>
+<ul>
+<li><strong>Dynamic host routing.</strong> <code>isPlatformHost</code> decides whether a request lands on the apex platform or on a tenant subdomain or custom domain.</li>
+<li><strong>Per-host <code>robots.txt</code>.</strong> Platform-only and transactional surfaces get disallowed while product pages stay open to crawlers.</li>
+<li><strong>Per-host <code>sitemap.xml</code>.</strong> Each tenant's sitemap points only at that tenant's own origin.</li>
+<li><strong>Per-tenant metadata.</strong> JSON-LD (<code>Product</code>, <code>Offer</code>) and OpenGraph tags resolve against the tenant's own domain.</li>
+</ul>
+<p>The disallow list is host-independent and covers eight paths:</p>
+<ul>
+<li><code>/dashboard</code></li>
+<li><code>/cart</code></li>
+<li><code>/checkout</code></li>
+<li><code>/account</code></li>
+<li><code>/tenants</code></li>
+<li><code>/orders</code></li>
+<li><code>/api</code></li>
+<li><code>/admin</code></li>
+</ul>
+<p><code>/orders</code> is disallowed whole, not just the tracking subpage. Every storefront path outside that list stays crawlable, because a product page is exactly what you want indexed.</p>
+<p>The split is deliberate. A cart page has no business in a search index, and a checkout page in a search index is a bug report waiting to happen.</p>
+<h2>Host-based routing is an SEO decision</h2>
+<p>Path-based tenancy (<code>dagango.com/store-a</code>) shares one hostname, one crawl budget, and one domain authority across every merchant. Host-based tenancy splits all three.</p>
+<p>The mechanics are smaller than they sound. The Next.js root layout renders platform branding for the apex, while tenant subtrees resolve a dynamic <code>metadataBase</code> keyed to the tenant's own origin. Canonical URLs and OpenGraph tags follow from that automatically.</p>
+<p>That last part matters more than it looks. Get <code>metadataBase</code> wrong and every tenant page emits a canonical pointing at the platform domain. You would then be telling Google that all merchants are one site, which is the directory problem again, just expressed in metadata instead of a <code>/stores</code> page.</p>
+<p>Behind the Cloudflare proxy, the host header survives intact, so the routing decision stays a pure function of the request. On the FastAPI side, tenant resolution reads the same host and scopes every query through the tenant column in PostgreSQL. No path parsing, no tenant slug threaded through route params.</p>
+<h2>Crawl budget on a young platform</h2>
+<p>A <code>/stores</code> directory paginates. On a platform with a few hundred merchants, that is thousands of thin listing pages, many of them near-empty and some of them soft-404s.</p>
+<p>Googlebot spends its allowance there instead of on product pages, and listing pages convert nothing anyway. On a young domain you are already fighting for crawl priority, so handing the crawler a few thousand dead ends is an expensive way to be thorough.</p>
+<p>Per-host sitemaps fix the incentive directly. Each sitemap points at <code>/products/[slug]</code> on the merchant's own domain, so crawl budget lands where buying intent lives. Each merchant also accumulates domain authority on their own origin rather than donating it to a shared pool.</p>
+<h2>A public directory is a scrape target</h2>
+<p>A platform-wide <code>/stores</code> endpoint is an enumeration endpoint. One scraper walks it and comes back with your complete seller list, plus a change feed every time a new store appears.</p>
+<p>Competitors do not have to guess who your merchants are, and they do not have to watch for new ones. Poaching becomes a cron job.</p>
+<p>I would rather every merchant be discovered because they pushed their own link:</p>
+<ul>
+<li>their Instagram bio,</li>
+<li>their WhatsApp group,</li>
+<li>or their TikTok shop link.</li>
+</ul>
+<h2>What I would tell the next team</h2>
+<p>If you run Next.js App Router plus FastAPI in one monorepo, host-based tenancy is a routing and metadata change, not a rewrite. Ours cost three PRs.</p>
+<p>Before launch, check the crawler surface on both host types:</p>
+<ul>
+<li>the platform host's <code>robots.txt</code>, from <code>dagango.com</code>,</li>
+<li>a tenant host's <code>robots.txt</code>, from a live subdomain,</li>
+<li>and confirm each <code>sitemap.xml</code> contains only that tenant's own URLs.</li>
+</ul>
+<p>If a tenant sitemap lists another merchant, you have leaked your directory through the back door. That check takes two minutes and catches the failure that matters.</p>
+<p>The directory question returns every quarter, usually wrapped in a growth argument. The answer does not change, because the economics behind it do not change.</p>
+<p>A store directory is what you build when aggregation is your business. When the merchant's own brand is the business, isolation is the only architecture that does not quietly work against them.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik — Field Notes</title>
+<meta name="description" content="Direktori /stores publik bakal bikin ecompy kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik — Field Notes">
+<meta property="og:description" content="Direktori /stores publik bakal bikin ecompy kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.">
+<meta property="og:url" content="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik — Field Notes">
+<meta name="twitter:description" content="Direktori /stores publik bakal bikin ecompy kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.">
+<meta name="twitter:image" content="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-09-26T00:00:00+00:00">
+<meta property="article:tag" content="multi-tenancy">
+<meta property="article:tag" content="nextjs">
+<meta property="article:tag" content="seo">
+<meta property="article:tag" content="e-commerce">
+<meta property="article:tag" content="architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik", "description": "Direktori /stores publik bakal bikin ecompy kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.", "datePublished": "2026-09-26T00:00:00+00:00", "dateModified": "2026-09-26T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/"}, "keywords": "multi-tenancy, nextjs, seo, e-commerce, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 998, "image": ["https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>26 Sep 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik</h1>
+    <div class="post__tags"><span>multi-tenancy</span><span>nextjs</span><span>seo</span><span>e-commerce</span><span>architecture</span></div>
+    <div class="post__content reveal is-visible">
+<p>Semua platform commerce multi-tenant pada akhirnya ketemu persimpangan yang sama. Entah semua merchant duduk di satu direktori toko, atau tiap merchant dapat domain sendiri. Di ecompy kita pilih jalan kedua.</p>
+<p>PR #50 justru nawarin opsi pertama: endpoint <code>GET /stores</code> plus halaman <code>/stores</code> yang nge-list semua merchant terdaftar. Jawabannya singkat: "PR #50: declined. we do not need public listings for our stores."</p>
+<h2>Direktori itu ya marketplace-nya sendiri</h2>
+<p>Shopee, Tokopedia, dan Amazon ngumpulin seller karena aggregasi pembeli emang produk utama mereka. Tiap checkout yang lewat mereka ambil potongan.</p>
+<p>Platform seller independen jalanin ekonomi yang kebalikannya. Merchant pengen tiga hal:</p>
+<ul>
+<li>brand sendiri,</li>
+<li>terima transfer bank atau order WhatsApp langsung,</li>
+<li>dan halaman produk yang bersih dari listing kompetitor.</li>
+</ul>
+<p>Katalog publik bersama ngambil semua itu balik. Begitu semua merchant masuk satu direktori, lo baru saja membangun ulang marketplace yang mereka tinggalkan. Cuma tanpa traffic-nya.</p>
+<p>Nah, inilah jebakannya. Direktori toko itu nggak kerasa kayak keputusan arsitektur waktu lo bangun. Rasanya kayak fitur yang bisa kelar dalam setengah hari. Padahal pelan-pelan dialah yang nentuin platform lo sebenarnya buat apa.</p>
+<p>Argumen yang paling sering muncul buat direktori itu soal visibilitas: katanya merchant baru butuh tempat biar ketemu orang. Masalahnya, itu logika marketplace. Platform yang jualannya isolasi punya logika yang beda.</p>
+<p>Buat UMKM Indonesia yang lagi lepas dari komisi marketplace, pindah itu justru inti jualannya. Mereka udah tahu berapa mahal harga katalog bersama.</p>
+<p>Bikin katalog baru di platform kita sendiri sama aja nambah marketplace keempat di hidup mereka. Itu jelas bukan jalan keluar.</p>
+<h2>Yang kita bikin sebagai gantinya</h2>
+<p>PR #51 sampai #53 gantiin ide direktori dengan host-based tenancy di monorepo. Ada empat potong yang bikin ini jalan:</p>
+<ul>
+<li><strong>Host routing dinamis.</strong> <code>isPlatformHost</code> yang mutusin request mendarat di apex platform atau di subdomain tenant / custom domain.</li>
+<li><strong><code>robots.txt</code> per host.</strong> Halaman platform dan transaksional diblokir, halaman produk tetap kebuka buat crawler.</li>
+<li><strong><code>sitemap.xml</code> per host.</strong> Sitemap tiap tenant nunjuk ke origin tenant itu sendiri doang.</li>
+<li><strong>Metadata per tenant.</strong> JSON-LD (<code>Product</code>, <code>Offer</code>) dan OpenGraph resolve ke domain tenant masing-masing.</li>
+</ul>
+<p>Disallow list-nya sama untuk semua host, dan isinya delapan path:</p>
+<ul>
+<li><code>/dashboard</code></li>
+<li><code>/cart</code></li>
+<li><code>/checkout</code></li>
+<li><code>/account</code></li>
+<li><code>/tenants</code></li>
+<li><code>/orders</code></li>
+<li><code>/api</code></li>
+<li><code>/admin</code></li>
+</ul>
+<p><code>/orders</code> diblokir utuh, bukan cuma subhalaman tracking-nya. Sisanya di storefront tetap bisa di-crawl, karena halaman produk memang yang mau lo indeks.</p>
+<p>Pembagiannya sengaja. Halaman cart nggak ada urusannya sama search index, dan halaman checkout yang masuk index itu laporan bug yang tinggal nunggu kejadian.</p>
+<h2>Host routing itu keputusan SEO</h2>
+<p>Tenancy berbasis path (<code>dagango.com/store-a</code>) bikin satu hostname, satu crawl budget, dan satu domain authority dipakai bareng semua merchant. Host-based tenancy mecah ketiganya.</p>
+<p>Mekanismenya lebih kecil dari kedengarannya. Root layout Next.js nge-render branding platform buat apex, sementara subtree tenant resolve <code>metadataBase</code> dinamis yang dikunci ke origin tenant sendiri. Canonical URL dan OpenGraph otomatis ngikut dari situ.</p>
+<p>Bagian ini justru lebih penting dari kelihatannya. Salah setting <code>metadataBase</code>, dan tiap halaman tenant ngeluarin canonical yang nunjuk ke domain platform.</p>
+<p>Lo lagi bilang ke Google bahwa semua merchant itu satu situs. Itu masalah direktori lagi, cuma kali ini wujudnya metadata ketimbang halaman <code>/stores</code>.</p>
+<p>Di belakang proxy Cloudflare, host header tetap sampai utuh ke aplikasi, jadi keputusan routing cukup lihat host-nya aja. Di sisi FastAPI, tenant resolution baca host yang sama terus scope semua query lewat kolom tenant di PostgreSQL. Nggak ada parsing path, nggak ada slug tenant yang dibawa-bawa lewat route param.</p>
+<p>Buat merchant yang mau pakai custom apex domain sendiri, on-boarding-nya juga cuma urusan DNS. Mereka arahin domainnya ke kita, host routing yang ngurus sisanya tanpa deploy terpisah. Satu kode buat banyak host, dan tiap host punya identitas sendiri.</p>
+<h2>Crawl budget di platform yang masih muda</h2>
+<p>Direktori <code>/stores</code> itu paginate. Di platform dengan beberapa ratus merchant, itu artinya ribuan halaman listing tipis. Banyak yang nyaris kosong, dan sebagian berujung soft-404.</p>
+<p>Googlebot ngabisin jatahnya di situ, bukan di halaman produk. Halaman listing sendiri nggak ngonversi apa-apa.</p>
+<p>Di domain yang masih muda lo udah berjuang buat crawl priority. Ngasih crawler ribuan jalan buntu itu cara mahal buat sok teliti.</p>
+<p>Sitemap per host benerin insentifnya langsung ke akarnya. Tiap sitemap nunjuk ke <code>/products/[slug]</code> di domain merchant sendiri, jadi crawl budget mendarat di tempat niat beli memang ada. Bonusnya, tiap merchant numpuk domain authority di origin sendiri, nggak nyumbangin ke kolam bersama.</p>
+<h2>Direktori publik itu target scraping</h2>
+<p>Endpoint <code>/stores</code> level platform itu ya endpoint enumerasi. Satu scraper jalanin dia, baliknya lo dapet daftar seller lengkap, plus feed perubahan tiap kali ada toko baru muncul.</p>
+<p>Kompetitor nggak perlu nebak-nebak siapa merchant lo lagi, dan nggak perlu ngawasin yang baru. Poaching berubah jadi cron job.</p>
+<p>Bahkan tanpa niat jahat, daftar kayak gitu tetap masalah. Begitu satu halaman isinya semua toko yang terdaftar, angkanya jadi patokan publik yang gampang dipakai buat ngebandingin diri sendiri sama platform lain. Merchant yang baru mulai nggak butuh itu.</p>
+<p>Menurut gue lebih enak tiap merchant ditemuin gara-gara mereka sendiri yang nyebarin linknya:</p>
+<ul>
+<li>bio Instagram mereka,</li>
+<li>grup WhatsApp mereka,</li>
+<li>atau link TikTok shop mereka.</li>
+</ul>
+<h2>Buat tim yang bakal ngadepin ini</h2>
+<p>Kalau lo jalanin Next.js App Router plus FastAPI dalam satu monorepo, host-based tenancy itu perubahan routing dan metadata, bukan rewrite. Punya kita kelar dalam tiga PR.</p>
+<p>Sebelum launch, cek crawler surface di dua tipe host sekaligus:</p>
+<ul>
+<li><code>robots.txt</code> host platform, ambil dari <code>dagango.com</code>,</li>
+<li><code>robots.txt</code> host tenant, ambil dari subdomain yang udah live,</li>
+<li>terus pastiin tiap <code>sitemap.xml</code> isinya cuma URL tenant itu sendiri.</li>
+</ul>
+<p>Kalau sitemap tenant malah nge-list merchant lain, berarti direktori lo bocor lewat pintu belakang. Cek ini cuma makan dua menit dan nangkep kegagalan yang paling penting.</p>
+<p>Pertanyaan soal direktori itu bakal balik tiap kuartal, biasanya dibungkus argumen growth. Jawabannya nggak berubah, karena ekonomi di belakangnya juga nggak berubah.</p>
+<p>Direktori toko itu yang lo bangun kalau aggregasi memang bisnis lo. Kalau brand merchant sendiri yang jadi bisnis, isolasi itu satu-satunya arsitektur yang nggak diam-diam kerja nglawan mereka. Itu bukan pilihan yang romantis atau idealis, cuma pilihan yang konsisten sama model bisnisnya sendiri. Dan buat gue, konsistensi kayak gitu yang bikin keputusan arsitektur bertahan lama.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
