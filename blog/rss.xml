@@ -11,7 +11,7 @@
       <link>https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/</link>
       <guid isPermaLink="true">https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/</guid>
       <pubDate>Sat, 26 Sep 2026 00:00:00 +0000</pubDate>
-      <description>A public /stores directory would have made ecompy behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.</description>
+      <description>A public /stores directory would have made Dagango.com behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.</description>
       <enclosure url="" length="0" type="text/html"/>
     </item>
     <item>

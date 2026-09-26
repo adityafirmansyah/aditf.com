@@ -2,13 +2,13 @@
 title: Why We Built Isolated Subdomains Instead of a Public Store Directory
 slug: isolated-subdomains-vs-public-store-directory
 date: 2026-09-26
-excerpt: A public /stores directory would have made ecompy behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.
+excerpt: A public /stores directory would have made Dagango.com behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.
 tags: multi-tenancy, nextjs, seo, e-commerce, architecture
 ---
 
 Every multi-tenant commerce platform hits the same fork. Either every merchant lives behind one storefront directory, or each one gets a domain of their own.
 
-We took the second road in ecompy. PR #50 proposed exactly the first option: a `GET /stores` endpoint plus a `/stores` landing directory listing every registered merchant. The verdict came back short: "PR #50: declined. we do not need public listings for our stores."
+We took the second road at Dagango.com. PR #50 proposed exactly the first option: a `GET /stores` endpoint plus a `/stores` landing directory listing every registered merchant. The verdict came back short: "PR #50: declined. we do not need public listings for our stores."
 
 ## The directory is the marketplace
 

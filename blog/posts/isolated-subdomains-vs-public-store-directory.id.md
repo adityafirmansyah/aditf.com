@@ -2,11 +2,11 @@
 title: Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik
 slug: isolated-subdomains-vs-public-store-directory
 date: 2026-09-26
-excerpt: Direktori /stores publik bakal bikin ecompy kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.
+excerpt: Direktori /stores publik bakal bikin Dagango.com kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.
 tags: multi-tenancy, nextjs, seo, e-commerce, architecture
 ---
 
-Semua platform commerce multi-tenant pada akhirnya ketemu persimpangan yang sama. Entah semua merchant duduk di satu direktori toko, atau tiap merchant dapat domain sendiri. Di ecompy kita pilih jalan kedua.
+Semua platform commerce multi-tenant pada akhirnya ketemu persimpangan yang sama. Entah semua merchant duduk di satu direktori toko, atau tiap merchant dapat domain sendiri. Di Dagango.com kita pilih jalan kedua.
 
 PR #50 justru nawarin opsi pertama: endpoint `GET /stores` plus halaman `/stores` yang nge-list semua merchant terdaftar. Jawabannya singkat: "PR #50: declined. we do not need public listings for our stores."
 

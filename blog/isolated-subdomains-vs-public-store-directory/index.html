@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Why We Built Isolated Subdomains Instead of a Public Store Directory — Field Notes</title>
-<meta name="description" content="A public /stores directory would have made ecompy behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.">
+<meta name="description" content="A public /stores directory would have made Dagango.com behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Why We Built Isolated Subdomains Instead of a Public Store Directory — Field Notes">
-<meta property="og:description" content="A public /stores directory would have made ecompy behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.">
+<meta property="og:description" content="A public /stores directory would have made Dagango.com behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.">
 <meta property="og:url" content="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.en.png">
@@ -28,7 +28,7 @@
 <meta property="og:image:alt" content="Why We Built Isolated Subdomains Instead of a Public Store Directory — Field Notes">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Why We Built Isolated Subdomains Instead of a Public Store Directory — Field Notes">
-<meta name="twitter:description" content="A public /stores directory would have made ecompy behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.">
+<meta name="twitter:description" content="A public /stores directory would have made Dagango.com behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.">
 <meta name="twitter:image" content="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.en.png">
 <meta name="author" content="Aditya Firmansyah">
 <meta name="theme-color" content="#14181B">
@@ -38,7 +38,7 @@
 <meta property="article:tag" content="seo">
 <meta property="article:tag" content="e-commerce">
 <meta property="article:tag" content="architecture">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Why We Built Isolated Subdomains Instead of a Public Store Directory", "description": "A public /stores directory would have made ecompy behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.", "datePublished": "2026-09-26T00:00:00+00:00", "dateModified": "2026-09-26T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/"}, "keywords": "multi-tenancy, nextjs, seo, e-commerce, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 940, "image": ["https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Why We Built Isolated Subdomains Instead of a Public Store Directory", "description": "A public /stores directory would have made Dagango.com behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.", "datePublished": "2026-09-26T00:00:00+00:00", "dateModified": "2026-09-26T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/"}, "keywords": "multi-tenancy, nextjs, seo, e-commerce, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 940, "image": ["https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/", "inLanguage": "id-ID"}}</script>
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/">
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/">
@@ -74,7 +74,7 @@
     <div class="post__tags"><span>multi-tenancy</span><span>nextjs</span><span>seo</span><span>e-commerce</span><span>architecture</span></div>
     <div class="post__content reveal is-visible">
 <p>Every multi-tenant commerce platform hits the same fork. Either every merchant lives behind one storefront directory, or each one gets a domain of their own.</p>
-<p>We took the second road in ecompy. PR #50 proposed exactly the first option: a <code>GET /stores</code> endpoint plus a <code>/stores</code> landing directory listing every registered merchant. The verdict came back short: "PR #50: declined. we do not need public listings for our stores."</p>
+<p>We took the second road at Dagango.com. PR #50 proposed exactly the first option: a <code>GET /stores</code> endpoint plus a <code>/stores</code> landing directory listing every registered merchant. The verdict came back short: "PR #50: declined. we do not need public listings for our stores."</p>
 <h2>The directory is the marketplace</h2>
 <p>Shopee, Tokopedia, and Amazon aggregate sellers because buyer aggregation is their actual product. Every checkout routes through their take-rate.</p>
 <p>An independent seller platform runs on the opposite economics. Merchants keep their own brand, take bank transfer or WhatsApp orders directly, and never see a competitor's listing underneath their own product page.</p>

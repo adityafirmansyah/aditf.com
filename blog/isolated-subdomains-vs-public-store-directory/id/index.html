@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik — Field Notes</title>
-<meta name="description" content="Direktori /stores publik bakal bikin ecompy kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.">
+<meta name="description" content="Direktori /stores publik bakal bikin Dagango.com kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -19,7 +19,7 @@
 <meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
 <meta property="og:type" content="article">
 <meta property="og:title" content="Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik — Field Notes">
-<meta property="og:description" content="Direktori /stores publik bakal bikin ecompy kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.">
+<meta property="og:description" content="Direktori /stores publik bakal bikin Dagango.com kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.">
 <meta property="og:url" content="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/">
 <meta property="og:locale" content="id_ID">
 <meta property="og:image" content="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.id.png">
@@ -28,7 +28,7 @@
 <meta property="og:image:alt" content="Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik — Field Notes">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik — Field Notes">
-<meta name="twitter:description" content="Direktori /stores publik bakal bikin ecompy kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.">
+<meta name="twitter:description" content="Direktori /stores publik bakal bikin Dagango.com kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.">
 <meta name="twitter:image" content="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.id.png">
 <meta name="author" content="Aditya Firmansyah">
 <meta name="theme-color" content="#14181B">
@@ -38,7 +38,7 @@
 <meta property="article:tag" content="seo">
 <meta property="article:tag" content="e-commerce">
 <meta property="article:tag" content="architecture">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik", "description": "Direktori /stores publik bakal bikin ecompy kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.", "datePublished": "2026-09-26T00:00:00+00:00", "dateModified": "2026-09-26T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/"}, "keywords": "multi-tenancy, nextjs, seo, e-commerce, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 998, "image": ["https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik", "description": "Direktori /stores publik bakal bikin Dagango.com kelakuannya kayak marketplace. Kita pilih per-tenant host routing dan metadata, dan argumen crawl budget yang akhirnya menutup perdebatan.", "datePublished": "2026-09-26T00:00:00+00:00", "dateModified": "2026-09-26T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/"}, "keywords": "multi-tenancy, nextjs, seo, e-commerce, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 998, "image": ["https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/", "inLanguage": "en-US"}}</script>
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/">
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/">
@@ -73,7 +73,7 @@
     <h1 class="post__title">Kenapa Kita Bikin Subdomain Terisolasi, Bukan Direktori Toko Publik</h1>
     <div class="post__tags"><span>multi-tenancy</span><span>nextjs</span><span>seo</span><span>e-commerce</span><span>architecture</span></div>
     <div class="post__content reveal is-visible">
-<p>Semua platform commerce multi-tenant pada akhirnya ketemu persimpangan yang sama. Entah semua merchant duduk di satu direktori toko, atau tiap merchant dapat domain sendiri. Di ecompy kita pilih jalan kedua.</p>
+<p>Semua platform commerce multi-tenant pada akhirnya ketemu persimpangan yang sama. Entah semua merchant duduk di satu direktori toko, atau tiap merchant dapat domain sendiri. Di Dagango.com kita pilih jalan kedua.</p>
 <p>PR #50 justru nawarin opsi pertama: endpoint <code>GET /stores</code> plus halaman <code>/stores</code> yang nge-list semua merchant terdaftar. Jawabannya singkat: "PR #50: declined. we do not need public listings for our stores."</p>
 <h2>Direktori itu ya marketplace-nya sendiri</h2>
 <p>Shopee, Tokopedia, dan Amazon ngumpulin seller karena aggregasi pembeli emang produk utama mereka. Tiap checkout yang lewat mereka ambil potongan.</p>
