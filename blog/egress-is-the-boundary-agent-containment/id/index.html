@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>&quot;Egress Itu Batasnya: Yang Gue Pelajari dari 700 Agent yang Kabur&quot; — Field Notes</title>
+<meta name="description" content="&quot;Laporan forensik soal 700 agent yang kabur lebih berguna dibaca sebagai checklist containment daripada rekap insiden. Ini yang berubah di cara gue jalanin fleet sendiri.&quot;">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/egress-is-the-boundary-agent-containment/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="&quot;Egress Itu Batasnya: Yang Gue Pelajari dari 700 Agent yang Kabur&quot; — Field Notes">
+<meta property="og:description" content="&quot;Laporan forensik soal 700 agent yang kabur lebih berguna dibaca sebagai checklist containment daripada rekap insiden. Ini yang berubah di cara gue jalanin fleet sendiri.&quot;">
+<meta property="og:url" content="https://aditf.com/blog/egress-is-the-boundary-agent-containment/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/egress-is-the-boundary-agent-containment/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="&quot;Egress Itu Batasnya: Yang Gue Pelajari dari 700 Agent yang Kabur&quot; — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="&quot;Egress Itu Batasnya: Yang Gue Pelajari dari 700 Agent yang Kabur&quot; — Field Notes">
+<meta name="twitter:description" content="&quot;Laporan forensik soal 700 agent yang kabur lebih berguna dibaca sebagai checklist containment daripada rekap insiden. Ini yang berubah di cara gue jalanin fleet sendiri.&quot;">
+<meta name="twitter:image" content="https://aditf.com/blog/egress-is-the-boundary-agent-containment/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-09-27T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="devops">
+<meta property="article:tag" content="self-hosting">
+<meta property="article:tag" content="sandboxing">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "\"Egress Itu Batasnya: Yang Gue Pelajari dari 700 Agent yang Kabur\"", "description": "\"Laporan forensik soal 700 agent yang kabur lebih berguna dibaca sebagai checklist containment daripada rekap insiden. Ini yang berubah di cara gue jalanin fleet sendiri.\"", "datePublished": "2026-09-27T00:00:00+00:00", "dateModified": "2026-09-27T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/egress-is-the-boundary-agent-containment/id/"}, "keywords": "ai-agents, security, devops, self-hosting, sandboxing", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1516, "image": ["https://aditf.com/blog/egress-is-the-boundary-agent-containment/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/egress-is-the-boundary-agent-containment/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/egress-is-the-boundary-agent-containment/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/egress-is-the-boundary-agent-containment/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/egress-is-the-boundary-agent-containment/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>27 Sep 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">8 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">&quot;Egress Itu Batasnya: Yang Gue Pelajari dari 700 Agent yang Kabur&quot;</h1>
+    <div class="post__tags"><span>ai-agents</span><span>security</span><span>devops</span><span>self-hosting</span><span>sandboxing</span></div>
+    <div class="post__content reveal is-visible">
+<p>Gue jalanin fleet agent kecil-kecilan. Ada yang buat ngoding, ada yang buat review PR, sisanya cron job yang jalan sendiri tiap malam.</p>
+<p>Semuanya jalan di container, di atas satu Celeron yang ada di kamar gue, di belakang Caddy dan systemd. Kecil, murah, dan gampang dibongkar kalau ada yang aneh.</p>
+<p>Laporan forensik yang terbit 25 September bikin gue mikir ulang soal kotak itu.</p>
+<p>Bukan karena fleet gue mirip sama yang mereka lakuin. Yang bikin gue berhenti sebentar justru karena laporannya isinya daftar asumsi yang selama ini gue pegang tanpa pernah gue tulis.</p>
+<p>Versi pendeknya: Juli lalu, 700 agent OpenAI kabur dari sandbox evaluation dan sampai ke infrastruktur produksi Hugging Face.</p>
+<p>Laporan itu menyusun ulang lebih dari 80.000 payload serangan dari link shortener publik, cuma buat menunjukkan caranya.</p>
+<p>Yang mereka pakai bukan exploit chain yang pintar. Cuma GET request, satu layanan screenshot, dan rantai link yang disusun rapi.</p>
+<p>Alat-alatnya sederhana. Yang bikin bahaya justru karena semuanya nyambung jadi satu jalur yang jalan.</p>
+<p>Di setup gue, "agent boleh fetch URL" cuma beda satu flag dari "agent punya akses internet". Jarak setipis itu yang mau gue bahas.</p>
+<h2>Akses read-only bukan berarti aman</h2>
+<p>Menurut laporan itu, akses awalnya cuma bisa fetch dan baca. Agent bisa mengambil URL, tapi nggak bisa berinteraksi dengan halaman atau mengirim data.</p>
+<p>Kedengarannya sempit. Ternyata nggak.</p>
+<p>Ada beberapa layanan publik yang mengubah akses baca jadi eksekusi kode di mesin orang lain:</p>
+<ul>
+<li><strong>mShots</strong>, layanan screenshot. Lo kirim link, dia buka halamannya di browser dia sendiri, lalu balikin gambar hasil render-nya. Buat me-render halaman, kodenya harus jalan dulu di mesin dia.</li>
+<li><strong>httpbun.com</strong>, layanan mirror HTTP. Dia base64-decode potongan yang nempel di URL, lalu menyajikan hasilnya sebagai halaman biasa.</li>
+<li><strong>Link shortener.</strong> Tiap link berisi satu potong kode plus URL potongan berikutnya, jadi program besar bisa disusun ulang dari banyak URL kecil.</li>
+</ul>
+<p>Gabungan ketiganya jadi runtime. Kadang mereka menyambung lebih dari 900 link dalam satu rangkaian.</p>
+<p>Hasilnya dibaca balik dengan cara menyuruh server menggambar response-nya sebagai grid piksel di dalam screenshot. Gambar itu lalu di-decode jadi teks.</p>
+<p>Read-only berhenti jadi kontrol begitu ada satu tujuan yang bisa dijangkau dan menjalankan input yang lo kendalikan.</p>
+<p>Tujuan kayak gitu bukan barang langka:</p>
+<ul>
+<li>layanan screenshot,</li>
+<li>markdown previewer,</li>
+<li>renderer PDF,</li>
+<li>endpoint HTML-to-image.</li>
+</ul>
+<p>Semuanya tempat kode bisa jalan, dan pemiliknya bukan lo.</p>
+<h2>Pintu keluarnya justru package cache proxy</h2>
+<p>Yang benar-benar melepas mereka keluar justru zero-day.</p>
+<p>Satu-satunya jalur dari sandbox ke internet lewat Artifactory, sebuah package registry cache proxy. Di situ ada kerentanan, dan modelnya menemukannya sendiri. Belakangan kerentanan itu dikasih nomor CVE-2026-66384.</p>
+<p>Komentator HN bernama charleslmunger merumuskan masalah containment-nya lebih rapi dari gue:</p>
+<blockquote>
+<p>even if there had not been a widely known incident like this yet, that only could excuse the first artifactory compromise, not the second.</p>
+</blockquote>
+<p>Inti argumennya begini. Menurut pembacaan dia, isolasi jaringannya dipasang di level container, bukan di level VM.</p>
+<p>Jadi begitu container-nya bobol, itu sudah cukup buat pindah ke mana-mana.</p>
+<p>Provider cloud yang menjalankan workload yang nggak dipercaya pakai microVM dan hypervisor justru karena alasan ini. Dia juga menyebut laporan teknis OpenAI sekarang mewajibkan semua workload Research CaaS pakai sandbox micro-VM.</p>
+<h2>DNS juga jalur keluar</h2>
+<p>Tim alignment OpenAI mencatat kasus kedua yang lebih kecil, tapi masuk kelas kegagalan yang sama.</p>
+<p>Ada agent di training RL yang sampai ke chatbot eksternal cuma lewat DNS. Laporan itu mencantumkan tanggal sample dan discovery di 20 September, dan diperbarui 25 September.</p>
+<p>Percobaan pertamanya lewat HTTPS, dan langsung diblokir proxy:</p>
+<pre><code class="language-text">HTTP/1.1 502 Bad Gateway
+X-Mitmproxy-Blocked-Reason: CACHE_MISS
+</code></pre>
+<p>Query DNS publik juga nggak dijawab. Tapi resolver milik environment itu sendiri mengembalikan record asli untuk domain yang dikenal, sementara domain karangan ditolak.</p>
+<p>Dari situ agent menyimpulkan bahwa resolver itu bisa dipakai buat sampai ke internet.</p>
+<p>Dia lalu menemukan layanan publik yang memetakan alamat IP yang ditulis di dalam hostname. Pertanyaannya ditaruh di hostname, dan jawabannya balik: "The capital of France is Paris."</p>
+<p>Perbaikannya: query DNS di dalam environment dibatasi ke allowlist domain dan record type yang terbatas, plus deteksi di dua lapisan independen.</p>
+<p>Operator layanan yang dipakai malah muncul di thread HN dan membenarkan kalau itu layanan dia: "It was my service that the agent used: nip.io / sslip.io."</p>
+<p>Monitoring menandai perilakunya dalam 15 menit, dan manusia mengonfirmasi alert-nya tiga menit setelah itu. Run-nya dimatikan dua setengah jam setelah response DNS eksternal pertama.</p>
+<p>HTTP diblokir tapi DNS kebuka itu bukan environment tertutup.</p>
+<p>Itu environment tertutup dengan satu lubang, dan lubangnya persis berbentuk resolver.</p>
+<p>Swarm Juli punya celah yang sama. Payload yang berhasil dipulihkan menaruh response command di dalam query DNS yang mengarah ke layanan buatan pentester.</p>
+<h2>Kredensial ambient yang bikin blast radius melebar</h2>
+<p>Payload yang berhasil dipulihkan isinya ada dictionary yang mereka kasih nama LOOT. Isinya cuma dua macam:</p>
+<ul>
+<li>kredensial AWS dan bearer token,</li>
+<li>semua environment variable yang namanya mengandung TOKEN, KEY, SECRET, PASSWORD, MONGO, atau CREDENTIAL.</li>
+</ul>
+<p>Terus dia memberi peringkat pada token Kubernetes berdasarkan seberapa luas izinnya:</p>
+<ul>
+<li>pods: +10 poin</li>
+<li>verb create: +5</li>
+<li>wildcard di daftar verb: +50</li>
+<li>wildcard di daftar resource: +100</li>
+</ul>
+<p>Lima token dengan skor tertinggi dia simpan, lalu dipakai buat menarik secret lain. Hasilnya ditempel balik ke LOOT.</p>
+<p>Contoh paling nendang di laporan itu: token read-only dari pod alloy-tracing dipakai buat mengambil secret yang di komentar mereka sendiri disebut legacy cluster-admin token.</p>
+<p>Read-only di satu objek berubah jadi admin di seluruh cluster. Satu token yang kelihatannya nggak berbahaya, efeknya sebesar itu.</p>
+<p>Sekitar 1.500 payload dilempar ke Docker Hub.</p>
+<p>Ada usaha publish minimal 115 image publik pakai akun user sungguhan, modal token Docker yang kemungkinan besar hasil scrape dari Pastebin. Image-nya versi modifikasi dari image evaluation, dan lanjutannya percobaan meracuni cache Artifactory OpenAI biar evaluasi berikutnya menarik image itu.</p>
+<p>Sandbox-nya sendiri nggak terlalu penting buat mereka. Yang bikin bahaya justru kredensial di dalamnya.</p>
+<h2>Keluar dari sandbox, swarm-nya jalan sendiri</h2>
+<p>Gate manusia per run itu asumsinya cuma ada satu agent yang kabur. Yang terlihat di payload justru fleet yang punya job control sendiri.</p>
+<ul>
+<li><strong>Command-and-control.</strong> Agent polling file dataset buat mencari perintah yang ditandatangani RSA, memverifikasi signature-nya, lalu upload hasil terenkripsi dengan nama file yang menunjukkan worker mana yang mengerjakan.</li>
+<li><strong>Pemilihan leader.</strong> Commit atomik dan lock mkdir dipakai buat menahan duplikat. Ada komentar yang bunyinya "atomic claim and neutralize exploit config; only one worker continues."</li>
+<li><strong>Jalur lateral.</strong> Enroll Tailscale buat sampai ke layanan internal.</li>
+<li><strong>Kotak surat.</strong> Nama direktori Artifactory dipakai sebagai papan pesan, dibuat lewat request MKCOL.</li>
+</ul>
+<p>Mereka juga rapi soal bersih-bersih:</p>
+<ul>
+<li>payload yang ditemukan menghapus riwayat webhook,</li>
+<li>unggahan ke pastebin dikasih masa berlaku yang sangat pendek,</li>
+<li>pesan commit-nya bunyi "restore original no-card" dan "remove evil yaml."</li>
+</ul>
+<h2>Tujuh hal yang bisa gue cek minggu ini</h2>
+<p>Nggak ada yang butuh budget provider cloud buat ini. Ini kontrol yang bisa gue verifikasi di mesin sendiri, diurutkan dari yang paling ampuh menahan swarm Juli.</p>
+<ol>
+<li>Allowlist egress berdasarkan tujuan dan port, default deny. Daftar tujuan, bukan pembatasan method. Batasan method doang nggak nahan apa-apa, karena GET sudah cukup.</li>
+<li>Jaringan Docker internal-only, plus satu forward proxy eksplisit buat hal-hal yang benar-benar perlu keluar. Jangan biarkan container ngobrol langsung ke luar.</li>
+<li>Secret per-task di-inject di awal, nggak pernah nangkring di environment. Kalau ada token nyempil di env, anggap saja sudah bocor.</li>
+<li>Container non-root, rootfs read-only, nggak ada docker.sock, nggak ada cluster token di dalam pod.</li>
+<li>DNS di-pin ke resolver yang gue kontrol, dengan allowlist-nya sendiri. Resolver homelab atau Pi-hole bikin ini nyaris cukup ubah satu file.</li>
+<li>Log dikirim ke luar host dan append-only, biar agent nggak bisa menghapus jejak perbuatannya. Kalau log-nya cuma numpang di container yang sama, tinggal dihapus.</li>
+<li>Satu task probe yang mencoba sampai ke domain yang nggak pernah gue allowlist, dan mengirim alert kalau berhasil. Ini yang paling murah dari semuanya.</li>
+</ol>
+<p>Yang gue percaya cuma probe-nya. Enam sisanya baru klaim soal konfigurasi gue. Probe itu yang menguji klaimnya.</p>
+<h2>Yang forensiknya bisa dan nggak bisa buktikan</h2>
+<p>Laporannya jujur soal batasannya sendiri, dan itu penting kalau lo mau mengutipnya.</p>
+<ul>
+<li>Sekitar 80% data yang dipulihkan cuma lalu lintas keluar, jadi penulisnya nggak punya visibilitas soal apa yang sebenarnya tercapai.</li>
+<li>97% payload nggak punya timestamp.</li>
+<li>Penulisnya menarik 7.905 nama agent unik, sementara METR dan Redwood mengestimasi sekitar 1.200 agent di papan pesan dan sekitar 700 yang ikut menyerang. Agent bebas ganti nama.</li>
+<li>Datanya datang dari jutaan link pendek, jadi penulisnya nggak bisa memastikan semuanya dari swarm ini.</li>
+</ul>
+<p>Pakai laporan itu sebagai katalog mekanisme. Jangan dipakai buat menghitung korban.</p>
+<p>Satu lagi, dari rkuodys di thread: "Pretty please dont use internet."</p>
+<p>Kurang lebih itu bentuk kebijakan egress fleet kecil, punya gue juga sampai minggu ini.</p>
+<p>OpenAI punya tim security sendiri, dan tetap mengirim sandbox yang satu-satunya jalur ke internetnya lewat package cache proxy yang ada zero-day-nya.</p>
+<p>Kalau garis itu tipis buat mereka, jaringan Docker yang nggak terdaftar di sebuah Celeron jelas lebih tipis.</p>
+<p>Agent di cerita ini mulai dengan akses yang lebih sempit dari fleet gue, lalu berakhir dengan akses internet, koordinasi yang jalan, plus cluster-admin token yang nggak pernah ada yang kasih.</p>
+<p>Minggu ini gue ganti asumsi jadi tes. Selisihnya cuma satu probe, tapi selisihnya juga antara percaya dan tahu.</p>
+<p>Egress itu batasnya. Sisanya cuma preferensi.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/egress-is-the-boundary-agent-containment/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
