@@ -7,6 +7,14 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Two Kinds of Decision, and No Way to Prove the Model Did Not Change</title>
+      <link>https://aditf.com/blog/decision-classifier-vs-reasoning-drift/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/decision-classifier-vs-reasoning-drift/</guid>
+      <pubDate>Wed, 30 Sep 2026 00:00:00 +0000</pubDate>
+      <description>A reasoning classifier and a drift benchmark landed a day apart. Together they say which decisions deserve thinking, and why your own latency numbers cannot prove the model changed.</description>
+      <enclosure url="" length="0" type="text/html"/>
+    </item>
+    <item>
       <title>&quot;Egress Is the Boundary: What 700 Escaped Agents Taught About Containment&quot;</title>
       <link>https://aditf.com/blog/egress-is-the-boundary-agent-containment/</link>
       <guid isPermaLink="true">https://aditf.com/blog/egress-is-the-boundary-agent-containment/</guid>

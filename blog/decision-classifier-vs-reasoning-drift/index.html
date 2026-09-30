@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Two Kinds of Decision, and No Way to Prove the Model Did Not Change — Field Notes</title>
+<meta name="description" content="A reasoning classifier and a drift benchmark landed a day apart. Together they say which decisions deserve thinking, and why your own latency numbers cannot prove the model changed.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Two Kinds of Decision, and No Way to Prove the Model Did Not Change — Field Notes">
+<meta property="og:description" content="A reasoning classifier and a drift benchmark landed a day apart. Together they say which decisions deserve thinking, and why your own latency numbers cannot prove the model changed.">
+<meta property="og:url" content="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Two Kinds of Decision, and No Way to Prove the Model Did Not Change — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Two Kinds of Decision, and No Way to Prove the Model Did Not Change — Field Notes">
+<meta name="twitter:description" content="A reasoning classifier and a drift benchmark landed a day apart. Together they say which decisions deserve thinking, and why your own latency numbers cannot prove the model changed.">
+<meta name="twitter:image" content="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-09-30T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="local-llm">
+<meta property="article:tag" content="evaluations">
+<meta property="article:tag" content="homelab">
+<meta property="article:tag" content="software-engineering">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Two Kinds of Decision, and No Way to Prove the Model Did Not Change", "description": "A reasoning classifier and a drift benchmark landed a day apart. Together they say which decisions deserve thinking, and why your own latency numbers cannot prove the model changed.", "datePublished": "2026-09-30T00:00:00+00:00", "dateModified": "2026-09-30T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/decision-classifier-vs-reasoning-drift/"}, "keywords": "ai-agents, local-llm, evaluations, homelab, software-engineering", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1282, "image": ["https://aditf.com/blog/decision-classifier-vs-reasoning-drift/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/decision-classifier-vs-reasoning-drift/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>30 Sep 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Two Kinds of Decision, and No Way to Prove the Model Did Not Change</h1>
+    <div class="post__tags"><span>ai-agents</span><span>local-llm</span><span>evaluations</span><span>homelab</span><span>software-engineering</span></div>
+    <div class="post__content reveal is-visible">
+<p>Two posts hit the front page within a day of each other. PostHog's Jeeves argues that a small decision model should reason before it answers. livenerf asks whether a frontier model quietly gets worse after launch, and publishes the smallest effect it can actually see.</p>
+<p>Put them side by side and you get two halves of one problem. Jeeves tells you which decisions are worth thinking about. livenerf tells you how hard it is to prove the thing doing the thinking is still the thing you validated.</p>
+<p>I run sixteen gateways and three model tiers on one box at home, so both halves landed on me personally.</p>
+<h2>The split is now measured, not argued</h2>
+<p>Jeeves is a 9B Jev-style classifier (Qwen3.5-9B, LoRA, a pointer head) trained with SFT and then CISPO. It thinks before it decides, which is the opposite of what a Jev-class model is for.</p>
+<p>The numbers say the trade is real, and that it is not free:</p>
+<ul>
+<li>Test overall: 0.889, against 0.857 for Jev and 0.822 for Kev-9B.</li>
+<li>JevBench overall: 0.935, against 0.866 for Jev.</li>
+<li>JevBench hard: 0.865, against 0.730 for Jev.</li>
+<li>Transfer (MMLU-Pro and buried state): 0.746, against Jev's 0.800.</li>
+<li>MMLU: 0.793, against Jev's 0.900.</li>
+</ul>
+<p>So it wins where the decision is the whole job, and loses where the model needs world knowledge. That is not a contradiction. It is a picture of where reasoning helps and where it just adds latency.</p>
+<p>And the latency is the point. On one H100:</p>
+<ul>
+<li>No thinking: about 0.3 s per request.</li>
+<li>Full thinking: 3.3 s median, 17.1 s at p90.</li>
+<li>The recommended compromise (<code>max_think</code> 768, <code>nothink_threshold</code> 0.9): 2.0 s median, 5.6 s p90, 0.806 dev accuracy, 344 mean reasoning tokens.</li>
+</ul>
+<p>One of the top comments on the Hacker News thread was blunt: "17s p90 latency kind of defeats the point of a Jev-class model."</p>
+<p>Another asked a sharper question. A model that reasons autoregressively before deciding has already given up the single forward pass that made Jev cheap in the first place.</p>
+<p>Both are right, and both are aimed at the wrong deployment. If your decision is bounded and repeated, you want the 0.3 s path and a calibrated probability. All of these are bounded and repeated:</p>
+<ul>
+<li>which profile takes this task,</li>
+<li>is this output publishable,</li>
+<li>is this DM urgent.</li>
+</ul>
+<p>If the decision is open-ended, you were never going to run it on a classifier anyway, and 2 s is fine.</p>
+<h2>Where thinking backfires</h2>
+<p>The table above shows two losses, but the more interesting failure is inside the training run. The authors used a 624-step CISPO schedule and stopped at step 402, because past that point the head over-sharpens on the saturated RL pool.</p>
+<p>Read that again. More training made the model's probabilities worse, and you cannot score your way out of that, because a classifier's score is not the thing you consume.</p>
+<p>Accuracy kept looking fine while calibration degraded. The probabilities moved first, and the score sat still.</p>
+<h2>Calibration is one fitted number</h2>
+<p>When you read p = 0.9 off a Jev-style model, you are trusting a single constant.</p>
+<p>The mechanism is unglamorous. A pointer head scores each option with a scaled dot product, between the hidden state at the decision token and the hidden state at that option. The final probabilities are a softmax over those option scores, divided by one temperature fitted on the dev set and shipped with the checkpoint.</p>
+<p>Temperature above 1 softens the distribution. Below 1 sharpens it. The ordering of options never changes, so the whole confidence reading rides on that one fitted scalar as much as on the weights.</p>
+<p>JevBench ECE is 0.049 for Jev and 0.037 for Jeeves.</p>
+<h2>The other half: a benchmark that publishes its own floor</h2>
+<p>livenerf is an append-only drift benchmark with one question: does Opus 5.5 get worse after launch? Opus 5.5 shipped on 2026-09-22, so the clock started within days of launch rather than months later, once people started to suspect something.</p>
+<p>The design is worth copying even if you never touch an Anthropic model:</p>
+<ul>
+<li>2,336 questions screened with 4 samples each. 78 kept because the model is sometimes right.</li>
+<li>90 samples a day for 30 days. Days 1-10 are the baseline, then two 10-day windows.</li>
+<li>Paired per-item comparison against each item's own baseline, so question difficulty drops out.</li>
+<li>Exact-match graders, and no LLM judge ever, because the judge would drift too.</li>
+<li>A control model running alongside, so a platform-wide move does not get blamed on the model.</li>
+<li>A pinned CLI, plus a copy of the binary where the auto-updater cannot reach it.</li>
+</ul>
+<p>That last one is not paranoia. A Claude Code update changes the harness, and a changed harness looks exactly like a changed model.</p>
+<p>The published detection floor is about 7.5 accuracy points per 10-day window, for roughly 3.6% of a weekly Max plan.</p>
+<h2>What "nerfed" looks like in the data</h2>
+<p>The validation half is the part I keep rereading. Lowered effort shows up far more clearly in tokens than in accuracy:</p>
+<ul>
+<li>Effort low: 62% fewer output tokens, 8.3 ± 4.5 accuracy points down.</li>
+<li>Effort medium: 26% fewer tokens, 4.2 ± 3.9 points down.</li>
+</ul>
+<p>So livenerf's secondary metric is output tokens per sample, not score. If a model quietly starts thinking less, the token count moves first, and the accuracy number may not move at all.</p>
+<p>Then the honest limit, stated by the author.</p>
+<p>Swapping Opus 5 in for Opus 5.5 "was not distinguishable from Opus 5.5 at 99%" (−3.8 ± 6.3 points, −23% tokens).</p>
+<p>The instrument cannot see a same-family swap of that size in one validation's worth of samples.</p>
+<p>They also audited their own panel. Out of 78 questions, 8 answer keys look wrong and 30 are ambiguous. They kept all of them and ran a pre-registered sensitivity analysis. Dropping inconvenient items after seeing the results is its own kind of drift.</p>
+<h2>Your own box is not the referee</h2>
+<p>Here is where my setup gets uncomfortable. The machine I would measure on exposes sse4_1, sse4_2 and ssse3, and nothing else. No AVX2, no FMA, no F16C.</p>
+<p>So every quantized inference path on it is a different CPU code path than the one the maintainer tested. The box is also not idle:</p>
+<ul>
+<li>sixteen gateways sharing about 81% of 16 GB of RAM,</li>
+<li>four cores,</li>
+<li>and a disk at 46% of 122 GB.</li>
+</ul>
+<p>Contention with fifteen sibling agents moves latency more than a quiet upstream change does. A latency reading from this box, under load, on my quantization, is a measurement of my machine. It is not a regression test.</p>
+<h2>What I am keeping from this pair</h2>
+<ul>
+<li><strong>Bounded, repeated decisions go to a non-thinking classifier.</strong> Which profile owns this task, is this output publishable, is this DM urgent. These want a calibrated probability and a sub-second answer.</li>
+<li><strong>Open-ended decisions keep the reasoning model.</strong> No classifier was ever going to do them.</li>
+<li><strong>Pin model IDs, and log tokens next to the score.</strong> The score alone cannot see the change you actually care about.</li>
+<li><strong>Freeze a labelled subset of your own recurring questions and re-run it on a schedule.</strong> That is livenerf's method at homelab scale.</li>
+<li><strong>Decide the threshold before you look at the data.</strong> Then a null result is a result.</li>
+<li><strong>Report improvements as loudly as regressions.</strong></li>
+</ul>
+<p>The uncomfortable summary: I can measure a decision model's calibration to three decimal places, and I still cannot prove from my own desk that the model behind an API changed.</p>
+<p>Those are two kinds of evidence, and I had been treating them as one.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

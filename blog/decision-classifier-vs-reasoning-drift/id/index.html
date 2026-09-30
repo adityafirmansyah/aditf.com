@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dua Jenis Keputusan, dan Nggak Ada Cara Membuktikan Modelnya Masih Sama — Field Notes</title>
+<meta name="description" content="Sebuah classifier yang mikir dan sebuah benchmark drift muncul berselang sehari. Bareng-bareng, keduanya ngasih tahu keputusan mana yang layak dipikirkan, dan kenapa angka latency dari box sendiri nggak bisa jadi bukti modelnya berubah.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Dua Jenis Keputusan, dan Nggak Ada Cara Membuktikan Modelnya Masih Sama — Field Notes">
+<meta property="og:description" content="Sebuah classifier yang mikir dan sebuah benchmark drift muncul berselang sehari. Bareng-bareng, keduanya ngasih tahu keputusan mana yang layak dipikirkan, dan kenapa angka latency dari box sendiri nggak bisa jadi bukti modelnya berubah.">
+<meta property="og:url" content="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Dua Jenis Keputusan, dan Nggak Ada Cara Membuktikan Modelnya Masih Sama — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Dua Jenis Keputusan, dan Nggak Ada Cara Membuktikan Modelnya Masih Sama — Field Notes">
+<meta name="twitter:description" content="Sebuah classifier yang mikir dan sebuah benchmark drift muncul berselang sehari. Bareng-bareng, keduanya ngasih tahu keputusan mana yang layak dipikirkan, dan kenapa angka latency dari box sendiri nggak bisa jadi bukti modelnya berubah.">
+<meta name="twitter:image" content="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-09-30T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="local-llm">
+<meta property="article:tag" content="evaluations">
+<meta property="article:tag" content="homelab">
+<meta property="article:tag" content="software-engineering">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Dua Jenis Keputusan, dan Nggak Ada Cara Membuktikan Modelnya Masih Sama", "description": "Sebuah classifier yang mikir dan sebuah benchmark drift muncul berselang sehari. Bareng-bareng, keduanya ngasih tahu keputusan mana yang layak dipikirkan, dan kenapa angka latency dari box sendiri nggak bisa jadi bukti modelnya berubah.", "datePublished": "2026-09-30T00:00:00+00:00", "dateModified": "2026-09-30T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/decision-classifier-vs-reasoning-drift/id/"}, "keywords": "ai-agents, local-llm, evaluations, homelab, software-engineering", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1358, "image": ["https://aditf.com/blog/decision-classifier-vs-reasoning-drift/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/decision-classifier-vs-reasoning-drift/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>30 Sep 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">7 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Dua Jenis Keputusan, dan Nggak Ada Cara Membuktikan Modelnya Masih Sama</h1>
+    <div class="post__tags"><span>ai-agents</span><span>local-llm</span><span>evaluations</span><span>homelab</span><span>software-engineering</span></div>
+    <div class="post__content reveal is-visible">
+<p>Ada dua post nongol di front page berselang sehari. Jeeves dari PostHog bilang model keputusan kecil sebaiknya mikir dulu sebelum jawab. livenerf nanya apakah model frontier diam-diam memburuk setelah rilis, terus mempublikasikan angka terkecil yang sanggup dia lihat.</p>
+<p>Kalau dua-duanya ditaruh sebelah-sebelahan, hasilnya dua sisi dari satu masalah yang sama.</p>
+<p>Jeeves ngasih tahu keputusan mana yang layak dipikirkan. livenerf ngasih tahu seberapa susah membuktikan bahwa yang mikir itu masih model yang sama dengan yang lo validasi.</p>
+<p>Gue jalanin enambelas gateway dan tiga tier model di satu box di rumah. Jadi dua-duanya kena gue langsung.</p>
+<h2>Pembagiannya sekarang terukur, bukan debat</h2>
+<p>Jeeves itu classifier Jev-style 9B (Qwen3.5-9B, LoRA, pointer head), dilatih pakai SFT terus CISPO. Dia mikir dulu sebelum memutuskan, padahal itu justru kebalikan dari tujuan model kelas Jev.</p>
+<p>Angkanya bilang trade-off-nya nyata, dan nggak gratis:</p>
+<ul>
+<li>Test overall: 0,889, lawan 0,857-nya Jev dan 0,822-nya Kev-9B.</li>
+<li>JevBench overall: 0,935, lawan 0,866-nya Jev.</li>
+<li>JevBench hard: 0,865, lawan 0,730-nya Jev.</li>
+<li>Transfer (MMLU-Pro dan buried state): 0,746, lawan 0,800-nya Jev.</li>
+<li>MMLU: 0,793, lawan 0,900-nya Jev.</li>
+</ul>
+<p>Jadi dia menang di tempat yang keputusannya emang seluruh pekerjaannya, dan kalah di tempat yang butuh pengetahuan dunia. Itu bukan kontradiksi. Itu gambar soal di mana reasoning nolongin dan di mana dia cuma nambah latency.</p>
+<p>Dan latency-nya itu intinya. Di satu H100:</p>
+<ul>
+<li>Tanpa mikir: sekitar 0,3 detik per request.</li>
+<li>Mikir penuh: median 3,3 detik, p90-nya 17,1 detik.</li>
+<li>Setting kompromi yang direkomendasikan (<code>max_think</code> 768, <code>nothink_threshold</code> 0,9): median 2,0 detik, p90 5,6 detik, akurasi dev 0,806, rata-rata 344 reasoning token.</li>
+</ul>
+<p>Salah satu komentar teratas di thread Hacker News-nya blak-blakan: "17s p90 latency kind of defeats the point of a Jev-class model."</p>
+<p>Ada juga yang nanya lebih tajam. Model yang mikir autoregresif sebelum memutuskan itu sebenarnya udah menyerahkan single forward pass yang bikin Jev murah dari awal.</p>
+<p>Dua-duanya benar, dan dua-duanya nggak kena sasaran. Kalau keputusan lo terbatas dan berulang, lo mau jalur 0,3 detik dan probabilitas yang terkalibrasi. Semua ini terbatas dan berulang:</p>
+<ul>
+<li>profil mana yang ambil task ini,</li>
+<li>output ini layak publish apa nggak,</li>
+<li>DM ini urgent apa nggak.</li>
+</ul>
+<p>Kalau keputusannya terbuka, dari awal lo nggak akan jalanin di classifier, dan 2 detik itu nggak masalah.</p>
+<h2>Di mana mikir malah merugikan</h2>
+<p>Tabel di atas nunjukin dua kekalahan, tapi kegagalan yang lebih menarik ada di dalam training run-nya. Penulisnya pakai jadwal CISPO 624 langkah dan berhenti di langkah 402, karena lewat dari itu head-nya over-sharpen di RL pool yang udah jenuh.</p>
+<p>Baca sekali lagi. Latihan yang lebih banyak malah bikin probabilitas modelnya memburuk, dan itu nggak bisa lo tutup pakai skor, karena skor classifier bukan barang yang lo konsumsi.</p>
+<p>Akurasinya tetap kelihatan oke sementara kalibrasinya turun. Yang gerak duluan probabilitasnya. Skornya diem.</p>
+<h2>Kalibrasi itu satu angka hasil fitting</h2>
+<p>Waktu lo baca p = 0,9 dari model Jev-style, lo cuma percaya satu konstanta.</p>
+<p>Mekanismenya nggak glamor. Pointer head menilai tiap opsi pakai scaled dot product, antara hidden state di token keputusan dan hidden state di opsi itu. Probabilitas akhirnya softmax dari skor-skor itu, dibagi satu temperature yang di-fit di dev set dan ikut tersimpan bareng checkpoint.</p>
+<p>Temperature di atas 1 melembutkan distribusinya. Di bawah 1 menajamkan. Urutan opsinya nggak pernah berubah, jadi seluruh bacaan keyakinan lo numpang di satu skalar hasil fitting itu, sama kayak numpang di bobotnya.</p>
+<p>ECE JevBench-nya 0,049 buat Jev dan 0,037 buat Jeeves.</p>
+<p>Di sinilah repotnya. Karena kalibrasinya cuma satu angka hasil fitting, setiap ambang batas yang lo bangun di atas prediksi model itu sebenernya nggak nempel di bobotnya.</p>
+<p>Dia nempel di angka dev set yang entah kapan terakhir dihitung. Refit pakai data baru, dan threshold p &gt; 0,9 yang lo setel enam bulan lalu ikut bergeser tanpa ada yang ngasih tahu. Nggak ada CI yang bunyi. Nggak ada changelog.</p>
+<h2>Sisi lainnya: benchmark yang mempublikasikan batasnya sendiri</h2>
+<p>livenerf itu benchmark drift append-only dengan satu pertanyaan: Opus 5.5 memburuk nggak setelah rilis?</p>
+<p>Opus 5.5 rilis 22 September 2026, jadi jamnya jalan nggak lama setelah peluncuran. Nggak nunggu berbulan-bulan sampai orang mulai curiga.</p>
+<p>Desainnya layak ditiru walau lo nggak pernah nyentuh model Anthropic:</p>
+<ul>
+<li>2.336 pertanyaan disaring dengan 4 sampel masing-masing. 78 disimpan karena modelnya kadang benar.</li>
+<li>90 sampel sehari selama 30 hari. Hari 1-10 jadi baseline, terus dua window 10 hari.</li>
+<li>Perbandingan per-item yang dipasangkan ke baseline item itu sendiri, jadi tingkat kesulitan soalnya hilang dari hitungan.</li>
+<li>Grader exact-match, dan nggak pernah pakai LLM judge, karena judge-nya juga akan drift.</li>
+<li>Model kontrol yang jalan bareng, jadi pergerakan seluruh platform nggak langsung dituduhkan ke modelnya.</li>
+<li>CLI yang di-pin, plus salinan binary-nya di tempat yang nggak bisa dijangkau auto-updater.</li>
+</ul>
+<p>Yang terakhir itu bukan paranoia. Update Claude Code mengubah harness, dan harness yang berubah kelihatannya persis seperti model yang berubah.</p>
+<p>Batas deteksi yang dipublikasikan sekitar 7,5 poin akurasi per window 10 hari.</p>
+<p>Biayanya kira-kira 3,6% dari plan Max mingguan.</p>
+<h2>"Nerf" itu kelihatannya seperti apa di datanya</h2>
+<p>Bagian validasinya yang paling sering gue baca ulang. Effort yang diturunkan jauh lebih kelihatan di token daripada di akurasi:</p>
+<ul>
+<li>Effort low: output token turun 62%, akurasi turun 8,3 ± 4,5 poin.</li>
+<li>Effort medium: token turun 26%, akurasi turun 4,2 ± 3,9 poin.</li>
+</ul>
+<p>Makanya metrik sekunder livenerf itu output token per sampel, bukan skor. Kalau model diam-diam mulai mikir lebih sedikit, jumlah token-nya bergerak duluan, dan angka akurasinya bisa sama sekali nggak bergerak.</p>
+<p>Terus ada batas jujurnya. Penulisnya sendiri yang ngomong begitu.</p>
+<p>Menukar Opus 5 dengan Opus 5.5 "was not distinguishable from Opus 5.5 at 99%". Selisih akurasinya −3,8 poin dengan margin ±6,3, dan output tokennya turun 23%.</p>
+<p>Instrumennya nggak bisa melihat pertukaran model satu keluarga sebesar itu dalam sampel sebanyak satu kali validasi.</p>
+<p>Mereka juga mengaudit panelnya sendiri. Dari 78 pertanyaan, 8 kunci jawabannya kelihatan salah dan 30 ambigu. Semuanya tetap dipakai, dan mereka jalanin analisis sensitivitas yang udah dipreregistrasi dari awal. Buang item yang bikin nggak nyaman setelah lihat hasilnya itu sendiri salah satu bentuk drift.</p>
+<h2>Box lo sendiri nggak bisa jadi patokan</h2>
+<p>Di sini setup gue mulai nggak nyaman. Mesin yang bakal gue pakai buat ngukur cuma punya sse4_1, sse4_2, dan ssse3. Nggak ada AVX2, nggak ada FMA, nggak ada F16C.</p>
+<p>Jadi tiap jalur inferensi terkuantisasi di situ lewat CPU code path yang beda dari yang dites maintainer-nya. Box-nya juga nggak nganggur:</p>
+<ul>
+<li>enambelas gateway berbagi sekitar 81% dari 16 GB RAM,</li>
+<li>empat core,</li>
+<li>dan disk yang kepakai 46% dari 122 GB.</li>
+</ul>
+<p>Berebut resource sama limabelas agent sebelah itu menggeser latency lebih besar daripada perubahan upstream yang tenang. Angka latency dari box ini, sambil kerja berat, di kuantisasi gue sendiri, itu cuma ngukur mesin gue. Bukan regression test.</p>
+<h2>Yang gue bawa pulang dari dua post ini</h2>
+<ul>
+<li><strong>Keputusan terbatas dan berulang masuk ke classifier tanpa mikir.</strong> Profil mana yang punya task ini, output ini layak publish apa nggak, DM ini urgent apa nggak. Semuanya mau probabilitas terkalibrasi dan jawaban di bawah satu detik.</li>
+<li><strong>Keputusan terbuka tetap di model reasoning.</strong> Nggak ada classifier yang dari awal sanggup ngerjain itu.</li>
+<li><strong>Pin model ID, terus catat tokennya di sebelah skornya.</strong> Skor sendirian nggak bisa lihat perubahan yang sebenernya lo pedulikan.</li>
+<li><strong>Bekukan subset pertanyaan berlabel dari soal-soal rutin lo sendiri, dan jalankan ulang terjadwal.</strong> Itu metode livenerf dalam skala homelab.</li>
+<li><strong>Tentukan ambangnya sebelum lihat datanya.</strong> Baru setelah itu hasil null tetap dihitung hasil.</li>
+<li><strong>Laporkan perbaikan sekeras lo melaporkan regresi.</strong></li>
+</ul>
+<p>Ringkasan yang agak nggak nyaman: gue bisa ngukur kalibrasi model keputusan sampai tiga angka di belakang koma, dan gue tetap nggak bisa membuktikan dari meja sendiri bahwa model di balik sebuah API itu berubah. Dua-duanya jenis bukti yang beda, dan selama ini gue memperlakukannya sebagai satu.</p>
+<p>Selama belasan tahun ngurus sistem, perubahan selalu bisa gue lacak dari diff, log, atau grafik. Di sini nggak bisa.</p>
+<p>Model di balik API bisa berubah tanpa satu baris diff pun mendarat di repo gue, dan satu-satunya cara tahu cuma punya pertanyaan berlabel yang gue jalanin sendiri terus-terusan.</p>
+<p>Jadi panel kecilnya mulai gue susun minggu ini. Beberapa lusin soal dari kasus nyata di fleet, hasilnya disimpan mentah, CLI-nya di-pin, dan ambangnya gue tetapkan sebelum lihat angkanya.</p>
+<p>Kalau nanti ada yang bergerak, buktinya udah ada dari sebelumnya. Bukan hasil nebak-nebak setelah kejadian. 🙂</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
