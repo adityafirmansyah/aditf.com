@@ -3,7 +3,7 @@
   <channel>
     <title>Aditya Firmansyah — Field Notes</title>
     <link>https://aditf.com/blog/</link>
-    <description>Practitioner notes on software engineering, AI agents, and self-hosting.</description>
+    <description>Practitioner notes on software engineering, AI agents, and self-hosting. English and Bahasa Indonesia.</description>
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
@@ -13,6 +13,7 @@
       <pubDate>Thu, 01 Oct 2026 00:00:00 +0000</pubDate>
       <description>Eighteen gateway daemons became one in under three minutes. The dashboard watching them broke, then got fixed with 270 uncommitted lines. A clean checkout puts production back to reporting 16 of 17 profiles down.</description>
       <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/gateway-fix-not-in-git/id/"/>
     </item>
     <item>
       <title>Two Kinds of Decision, and No Way to Prove the Model Did Not Change</title>
@@ -21,6 +22,7 @@
       <pubDate>Wed, 30 Sep 2026 00:00:00 +0000</pubDate>
       <description>A reasoning classifier and a drift benchmark landed a day apart. Together they say which decisions deserve thinking, and why your own latency numbers cannot prove the model changed.</description>
       <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/id/"/>
     </item>
     <item>
       <title>&quot;Egress Is the Boundary: What 700 Escaped Agents Taught About Containment&quot;</title>
@@ -29,6 +31,7 @@
       <pubDate>Sun, 27 Sep 2026 00:00:00 +0000</pubDate>
       <description>&quot;A forensic report on 700 escaped agents reads better as a containment checklist than an incident recap. Here is what it changed about how I run my own fleet.&quot;</description>
       <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/egress-is-the-boundary-agent-containment/id/"/>
     </item>
     <item>
       <title>Why We Built Isolated Subdomains Instead of a Public Store Directory</title>
@@ -37,6 +40,7 @@
       <pubDate>Sat, 26 Sep 2026 00:00:00 +0000</pubDate>
       <description>A public /stores directory would have made Dagango.com behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.</description>
       <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/"/>
     </item>
     <item>
       <title>Why Your Postgres LIKE Query Silently Seq Scans (And the One-Line Fix)</title>
@@ -45,6 +49,7 @@
       <pubDate>Fri, 25 Sep 2026 00:00:00 +0000</pubDate>
       <description>On a default en_US.UTF-8 Postgres, a UNIQUE (tenant_id, slug) index cannot serve LIKE &#x27;prefix%&#x27; queries. Here are the benchmark numbers at 20,000 rows and the varchar_pattern_ops index that fixes it.</description>
       <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/id/"/>
     </item>
     <item>
       <title>Your Agent&#x27;s Config Silently Failed: The Canary Test That Catches It</title>
@@ -53,6 +58,7 @@
       <pubDate>Thu, 24 Sep 2026 00:00:00 +0000</pubDate>
       <description>Claude Code shipped AGENTS.md support gated behind a remote flag, so telemetry-off users got silent failures. Here&#x27;s the five-second test that catches this class of bug in any agent setup.</description>
       <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/agent-config-canary-test/id/"/>
     </item>
     <item>
       <title>Self-Hosting Behind CGNAT: A WireGuard Bridge That Actually Works</title>
@@ -61,6 +67,7 @@
       <pubDate>Wed, 23 Sep 2026 00:00:00 +0000</pubDate>
       <description>Port forwarding stopped working and it wasn&#x27;t your router&#x27;s fault. Here&#x27;s the outbound WireGuard tunnel pattern that gets a homelab back on the public internet under CGNAT.</description>
       <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/id/"/>
     </item>
     <item>
       <title>AI Agents Flooded Our PR Queue: Fixing CI Before It Breaks</title>
@@ -69,6 +76,7 @@
       <pubDate>Tue, 22 Sep 2026 00:00:00 +0000</pubDate>
       <description>Coding agents made writing PRs nearly free, which means your pipeline is now the bottleneck. Here&#x27;s what Linear&#x27;s CI rework maps to on a small-team budget.</description>
       <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/ci-bottleneck-in-agent-era/id/"/>
     </item>
     <item>
       <title>Why I Self-Host Everything on a Mini PC</title>
@@ -77,6 +85,7 @@
       <pubDate>Tue, 22 Sep 2026 00:00:00 +0000</pubDate>
       <description>A Celeron box with 14GB RAM in the corner of my room runs my stores, my agents, and this blog. Here is the math on why cloud bills stopped making sense.</description>
       <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/why-i-self-host-on-a-mini-pc/id/"/>
     </item>
   </channel>
 </rss>

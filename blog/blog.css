@@ -41,11 +41,20 @@
 }
 
 .post-card__lang {
-  display: inline-block; vertical-align: middle; margin-left: 8px;
+  display: inline-block; vertical-align: middle; margin-left: 0;
   font-family: var(--font-mono); font-size: 10px; letter-spacing: .08em;
   color: var(--ink); background: var(--steel);
   padding: 2px 6px; border-radius: 2px;
+  text-decoration: none;
 }
+/* Bilingual cards are a container (outer <div>) holding two real links, because
+   a link nested inside the card anchor would be invalid and unclickable. */
+.post-card__main {
+  display: flex; align-items: stretch; gap: 24px; flex: 1; min-width: 0;
+  text-decoration: none; color: var(--paper);
+}
+a.post-card__lang { align-self: flex-start; }
+a.post-card__lang:hover { background: var(--amber); color: var(--ink); }
 
 .post-card__tags { display: flex; flex-wrap: wrap; gap: 8px; }
 .post-card__tags span {

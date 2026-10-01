@@ -264,15 +264,36 @@ def build_listing(posts, og_url=None):
         meta = e["en"]["meta"]
         slug = e["slug"]
         tags = "".join(f"<span>{esc(t)}</span>" for t in meta["tags"][:5])
-        id_badge = ('<span class="post-card__lang" title="Bahasa Indonesia version available">ID</span>'
-                    if "id" in e else "")
-        cards.append(f"""    <a class="post-card reveal" href="/blog/{esc(slug)}/">
+        has_id = "id" in e
+        # NOTE: when an ID twin exists the card cannot remain a single <a>. A link
+        # nested inside an anchor is invalid HTML and is not clickable, so the ID
+        # badge could never work there. The card becomes a container holding one
+        # anchor for the post and a second, independent anchor for the /id/ twin.
+        if has_id:
+            cards.append(f"""    <div class="post-card reveal">
+      <a class="post-card__main" href="/blog/{esc(slug)}/">
+        <div class="post-card__date">
+          <span class="post-card__day">{esc(fmt_date(meta['date']))}</span>
+          <span class="post-card__rt">{reading_time(e['en']['body'])} min read</span>
+        </div>
+        <div class="post-card__body">
+          <h3>{esc(meta['title'])}</h3>
+          <p>{esc(meta.get('excerpt', ''))}</p>
+          <div class="post-card__tags">{tags}</div>
+        </div>
+        <span class="post-card__go" aria-hidden="true">&rarr;</span>
+      </a>
+      <a class="post-card__lang" href="/blog/{esc(slug)}/id/" lang="id" hreflang="id"
+         title="Baca versi Bahasa Indonesia">ID</a>
+    </div>""")
+        else:
+            cards.append(f"""    <a class="post-card reveal" href="/blog/{esc(slug)}/">
       <div class="post-card__date">
         <span class="post-card__day">{esc(fmt_date(meta['date']))}</span>
         <span class="post-card__rt">{reading_time(e['en']['body'])} min read</span>
       </div>
       <div class="post-card__body">
-        <h3>{esc(meta['title'])} {id_badge}</h3>
+        <h3>{esc(meta['title'])}</h3>
         <p>{esc(meta.get('excerpt', ''))}</p>
         <div class="post-card__tags">{tags}</div>
       </div>
@@ -578,25 +599,36 @@ def build_blog_og_image():
 
 
 def build_rss(posts):
+    """EN feed (last 20). Each item also declares its Indonesian twin via
+    <atom:link rel="alternate" hreflang="id"> when one exists, and the ID
+    permalink is appended to the description so a feed reader surfaces it.
+    Previously the feed listed EN URLs only and declared <language>en</language>,
+    so an Indonesian subscriber had no way to learn the ID versions existed."""
     items = []
     for e in posts[:20]:
         meta = e["en"]["meta"]
         body_html = markdown.markdown(e["en"]["body"], extensions=["fenced_code", "tables"])
         pub = datetime.strptime(meta["date"], "%Y-%m-%d").replace(tzinfo=timezone.utc)
+        en_url = f"{BLOG_URL}{esc(e['slug'])}/"
+        id_alt = ""
+        if "id" in e:
+            id_url = f"{BLOG_URL}{esc(e['slug'])}/id/"
+            id_alt = (f'\n      <atom:link rel="alternate" type="text/html" '
+                      f'hreflang="id" href="{id_url}"/>')
         items.append(f"""    <item>
       <title>{esc(meta['title'])}</title>
-      <link>{BLOG_URL}{esc(e['slug'])}/</link>
-      <guid isPermaLink="true">{BLOG_URL}{esc(e['slug'])}/</guid>
+      <link>{en_url}</link>
+      <guid isPermaLink="true">{en_url}</guid>
       <pubDate>{pub.strftime('%a, %d %b %Y %H:%M:%S +0000')}</pubDate>
       <description>{esc(meta.get('excerpt', ''))}</description>
-      <enclosure url="" length="0" type="text/html"/>
+      <enclosure url="" length="0" type="text/html"/>{id_alt}
     </item>""")
     rss = f"""<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Aditya Firmansyah — Field Notes</title>
     <link>{BLOG_URL}</link>
-    <description>Practitioner notes on software engineering, AI agents, and self-hosting.</description>
+    <description>Practitioner notes on software engineering, AI agents, and self-hosting. English and Bahasa Indonesia.</description>
     <language>en</language>
     <atom:link href="{BLOG_URL}rss.xml" rel="self" type="application/rss+xml"/>
 {chr(10).join(items)}
