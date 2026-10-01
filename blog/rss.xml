@@ -7,6 +7,14 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>18 Gateways to 1: The Fix That Isn&#x27;t in Git</title>
+      <link>https://aditf.com/blog/gateway-fix-not-in-git/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/gateway-fix-not-in-git/</guid>
+      <pubDate>Thu, 01 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Eighteen gateway daemons became one in under three minutes. The dashboard watching them broke, then got fixed with 270 uncommitted lines. A clean checkout puts production back to reporting 16 of 17 profiles down.</description>
+      <enclosure url="" length="0" type="text/html"/>
+    </item>
+    <item>
       <title>Two Kinds of Decision, and No Way to Prove the Model Did Not Change</title>
       <link>https://aditf.com/blog/decision-classifier-vs-reasoning-drift/</link>
       <guid isPermaLink="true">https://aditf.com/blog/decision-classifier-vs-reasoning-drift/</guid>

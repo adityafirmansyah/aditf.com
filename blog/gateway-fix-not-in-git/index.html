@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>18 Gateways to 1: The Fix That Isn&#x27;t in Git — Field Notes</title>
+<meta name="description" content="Eighteen gateway daemons became one in under three minutes. The dashboard watching them broke, then got fixed with 270 uncommitted lines. A clean checkout puts production back to reporting 16 of 17 profiles down.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/gateway-fix-not-in-git/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="18 Gateways to 1: The Fix That Isn&#x27;t in Git — Field Notes">
+<meta property="og:description" content="Eighteen gateway daemons became one in under three minutes. The dashboard watching them broke, then got fixed with 270 uncommitted lines. A clean checkout puts production back to reporting 16 of 17 profiles down.">
+<meta property="og:url" content="https://aditf.com/blog/gateway-fix-not-in-git/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/gateway-fix-not-in-git/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="18 Gateways to 1: The Fix That Isn&#x27;t in Git — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="18 Gateways to 1: The Fix That Isn&#x27;t in Git — Field Notes">
+<meta name="twitter:description" content="Eighteen gateway daemons became one in under three minutes. The dashboard watching them broke, then got fixed with 270 uncommitted lines. A clean checkout puts production back to reporting 16 of 17 profiles down.">
+<meta name="twitter:image" content="https://aditf.com/blog/gateway-fix-not-in-git/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-01T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="homelab">
+<meta property="article:tag" content="systemd">
+<meta property="article:tag" content="observability">
+<meta property="article:tag" content="self-hosting">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "18 Gateways to 1: The Fix That Isn't in Git", "description": "Eighteen gateway daemons became one in under three minutes. The dashboard watching them broke, then got fixed with 270 uncommitted lines. A clean checkout puts production back to reporting 16 of 17 profiles down.", "datePublished": "2026-10-01T00:00:00+00:00", "dateModified": "2026-10-01T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/gateway-fix-not-in-git/"}, "keywords": "ai-agents, homelab, systemd, observability, self-hosting", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1326, "image": ["https://aditf.com/blog/gateway-fix-not-in-git/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/gateway-fix-not-in-git/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/gateway-fix-not-in-git/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/gateway-fix-not-in-git/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/gateway-fix-not-in-git/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>01 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">7 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">18 Gateways to 1: The Fix That Isn&#x27;t in Git</h1>
+    <div class="post__tags"><span>ai-agents</span><span>homelab</span><span>systemd</span><span>observability</span><span>self-hosting</span></div>
+    <div class="post__content reveal is-visible">
+<p>At 18:43:02 on 30 September, this box ran eighteen gateway daemons. By 18:45:27 it ran one. The fold worked exactly as designed.</p>
+<p>The dashboard that watches them broke, and that part of the story ends badly. Not because the fix failed. Because the fix never made it into a commit.</p>
+<h2>The fold, measured</h2>
+<p>Before and after, read off the machine:</p>
+<ul>
+<li><strong>Gateway processes:</strong> 18 (17 role profiles plus the default) → <strong>1</strong>, pid 3703821, 845 MB RSS, up 22 hours.</li>
+<li><strong>Per-profile loopback ports:</strong> 8378–8394, plus 8642 → <strong>zero listeners on the per-profile range</strong>. Only 8001, 8002, 8113 and 8642 answer now.</li>
+<li><strong>Total Hermes RSS:</strong> 4.4 GB → <strong>2.06 GiB across 18 processes</strong>.</li>
+<li><strong>Hermes systemd units:</strong> 18 → <strong>2</strong>, hermes-gateway and hermes-ops-dashboard.</li>
+</ul>
+<p><code>ss -tln | grep -c '127.0.0.1:83[0-9][0-9]'</code> returns 0. The per-profile range is simply gone.</p>
+<p>All 16 profiles on disk answer on the multiplex route, and <code>/p/&lt;profile&gt;/health</code> returns HTTP 200 for every one of them.</p>
+<h2>The gateway said no first, and named its own fix</h2>
+<p>At 18:43:02 the launching gateway refused to go multiplex. Its own words:</p>
+<blockquote>
+<p>This gateway stays standalone: profile(s) 'branding' (systemd (user)), 'challenger' (systemd (user)), … 'viral-researcher' (systemd (user)) still run their own gateway; fold them with <code>hermes gateway migrate --multiplex</code>. It serves only the launching profile.</p>
+</blockquote>
+<p>Then it logged a race it had already decided not to run:</p>
+<blockquote>
+<p>Another profile's standalone gateway owns this host (PID 3605453 (no bound port; profiles: challenger)); starting beside it rather than retrying a race no second profile can win.</p>
+</blockquote>
+<p>That is a migration tool telling you it needs a migration, and handing you the command. The refusal costs nothing. The race it declined to run is the expensive one, and it was right to refuse.</p>
+<p>The migration itself ran 18:43:02 to 18:45:27. The <code>default.target.wants</code> directory mtime marks the end.</p>
+<h2>A fold is a thundering herd, not a rolling restart</h2>
+<p>At 18:43:35 the gateway wrote about its own death:</p>
+<blockquote>
+<p>Shutdown context: signal=UNKNOWN under_systemd=yes parent_pid=1216 parent_name=systemd loadavg_1m=17.39</p>
+</blockquote>
+<p>17.39 on a 4-core Celeron J4105. That is more than 4x oversubscription, recorded by the process being shut down. Fifteen shutdowns and one config converge all land inside the same minute.</p>
+<p>This box has no swap. <code>swapon --show</code> prints nothing, deliberately, because the SSD is slow. Nothing absorbs the spike, so the load either settles on its own or something dies.</p>
+<h2>What broke first: the peer URLs</h2>
+<p><code>bot_peers</code> in <code>~/.hermes/config.yaml</code> held URLs aimed at per-profile ports the fold had just deleted, and cross-profile delegation stopped working immediately:</p>
+<pre><code>$ hermes peer dm ...
+Connection refused
+</code></pre>
+<p>Re-pointing each entry at the multiplex route fixed it:</p>
+<pre><code>http://127.0.0.1:8642/p/&lt;name&gt;
+</code></pre>
+<p><code>/p/&lt;name&gt;/v1/capabilities</code> returns 200 again, and the table now holds 16 entries pointing at that route. Those URLs were the migration's other half, and nobody had written them down as a dependency.</p>
+<h2>What broke second: a health check that reads files</h2>
+<p>The ops dashboard is a small FastAPI app on 127.0.0.1:9898, and the fold broke it. That is not a claim read off a status page. It is what you get from replaying the committed code.</p>
+<p><code>HEAD</code> of <code>hermes_ops.py</code> holds this check:</p>
+<pre><code class="language-python">if _pid_alive(st.get(&quot;pid&quot;)) and _http_health(p[&quot;port&quot;]):
+</code></pre>
+<p>That same file contains zero occurrences of the string <code>multiplex</code>. Both clauses fail forever:</p>
+<ol>
+<li>the per-profile port was deleted by the fold, deliberately;</li>
+<li>the pid recorded for that profile in <code>gateway_state.json</code> is dead.</li>
+</ol>
+<p>Here is the cto profile's state file, last written by the pre-fold process:</p>
+<pre><code class="language-json">{&quot;pid&quot;:3608090,&quot;gateway_state&quot;:&quot;stopped&quot;,
+ &quot;platforms&quot;:{&quot;api_server&quot;:{&quot;listener_base&quot;:&quot;http://127.0.0.1:8387&quot;,
+   &quot;metrics&quot;:{&quot;port&quot;:8387,&quot;last_heartbeat&quot;:&quot;2026-09-30T11:43:55Z&quot;}}},
+ &quot;served_profiles&quot;:[],
+ &quot;multiplex_standalone_reason&quot;:&quot;profile(s) 'branding' ... 'viral-researcher' still run their own gateway; fold them with `hermes gateway migrate --multiplex`&quot;}
+</code></pre>
+<p>Pid 3608090 is dead, <code>ProcessLookupError</code>. Port 8387 is not listening. <code>served_profiles</code> is empty.</p>
+<p>Replay those two clauses against the box and 1 of 17 profiles comes back online, so 16 read as DOWN. Fifteen profile state files still carry a dead recorded pid, frozen relics of a topology that ended at 18:45. The root <code>~/.hermes/gateway_state.json</code> is live and authoritative; the per-profile files are the fossils.</p>
+<p>Ask the same profiles the way the fixed code asks them:</p>
+<pre><code>== same profiles via /p/&lt;name&gt;/health ==
+   reachable: 17/17
+</code></pre>
+<h2>The fix is live, and it is not in git</h2>
+<p>The live dashboard answers <code>{'total': 17, 'active': 1, 'idle': 16, 'down': 0}</code>. It stopped calling healthy profiles down at 13:43:28 today. Here is what stopped it:</p>
+<ul>
+<li><code>hermes_ops.py</code>: <strong>+270 uncommitted lines</strong>, adding <code>multiplex_host()</code> and <code>profile_reachable()</code>, which fall back to <code>/p/&lt;name&gt;/health</code> on the shared listener.</li>
+<li><code>hermes_status.py</code>: <strong>9 changed lines</strong>, now calling <code>_ops.profile_reachable(p)</code>.</li>
+<li>Branch <code>feat/ops-fleet-dashboard</code>, HEAD <code>844ab0d</code> (30 September, 14:04). The fix is not in that commit.</li>
+<li>File mtime 12:07:10. The service was restarted onto the dirty working tree at 13:43:28 and has run on it ever since.</li>
+</ul>
+<p>So the fix is real, it is correct, and it lives in exactly one place: a working tree nobody committed. A clean checkout, a redeploy or a branch switch puts the dashboard back to reporting 16 of 17 profiles down. There will be no commit to diff, no PR to review, and nothing in the history saying a fix ever happened.</p>
+<p>"It works right now" and "it is recorded" are different claims, and only one of them survives <code>git checkout .</code></p>
+<h2>One gateway, uncapped</h2>
+<p>The fold removed 17 processes and created one point of trust. The envelope around it is wide:</p>
+<ul>
+<li><code>hermes-gateway.service</code> runs <code>Restart=always</code> and <code>RestartUSec=5s</code>.</li>
+<li><code>MemoryCurrent</code> sits around 2.4–2.9 GiB and moves.</li>
+<li><code>TasksCurrent</code> is 95.</li>
+<li><code>MemoryHigh=infinity</code> and <code>MemoryMax=infinity</code>, so accounting is on and the cap is not.</li>
+</ul>
+<p>Memory is policed by hand instead. After a batch of turns, free heap is handed back to the kernel with <code>malloc_trim</code>, which reaches for <code>sbrk</code> and <code>madvise</code>. That is a policy, not a guarantee.</p>
+<p>With zero swap, the OOM killer gets exactly one shot and does not consult anyone first. Zombies are 0 right now, uptime is 1 week 17 hours, and disk sits at 60% of 115 G.</p>
+<h2>The same bug in my own notes</h2>
+<p>I nearly published the opposite of this post. My first draft said the dashboard was reporting 16 of 17 profiles down, and I had a measurement sheet that agreed with it.</p>
+<p>That sheet was already stale when I read it. The fix had been live for three hours. My own counting script had read the status value <code>IDLE</code> as <code>DOWN</code>.</p>
+<p>A snapshot wearing the present tense. The system was fine; the note about it was three hours out of date. That failure has a shape, and the shape is worth naming:</p>
+<ul>
+<li>"right now the system reports X" is true only at the instant the query ran;</li>
+<li>once the query lands in a file, that file's timestamp is part of the claim;</li>
+<li>so re-run it at publish, or write it in the past tense with the time attached.</li>
+</ul>
+<h2>The residual state</h2>
+<p>Mostly clean. Not entirely:</p>
+<ul>
+<li>16 per-profile <code>runs_idempotency.db</code> files, or 48 counting <code>-wal</code> and <code>-shm</code>;</li>
+<li>exactly 1 with a non-empty WAL, 245 KB, which outlived the process that wrote it;</li>
+<li>and 15 profile state files still pointing at pids that no longer exist.</li>
+</ul>
+<p>Abandoned write state is rare and it is real. So are 15 little JSON files that keep answering questions about a topology that stopped existing at 18:45.</p>
+<h2>Closing</h2>
+<p>The fold cost three minutes, one load spike and two broken consumers, and both consumers are fixed now. <code>bot_peers</code> points at the multiplex route. The dashboard reads <code>/p/&lt;name&gt;/health</code> and no longer calls a healthy profile down.</p>
+<p>What is not fixed is the record. Somebody will eventually redeploy that repo, land on a clean checkout, and watch 16 of 17 profiles go red with nothing in the history to explain it. The lesson from the routing table applies to the code that watches the routing table: a migration is not done when the old processes stop. It is done when every consumer has been re-pointed, and the change is in the commit.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/gateway-fix-not-in-git/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
