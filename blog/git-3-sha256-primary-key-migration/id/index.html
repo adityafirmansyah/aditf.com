@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Default SHA-256 di Git 3.0 Itu Migrasi Primary Key — Field Notes</title>
+<meta name="description" content="Gue bikin repo SHA-256 pakai git yang udah keinstall di laptop ini. Dua dari tiga hal yang gue lakuin tiap hari ke repo langsung gagal, dan yang ketiga dijamin mati di client lama. Yang mahal bukan hash-nya, tapi key-nya.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/git-3-sha256-primary-key-migration/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Default SHA-256 di Git 3.0 Itu Migrasi Primary Key — Field Notes">
+<meta property="og:description" content="Gue bikin repo SHA-256 pakai git yang udah keinstall di laptop ini. Dua dari tiga hal yang gue lakuin tiap hari ke repo langsung gagal, dan yang ketiga dijamin mati di client lama. Yang mahal bukan hash-nya, tapi key-nya.">
+<meta property="og:url" content="https://aditf.com/blog/git-3-sha256-primary-key-migration/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/git-3-sha256-primary-key-migration/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Default SHA-256 di Git 3.0 Itu Migrasi Primary Key — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Default SHA-256 di Git 3.0 Itu Migrasi Primary Key — Field Notes">
+<meta name="twitter:description" content="Gue bikin repo SHA-256 pakai git yang udah keinstall di laptop ini. Dua dari tiga hal yang gue lakuin tiap hari ke repo langsung gagal, dan yang ketiga dijamin mati di client lama. Yang mahal bukan hash-nya, tapi key-nya.">
+<meta name="twitter:image" content="https://aditf.com/blog/git-3-sha256-primary-key-migration/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-02T00:00:00+00:00">
+<meta property="article:tag" content="git">
+<meta property="article:tag" content="developer-tooling">
+<meta property="article:tag" content="migrations">
+<meta property="article:tag" content="version-control">
+<meta property="article:tag" content="storage">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Default SHA-256 di Git 3.0 Itu Migrasi Primary Key", "description": "Gue bikin repo SHA-256 pakai git yang udah keinstall di laptop ini. Dua dari tiga hal yang gue lakuin tiap hari ke repo langsung gagal, dan yang ketiga dijamin mati di client lama. Yang mahal bukan hash-nya, tapi key-nya.", "datePublished": "2026-10-02T00:00:00+00:00", "dateModified": "2026-10-02T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/git-3-sha256-primary-key-migration/id/"}, "keywords": "git, developer-tooling, migrations, version-control, storage", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1328, "image": ["https://aditf.com/blog/git-3-sha256-primary-key-migration/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/git-3-sha256-primary-key-migration/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/git-3-sha256-primary-key-migration/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/git-3-sha256-primary-key-migration/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/git-3-sha256-primary-key-migration/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>02 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">7 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Default SHA-256 di Git 3.0 Itu Migrasi Primary Key</h1>
+    <div class="post__tags"><span>git</span><span>developer-tooling</span><span>migrations</span><span>version-control</span><span>storage</span></div>
+    <div class="post__content reveal is-visible">
+<h2>Ributnya soal hash. Tagihannya soal key.</h2>
+<p>Post-nya Scott Chacon, "Git 3.0's upcoming SHA-256 default will be a costly mistake", lagi nangkring di front page Hacker News: 364 poin, sekitar 350 komentar. Hampir semua isi thread-nya debat soal fungsi hash.</p>
+<p>Bukan di situ duitnya.</p>
+<p>Setuju sama hitungan biayanya, tapi nggak setuju dramanya. SHA-256 memang hash yang benar buat jangka panjang, dan cepat atau lambat dia harus jadi default. Tapi yang bikin mahal itu bukan sisi kriptografinya sama sekali.</p>
+<p>Commit hash udah lama berhenti jadi sekadar ID internal doang di repo ini. Dia itu primary key, dan foreign key-nya nyebar di semua API forge, config CI, script release, permalink, sampai thread Slack di grup kantor.</p>
+<p>Kalau key-nya sekaligus jadi interface publik, ganti key itu bukan migrasi index. Itu migrasi ekosistem.</p>
+<p>Biar nggak cuma ngomong dari bacaan, gue luangin satu menit buka shell. Git yang keinstall di mesin ini 2.53.0, dan buat nguji ini udah lebih dari cukup.</p>
+<h2>Satu menit di shell, hampir semua argumennya udah kelar</h2>
+<p>Langkah pertama, bikin repo SHA-256 terus commit satu file:</p>
+<pre><code class="language-bash">git init --object-format=sha256 s256
+cd s256 &amp;&amp; echo hi &gt; a.txt &amp;&amp; git add a.txt &amp;&amp; git commit -m first
+
+git rev-parse HEAD
+# 5a14a64b8b6e5d545d946d1284b5f422502e8af6fcfde892185d7e6cb1f30e4b
+git rev-parse --short HEAD
+# 5a14a64
+</code></pre>
+<p>Nama lengkapnya 64 karakter hex. Repo SHA-1 di mesin yang sama nyebut commit-nya dengan 40 karakter. Versi pendeknya tujuh karakter di dua-duanya, jadi output <code>--short</code> selamat dan yang nggak selamat justru nama lengkapnya.</p>
+<p>Terus gue lakuin tiga hal yang tiap hari gue kerjain ke repo.</p>
+<ul>
+<li><strong>Push.</strong> Ke bare repo yang dibikin pakai <code>git init --bare --object-format=sha256</code>, push-nya lancar. Ke <code>git init --bare</code> biasa, mati dengan exit 128 dan <code>fatal: the receiving end does not support this repository's hash algorithm</code>.</li>
+<li><strong>Push lintas format.</strong> Repo SHA-256 yang nge-push ke bare repo SHA-1 gagal dengan cara yang sama, exit 128, plus <code>fatal: the remote end hung up unexpectedly</code>.</li>
+<li><strong>Submodule.</strong> Nambahin repo SHA-256 sebagai submodule di superproject SHA-1 gagal dengan <code>error: cannot add a submodule of a different hash algorithm</code>.</li>
+</ul>
+<p>Dua dari tiga langsung gagal. Yang pertama justru yang paling penting: repo penerimanya harus tahu format hash sejak <code>init</code>.</p>
+<p>Elo nggak bisa nge-push repo SHA-256 ke repo yang udah berdiri sebagai SHA-1. Format itu bukan sifat object-nya, tapi sifat repo-nya.</p>
+<h2>Pintu satu arahnya ada di versi format</h2>
+<p>Repo SHA-256 nulis dua baris ini ke <code>.git/config</code>:</p>
+<pre><code>[core]
+    repositoryformatversion = 1
+[extensions]
+    objectformat = sha256
+</code></pre>
+<p>Dokumen transisinya tegas soal alasan dua baris itu ada. Setelan itu bikin semua versi Git setelah v0.99.9l mati, dan nggak nekat jalan di repo SHA-256.</p>
+<p>Antara v0.99.9l dan v2.7.0 errornya <code>fatal: Expected git repo version &lt;= 0, found 1</code>. Lewat v2.7.0, pesannya berubah jadi <code>fatal: unknown repository extensions found: objectformat compatobjectformat</code>. Nggak ada jalan tengah yang bikin versi lama tadi bisa baca.</p>
+<p>Itu bukan feature flag yang bisa dinyalain tiap tim sesuai jadwal sendiri. Client lama nggak bisa baca repo-nya sama sekali, dan itu naruh semua consumer di satu sisi garis.</p>
+<h2>Setengah debat di thread itu udah dijawab dokumennya</h2>
+<p>Klaim "nggak bisa di-push ke mana-mana" di thread kebaca kayak bug report. Dokumen transisinya bilang itu keadaan sementara, dan jembatannya dijelasin cukup detail.</p>
+<p>Jembatannya berupa tabel mapping dua arah antara nama object SHA-256 dan SHA-1, dibikin lokal dan bisa dicek pakai <code>git fsck</code>, plus setelan <code>extensions.compatObjectFormat</code>. Object bisa dipanggil pakai nama 40 karakter atau 64 karakter.</p>
+<p>Fetch dari server SHA-1 dikonversi ke bentuk SHA-256 sambil nyatet mapping-nya. Push ke server SHA-1 dikonversi di jalan keluar, jadi servernya nggak pernah tahu client-nya pakai hash apa.</p>
+<p>Yang masuk daftar di luar cakupan justru bagian yang kelewat di thread:</p>
+<ul>
+<li>intermixing object yang pakai beberapa fungsi hash dalam satu repo;</li>
+<li>shallow clone dan fetch ke repo SHA-256;</li>
+<li>nge-skip fetch sebagian submodule;</li>
+<li>minjem object dari repo SHA-1 lewat <code>objects/info/alternates</code>;</li>
+<li>migrasi tree <code>git notes</code> ke nama SHA-256;</li>
+<li>dukungan SHA-256 di protokol Git-nya sendiri.</li>
+</ul>
+<p>Jadi yang diperdebatkan bukan ada atau nggaknya keadaan sementara. Yang diperdebatkan biayanya, dan dokumennya nutup bagian itu dengan tegas: "Until Git protocol gains SHA-256 support, using SHA-256 based storage on public-facing Git servers is strongly discouraged."</p>
+<h2>Yang sebenernya jebol, dan bukan fungsi hash-nya</h2>
+<p>Daftar biaya dari Chacon itu yang paling konkret. Baca aja sebagai inventaris titik interface, bukan sebagai teror.</p>
+<ul>
+<li>Tiap repo di forge masuk ke satu keranjang atau keranjang lain, dan dua keranjang itu nggak bisa dicampur.</li>
+<li>Submodule butuh dua sisi yang formatnya sama, persis kayak command ketiga di atas.</li>
+<li>Konversi project yang udah jalan berarti hash ulang semua object dan semua signature lama jadi nggak berlaku.</li>
+<li>Permalink yang bawa hash lengkap di Slack, email dan dokumen berhenti ngebuka.</li>
+<li>Tooling apa pun yang nunggu 40 karakter buat hash harus nebak atau deteksi formatnya.</li>
+</ul>
+<p>Yang terakhir itu kalimatnya dia sendiri, dan mesin gue sampel kecilnya. Ada sepuluh repo, semuanya SHA-1, dan nggak ada satu pun yang punya key <code>objectformat</code> di <code>.git/config</code>.</p>
+<p>Di hari Git 3.0, tiap repo jadi satu keputusan. Tiap script, hook, dan integrasi yang baca hash ikut masuk ke keputusan itu.</p>
+<h2>Bantahan-bantahannya, sama namanya</h2>
+<p><code>ltbarcly3</code> nyebut ini "Y2K fud", dan dia bikin kasus terkuat buat sisi seberang. Alternatifnya ya tetep SHA-1 sampai jadi kritis, terus semua orang pindah di hari yang sama, sementara forge yang nggak pernah kepaksa implement SHA-256 ikut kena.</p>
+<p><code>plorkyeran</code> nunjuk kalau masalah forge itu soal pilihan implementasi, bukan sifat hash. <code>GrantMoyer</code> nyantumin dokumen transisinya dan nyebut beberapa kekhawatiran penulisnya udah dijawab di situ.</p>
+<p><code>gorgoiler</code> nyadar hal yang sama dari arah sebaliknya: mapping dua arah itu justru interoperabilitas yang diklaim post-nya nggak ada.</p>
+<p>Di sisi trust, <code>Strilanc</code> nolak framing-nya mentah-mentah, dan <code>mort96</code> ngejelasin kasus mirror plus tooling: "I deal with things which reference commits by hash in repos all the damn time. There are thousands of them in every Yocto project!"</p>
+<h2>Usulan yang dilewatin thread</h2>
+<p>Bagian konstruktif dari post-nya: tree hash yang ditandatangani terpisah. Konten tree di-hash ulang pakai algoritma kedua, terus dua-duanya ikut ditandatangani, jadi SHA-1 tetap buat ambil konten dan hash kedua buat verifikasi.</p>
+<p>Git-evtag punya Colin Walters udah kayak gitu sejak 2015: nambahin checksum <code>Git-EVTag-v0-SHA512</code> di atas commit, tree, dan tiap blob ke tag-nya sebelum ditandatangani.</p>
+<p><code>SmasherEpilepti</code> nyebut ini paling pas di thread: bagian paling menarik dari artikelnya, tapi paling sedikit dapat perhatian. Argumen dasarnya udah dibikin Linus di 2005 dan dikutip Chacon: keamanan yang asli ada di distribusi, bukan di hash-nya.</p>
+<h2>Bentuk yang sama, storage yang beda</h2>
+<p>Cerita front page lain di hari yang sama, "RIP, vector database" dari turbopuffer, itu pelajaran yang sama dari sisi index. Di v1 dan v2, tiap dokumen disimpan di bawah ANN address-nya. Waktu SPFresh nge-balance ulang vektor, seluruh dokumennya ikut pindah, dan update satu vektor bisa mindahin ratusan atribut sekalian index-nya.</p>
+<p>Fix di v3 dibilang datar: jangan pakai ANN address sebagai key. ANN index-nya jadi sekadar secondary index. Posting list full-text mereka berubah dari median sekitar 1,5 entri per blok jadi blok tetap sekitar 256, dan index-nya jadi sepuluh kali lebih kecil sementara query-nya sampai dua puluh kali lebih cepat.</p>
+<p>Skalanya bikin poinnya soal biaya: 1T+ dokumen, 10M+ writes per detik, 25k+ query per detik, single index 100B+ vektor dengan 200 ms p99 di 1k+ QPS.</p>
+<p>Itu tanda terima dari harga sebuah key yang diam-diam udah jadi interface.</p>
+<h2>Yang gue lakuin sebelum hari Git 3.0</h2>
+<p>Intinya bukan "hindari SHA-256", dan bukan juga "tunggu ada yang mutusin duluan". Asumsi soal format hash sekarang jadi inventaris, jadi tulis aja.</p>
+<ul>
+<li>Jalanin reproduksi di atas di direktori sementara, pakai git yang beneran lo pakai.</li>
+<li>Grep pipeline-nya buat asumsi hash 40 karakter, plus kode yang motong atau bandingin hash.</li>
+<li>Cek <code>git config --get extensions.objectformat</code> di semua repo dan catet format masing-masing.</li>
+<li>Tanyain consumer mana yang nggak bisa lo update sesuai jadwal lo, karena mereka yang dikunci baris <code>repositoryformatversion = 1</code>.</li>
+</ul>
+<p>Satu baris config bisa ganti fungsi hash. Tapi key yang dibangun di atasnya itu interface yang dipakai tooling sepuluh tahun.</p>
+<p>Yang mahal migrasi yang kedua, dan langkah pintarnya tahu besar tagihannya sebelum default-nya keburu ganti di bawah kita.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/git-3-sha256-primary-key-migration/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

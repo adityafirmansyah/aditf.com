@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Git 3.0&#x27;s SHA-256 Default Is a Primary-Key Migration</title>
+      <link>https://aditf.com/blog/git-3-sha256-primary-key-migration/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/git-3-sha256-primary-key-migration/</guid>
+      <pubDate>Fri, 02 Oct 2026 00:00:00 +0000</pubDate>
+      <description>I created a SHA-256 repository with the git I already have. Two of three daily operations failed outright, and the third is documented to die on older clients. The hash is not the migration; the key is.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/git-3-sha256-primary-key-migration/id/"/>
+    </item>
+    <item>
       <title>18 Gateways to 1: The Fix That Isn&#x27;t in Git</title>
       <link>https://aditf.com/blog/gateway-fix-not-in-git/</link>
       <guid isPermaLink="true">https://aditf.com/blog/gateway-fix-not-in-git/</guid>
