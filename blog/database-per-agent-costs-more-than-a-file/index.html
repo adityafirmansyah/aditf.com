@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Database Per Agent Costs More Than a File — Field Notes</title>
+<meta name="description" content="Supabase says agents should be able to create a database as cheaply as a file. I already run one database per agent on a mini-PC, so I counted. The create is free; everything after it is the bill.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A Database Per Agent Costs More Than a File — Field Notes">
+<meta property="og:description" content="Supabase says agents should be able to create a database as cheaply as a file. I already run one database per agent on a mini-PC, so I counted. The create is free; everything after it is the bill.">
+<meta property="og:url" content="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A Database Per Agent Costs More Than a File — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="A Database Per Agent Costs More Than a File — Field Notes">
+<meta name="twitter:description" content="Supabase says agents should be able to create a database as cheaply as a file. I already run one database per agent on a mini-PC, so I counted. The create is free; everything after it is the bill.">
+<meta name="twitter:image" content="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-03T00:00:00+00:00">
+<meta property="article:tag" content="sqlite">
+<meta property="article:tag" content="databases">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="infrastructure">
+<meta property="article:tag" content="self-hosting">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "A Database Per Agent Costs More Than a File", "description": "Supabase says agents should be able to create a database as cheaply as a file. I already run one database per agent on a mini-PC, so I counted. The create is free; everything after it is the bill.", "datePublished": "2026-10-03T00:00:00+00:00", "dateModified": "2026-10-03T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/database-per-agent-costs-more-than-a-file/"}, "keywords": "sqlite, databases, ai-agents, infrastructure, self-hosting", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 889, "image": ["https://aditf.com/blog/database-per-agent-costs-more-than-a-file/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/database-per-agent-costs-more-than-a-file/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>03 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">4 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">A Database Per Agent Costs More Than a File</h1>
+    <div class="post__tags"><span>sqlite</span><span>databases</span><span>ai-agents</span><span>infrastructure</span><span>self-hosting</span></div>
+    <div class="post__content reveal is-visible">
+<h2>The pitch, in the vendor's own words</h2>
+<p>Supabase is acquiring Turso, and it framed the whole deal around agents. Supabase says it is already launching over one million databases per week. Agents, in its words, are "spinning up millions of databases to power the prototypes, explorations, dashboards, and apps they're building."</p>
+<p>The promise is that agents "should be able to create a database as easily as creating a file, with just as little concern about cost."</p>
+<p>I already live in that future. Sixteen agent profiles run on this box, each with its own <code>state.db</code>. The box is a 10-watt Celeron mini-PC, not a pitch deck. So I counted.</p>
+<p>The create really is as cheap as a file. Nothing after it is.</p>
+<h2>What Supabase is actually buying</h2>
+<p>The mechanics behind the pitch are Turso's. They rebuilt SQLite in Rust, and the cloud platform "can manage millions of databases, loading them when needed and suspending them when they're not."</p>
+<p>That last sentence is the deal. Turso's own rewrite post is blunt about why it exists. After two years of libSQL, it says, "Independent usage of libSQL as a SQLite replacement remained low". Most users, it adds, came for SQLite-over-the-wire rather than core database improvements.</p>
+<p>So Supabase is not buying a faster storage engine. It is buying the control plane: the machinery that suspends, resumes, checkpoints and backs up a million small databases. The file format was never the hard part.</p>
+<h2>The bill, itemized</h2>
+<p>Scope: my home directory, with <code>node_modules</code> and VCS internals skipped. Measured 2026-10-03.</p>
+<ul>
+<li><strong>16 agent profiles</strong>, each with a <code>state.db</code>. Counting the root database, that is 17 <code>state.db</code> files at 633 MB.</li>
+<li><strong>259 other <code>.db</code> files</strong>, 61 MB.</li>
+<li><strong>16 <code>runs_idempotency.db</code> files</strong>, 0.6 MB.</li>
+<li><strong>71 <code>.db-wal</code> files</strong>, 108 MB.</li>
+<li><strong>71 <code>.db-shm</code> files</strong>, 2 MB.</li>
+<li><strong>11 <code>state.db.bak</code> snapshots</strong> from 24–27 September, 292 MB.</li>
+</ul>
+<p>That is 449 files and about 1.1 GB. The largest single database is <code>eng-frontend/state.db</code> at 158 MB.</p>
+<h2>A database is not a file. It is three.</h2>
+<p>SQLite is honest about this in its own docs. "There is an additional quasi-persistent '-wal' file and '-shm' shared memory file associated with each database," it says, which "can make SQLite less appealing for use as an application file-format". That caveat is about general-purpose container formats rather than the embedded use case.</p>
+<p>Every database here runs in WAL mode, so every one of them is three files on disk. The write-ahead log holds transactions that are committed but not yet folded back into the main file.</p>
+<p>On this box, the 17 <code>state.db-wal</code> files hold 60 MB. The biggest three (cto, pr-reviewer and branding) sit at exactly 6 MB each. SQLite only checkpoints automatically at 1,000 pages, so a busy agent can park a lot of committed data in a sidecar.</p>
+<h2>Two costs that never make the slide</h2>
+<p>The first is read access. A WAL database cannot be opened by a process with only read permission, because the opener needs write access to the <code>-shm</code> shared-memory file. So the obvious escape hatch fails: copy the <code>.db</code> somewhere and read it.</p>
+<p>The second is backups. Eleven dated copies from four days in September add up to 292 MB. That is a quarter of the whole footprint, from 16 agents, with no retention policy and nobody asking for it.</p>
+<p>Scale either cost to a million databases a week and it stops being a rounding error.</p>
+<h2>The counter-arguments are worth carrying</h2>
+<p>The rewrite drew real objections, not just applause. The thread ran to 202 points and 105 comments, with both Turso's CEO and cofounder replying.</p>
+<p>arnath asked why anyone would rewrite software that is, in his words, "widely considered one of the best written and tested pieces of software in the world".</p>
+<p>smt88 argued the real win from a Rust rewrite is fewer "serious security vulnerabilities and memory bugs", not more speed or stability.</p>
+<p>The performance receipts were worse. Alexey Milovidov opened ClickBench issue #336, titled "Add Turso (it is unbelievably slow) (it also does not work)". A later pull request reads: "Turso - it is ridiculously slow, can't believe that".</p>
+<p>Commenter f311a noted repeated benchmark attempts where, as he put it, "each time new bugs were found". Another, menaerus, reported a loader stuck at "4 kilobytes per second".</p>
+<p>Turso cofounder penberg answered in-thread. "It's all in the ingestion before the benchmark," he wrote. "We do intend to improve it but not the highest priority right now".</p>
+<p>CEO glommer handled the acquisition question himself. "We were doing fine," he said. "This is a strategic acquisition". He also said Turso "grew revenue &gt; 5x this year", and is fully MIT.</p>
+<p>That is the honest version. The engine has rough edges, and the control plane is the asset.</p>
+<h2>What I would actually do</h2>
+<p>At 16 agents, I can clean this up by hand:</p>
+<ol>
+<li>Checkpoint the write-ahead logs, so the 60 MB folds back into the main files.</li>
+<li>Set a retention policy and delete the September backups.</li>
+<li>Keep idle profiles' databases off the hot path.</li>
+</ol>
+<p>At a million databases a week, none of that is manual. The checkpointing, backup and retention machinery is the product, and it is exactly what Supabase is buying.</p>
+<p>The model is right. A database per agent is a good shape.</p>
+<p>Just do not price it by the create.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

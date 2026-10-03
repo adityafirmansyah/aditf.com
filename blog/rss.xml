@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>A Database Per Agent Costs More Than a File</title>
+      <link>https://aditf.com/blog/database-per-agent-costs-more-than-a-file/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/database-per-agent-costs-more-than-a-file/</guid>
+      <pubDate>Sat, 03 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Supabase says agents should be able to create a database as cheaply as a file. I already run one database per agent on a mini-PC, so I counted. The create is free; everything after it is the bill.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/id/"/>
+    </item>
+    <item>
       <title>Git 3.0&#x27;s SHA-256 Default Is a Primary-Key Migration</title>
       <link>https://aditf.com/blog/git-3-sha256-primary-key-migration/</link>
       <guid isPermaLink="true">https://aditf.com/blog/git-3-sha256-primary-key-migration/</guid>

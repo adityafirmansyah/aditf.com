@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Satu Database per Agent Itu Nggak Semurah File — Field Notes</title>
+<meta name="description" content="Supabase bilang agent harus bisa bikin database semurah bikin file. Di mini-PC gue udah jalanin satu database per agent, jadi gue hitung. Bikinnya emang murah; semua yang setelahnya itu baru tagihannya.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Satu Database per Agent Itu Nggak Semurah File — Field Notes">
+<meta property="og:description" content="Supabase bilang agent harus bisa bikin database semurah bikin file. Di mini-PC gue udah jalanin satu database per agent, jadi gue hitung. Bikinnya emang murah; semua yang setelahnya itu baru tagihannya.">
+<meta property="og:url" content="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Satu Database per Agent Itu Nggak Semurah File — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Satu Database per Agent Itu Nggak Semurah File — Field Notes">
+<meta name="twitter:description" content="Supabase bilang agent harus bisa bikin database semurah bikin file. Di mini-PC gue udah jalanin satu database per agent, jadi gue hitung. Bikinnya emang murah; semua yang setelahnya itu baru tagihannya.">
+<meta name="twitter:image" content="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-03T00:00:00+00:00">
+<meta property="article:tag" content="sqlite">
+<meta property="article:tag" content="databases">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="infrastructure">
+<meta property="article:tag" content="self-hosting">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Satu Database per Agent Itu Nggak Semurah File", "description": "Supabase bilang agent harus bisa bikin database semurah bikin file. Di mini-PC gue udah jalanin satu database per agent, jadi gue hitung. Bikinnya emang murah; semua yang setelahnya itu baru tagihannya.", "datePublished": "2026-10-03T00:00:00+00:00", "dateModified": "2026-10-03T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/database-per-agent-costs-more-than-a-file/id/"}, "keywords": "sqlite, databases, ai-agents, infrastructure, self-hosting", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 800, "image": ["https://aditf.com/blog/database-per-agent-costs-more-than-a-file/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/database-per-agent-costs-more-than-a-file/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>03 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">4 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Satu Database per Agent Itu Nggak Semurah File</h1>
+    <div class="post__tags"><span>sqlite</span><span>databases</span><span>ai-agents</span><span>infrastructure</span><span>self-hosting</span></div>
+    <div class="post__content reveal is-visible">
+<h2>Pitch-nya, pakai kalimat mereka sendiri</h2>
+<p>Supabase lagi ngakuisisi Turso, dan framing-nya seputar agent. Mereka ngaku udah launch lebih dari satu juta database tiap minggu, dan agent, kata mereka, "spinning up millions of databases to power the prototypes, explorations, dashboards, and apps they're building."</p>
+<p>Janjinya sederhana: agent "should be able to create a database as easily as creating a file, with just as little concern about cost". Dan gue udah hidup di masa depan itu.</p>
+<p>Di mesin ini jalan 16 profil agent, masing-masing punya <code>state.db</code> sendiri. Mesinnya mini-PC Celeron 10 watt, bukan slide deck. Jadi gue hitung.</p>
+<p>Bikin database-nya emang semurah bikin file, tapi yang setelahnya nggak.</p>
+<h2>Yang sebenernya dibeli Supabase</h2>
+<p>Mesin di balik pitch itu punya Turso. SQLite ditulis ulang pakai Rust. Platform cloud-nya "can manage millions of databases, loading them when needed and suspending them when they're not."</p>
+<p>Kalimat terakhir itu intinya, dan post rewrite Turso sendiri jujur soal alasannya. Setelah dua tahun libSQL, katanya, "Independent usage of libSQL as a SQLite replacement remained low". Kebanyakan user, tambahnya, lebih butuh SQLite-over-the-wire daripada perbaikan database intinya.</p>
+<p>Jadi Supabase nggak beli storage engine yang lebih cepat, tapi control plane-nya: mesin yang nge-suspend, nge-resume, nge-checkpoint, dan nge-backup sejuta database kecil. Format file-nya bukan bagian yang susah.</p>
+<h2>Tagihannya, satu per satu</h2>
+<p>Cakupannya: direktori home gue, <code>node_modules</code> dan isi VCS di-skip, diukur 2026-10-03.</p>
+<ul>
+<li><strong>16 profil agent</strong>, masing-masing punya <code>state.db</code> sendiri, dan kalau ditambah database root totalnya jadi 17 <code>state.db</code>, 633 MB.</li>
+<li><strong>259 file <code>.db</code> lain</strong>, 61 MB.</li>
+<li><strong>16 file <code>runs_idempotency.db</code></strong>, 0,6 MB.</li>
+<li><strong>71 file <code>.db-wal</code></strong>, 108 MB.</li>
+<li><strong>71 file <code>.db-shm</code></strong>, 2 MB.</li>
+<li><strong>11 snapshot <code>state.db.bak</code></strong> bertanggal 24–27 September, 292 MB.</li>
+</ul>
+<p>Totalnya 449 file, sekitar 1,1 GB. Database tunggal paling besar itu <code>eng-frontend/state.db</code>. Ukurannya 158 MB.</p>
+<h2>Database itu bukan satu file, tapi tiga</h2>
+<p>SQLite sendiri ngomong gini di dokumennya: "There is an additional quasi-persistent '-wal' file and '-shm' shared memory file associated with each database," yang bikin SQLite "less appealing for use as an application file-format". Peringatan itu soal database yang dipakai sebagai format file serbaguna, dan itu bukan soal pemakaian embedded-nya.</p>
+<p>Semua database di sini jalan di mode WAL. Jadi tiap satu itu tiga file di disk. Write-ahead log-nya nyimpen transaksi yang udah commit tapi belum dilipat balik ke file utama.</p>
+<p>Di mesin ini, 17 file <code>state.db-wal</code> nahan 60 MB, dan tiga paling gede (cto, pr-reviewer, branding) pas 6 MB masing-masing. SQLite cuma auto-checkpoint tiap 1.000 halaman, jadi agent yang sibuk bisa nyimpen banyak data ter-commit di file sampingan.</p>
+<h2>Dua biaya yang nggak pernah masuk slide</h2>
+<p>Pertama, akses baca. Database WAL nggak bisa dibuka oleh proses yang cuma punya izin baca. Proses pembukanya butuh akses tulis ke file shared memory <code>-shm</code>. Jadi jalan pintas yang kelihatan jelas itu gagal: copy <code>.db</code>-nya ke tempat lain terus dibaca.</p>
+<p>Kedua, backup. Sebelas salinan bertanggal dari empat hari di September jumlahnya 292 MB, seperempat dari seluruh footprint, dari 16 agent, tanpa retention policy dan nggak ada yang minta.</p>
+<p>Skalain salah satunya ke sejuta database per minggu. Angkanya langsung berhenti jadi pembulatan.</p>
+<h2>Argumen lawannya perlu dibawa juga</h2>
+<p>Rewrite-nya menuai penolakan nyata, bukan cuma tepuk tangan. Thread-nya sampai 202 poin dan 105 komentar. CEO maupun cofounder Turso ikut jawab di situ.</p>
+<p>arnath nanya, kenapa harus nulis ulang software yang menurut dia "widely considered one of the best written and tested pieces of software in the world".</p>
+<p>smt88 malah bilang, keuntungan utama nulis ulang pakai Rust itu ngurangin "serious security vulnerabilities and memory bugs", bukan nambah kecepatan atau stabilitas.</p>
+<p>Soal performa lebih parah lagi. Alexey Milovidov buka issue ClickBench #336 dengan judul "Add Turso (it is unbelievably slow) (it also does not work)", dan satu pull request setelahnya bunyinya: "Turso - it is ridiculously slow, can't believe that".</p>
+<p>Komentator f311a nyatet percobaan benchmark berulang yang, katanya, "each time new bugs were found". Ada juga menaerus. Dia lapor loader-nya nyangkut di "4 kilobytes per second".</p>
+<p>Cofounder Turso, penberg, jawab di thread. "It's all in the ingestion before the benchmark," tulisnya, dan "we do intend to improve it but not the highest priority right now".</p>
+<p>CEO glommer jawab sendiri soal akuisisinya. "We were doing fine," ujarnya. "This is a strategic acquisition," dan Turso "grew revenue &gt; 5x this year", full MIT.</p>
+<p>Itu versi jujurnya. Engine-nya masih kasar di beberapa tempat. Yang jadi aset justru control plane-nya.</p>
+<h2>Yang bakal gue lakuin</h2>
+<p>Di 16 agent, gue masih bisa beresin ini manual:</p>
+<ol>
+<li>Checkpoint write-ahead log-nya, biar 60 MB-nya balik ke file utama.</li>
+<li>Bikin retention policy, terus hapus backup September itu.</li>
+<li>Jauhkan database profil yang nganggur dari jalur panas.</li>
+</ol>
+<p>Di sejuta database per minggu, nggak ada yang manual. Mesin checkpoint, backup, dan retention itu produknya. Dan persis itu yang dibeli Supabase.</p>
+<p>Model-nya bener: satu database per agent itu bentuk yang masuk akal.</p>
+<p>Yang salah cuma kalau lo ngehargainnya dari biaya bikin.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
