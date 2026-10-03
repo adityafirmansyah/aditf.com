@@ -6,39 +6,69 @@ excerpt: Coding agent bikin nulis PR jadi nyaris gratis, artinya pipeline CI-mu 
 tags: ci-cd, ai-agents, developer-productivity, testing, github-actions
 ---
 
-Empat belas PR nangkring di antrean pas Selasa pagi, semuanya dari agent, nggak ada satupun dari manusia yang ngetik satu baris kode. Ini fleet Hermes yang gue jalanin buat dagango.com dan beberapa repo klien di minggu biasa. Coding agent sama QA agent nggak tidur, nggak capek nulis test, dan nggak merasa bersalah buka PR #15 pas PR #12 masih running CI.
+Empat belas PR nangkring di antrean pas Selasa pagi. Semuanya dari agent, nggak ada satu pun dari manusia yang ngetik satu baris kode.
 
-Yang pertama kali jebol bukan codebase-nya. Yang jebol duluan itu pipeline yang harusnya nge-validate itu semua.
+Itu fleet Hermes yang gue jalanin buat dagango.com dan beberapa repo klien, dan itu cuma minggu biasa.
 
-Linear nulis soal masalah persis ini tanggal 21 September ("AI coding has made CI a bottleneck, so we reworked ours to keep up"). Dalam sehari, tulisan itu udah tembus 230-an poin dan 250-an komentar di Hacker News. Kayaknya semua tim yang jalanin agent di skala besar mentok di titik yang sama, di waktu yang hampir bareng.
+Coding agent sama QA agent nggak tidur dan nggak capek nulis test. Buka PR #15 pas PR #12 masih running CI pun mereka nggak merasa bersalah.
 
-Data produk Linear sendiri ngasih gambaran yang lebih luas:
+Yang jebol duluan bukan codebase-nya, tapi pipeline yang nge-validate kodenya.
 
-- PR mingguan tim yang pakai coding agent naik hampir tiga kali lipat dalam dua tahun, dari 21 jadi 65.
-- AI bergerak dari kurang dari satu issue per seribu jadi hampir separuh dari semua issue yang dibuat di Linear.
-- Khusus di post CI-nya, test suite internal mereka hampir empat kali lipat sejak Januari.
+Tanggal 21 September, Linear nulis soal masalah yang persis sama: "AI coding has made CI a bottleneck, so we reworked ours to keep up".
 
-Ini bukan masalah khusus Linear. Ini yang bakal terjadi ke pipeline manapun yang dibangun buat manusia, begitu "junior developer" kamu ternyata agent yang jalan paralel 24 jam.
+Sehari kemudian di Hacker News, tulisan itu udah lewat 230 poin dan 250-an komentar.
 
-## Bottleneck-nya pindah dari nulis kode ke verifikasi kode
+Kayaknya bukan cuma Linear yang mentok. Semua tim yang jalanin agent di skala gede nabrak dinding yang sama, dan waktunya berdekatan.
 
-Bertahun-tahun, kendala di software delivery itu di authoring: nulis kode, nulis test, nulis deskripsi PR yang nggak ada yang baca. Agent bikin biaya itu turun mendekati nol. Kapasitas CI nggak ikut turun, karena CI itu ukurannya buat kecepatan manusia bikin PR, dan agent bikin PR di kecepatan yang sama sekali beda.
+Angka dari Linear sendiri nunjukin bentuknya:
 
-Linear berhasil jagain waktu tunggu PR di 5-6 menit walaupun test suite-nya meledak, tapi cuma karena mereka aktif motong runner time per test kira-kira setengahnya. Kapasitas verifikasi sekarang jadi hal yang harus kamu desain, sama kayak kamu desain buat load database atau rate limit API.
+- PR mingguan dari tim yang pakai coding agent naik hampir tiga kali lipat dalam dua tahun, dari 21 jadi 65.
+- Issue bikinan AI naik dari kurang dari satu per seribu jadi hampir separuh dari semua issue yang dibuat di Linear.
+- Test suite internal mereka hampir empat kali lipat sejak Januari, kata post CI mereka sendiri.
 
-Gue ngerasain ini langsung waktu gue lepasin tiga coding agent bareng-bareng ke repo dagango.com. Menit GitHub Actions di plan kita habis sembilan hari, padahal biasanya cukup buat sebulan. Masalahnya bukan kualitas kode. Masalahnya pipeline-nya keselek jumlah job.
+Nggak ada satu pun angka itu yang khusus Linear.
+
+Itu yang bakal kejadian ke pipeline mana pun yang dibangun buat manusia, begitu "junior developer" lo isinya agent yang jalan paralel 24 jam.
+
+## Bottleneck-nya geser dari nulis kode ke verifikasi
+
+Bertahun-tahun, yang jadi kendala di software delivery itu authoring.
+
+Nulis kode, nulis test, sampai deskripsi PR yang nggak ada yang baca.
+
+Agent bikin biaya itu nyaris nol. Tapi kapasitas CI nggak ikut turun, karena CI itu ukurannya buat kecepatan manusia bikin PR, dan agent bikin PR di kecepatan yang beda sama sekali.
+
+Linear jagain waktu tunggu PR mereka di 5-6 menit walaupun test suite-nya meledak. Caranya cuma satu: runner time per test mereka potong kira-kira setengahnya.
+
+Kapasitas verifikasi sekarang jadi hal yang harus lo desain, sama kayak lo desain buat load database atau rate limit API.
+
+Gue ngerasain ini langsung pas ngelepas tiga coding agent ke repo dagango.com.
+
+Dalam sembilan hari, jatah menit GitHub Actions kita untuk sebulan habis.
+
+Yang bermasalah bukan kualitas kodenya, tapi pipeline yang nggak sanggup nampung jumlah job.
 
 ## Kemenangan termurah: benerin infra dulu sebelum ngoprek logic pipeline
 
-Lever pertama Linear itu nggak butuh ubah pipeline sama sekali: pindah dari GitHub Actions ke runner pihak ketiga yang lebih cepat bikin job rata-rata 34% lebih ngebut, sementara `tsc` type-check turun 52%. File workflow-nya sendiri nggak berubah sama sekali.
+Lever pertama Linear nggak butuh ubah pipeline sama sekali.
 
-Buat tim kecil atau budget UMKM, di volume job era-agent, runner hosted premium cepat jadi mahal, karena billing per-menit langsung numpuk begitu jumlah job meledak naik. Self-hosted runner di hardware biasa ngubah hitungannya. Punya gue jalan di homelab yang malu-maluin kalau disebut di forum hardware, dan tetep menang dari sisi waktu sampai hasil pertama muncul. Alasannya simpel: nggak ada antrean dan nggak ada meter yang jalan buat tiap job.
+Ganti GitHub Actions ke runner pihak ketiga yang lebih cepat bikin job rata-rata 34% lebih ngebut. `tsc` type-check-nya turun 52%, dan file workflow-nya sendiri nggak disentuh.
 
-## Hitung berapa kali runner start, bukan berapa detik
+Buat tim kecil atau budget UMKM, runner hosted premium jadi mahal cepat begitu jumlah job meledak naik. Sebab billing per-menit itu numpuk persis di volume yang diciptain agent.
 
-Pelajaran kedua Linear: benerin critical path dulu sebelum micro-optimize apapun di dalemnya. Batasin fetch depth git aja bikin gate job paling lambat mereka turun dari 94 detik ke 20 detik. Batching tujuh check kecil jadi dua job hemat sekitar 87.000 runner-minute per bulan, 11,8% dari total spending CI mereka.
+Self-hosted runner di hardware biasa ngubah hitungannya.
 
-Dua-duanya nggak nyentuh logic test sama sekali. Dua-duanya datang dari ngitung berapa job yang jalan, terlepas dari berapa lama tiap job jalan.
+Punya gue jalan di homelab yang malu-maluin kalau disebut di forum hardware. Tapi tetap menang dari sisi wall-clock time sampai hasil pertama muncul.
+
+Alasannya simpel: nggak ada antrean, dan nggak ada meter yang jalan di tiap job.
+
+## Hitung runner start, bukan detik
+
+Pelajaran kedua dari Linear: benerin critical path dulu sebelum micro-optimize apa pun di dalemnya.
+
+Batasin fetch depth git aja bikin gate job paling lambat mereka turun dari 94 detik ke 20 detik. Batching tujuh check kecil jadi dua job hemat sekitar 87.000 runner-minute per bulan, atau 11,8% dari total spending CI mereka.
+
+Dua-duanya nggak nyentuh logic test sama sekali. Hitungannya pindah dari durasi tiap job ke jumlah job yang jalan.
 
 ```yaml
 # Sebelum: 7 job terpisah = 7x cold-start tax
@@ -59,27 +89,59 @@ jobs:
     run: pnpm test:unit
 ```
 
-Setiap job start punya overhead tetap (checkout, restore dependency, setup environment) sebelum dia jalanin satu assertion pun. Kalikan itu sama volume PR hasil agent, dan itu berhenti jadi angka kecil yang bisa diabaikan. Di pipeline kita bentuknya beda: lima job alih-alih tujuh kayak punya Linear. Tapi fix-nya sama persis: gabungin jadi dua job motong rata-rata waktu gate PR hampir sepertiga tanpa nyentuh satu test pun.
+Setiap job start bawa overhead tetap sebelum jalanin satu assertion pun.
+
+Checkout, restore dependency, setup environment. Itu semua jalan dulu sebelum test-nya mulai.
+
+Kalikan overhead itu sama volume PR yang dibikin agent, dan angkanya berhenti jadi pembulatan kecil yang bisa diabaikan.
+
+Di pipeline kita bentuknya beda: lima job, sementara punya Linear tujuh.
+
+Tapi fix-nya sama persis. Gabungin jadi dua job motong rata-rata waktu gate PR kita hampir sepertiga, tanpa nyentuh satu test pun.
 
 ## Isolasi test sekarang jadi cost center, dan agent bikin risikonya naik
 
-Isolasi per-file default-nya Vitest itu rebuild module graph di setiap file test. Aman, tapi mahal di skala besar. Opt-in `isolate: false` punya Linear itu penghematan terbesar mereka, sekitar 17% dari spending bulanan CI, nurunin runtime API shard dari 32,8 ke 22 menit. Ini juga perubahan paling berisiko di daftar itu: matiin isolasi berarti test bisa bocor state satu ke yang lain kalau nggak ditulis hati-hati.
+Isolasi per-file default Vitest itu rebuild module graph di setiap file test. Aman, tapi mahal begitu skalanya gede.
 
-Agent kamu sekarang nulis sebagian besar test kamu, dan mereka nggak reliable buat tahu kapan sebuah test butuh isolasi. Manusia yang pernah kena getahnya shared mutable state nulis test defensif karena udah pernah kapok. Agent yang cuma dioptimasi buat "bikin CI hijau" bakal santai nulis test yang lolos pas isolated dan malah ngerusak fixture test berikutnya pas isolasi dimatiin.
+Opt-in `isolate: false` jadi penghematan terbesar Linear, sekitar 17% dari spending CI bulanan mereka. Runtime API shard mereka turun dari 32,8 ke 22 menit.
 
-Linear ngegate ini pakai comment opt-in eksplisit dan requirement teardown per file: tandain test yang aman isolasi satu-satu, dan review penandaan itu kayak review diff sensitif keamanan. Di proyek Next.js kita, itu artinya cuma unit test pure-function dengan nol shared module state. Apapun yang nyentuh fixture database atau mocked API client tetap pakai isolasi penuh, titik.
+Itu juga perubahan paling berisiko di daftar mereka. Matiin isolasi berarti test bisa bocor state satu ke yang lain kalau nggak ditulis hati-hati.
+
+Sekarang test lo sebagian besar ditulis agent, dan mereka nggak reliable buat tahu kapan sebuah test butuh isolasi.
+
+Manusia yang pernah kena shared mutable state nulis test defensif karena udah pernah kapok.
+
+Agent yang cuma dioptimasi buat "bikin CI hijau" bakal santai nulis test yang lolos pas isolated, dan malah ngerusak fixture test berikutnya begitu isolasi dimatiin.
+
+Linear ngegate ini pakai comment opt-in eksplisit plus requirement teardown per file.
+
+Test ditandain aman-isolasi satu per satu, dan penandaan itu direview kayak diff yang sensitif keamanan.
+
+Di proyek Next.js kita, itu artinya cuma unit test pure-function tanpa shared module state. Apa pun yang nyentuh fixture database atau mocked API client tetap pakai isolasi penuh, titik.
 
 ## Jangan cache hal yang lebih murah dibangun ulang
 
-Cache `node_modules` punya Linear makan waktu sekitar 28 detik buat di-restore. `pnpm install` yang difilter cuma 7,5 detik. Mereka hapus cache-nya.
+Cache `node_modules` punya Linear butuh sekitar 28 detik buat restore. `pnpm install` yang difilter cuma 7,5 detik. Cache-nya mereka hapus.
 
-Caching kerasa kayak kemenangan gratis karena itu saran default di mana-mana, tapi caching punya biaya restore yang jarang ada yang benchmark lawan alternatifnya. Pelajarannya lebih luas dari sekadar node_modules: cache itu taruhan bahwa waktu restore lebih cepat dari waktu rebuild, dan taruhan itu nggak selalu menang.
+Caching kerasa kayak kemenangan gratis karena itu saran default di mana-mana.
+
+Padahal caching bawa biaya restore yang hampir nggak ada yang benchmark lawan alternatifnya. Pelajarannya lebih luas dari node_modules.
+
+Cache itu taruhan bahwa waktu restore lebih cepat dari waktu rebuild. Dan taruhan itu nggak selalu menang.
 
 ## CI di era agent harusnya gate di apa?
 
-Thread HN di bawah post Linear kebagi jadi dua kubu. Satu komentator, yieldcrv, bilang unit test secara umum udah jadi kosmetik yang nggembungin angka coverage. Dia juga bikin poin yang layak direnungin: dia nggak lihat agent make test beda dari developer junior atau mid-level, karena manusia juga sebenarnya nggak rigorous-rigorous amat soal itu.
+Thread HN di bawah post Linear pecah jadi dua kubu.
 
-Komentator lain, sz4kerto, bikin poin praktisi yang lebih tajam: review diam-diam bergeser dari review kode ke review test, karena di situlah sekarang letak klaim beneran soal correctness dari agent. Solomon Hykes, founder Docker, bilang build dan test harus dijadwalin sebagai satu sistem yang jalan bareng, bukan dua proses terpisah.
+yieldcrv bilang unit test secara umum udah jadi kosmetik yang cuma bikin angka coverage naik.
+
+Dia juga bikin poin yang layak direnungin: dia nggak lihat agent pakai test beda dari developer junior atau mid-level. Manusia sendiri juga nggak ketat-ketat amat soal itu.
+
+sz4kerto bikin poin praktisi yang lebih tajam. Review diam-diam bergeser dari review kode ke review test, karena di situlah letak klaim beneran soal correctness dari agent.
+
+Solomon Hykes, founder Docker, bilang build dan test harusnya dijadwalin sebagai satu sistem. Bukan dua proses yang jalan sendiri-sendiri.
+
+Tiga komentator, tiga sudut pandang. Pertanyaan yang sebenarnya masih terbuka: apa yang pantas dijadikan gate di era agent?
 
 <!-- owner-prose:start -->
 Setelah jalanin fleet ini tiap hari, gue akhirnya punya satu prinsip sederhana:
