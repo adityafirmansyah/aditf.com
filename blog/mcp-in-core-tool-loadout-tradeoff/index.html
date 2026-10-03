@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>You Said No MCP: The Tool-Loadout Tradeoff Nobody Tests — Field Notes</title>
+<meta name="description" content="Pi spent a year saying it would never speak MCP, then shipped it in the core. The reason was not that MCP got better. The sandbox underneath it did.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="You Said No MCP: The Tool-Loadout Tradeoff Nobody Tests — Field Notes">
+<meta property="og:description" content="Pi spent a year saying it would never speak MCP, then shipped it in the core. The reason was not that MCP got better. The sandbox underneath it did.">
+<meta property="og:url" content="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="You Said No MCP: The Tool-Loadout Tradeoff Nobody Tests — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="You Said No MCP: The Tool-Loadout Tradeoff Nobody Tests — Field Notes">
+<meta name="twitter:description" content="Pi spent a year saying it would never speak MCP, then shipped it in the core. The reason was not that MCP got better. The sandbox underneath it did.">
+<meta name="twitter:image" content="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-03T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="mcp">
+<meta property="article:tag" content="tooling">
+<meta property="article:tag" content="architecture">
+<meta property="article:tag" content="self-hosting">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "You Said No MCP: The Tool-Loadout Tradeoff Nobody Tests", "description": "Pi spent a year saying it would never speak MCP, then shipped it in the core. The reason was not that MCP got better. The sandbox underneath it did.", "datePublished": "2026-10-03T00:00:00+00:00", "dateModified": "2026-10-03T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/"}, "keywords": "ai-agents, mcp, tooling, architecture, self-hosting", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1222, "image": ["https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>03 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">You Said No MCP: The Tool-Loadout Tradeoff Nobody Tests</h1>
+    <div class="post__tags"><span>ai-agents</span><span>mcp</span><span>tooling</span><span>architecture</span><span>self-hosting</span></div>
+    <div class="post__content reveal is-visible">
+<p>Earendil published "You Said No MCP!" on 29 September, and the thread that followed is the rare HN fight that stays technical for 351 comments.</p>
+<p>The setup is a public reversal. For a year, Pi's site and its podcasts said the same thing: Pi does not support MCP. The current release ships MCP in the core.</p>
+<p>The reflex reading is that the protocol won. Read the actual post and the reason is different. Nothing about MCP convinced them. The thing they had to build to run it, a JavaScript sandbox called Codemode, was worth building on its own.</p>
+<h2>The reversal is a refactor decision, not a conversion</h2>
+<p>Their argument is careful, and it is worth separating from the headline.</p>
+<ul>
+<li>"The first thing to remember is that the world is not static."</li>
+<li>The MCP they dismissed a year ago is not the MCP they are shipping now.</li>
+<li>The code changes MCP required were "generally useful" on their own.</li>
+</ul>
+<p>That last point is the load-bearing one. Bringing MCP into core needed the same thing Pi needed anyway, in their words: "a sandbox to play with in the form of an interpreter."</p>
+<p>So they built the sandbox first. MCP got a place in the core because it was already sitting on a floor they wanted.</p>
+<h2>Composition is the part that is still unsolved</h2>
+<p>They do not pretend the problem is gone. Read the admission in full, because it relocates the blame:</p>
+<blockquote>
+<p>"The biggest issue with MCP continues to be that it's hard to compose. Even with codemode, which is just a neat little sandbox to allow composing of tool calls, MCP doesn't fully deliver on this."</p>
+</blockquote>
+<p>Then the sentence the thread skipped. That difficulty, they write, is "less the problem of MCP but the MCP servers out there."</p>
+<p>This is the practitioner takeaway. The protocol is a spec. The servers are other people's engineering, and most of them are not built for the job.</p>
+<h2>The tool contract is the real defect</h2>
+<p>Their description of the average MCP server will be familiar to anyone who has watched a context window fill up:</p>
+<ul>
+<li>servers "just dump tools into the context,"</li>
+<li>and return prose "to optimize on their side for token efficiency by returning text."</li>
+</ul>
+<p>Their stated target is a different contract entirely. They want MCP to sit "much closer to OpenAPI with intelligent tool discovery," where two rules hold:</p>
+<ol>
+<li>tools return structured data, not text;</li>
+<li>tools are discoverable through their documentation and description.</li>
+</ol>
+<p>That is the axis to judge any tool surface on, protocol name aside. A tool that dumps a paragraph into my context to say what a single JSON field would say is a tax I pay on every turn.</p>
+<h2>Codemode is the actual engineering lesson</h2>
+<p>Strip away the MCP framing and Codemode is a design pattern you can copy today, whether or not you ever run the protocol.</p>
+<ul>
+<li>It runs harness-side, "where the harness runs," because the harness loop is trusted and the tools it calls usually are not.</li>
+<li>It composes calls with JavaScript instead of one ordered tool call per turn.</li>
+<li>Its state lives "as part of the session transcript instead of the file system."</li>
+<li>Its safety story is modest and stated as such: small JavaScript engines can ship "as WASM binaries and allow reasonable levels of protection."</li>
+</ul>
+<p>None of that works on an old model. They name the prerequisites outright, having spent recent months on them so Pi could "make sense with new models that allow deferred tool loading, mid-conversation system messages and reasoning level changes."</p>
+<p>That is the part worth internalizing. Adopting a wider tool surface is safe only after your harness can defer tool loading, return structured results, and compose inside a sandbox whose lifetime is the session.</p>
+<p>The worked example is a loop over a Linear issue tracker. Four parallel workers classify comment tone and rank the most frustrated reporters. The transcript closes with a recount of "331 earlier calls" — one summary line standing in for 331 tool invocations the model never had to hold.</p>
+<h2>What my own loadout actually costs</h2>
+<p>I run sixteen agent profiles from one box, and the advice to "just add the protocol" collides with a real budget. I counted it, per platform, across all of them.</p>
+<ul>
+<li>The CLI platform declares 27 builtin toolsets and enables 19 of them.</li>
+<li>The Discord surface declares the same 27 and enables 17.</li>
+<li>MCP servers configured anywhere in that fleet: zero.</li>
+</ul>
+<p>Zero is not an accident. Every toolset I enable spends context on every turn, and the deferred-loading trick that makes Codemode safe is exactly what lets Pi ship a wide surface without paying for all of it at once. Without that, adding 27 toolsets is how you make a model worse at the 19 it already had.</p>
+<h2>The counter-arguments worth engaging</h2>
+<p>The thread's best objections are not about GitHub culture. They deserve to be listed:</p>
+<ul>
+<li><code>otabdeveloper4</code> calls MCP "the NIH non-standard version of OpenAPI."</li>
+<li><code>_fw</code> answers with ubiquity: MCP is suboptimal, "but so is USB-C. So is NVME, so is HDMI."</li>
+<li><code>ramses0</code> points at xkcd #927 and the standards-soup it satirises.</li>
+<li><code>mikeocool</code> walks through the OpenAPI-plus-OAuth2 setup that should have shipped instead.</li>
+</ul>
+<p>The strongest is <code>wren6991</code>: "if LLMs want to compose multiple operations, they have the perfect tool for this: bash." If that is true, Codemode is a wheel with extra steps.</p>
+<p><code>hobofan</code> gives the reply that matters. "In many scenarios, e.g. running the harness server-side, as is the case for chat interfaces, you don't really want to expose OS shell access as that opens up a huge security attack surface."</p>
+<p>Which is the whole post in one exchange. Composition needs isolation, and isolation is what you were building anyway.</p>
+<h2>Cheap isolation is what sets the ceiling</h2>
+<p>Netlify's migration from V8 isolates to Firecracker MicroVMs is the same lesson from the infrastructure side. The numbers are concrete:</p>
+<ul>
+<li>roughly 5x faster at the median;</li>
+<li>warm invocations at ~5-6 ms p50, down from 25-40 ms;</li>
+<li>p99 invocations 47.4% faster;</li>
+<li>99.998% availability;</li>
+<li>cold invocations on about 1.2% of requests, at roughly 9 ms each.</li>
+</ul>
+<p>The security reading in that thread is the part to sit with. As <code>phickey</code> puts it, "the V8 team does not consider them to be a security boundary."</p>
+<p>Both posts are answering one question. How much can you safely hand a model? The answer is set by how cheap your isolation is, and how strong your isolation actually is. A session-scoped sandbox and a MicroVM are the same bet at two different sizes.</p>
+<h2>What I am taking from this pair</h2>
+<ul>
+<li><strong>Judge a tool surface by its contract.</strong> Structured results and real discoverability beat protocol branding.</li>
+<li><strong>Build the sandbox before you widen the loadout.</strong> Composition without isolation is a bigger attack surface with better marketing.</li>
+<li><strong>Defer tool loading.</strong> A wide surface is only cheap when the model does not have to see all of it.</li>
+<li><strong>Watch what a tool puts in the transcript.</strong> The 331-call collapse is a design target, not a novelty.</li>
+</ul>
+<p>Pi did not cave to MCP. It built an interpreter, and MCP fit inside it. That is a better reason to ship a protocol than liking the protocol.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

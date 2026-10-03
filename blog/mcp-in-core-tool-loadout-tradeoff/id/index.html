@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pi Bilang Nggak Akan Pakai MCP, Terus Justru Ditaruh di Core — Field Notes</title>
+<meta name="description" content="Setahun Pi ngotot nggak akan dukung MCP, eh rilis terbarunya malah naruh MCP di core. Alasannya bukan karena MCP jadi bagus, tapi karena sandbox di bawahnya yang beres.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Pi Bilang Nggak Akan Pakai MCP, Terus Justru Ditaruh di Core — Field Notes">
+<meta property="og:description" content="Setahun Pi ngotot nggak akan dukung MCP, eh rilis terbarunya malah naruh MCP di core. Alasannya bukan karena MCP jadi bagus, tapi karena sandbox di bawahnya yang beres.">
+<meta property="og:url" content="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Pi Bilang Nggak Akan Pakai MCP, Terus Justru Ditaruh di Core — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Pi Bilang Nggak Akan Pakai MCP, Terus Justru Ditaruh di Core — Field Notes">
+<meta name="twitter:description" content="Setahun Pi ngotot nggak akan dukung MCP, eh rilis terbarunya malah naruh MCP di core. Alasannya bukan karena MCP jadi bagus, tapi karena sandbox di bawahnya yang beres.">
+<meta name="twitter:image" content="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-03T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="mcp">
+<meta property="article:tag" content="tooling">
+<meta property="article:tag" content="architecture">
+<meta property="article:tag" content="self-hosting">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Pi Bilang Nggak Akan Pakai MCP, Terus Justru Ditaruh di Core", "description": "Setahun Pi ngotot nggak akan dukung MCP, eh rilis terbarunya malah naruh MCP di core. Alasannya bukan karena MCP jadi bagus, tapi karena sandbox di bawahnya yang beres.", "datePublished": "2026-10-03T00:00:00+00:00", "dateModified": "2026-10-03T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/id/"}, "keywords": "ai-agents, mcp, tooling, architecture, self-hosting", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1273, "image": ["https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>03 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Pi Bilang Nggak Akan Pakai MCP, Terus Justru Ditaruh di Core</h1>
+    <div class="post__tags"><span>ai-agents</span><span>mcp</span><span>tooling</span><span>architecture</span><span>self-hosting</span></div>
+    <div class="post__content reveal is-visible">
+<p>Tanggal 29 September Earendil nulis post "You Said No MCP!". Thread-nya jadi salah satu debat HN yang jarang-jarang: 351 komentar tapi isinya tetap teknis.</p>
+<p>Ceritanya soal pembalikan sikap yang terbuka banget. Setahun lamanya situs Pi dan podcast-podcast-nya bilang hal yang sama: Pi nggak dukung MCP. Sekarang rilis terbarunya malah naruh MCP di core.</p>
+<p>Reaksi refleksnya: berarti protokolnya menang. Baca post-nya sampai habis, dan alasannya beda. Nggak ada yang bikin mereka berubah pikiran soal MCP-nya. Yang bikin mereka berubah justru sandbox JavaScript bernama Codemode, yang emang layak dibangun sendiri.</p>
+<h2>Ini keputusan refactor, bukan pindah keyakinan</h2>
+<p>Argumen mereka rapi, dan sayangnya kelewat gampang ditelan headline.</p>
+<ul>
+<li>"The first thing to remember is that the world is not static."</li>
+<li>MCP yang mereka tolak setahun lalu bukan MCP yang mereka rilis sekarang.</li>
+<li>Perubahan kode yang MCP butuh ternyata "generally useful" buat mereka sendiri.</li>
+</ul>
+<p>Poin terakhir itu yang paling penting. Masukin MCP ke core butuh hal yang sama dengan yang Pi butuh: "a sandbox to play with in the form of an interpreter."</p>
+<p>Jadi sandbox-nya mereka bangun duluan. MCP cuma numpang di lantai yang udah mau mereka bangun.</p>
+<h2>Komposisi masih jadi PR yang belum kelar</h2>
+<p>Mereka nggak pura-pura masalahnya hilang. Baca pengakuannya utuh-utuh, karena di situ mereka memindahkan siapa yang salah:</p>
+<blockquote>
+<p>"The biggest issue with MCP continues to be that it's hard to compose. Even with codemode, which is just a neat little sandbox to allow composing of tool calls, MCP doesn't fully deliver on this."</p>
+</blockquote>
+<p>Terus kalimat yang kelewat di thread. Kesulitan itu, tulis mereka, "less the problem of MCP but the MCP servers out there."</p>
+<p>Nah ini intinya buat yang ngoprek harian. Protokolnya cuma spesifikasi. Servernya kerjaan orang lain, dan kebanyakan dibangun bukan buat kerjaan ini.</p>
+<h2>Kontrak tool-nya yang bermasalah</h2>
+<p>Deskripsi mereka soal MCP server rata-rata pasti familiar buat lo yang pernah lihat context window penuh pelan-pelan:</p>
+<ul>
+<li>servernya "just dump tools into the context,"</li>
+<li>terus balikin prosa "to optimize on their side for token efficiency by returning text."</li>
+</ul>
+<p>Yang mereka mau justru kontrak beda. MCP sebaiknya duduk "much closer to OpenAPI with intelligent tool discovery," dengan dua aturan:</p>
+<ol>
+<li>tool balikin structured data, bukan teks;</li>
+<li>tool bisa ketemu lewat dokumentasi dan deskripsinya.</li>
+</ol>
+<p>Itu sumbu buat ngejudge tool surface apa pun, apa pun nama protokolnya. Tool yang nyemburin satu paragraf cuma buat bilang isi satu field JSON itu pajak yang gue bayar tiap turn.</p>
+<h2>Codemode itu pelajaran engineering-nya</h2>
+<p>Buang dulu bingkai MCP-nya, dan Codemode jadi pola desain yang bisa lo contek sekarang juga, mau lo pakai protokolnya apa nggak.</p>
+<ul>
+<li>Jalan di sisi harness, "where the harness runs," karena loop harness itu trusted sementara tool yang dipanggilnya biasanya nggak.</li>
+<li>Nyusun panggilan pakai JavaScript. Beberapa panggilan jalan bareng, nggak usah satu-satu tiap turn.</li>
+<li>State-nya nyimpen "as part of the session transcript instead of the file system."</li>
+<li>Cerita keamanannya jujur dan sederhana: engine JavaScript kecil bisa dikirim "as WASM binaries and allow reasonable levels of protection."</li>
+</ul>
+<p>Semua itu nggak jalan di model lama. Mereka sebut syaratnya gamblang, karena berbulan-bulan sebelumnya kerja buat bikin Pi "make sense with new models that allow deferred tool loading, mid-conversation system messages and reasoning level changes."</p>
+<p>Ini bagian yang harusnya dibawa pulang. Ngeluasin tool surface baru aman setelah harness lo bisa nunda tool loading, balikin hasil terstruktur, dan nyusun di dalam sandbox yang umurnya seumur sesi.</p>
+<p>Urutannya penting juga, dan sering kebalik. Orang biasanya nambah tool dulu, terus baru panik mikirin sandbox. Cara itu keliatannya cepat, tapi biayanya ketagih di belakang: context bengkak, prompt jadi susah ditebak, dan tiap kali ada tool baru lo ngutak-atik ulang bagian yang seharusnya udah stabil.</p>
+<p>Contoh nyatanya loop di atas issue tracker Linear. Empat worker paralel ngklasifikasi nada komentar dan ngeranking reporter paling kesel. Transcript-nya ditutup dengan hitungan "... (331 earlier calls)": satu baris ringkasan mewakili 331 panggilan tool yang nggak perlu dipegang modelnya.</p>
+<h2>Loadout gue sendiri sebenarnya berapa mahal</h2>
+<p>Gue jalanin enam belas profil agent dari satu box, jadi saran "tinggal tambah protokolnya" itu langsung nabrak budget yang nyata. Gue hitung langsung, per platform, di semua profil itu.</p>
+<ul>
+<li>Platform CLI mendeklarasikan 27 builtin toolset, dan 19 di antaranya diaktifin.</li>
+<li>Sisi Discord mendeklarasikan 27 juga, 17 yang diaktifin.</li>
+<li>MCP server yang dikonfigurasi di semua profil itu: nol.</li>
+</ul>
+<p>Nol itu bukan kebetulan. Tiap toolset yang lo aktifin langsung makan context tiap turn, dan trik deferred loading yang bikin Codemode aman justru yang bikin Pi bisa ngepasang surface lebar tanpa bayar semuanya sekaligus. Tanpa itu, nambah 27 toolset malah bikin model lebih payah di 19 yang udah ada.</p>
+<p>Yang bikin angka itu penting bukan besar-kecilnya, tapi efeknya ke kualitas jawaban. Tool yang nggak pernah kepakai tapi tetap nangkring di context tetap kehitung model tiap turn.</p>
+<p>Surface yang gemuk bikin model lebih gampang milih tool yang salah. Bukan karena modelnya tolol. Pilihannya cuma kebanyakan.</p>
+<p>Jadi nol MCP server di seluruh profil itu bukan penolakan ideologis. Itu cuma efek samping dari kebiasaan ngukur dulu sebelum nambah.</p>
+<h2>Bantahan di thread yang sayang buat dilewat</h2>
+<p>Bantahan terbaik di thread bukan soal budaya GitHub. Empat yang sayang dilewat:</p>
+<ul>
+<li><code>otabdeveloper4</code> bilang MCP itu "the NIH non-standard version of OpenAPI."</li>
+<li><code>_fw</code> balas pakai ubiquity: MCP memang suboptimal, "but so is USB-C. So is NVME, so is HDMI."</li>
+<li><code>ramses0</code> nunjuk xkcd #927 dan standar-standar yang bersaing di situ.</li>
+<li><code>mikeocool</code> nggambarin setup OpenAPI plus OAuth2 yang harusnya udah lama ada.</li>
+</ul>
+<p>Yang paling kuat <code>wren6991</code>: "if LLMs want to compose multiple operations, they have the perfect tool for this: bash." Kalau itu bener, Codemode cuma bikin roda baru buat hal yang udah ada.</p>
+<p><code>hobofan</code> ngasih balasan yang bikin itu tumbang. "In many scenarios, e.g. running the harness server-side, as is the case for chat interfaces, you don't really want to expose OS shell access as that opens up a huge security attack surface."</p>
+<p>Itu inti post-nya cuma dalam satu tukeran. Komposisi butuh isolasi, dan isolasi itu yang emang mau lo bangun.</p>
+<h2>Isolasi murah itu yang nentuin batasnya</h2>
+<p>Migrasi Netlify dari V8 isolate ke Firecracker MicroVM itu pelajaran yang sama, dilihat dari sisi infrastruktur. Angkanya konkret:</p>
+<ul>
+<li>sekitar 5x lebih cepat di median;</li>
+<li>warm invocation ~5-6 ms p50, turun dari 25-40 ms;</li>
+<li>p99 47,4% lebih cepat;</li>
+<li>availability 99,998%;</li>
+<li>cold invocation di sekitar 1,2% request, sekitar 9 ms.</li>
+</ul>
+<p>Sisi keamanannya yang perlu dicerna. Kata <code>phickey</code>, "the V8 team does not consider them to be a security boundary."</p>
+<p>Dua post ini sebenernya ngejawab satu pertanyaan. Seberapa banyak yang aman lo kasih ke model? Jawabannya ditentukan seberapa murah isolasi lo, dan seberapa kuat isolasi itu. Sandbox seumur sesi dan sebuah MicroVM itu taruhan yang sama di dua ukuran beda.</p>
+<h2>Yang gue bawa pulang</h2>
+<ul>
+<li><strong>Nilai tool surface dari kontraknya.</strong> Hasil terstruktur dan discoverability yang beneran jalan ngalahin branding protokol.</li>
+<li><strong>Bangun sandbox-nya sebelum ngeluasin loadout.</strong> Komposisi tanpa isolasi cuma attack surface lebih gede dengan marketing lebih bagus.</li>
+<li><strong>Tunda tool loading.</strong> Surface lebar cuma murah kalau modelnya nggak harus lihat semuanya.</li>
+<li><strong>Perhatiin apa yang dilempar tool ke transcript.</strong> Keruntuhan 331 panggilan jadi satu baris itu target desain, bukan hal aneh.</li>
+</ul>
+<p>Pi nggak nyerah sama MCP. Mereka bangun interpreter, dan MCP kebetulan masuk di dalamnya. Alasan itu jauh lebih masuk akal buat ngerilis sebuah protokol daripada sekadar suka sama protokolnya.</p>
+<p>Ada satu hal yang sering kelewat waktu orang ngomongin MCP: yang diuji sebenernya bukan protokolnya, tapi disiplin harness-nya. Kalau harness lo bisa nunda tool loading dan nyusun panggilan di dalam sandbox, protokol apa pun bakal keliatan lumayan. Kalau nggak bisa, protokol terbaik di dunia pun cuma nambah beban ke context yang udah sesak.</p>
+<p>Dan lucunya, posisi awalnya nggak salah. Mereka cuma salah nebak kapan batasnya bergeser.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

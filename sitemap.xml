@@ -32,6 +32,24 @@
     <priority>0.7</priority>
   </url>
   <url>
+    <loc>https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/id/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/"/>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/id/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/id/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/"/>
+    <lastmod>2026-10-03</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  <url>
     <loc>https://aditf.com/blog/git-3-sha256-primary-key-migration/</loc>
     <xhtml:link rel="alternate" hreflang="en" href="https://aditf.com/blog/git-3-sha256-primary-key-migration/"/>
     <xhtml:link rel="alternate" hreflang="id" href="https://aditf.com/blog/git-3-sha256-primary-key-migration/id/"/>
