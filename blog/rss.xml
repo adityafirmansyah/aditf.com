@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot;</title>
+      <link>https://aditf.com/blog/reproducing-the-git-hook-attack/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/reproducing-the-git-hook-attack/</guid>
+      <pubDate>Mon, 05 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Frank Wiles got a fake project inquiry, a Dropbox folder of specs, and a hidden .git with a post-checkout hook. I reproduced both vectors on git 2.53.0, and the popular fix is overridable.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/reproducing-the-git-hook-attack/id/"/>
+    </item>
+    <item>
       <title>My 17 Agents Remember With 1,069 Markdown Skills, Not Vectors</title>
       <link>https://aditf.com/blog/agents-remember-with-markdown-skills-not-vectors/</link>
       <guid isPermaLink="true">https://aditf.com/blog/agents-remember-with-markdown-skills-not-vectors/</guid>

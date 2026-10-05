@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot; — Field Notes</title>
+<meta name="description" content="Frank Wiles got a fake project inquiry, a Dropbox folder of specs, and a hidden .git with a post-checkout hook. I reproduced both vectors on git 2.53.0, and the popular fix is overridable.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/reproducing-the-git-hook-attack/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot; — Field Notes">
+<meta property="og:description" content="Frank Wiles got a fake project inquiry, a Dropbox folder of specs, and a hidden .git with a post-checkout hook. I reproduced both vectors on git 2.53.0, and the popular fix is overridable.">
+<meta property="og:url" content="https://aditf.com/blog/reproducing-the-git-hook-attack/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/reproducing-the-git-hook-attack/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot; — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot; — Field Notes">
+<meta name="twitter:description" content="Frank Wiles got a fake project inquiry, a Dropbox folder of specs, and a hidden .git with a post-checkout hook. I reproduced both vectors on git 2.53.0, and the popular fix is overridable.">
+<meta name="twitter:image" content="https://aditf.com/blog/reproducing-the-git-hook-attack/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-05T00:00:00+00:00">
+<meta property="article:tag" content="git">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="supply-chain">
+<meta property="article:tag" content="devtools">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "\"Reproducing the .git Hook Attack: git status Runs an Attacker's Command\"", "description": "Frank Wiles got a fake project inquiry, a Dropbox folder of specs, and a hidden .git with a post-checkout hook. I reproduced both vectors on git 2.53.0, and the popular fix is overridable.", "datePublished": "2026-10-05T00:00:00+00:00", "dateModified": "2026-10-05T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/reproducing-the-git-hook-attack/"}, "keywords": "git, security, ai-agents, supply-chain, devtools", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1107, "image": ["https://aditf.com/blog/reproducing-the-git-hook-attack/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/reproducing-the-git-hook-attack/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/reproducing-the-git-hook-attack/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/reproducing-the-git-hook-attack/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/reproducing-the-git-hook-attack/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>05 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot;</h1>
+    <div class="post__tags"><span>git</span><span>security</span><span>ai-agents</span><span>supply-chain</span><span>devtools</span></div>
+    <div class="post__content reveal is-visible">
+<h2>The ask was a payload</h2>
+<p>Frank Wiles got an inquiry that read like every other one. An Ed Tech web app, an NDA before the call, specs in a Dropbox folder. He opened the folder.</p>
+<p>Then the "client" said the NDA was in the NDA branch, and he just needed to switch to it. That switch is <code>git checkout</code>. That is the entire attack.</p>
+<p>The write-up is now the top item on lobste.rs, with 129 points and 39 comments.</p>
+<p>This is not a story about one careless contractor. It is a story about a command every developer reads as harmless. We treat <code>git checkout</code> as a read. It runs code.</p>
+<h2>What ran when he switched branches</h2>
+<p>Wiles missed the <code>.git</code> directory sitting in the Dropbox folder. Inside it was a <code>post-checkout</code> hook wired to a Vercel app for command and control. In his words, it would "download an OS specific binary," run it, and delete itself.</p>
+<p>He alerted Dropbox and Vercel's security teams. He suspects the goal was his GitHub account and client access.</p>
+<p>Nothing here is a git bug. The docs say it plainly. <code>post-checkout</code> "is invoked when a git-checkout or git-switch is run after having updated the worktree." A file in <code>.git/hooks/</code> is executable code git will run for you.</p>
+<h2>Repro 1: a checkout runs the hook</h2>
+<p>I wanted to know how much of this holds on a current git, so I built it. One repo, one branch, one hook that logs its arguments:</p>
+<pre><code class="language-sh"># .git/hooks/post-checkout
+#!/bin/sh
+echo &quot;ran: args=$# prev=$1 new=$2 flag=$3&quot; &gt;&gt; hook.log
+</code></pre>
+<p>Then the exact step the attacker asked for:</p>
+<pre><code>$ git checkout nda
+Switched to branch 'nda'
+$ cat hook.log
+ran: args=3 prev=3dfc32704f4b... new=3dfc32704f4b... flag=1
+</code></pre>
+<p>It ran on git 2.53.0. Three arguments, matching the docs: previous HEAD, new HEAD, and the branch-checkout flag.</p>
+<p>The part that matters is what you cannot see. <code>git status</code> stayed clean. <code>git ls-files</code> listed only <code>README.md</code>. The hook lives inside <code>.git</code>, so it never shows up in a diff, a review, or a directory listing.</p>
+<h2>Repro 2: git status runs your config</h2>
+<p>A hook needs you to check out a branch. The top comment in the lobste.rs thread needs nothing from you. User agwa described shipping a <code>.git/config</code> with <code>core.fsmonitor</code> set to a command. That command then runs on "very basic ones like <code>git status</code>."</p>
+<p>I tested it. A script path in <code>.git/config</code>, then a plain status:</p>
+<pre><code>$ git config core.fsmonitor /path/to/fsmon.sh
+$ git status
+$ cat fs.log
+FSMONITOR EXECUTED args=2 1791180551388075699
+</code></pre>
+<p>That is the worse vector. <code>git status</code> is what your editor, your build, and your agent run without thinking. agwa's list is blunt: IDEs, <code>go build</code>, and shell prompt integrations all run it implicitly.</p>
+<p>The docs confirm why a pathname is dangerous. <code>core.fsmonitor</code> "was extended to allow boolean values in addition to hook pathnames." A path is a command, and older clients can misread even <code>true</code> as one.</p>
+<h2>Why clones are safe and a Dropbox folder is not</h2>
+<p>Here is the distinction that decides whether you are exposed, and it is narrower than people assume. git will not put a <code>.git/</code> path in a tree. I tried the plumbing route:</p>
+<pre><code>$ git update-index --add --cacheinfo 100755,&lt;blob&gt;,.git/hooks/post-checkout
+error: Invalid path '.git/hooks/post-checkout'
+fatal: git update-index: --cacheinfo cannot add .git/hooks/post-checkout
+</code></pre>
+<p>A plain <code>git add</code> of that same path does nothing at all, silently. So a hook cannot ride in a commit. A fresh clone of my booby-trapped repo carried only <code>*.sample</code> files. A checkout there ran nothing.</p>
+<p>agwa draws the line where the git project draws it. Cloning "is in fact the only safe way to get a repo from an untrusted source." A malicious clone counts as a vulnerability. A malicious tarball is your problem.</p>
+<p>That gives three cases:</p>
+<ul>
+<li><strong>Clone from a URL.</strong> git checks it out for you, safely.</li>
+<li><strong>Extract a zip or tarball.</strong> The <code>.git</code> is already inside. This is the hostile path.</li>
+<li><strong>Open a folder someone shared.</strong> The Wiles case. No clone, no checks.</li>
+</ul>
+<p>z3bra in the thread hit the same wall from the other side. A clone of a repo that tried to ship <code>.git/hooks/post-checkout</code> died with <code>fatal: unable to checkout working tree</code>. vifon adds one exception worth knowing. A real <code>git bundle</code> is safe, because cloning from it will not check those files out.</p>
+<h2>The mitigation everyone posted is overridable</h2>
+<p>The most-upvoted fix was arialdo's. Disable hooks globally with <code>git config --global core.hooksPath /dev/null</code>.</p>
+<p>Good instinct, and it does not hold. oger predicted the hole, and I reproduced it. With that global setting in place, the hook stayed silent. Then one repo-local line:</p>
+<pre><code>[core]
+    hooksPath = .git/hooks
+</code></pre>
+<p>The hook ran again. Repo config beats global config, so a hostile repo re-arms itself.</p>
+<p>What holds is the per-command form. Command-line config is applied last:</p>
+<pre><code>$ git -c core.hooksPath=/dev/null checkout nda
+$ git -c core.fsmonitor=false status
+</code></pre>
+<p>Both suppressed execution against the hostile repo. The git-config docs endorse the form directly, writing the parameter as <code>git -c core.hooksPath=/dev/null</code>.</p>
+<h2>Why agents are the softer target</h2>
+<p>I run a 17-profile agent fleet. Coding, QA, and PR-review agents clone repositories and run <code>git status</code> and <code>git checkout</code> unattended, with their git credentials in the environment. That is exactly what the attacker wanted: access to an account and its clients.</p>
+<p>The attack fits an agent better than a human. An agent is often handed a repo as a folder or a tarball, not a clone. It runs <code>git status</code> constantly. Nothing in its context is looking for a <code>.git</code> directory.</p>
+<p>The hardening that follows is short:</p>
+<ul>
+<li><strong>Clone, never copy.</strong> If you must move a repo, clone it and delete the source.</li>
+<li><strong>Inject the two flags.</strong> Put <code>-c core.hooksPath=/dev/null -c core.fsmonitor=false</code> in the agent's git wrapper.</li>
+<li><strong>Sandbox the credentials.</strong> Run agent git in a container with scoped, short-lived tokens.</li>
+<li><strong>Inspect before the first command.</strong> Check <code>.git/hooks</code> and <code>.git/config</code> on any repo a third party supplied.</li>
+</ul>
+<p>loldot's line in the thread is the right default: "I just consider everything project someone sends me as a malicious." benoliver999 notes the same shape shows up in take-home interview bundles that ship a <code>.git</code>.</p>
+<h2>The takeaway</h2>
+<p><code>git checkout</code> is not a read. It is a program loader with a familiar interface, and <code>git status</code> can be one too. The fix is not a clever global flag, because a repository can fight you for control of its own config.</p>
+<p>Clone what you do not trust. Copy nothing. And when someone tells you the NDA is on a branch, ask why they need you to run a checkout.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/reproducing-the-git-hook-attack/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
