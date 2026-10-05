@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>My 17 Agents Remember With 1,069 Markdown Skills, Not Vectors</title>
+      <link>https://aditf.com/blog/agents-remember-with-markdown-skills-not-vectors/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/agents-remember-with-markdown-skills-not-vectors/</guid>
+      <pubDate>Sun, 04 Oct 2026 00:00:00 +0000</pubDate>
+      <description>A memory plugin attaches the five most similar snippets to every prompt. I run 17 agents, and their durable knowledge is 1,069 Markdown skill files plus a memory file I keep under a kilobyte.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/agents-remember-with-markdown-skills-not-vectors/id/"/>
+    </item>
+    <item>
       <title>A Database Per Agent Costs More Than a File</title>
       <link>https://aditf.com/blog/database-per-agent-costs-more-than-a-file/</link>
       <guid isPermaLink="true">https://aditf.com/blog/database-per-agent-costs-more-than-a-file/</guid>
