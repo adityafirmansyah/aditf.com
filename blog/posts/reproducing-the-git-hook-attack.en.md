@@ -8,25 +8,25 @@ tags: git, security, ai-agents, supply-chain, devtools
 
 ## The ask was a payload
 
-Frank Wiles got an inquiry that read like every other one. An Ed Tech web app, an NDA before the call, specs in a Dropbox folder. He opened the folder.
+Frank Wiles got an inquiry that looked like every other one he receives. An Ed Tech company wanted a web app built, asked him to sign an NDA before the call, and shared the specs in a Dropbox folder. So he opened the folder.
 
-Then the "client" said the NDA was in the NDA branch, and he just needed to switch to it. That switch is `git checkout`. That is the entire attack.
+Inside, the "client" had left a note: the NDA was in the NDA branch, and he just needed to switch to it. That instruction is the entire attack. Switching branches means running `git checkout`, and `git checkout` runs code.
 
-The write-up is now the top item on lobste.rs, with 129 points and 39 comments.
+The write-up he published afterwards is now the top item on lobste.rs, with 129 points and 39 comments.
 
-This is not a story about one careless contractor. It is a story about a command every developer reads as harmless. We treat `git checkout` as a read. It runs code.
+This is not a story about one careless contractor. Most developers read `git checkout` as a harmless lookup, and it can execute code on their machine instead.
 
 ## What ran when he switched branches
 
-Wiles missed the `.git` directory sitting in the Dropbox folder. Inside it was a `post-checkout` hook wired to a Vercel app for command and control. In his words, it would "download an OS specific binary," run it, and delete itself.
+Wiles missed the `.git` directory sitting in the Dropbox folder, and that directory is where the attack lived. Inside it was a `post-checkout` hook wired to a Vercel app for command and control. In his words, it would "download an OS specific binary," run it, and delete itself.
 
-He alerted Dropbox and Vercel's security teams. He suspects the goal was his GitHub account and client access.
+He alerted Dropbox and Vercel's security teams afterwards. He suspects the goal was his GitHub account and the client access that came with it.
 
-Nothing here is a git bug. The docs say it plainly. `post-checkout` "is invoked when a git-checkout or git-switch is run after having updated the worktree." A file in `.git/hooks/` is executable code git will run for you.
+Nothing here is a git bug, and the docs say so outright. `post-checkout` "is invoked when a git-checkout or git-switch is run after having updated the worktree." A file in `.git/hooks/` is executable code that git will run for you.
 
 ## Repro 1: a checkout runs the hook
 
-I wanted to know how much of this holds on a current git, so I built it. One repo, one branch, one hook that logs its arguments:
+I wanted to know how much of this still holds on a current git, so I rebuilt it from scratch. One repository, one branch, one hook that logs its arguments:
 
 ```sh
 # .git/hooks/post-checkout
@@ -34,7 +34,7 @@ I wanted to know how much of this holds on a current git, so I built it. One rep
 echo "ran: args=$# prev=$1 new=$2 flag=$3" >> hook.log
 ```
 
-Then the exact step the attacker asked for:
+Then I ran the exact step the attacker asked for:
 
 ```
 $ git checkout nda
@@ -43,15 +43,15 @@ $ cat hook.log
 ran: args=3 prev=3dfc32704f4b... new=3dfc32704f4b... flag=1
 ```
 
-It ran on git 2.53.0. Three arguments, matching the docs: previous HEAD, new HEAD, and the branch-checkout flag.
+It ran on git 2.53.0, and it passed three arguments exactly as the docs describe: the previous HEAD, the new HEAD, and the branch-checkout flag.
 
-The part that matters is what you cannot see. `git status` stayed clean. `git ls-files` listed only `README.md`. The hook lives inside `.git`, so it never shows up in a diff, a review, or a directory listing.
+The important part is what you cannot see. `git status` stayed clean, and `git ls-files` listed only `README.md`. The hook lives inside `.git`, so it never appears in a diff, a review, or a directory listing.
 
 ## Repro 2: git status runs your config
 
-A hook needs you to check out a branch. The top comment in the lobste.rs thread needs nothing from you. User agwa described shipping a `.git/config` with `core.fsmonitor` set to a command. That command then runs on "very basic ones like `git status`."
+A hook needs you to check out a branch first. The top comment in the lobste.rs thread describes a vector that needs nothing from you at all. User agwa wrote about shipping a `.git/config` with `core.fsmonitor` set to a command, which then runs on "very basic ones like `git status`."
 
-I tested it. A script path in `.git/config`, then a plain status:
+I tested that too. I pointed a script path in `.git/config` and ran a plain status:
 
 ```
 $ git config core.fsmonitor /path/to/fsmon.sh
@@ -60,13 +60,13 @@ $ cat fs.log
 FSMONITOR EXECUTED args=2 1791180551388075699
 ```
 
-That is the worse vector. `git status` is what your editor, your build, and your agent run without thinking. agwa's list is blunt: IDEs, `go build`, and shell prompt integrations all run it implicitly.
+This is the worse vector, because `git status` is a command your editor, your build, and your agent run without thinking. agwa's list is blunt: IDEs, `go build`, and shell prompt integrations all run it implicitly.
 
-The docs confirm why a pathname is dangerous. `core.fsmonitor` "was extended to allow boolean values in addition to hook pathnames." A path is a command, and older clients can misread even `true` as one.
+The docs explain why a pathname is dangerous here. `core.fsmonitor` "was extended to allow boolean values in addition to hook pathnames," so a path is treated as a command. Older clients can even misread `true` as one.
 
 ## Why clones are safe and a Dropbox folder is not
 
-Here is the distinction that decides whether you are exposed, and it is narrower than people assume. git will not put a `.git/` path in a tree. I tried the plumbing route:
+One distinction decides whether you are exposed, and it is narrower than most people assume. git refuses to put a `.git/` path into a tree at all. I tried the plumbing route to confirm that:
 
 ```
 $ git update-index --add --cacheinfo 100755,<blob>,.git/hooks/post-checkout
@@ -74,45 +74,45 @@ error: Invalid path '.git/hooks/post-checkout'
 fatal: git update-index: --cacheinfo cannot add .git/hooks/post-checkout
 ```
 
-A plain `git add` of that same path does nothing at all, silently. So a hook cannot ride in a commit. A fresh clone of my booby-trapped repo carried only `*.sample` files. A checkout there ran nothing.
+A plain `git add` of the same path does nothing at all, and it does not even warn you. So a hook cannot ride along in a commit. When I cloned my booby-trapped repo fresh, it carried only the `*.sample` files, and a checkout there ran nothing.
 
-agwa draws the line where the git project draws it. Cloning "is in fact the only safe way to get a repo from an untrusted source." A malicious clone counts as a vulnerability. A malicious tarball is your problem.
+agwa puts the line where the git project puts it: cloning "is in fact the only safe way to get a repo from an untrusted source." A malicious clone counts as a vulnerability in git. A malicious tarball is your own problem.
 
-That gives three cases:
+That leaves three cases:
 
 - **Clone from a URL.** git checks it out for you, safely.
 - **Extract a zip or tarball.** The `.git` is already inside. This is the hostile path.
 - **Open a folder someone shared.** The Wiles case. No clone, no checks.
 
-z3bra in the thread hit the same wall from the other side. A clone of a repo that tried to ship `.git/hooks/post-checkout` died with `fatal: unable to checkout working tree`. vifon adds one exception worth knowing. A real `git bundle` is safe, because cloning from it will not check those files out.
+z3bra ran into the same wall from the other direction. A clone of a repo that tried to ship `.git/hooks/post-checkout` died with `fatal: unable to checkout working tree`. vifon adds one exception worth knowing: a real `git bundle` is safe, because cloning from it will not check those files out.
 
 ## The mitigation everyone posted is overridable
 
-The most-upvoted fix was arialdo's. Disable hooks globally with `git config --global core.hooksPath /dev/null`.
+The most-upvoted fix was arialdo's, which disables hooks globally with `git config --global core.hooksPath /dev/null`.
 
-Good instinct, and it does not hold. oger predicted the hole, and I reproduced it. With that global setting in place, the hook stayed silent. Then one repo-local line:
+That is a good instinct, but it does not hold. oger predicted the hole, and I reproduced it. With that global setting in place, the hook stayed silent. Then I added one repo-local line:
 
 ```
 [core]
     hooksPath = .git/hooks
 ```
 
-The hook ran again. Repo config beats global config, so a hostile repo re-arms itself.
+The hook ran again, because repo config beats global config, and a hostile repo can re-arm itself.
 
-What holds is the per-command form. Command-line config is applied last:
+What does hold is the per-command form, since command-line config is applied last:
 
 ```
 $ git -c core.hooksPath=/dev/null checkout nda
 $ git -c core.fsmonitor=false status
 ```
 
-Both suppressed execution against the hostile repo. The git-config docs endorse the form directly, writing the parameter as `git -c core.hooksPath=/dev/null`.
+Both forms suppressed execution against the hostile repo. The git-config docs endorse them directly, writing the parameter as `git -c core.hooksPath=/dev/null`.
 
 ## Why agents are the softer target
 
-I run a 17-profile agent fleet. Coding, QA, and PR-review agents clone repositories and run `git status` and `git checkout` unattended, with their git credentials in the environment. That is exactly what the attacker wanted: access to an account and its clients.
+I run a 17-profile agent fleet. The coding, QA, and PR-review agents clone repositories and run `git status` and `git checkout` unattended, with their git credentials sitting in the environment. That is exactly what the attacker was after: access to an account and the clients attached to it.
 
-The attack fits an agent better than a human. An agent is often handed a repo as a folder or a tarball, not a clone. It runs `git status` constantly. Nothing in its context is looking for a `.git` directory.
+The attack fits an agent better than a human, because an agent is often handed a repo as a folder or a tarball rather than a clone. It runs `git status` constantly, and nothing in its context is looking for a `.git` directory.
 
 The hardening that follows is short:
 
@@ -125,6 +125,6 @@ loldot's line in the thread is the right default: "I just consider everything pr
 
 ## The takeaway
 
-`git checkout` is not a read. It is a program loader with a familiar interface, and `git status` can be one too. The fix is not a clever global flag, because a repository can fight you for control of its own config.
+`git checkout` is not a read. It can run a program, and it wears an interface that makes it look like it only reads. `git status` can do the same.
 
-Clone what you do not trust. Copy nothing. And when someone tells you the NDA is on a branch, ask why they need you to run a checkout.
+The fix is not a clever global flag, because a repository can fight you for control of its own config. Clone what you do not trust and copy nothing, and when someone tells you the NDA is on a branch, ask why they need you to run the checkout yourself.

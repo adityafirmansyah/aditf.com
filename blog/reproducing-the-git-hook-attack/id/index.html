@@ -38,7 +38,7 @@
 <meta property="article:tag" content="ai-agents">
 <meta property="article:tag" content="supply-chain">
 <meta property="article:tag" content="devtools">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "\"Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang\"", "description": "Penyerang ngirim folder Dropbox berisi .git tersembunyi, terus minta \"pindah ke branch NDA\". Satu git checkout itu cukup buat jalanin kode mereka. Gue reproduce semuanya di git 2.53.0, dan mitigasi populer-nya nggak sekuat kelihatannya.", "datePublished": "2026-10-05T00:00:00+00:00", "dateModified": "2026-10-05T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/reproducing-the-git-hook-attack/id/"}, "keywords": "git, security, ai-agents, supply-chain, devtools", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1163, "image": ["https://aditf.com/blog/reproducing-the-git-hook-attack/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/reproducing-the-git-hook-attack/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "\"Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang\"", "description": "Penyerang ngirim folder Dropbox berisi .git tersembunyi, terus minta \"pindah ke branch NDA\". Satu git checkout itu cukup buat jalanin kode mereka. Gue reproduce semuanya di git 2.53.0, dan mitigasi populer-nya nggak sekuat kelihatannya.", "datePublished": "2026-10-05T00:00:00+00:00", "dateModified": "2026-10-05T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/reproducing-the-git-hook-attack/id/"}, "keywords": "git, security, ai-agents, supply-chain, devtools", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1272, "image": ["https://aditf.com/blog/reproducing-the-git-hook-attack/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/reproducing-the-git-hook-attack/", "inLanguage": "en-US"}}</script>
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/reproducing-the-git-hook-attack/">
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/reproducing-the-git-hook-attack/id/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/reproducing-the-git-hook-attack/">
@@ -74,22 +74,23 @@
     <div class="post__tags"><span>git</span><span>security</span><span>ai-agents</span><span>supply-chain</span><span>devtools</span></div>
     <div class="post__content reveal is-visible">
 <h2>Permintaannya sendiri yang jadi payload</h2>
-<p>Frank Wiles dapet tawaran proyek yang kelihatan biasa banget. Aplikasi web buat Ed Tech, NDA dulu sebelum meeting, spec-nya nongkrong di folder Dropbox.</p>
+<p>Frank Wiles dapet tawaran proyek yang kelihatan biasa banget. Sebuah perusahaan Ed Tech mau bikin web app, minta dia tanda tangan NDA dulu sebelum meeting, dan nitip spec-nya di sebuah folder Dropbox.</p>
 <p>Dia buka foldernya.</p>
-<p>Terus "klien"-nya bilang: NDA-nya ada di branch NDA, tinggal pindah ke situ. Pindah ke branch NDA itu ya artinya <code>git checkout</code>.</p>
-<p>Di situ seluruh serangannya.</p>
-<p>Tulisannya sekarang jadi item paling atas di lobste.rs, dengan 129 poin dan 39 komentar.</p>
-<p>Ini bukan cerita soal satu kontraktor yang kurang hati-hati. Ini soal satu perintah yang semua orang anggap aman.</p>
-<p>Kita pikir <code>git checkout</code> cuma baca, padahal dia jalanin kode.</p>
+<p>Di dalamnya, si "klien" udah ninggalin catatan: NDA-nya ada di branch NDA, dan dia cuma perlu pindah ke situ. Instruksi itu sendiri yang jadi serangan utuhnya.</p>
+<p>Pindah branch artinya jalanin <code>git checkout</code>, dan <code>git checkout</code> jalanin kode.</p>
+<p>Tulisan yang dia publikasiin setelahnya sekarang jadi item paling atas di lobste.rs, dengan 129 poin dan 39 komentar.</p>
+<p>Ini bukan cerita soal satu kontraktor yang kurang hati-hati, karena siapa pun bisa kena.</p>
+<p>Hampir semua developer baca <code>git checkout</code> sebagai operasi baca yang aman, padahal perintah itu bisa jalanin kode di mesin mereka.</p>
 <h2>Yang jalan waktu dia pindah branch</h2>
-<p>Wiles kelewat folder <code>.git</code> yang nyempil di Dropbox itu.</p>
-<p>Di dalamnya ada hook <code>post-checkout</code>.</p>
-<p>Kata dia sendiri, hook itu nyambung ke app Vercel buat command and control dan bakal "download an OS specific binary", jalanin, terus hapus dirinya sendiri.</p>
-<p>Dia lapor ke tim security Dropbox dan Vercel, sambil menduga targetnya akun GitHub plus akses ke klien-kliennya.</p>
-<p>Nggak ada bug git di sini. Dokumentasinya bilang gamblang: <code>post-checkout</code> "is invoked when a git-checkout or git-switch is run after having updated the worktree."</p>
-<p>File di <code>.git/hooks/</code> itu kode yang git siap jalanin buat lo.</p>
+<p>Wiles kelewat folder <code>.git</code> yang nyempil di folder Dropbox itu, dan justru di situ serangannya bersembunyi.</p>
+<p>Di dalamnya ada hook <code>post-checkout</code> yang nyambung ke app Vercel buat command and control.</p>
+<p>Kata dia sendiri, hook itu bakal "download an OS specific binary" yang cocok sama mesin lo, jalanin, terus hapus dirinya sendiri.</p>
+<p>Dia lapor ke tim security Dropbox dan Vercel setelah kejadian itu. Dia menduga targetnya akun GitHub dia plus akses ke klien-kliennya.</p>
+<p>Nggak ada bug git di sini, dan dokumentasinya bilang gamblang.</p>
+<p><code>post-checkout</code> "is invoked when a git-checkout or git-switch is run after having updated the worktree." File di <code>.git/hooks/</code> itu kode yang git siap jalanin buat lo.</p>
 <h2>Reproduksi 1: checkout jalanin hook-nya</h2>
-<p>Gue penasaran seberapa nyata ini di git versi sekarang, jadi gue bikin sendiri. Satu repo, satu branch, satu hook yang nyatet argumennya:</p>
+<p>Gue penasaran seberapa nyata ini masih jalan di git versi sekarang, jadi gue bikin ulang dari nol.</p>
+<p>Satu repo, satu branch, satu hook yang nyatet argumennya:</p>
 <pre><code class="language-sh"># .git/hooks/post-checkout
 #!/bin/sh
 echo &quot;ran: args=$# prev=$1 new=$2 flag=$3&quot; &gt;&gt; hook.log
@@ -100,60 +101,62 @@ Switched to branch 'nda'
 $ cat hook.log
 ran: args=3 prev=3dfc32704f4b... new=3dfc32704f4b... flag=1
 </code></pre>
-<p>Jalan di git 2.53.0. Tiga argumen, sama kayak di dokumentasi: HEAD sebelumnya, HEAD baru, dan flag checkout branch.</p>
-<p>Yang penting justru yang nggak kelihatan.</p>
-<p><code>git status</code> tetap bersih. <code>git ls-files</code> cuma nunjukin <code>README.md</code>.</p>
+<p>Jalan di git 2.53.0, dan dia ngirim tiga argumen persis kayak yang dijelasin dokumentasi: HEAD sebelumnya, HEAD baru, dan flag checkout branch.</p>
+<p>Yang penting justru yang nggak kelihatan. <code>git status</code> tetap bersih, dan <code>git ls-files</code> cuma nunjukin <code>README.md</code>.</p>
 <p>Hook-nya hidup di dalam <code>.git</code>, jadi dia nggak akan pernah muncul di diff, di review, atau di listing folder.</p>
 <h2>Reproduksi 2: git status juga jalanin config lo</h2>
-<p>Hook butuh lo buat pindah branch. Tapi komentar paling atas di thread lobste.rs malah sama sekali nggak butuh aksi dari lo.</p>
-<p>User agwa nulis soal nyimpen <code>.git/config</code> dengan <code>core.fsmonitor</code> diarahin ke sebuah command. Command itu terus jalan di "very basic ones like <code>git status</code>."</p>
-<p>Gue juga tes sendiri di repo gue. Path script di <code>.git/config</code>, terus <code>git status</code> biasa:</p>
+<p>Hook butuh lo buat pindah branch dulu.</p>
+<p>Tapi komentar paling atas di thread lobste.rs ngebahas jalur yang sama sekali nggak butuh aksi dari lo.</p>
+<p>User agwa nulis soal nyimpen <code>.git/config</code> dengan <code>core.fsmonitor</code> diarahin ke sebuah command, yang terus jalan di "very basic ones like <code>git status</code>."</p>
+<p>Gue juga tes sendiri di repo gue. Satu path script di <code>.git/config</code>, terus <code>git status</code> biasa:</p>
 <pre><code>$ git config core.fsmonitor /path/to/fsmon.sh
 $ git status
 $ cat fs.log
 FSMONITOR EXECUTED args=2 1791180551388075699
 </code></pre>
 <p>Ini yang lebih bahaya, karena <code>git status</code> itu perintah yang editor, build script, dan agent lo jalanin tanpa mikir.</p>
-<p>Daftar agwa tegas: IDE, <code>go build</code>, dan integrasi shell prompt, semuanya jalanin itu diam-diam.</p>
-<p>Dokumentasi git ngasih tahu kenapa path itu bahaya: <code>core.fsmonitor</code> "was extended to allow boolean values in addition to hook pathnames."</p>
-<p>Artinya sebuah path itu command. Dan client versi lama bisa salah baca bahkan <code>true</code> sebagai command.</p>
+<p>agwa nggak muter-muter: IDE, <code>go build</code>, dan integrasi shell prompt, semuanya jalanin itu diam-diam.</p>
+<p>Dokumentasi git ngasih tahu kenapa path itu bahaya.</p>
+<p><code>core.fsmonitor</code> "was extended to allow boolean values in addition to hook pathnames," jadi sebuah path diperlakukan sebagai command. Client versi lama malah bisa salah baca <code>true</code> sebagai command juga.</p>
 <h2>Kenapa clone aman dan folder Dropbox nggak</h2>
 <p>Ada satu batas yang nentuin lo kena atau nggak, dan batasnya lebih sempit dari yang orang kira.</p>
-<p>git nggak mau naruh path <code>.git/</code> di dalam tree. Gue coba lewat jalur plumbing:</p>
+<p>git nolak naruh path <code>.git/</code> di dalam tree sama sekali.</p>
+<p>Gue coba lewat jalur plumbing buat mastiin:</p>
 <pre><code>$ git update-index --add --cacheinfo 100755,&lt;blob&gt;,.git/hooks/post-checkout
 error: Invalid path '.git/hooks/post-checkout'
 fatal: git update-index: --cacheinfo cannot add .git/hooks/post-checkout
 </code></pre>
-<p><code>git add</code> biasa malah nggak ngapa-ngapain, diam-diam aja. Jadi hook nggak bisa ikut lewat commit.</p>
-<p>Clone baru dari repo gue yang udah dijebak cuma dapet file <code>*.sample</code>. Checkout di situ nggak jalanin apa-apa.</p>
-<p>agwa narik garisnya persis kayak gimana proyek git narik garisnya. Cloning itu "in fact the only safe way to get a repo from an untrusted source."</p>
-<p>Clone yang jahat dihitung sebagai vulnerability. Tarball yang jahat dihitung sebagai masalah lo sendiri.</p>
-<p>Jadi ada tiga kasus:</p>
+<p><code>git add</code> biasa buat path yang sama malah nggak ngapa-ngapain, dan nggak ngasih peringatan apa pun. Jadi hook nggak bisa ikut kebawa lewat commit.</p>
+<p>Waktu gue clone repo jebakan gue dari nol, hasilnya cuma bawa file <code>*.sample</code>, dan checkout di situ nggak jalanin apa-apa.</p>
+<p>agwa narik garisnya persis di tempat proyek git narik garisnya: cloning itu "is in fact the only safe way to get a repo from an untrusted source."</p>
+<p>Clone yang jahat dihitung sebagai vulnerability di git. Tarball yang jahat dihitung sebagai masalah lo sendiri.</p>
+<p>Jadi sisanya ada tiga kasus:</p>
 <ul>
 <li><strong>Clone dari URL.</strong> git yang checkout buat lo, aman.</li>
 <li><strong>Ekstrak zip atau tarball.</strong> <code>.git</code>-nya udah ada di dalam. Ini jalur yang berbahaya.</li>
 <li><strong>Buka folder kiriman orang.</strong> Kasus Wiles. Nggak ada clone, nggak ada pengecekan.</li>
 </ul>
-<p>z3bra di thread itu nabrak tembok yang sama dari sisi lain. Clone dari repo yang nyoba ngirim <code>.git/hooks/post-checkout</code> mati dengan <code>fatal: unable to checkout working tree</code>.</p>
-<p>vifon nambahin satu pengecualian yang perlu lo tahu. <code>git bundle</code> asli itu aman, karena clone dari situ nggak akan checkout file-file itu.</p>
+<p>z3bra nabrak tembok yang sama dari arah lain. Clone dari repo yang nyoba ngirim <code>.git/hooks/post-checkout</code> mati dengan <code>fatal: unable to checkout working tree</code>.</p>
+<p>vifon nambahin satu pengecualian yang perlu lo tahu: <code>git bundle</code> asli itu aman, karena clone dari situ nggak akan checkout file-file itu.</p>
 <h2>Mitigasi paling populer ternyata bisa diakalin</h2>
-<p>Fix yang paling banyak di-upvote itu dari arialdo. Matiin hook sepenuhnya pakai <code>git config --global core.hooksPath /dev/null</code>.</p>
-<p>Niatnya bagus, tapi nggak nahan.</p>
-<p>oger udah nebak lubangnya duluan, dan gue reproduce sendiri di repo gue. Dengan setting global itu terpasang, hook-nya diam. Terus satu baris di config repo:</p>
+<p>Fix yang paling banyak di-upvote itu dari arialdo, yang matiin hook sepenuhnya pakai <code>git config --global core.hooksPath /dev/null</code>.</p>
+<p>Niatnya bagus, tapi nggak nahan. oger udah nebak lubangnya duluan, dan gue reproduce sendiri di repo gue.</p>
+<p>Dengan setting global itu terpasang, hook-nya diam.</p>
+<p>Terus gue nambahin satu baris di config repo:</p>
 <pre><code>[core]
     hooksPath = .git/hooks
 </code></pre>
-<p>Hook-nya jalan lagi. Config repo ngalahin config global, jadi repo yang jahat bisa nyalain ulang dirinya sendiri.</p>
-<p>Yang nahan itu bentuk per-command. Config dari command line dipakai paling akhir:</p>
+<p>Hook-nya jalan lagi, karena config repo ngalahin config global, dan repo yang jahat bisa nyalain ulang dirinya sendiri.</p>
+<p>Yang nahan itu bentuk per-command, karena config dari command line dipakai paling akhir:</p>
 <pre><code>$ git -c core.hooksPath=/dev/null checkout nda
 $ git -c core.fsmonitor=false status
 </code></pre>
 <p>Dua-duanya berhasil ngeblok eksekusi di repo yang jahat. Dokumentasi git-config malah nyaranin bentuk ini langsung, ditulis sebagai <code>git -c core.hooksPath=/dev/null</code>.</p>
 <h2>Kenapa agent lo lebih rentan</h2>
-<p>Gue jalanin fleet 17 profil agent. Agent coding, QA, dan PR-review nge-clone repo terus jalanin <code>git status</code> dan <code>git checkout</code> tanpa diawasi, dengan kredensial git nempel di environment.</p>
-<p>Itu persis yang dicari penyerang: akses ke akun dan klien-kliennya.</p>
-<p>Serangan ini lebih cocok buat agent daripada buat manusia. Agent sering dikasih repo dalam bentuk folder atau tarball, bukan hasil clone.</p>
-<p>Dia jalanin <code>git status</code> terus-terusan. Dan nggak ada apa pun di konteksnya yang lagi nyari folder <code>.git</code>.</p>
+<p>Gue jalanin fleet 17 profil agent.</p>
+<p>Agent coding, QA, dan PR-review nge-clone repo terus jalanin <code>git status</code> dan <code>git checkout</code> tanpa diawasi, dengan kredensial git nempel di environment. Itu persis yang dicari penyerang: akses ke sebuah akun dan klien-klien yang nempel di situ.</p>
+<p>Serangan ini lebih cocok buat agent daripada buat manusia, karena agent sering nerima repo dalam bentuk folder atau tarball, dan bukan hasil clone.</p>
+<p>Dia jalanin <code>git status</code> terus-terusan, dan nggak ada apa pun di konteksnya yang lagi nyari folder <code>.git</code>.</p>
 <p>Harden-nya singkat:</p>
 <ul>
 <li><strong>Clone, jangan copy.</strong> Kalau memang harus mindahin repo, clone terus hapus sumbernya.</li>
@@ -161,17 +164,18 @@ $ git -c core.fsmonitor=false status
 <li><strong>Sandbox kredensialnya.</strong> Jalanin git agent di container dengan token yang scoped dan umurnya pendek.</li>
 <li><strong>Periksa dulu sebelum command pertama.</strong> Cek <code>.git/hooks</code> dan <code>.git/config</code> di setiap repo yang datang dari pihak ketiga.</li>
 </ul>
-<p>Kalimat loldot di thread itu jadi default yang bener: "I just consider everything project someone sends me as a malicious."</p>
-<p>benoliver999 nyatet bentuk yang sama juga nongol di bundle take-home interview yang bawa <code>.git</code>.</p>
+<p>Kalimat loldot di thread itu jadi default yang bener: "I just consider everything project someone sends me as a malicious." benoliver999 nyatet bentuk yang sama juga nongol di bundle take-home interview yang bawa <code>.git</code>.</p>
 <h2>Intinya</h2>
-<p><code>git checkout</code> bukan operasi baca. Dia program loader dengan tampilan yang familiar, dan <code>git status</code> juga bisa jadi begitu.</p>
+<p><code>git checkout</code> bukan operasi baca. Dia bisa jalanin sebuah program, dan tampilannya dibikin biar kelihatan cuma baca. <code>git status</code> juga bisa begitu.</p>
 <p>Solusinya bukan flag global yang pintar, karena sebuah repo bisa ngelawan lo buat ngerebut config-nya sendiri.</p>
-<p>Clone apa pun yang nggak lo percaya. Jangan pernah copy.</p>
-<p>Dan kalau ada yang bilang NDA-nya ada di sebuah branch, tanya kenapa dia butuh lo buat jalanin checkout.</p>
-<p>Kalau gue tarik ke konteks gue sendiri: fleet agent gue nge-clone repo tiap hari, dan hampir semuanya datang dari sumber yang nggak gue periksa satu-satu. Yang bikin gue tenang cuma satu hal, yaitu semua clone-nya lewat jalur yang bener.</p>
+<p>Clone apa pun yang nggak lo percaya dan jangan pernah copy, dan kalau ada yang bilang NDA-nya ada di sebuah branch, tanya kenapa dia butuh lo buat jalanin checkout-nya sendiri.</p>
+<p>Kalau gue tarik ke konteks gue sendiri: fleet agent gue nge-clone repo tiap hari, dan hampir semuanya datang dari sumber yang nggak gue periksa satu-satu.</p>
+<p>Yang bikin gue tenang cuma satu hal, yaitu semua clone-nya lewat jalur yang bener.</p>
 <p>Begitu ada satu saja yang dikasih dalam bentuk zip atau folder Dropbox, dan ada agent yang jalanin <code>git status</code> di situ, seluruh aturan mainnya berubah.</p>
 <p>Jadi aturan gue sekarang sederhana: apa pun yang nggak datang dari <code>git clone</code>, gue anggap asing sampai gue periksa sendiri.</p>
-<p>Sisanya gue perlakukan seperti kode asing. Diperiksa dulu, baru dijalanin. Nggak ada yang namanya "cuma lihat-lihat dulu" di repo yang nggak lo percaya.</p>
+<p>Sisanya gue perlakukan seperti kode asing. Diperiksa dulu, baru dijalanin.</p>
+<p>Nggak ada yang namanya "cuma lihat-lihat dulu" di repo yang nggak lo percaya.</p>
+<p>Dan itu nggak butuh lo buat pindah branch. Cukup satu <code>git status</code> di folder yang salah.</p>
     </div>
     <div class="hero__actions post__footer-actions">
       <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
