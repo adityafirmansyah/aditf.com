@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>The SQLAlchemy Session Poisoning Trap in Bulk CSV Import</title>
+      <link>https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/</guid>
+      <pubDate>Tue, 06 Oct 2026 00:00:00 +0000</pubDate>
+      <description>One failed row in a bulk import can poison a shared SQLAlchemy session and kill the next 497. Here is the real session-lifecycle fix, with numbers from PostgreSQL 18.6.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/id/"/>
+    </item>
+    <item>
       <title>&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot;</title>
       <link>https://aditf.com/blog/reproducing-the-git-hook-attack/</link>
       <guid isPermaLink="true">https://aditf.com/blog/reproducing-the-git-hook-attack/</guid>

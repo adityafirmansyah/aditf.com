@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jebakan Session Poisoning di SQLAlchemy saat Bulk Import CSV — Field Notes</title>
+<meta name="description" content="Satu baris gagal di bulk import bisa ngerusak session SQLAlchemy yang dipakai bareng dan ngebunuh 497 baris berikutnya. Ini fix siklus hidup session yang sebenarnya, lengkap angka dari PostgreSQL 18.6 asli.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jebakan Session Poisoning di SQLAlchemy saat Bulk Import CSV — Field Notes">
+<meta property="og:description" content="Satu baris gagal di bulk import bisa ngerusak session SQLAlchemy yang dipakai bareng dan ngebunuh 497 baris berikutnya. Ini fix siklus hidup session yang sebenarnya, lengkap angka dari PostgreSQL 18.6 asli.">
+<meta property="og:url" content="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Jebakan Session Poisoning di SQLAlchemy saat Bulk Import CSV — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Jebakan Session Poisoning di SQLAlchemy saat Bulk Import CSV — Field Notes">
+<meta name="twitter:description" content="Satu baris gagal di bulk import bisa ngerusak session SQLAlchemy yang dipakai bareng dan ngebunuh 497 baris berikutnya. Ini fix siklus hidup session yang sebenarnya, lengkap angka dari PostgreSQL 18.6 asli.">
+<meta name="twitter:image" content="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-06T00:00:00+00:00">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="sqlalchemy">
+<meta property="article:tag" content="postgresql">
+<meta property="article:tag" content="backend">
+<meta property="article:tag" content="architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Jebakan Session Poisoning di SQLAlchemy saat Bulk Import CSV", "description": "Satu baris gagal di bulk import bisa ngerusak session SQLAlchemy yang dipakai bareng dan ngebunuh 497 baris berikutnya. Ini fix siklus hidup session yang sebenarnya, lengkap angka dari PostgreSQL 18.6 asli.", "datePublished": "2026-10-06T00:00:00+00:00", "dateModified": "2026-10-06T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/id/"}, "keywords": "python, sqlalchemy, postgresql, backend, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 991, "image": ["https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>06 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Jebakan Session Poisoning di SQLAlchemy saat Bulk Import CSV</h1>
+    <div class="post__tags"><span>python</span><span>sqlalchemy</span><span>postgresql</span><span>backend</span><span>architecture</span></div>
+    <div class="post__content reveal is-visible">
+<h2>Baris gagal nggak boleh ngejatuhin baris lain</h2>
+<p>Baris ke-3 dari import CSV 500 baris kena unique constraint.</p>
+<p>Insert-nya error, lo catat, terus lanjut ke baris ke-4. Baris ke-4 balik bawa error session. Baris ke-5 juga.</p>
+<p>Semua baris setelahnya ikut mati. Import "partial success" lo berubah jadi gagal total, dan database cuma nyimpen dua produk padahal 497 harusnya masuk.</p>
+<p>Itu jebakannya. Dan buat keluar dari situ lo nggak butuh Celery, Redis, atau background worker.</p>
+<p>Ini cuma bug siklus hidup transaksi, dan obatnya lebih kecil daripada kerusakan yang dia bikin.</p>
+<p>Gue kena waktu bangun fitur bulk import CSV produk buat Dagango.com, platform e-commerce Next.js/FastAPI.</p>
+<p>Daripada langsung lari ke async queue, gue jalanin spike lawan PostgreSQL 18.6 asli. Gue mau tau apakah batching synchronous dengan session recovery yang bener bakal tahan. Ternyata iya.</p>
+<h2>Yang di-abort Postgres itu transaksinya, bukan statement-nya</h2>
+<p>Satu statement yang error di dalam transaction block bukan cuma bikin statement itu gagal. PostgreSQL nandain seluruh transaksinya aborted.</p>
+<p>Semua command setelahnya dapet ini:</p>
+<pre><code>25P02: current transaction is aborted, commands ignored until end of transaction block
+</code></pre>
+<p>Kelas 25 itu <code>invalid_transaction_state</code>, dan <code>25P02</code> itu <code>in_failed_sql_transaction</code>. Ini perilaku Postgres yang terdokumentasi, bukan flag yang bisa lo matiin.</p>
+<p>Errornya ada di level transaksi, bukan level statement, dan justru itu alasan blok <code>try</code> per statement nggak bisa nyelametin lo.</p>
+<p>Error yang lo liat berikutnya tergantung cara lo ngomong ke database. Detail ini penting:</p>
+<ul>
+<li><strong>Loop <code>Session.execute()</code> mentah:</strong> statement berikutnya naikin <code>sqlalchemy.exc.InternalError</code> dengan sqlstate <code>25P02</code>, ngebungkus <code>psycopg.errors.InFailedSqlTransaction</code>.</li>
+<li><strong>Loop ORM <code>add</code> + <code>commit</code>:</strong> <code>commit()</code> berikutnya naikin <code>sqlalchemy.exc.PendingRollbackError</code>.</li>
+</ul>
+<p>Dua-duanya masalah yang sama, "lo belum rollback".</p>
+<p>Nggak ada yang <code>IntegrityError</code>. Jadi <code>except IntegrityError: continue</code> nggak akan pernah nangkep, dan import-nya mati di baris ke-4.</p>
+<h2>rollback() itu udah cukup, satu baris</h2>
+<p>Fix-nya satu baris. Beneran cuma satu:</p>
+<pre><code class="language-python">db.rollback()
+</code></pre>
+<p>Itu panggilan yang pentingnya nyata, dan dia ngerjain dua tugas sekaligus. Dia nurunin status transaksi Postgres dari aborted jadi sehat, dan dia buang graph objek yang masih pending.</p>
+<p>Di SQLAlchemy 2.0, <code>Session.rollback()</code> ngejalanin <code>SessionTransaction._restore_snapshot</code>, yang nge-expunge state baru session dan nandain mereka transient:</p>
+<pre><code class="language-python">to_expunge = set(self._new).union(self.session._new)
+self.session._expunge_states(to_expunge, to_transient=True)
+</code></pre>
+<p>Jadi produk yang gagal, gambar-gambarnya, dan varian-variannya keluar dari session bareng rollback-nya. Nggak ada hantu setengah-pending yang nangkring buat nempel lagi di insert berikutnya.</p>
+<p>Di sinilah banyak nasihat, termasuk komentar yang nyempil di kode gue sendiri, salah.</p>
+<p>Yang umum dilakukan orang: habis <code>rollback()</code> terus tambahin <code>db.expunge_all()</code>, dengan teori rollback doang nyisain objek basi. Di SQLAlchemy 2.0 teori itu salah.</p>
+<p>Matriks recovery-nya gue konfirmasi di stack asli. Hasilnya begini buat baris berikutnya:</p>
+<ul>
+<li><code>rollback()</code> doang → <strong>OK</strong>.</li>
+<li><code>expunge_all()</code> doang → GAGAL (<code>PendingRollbackError</code>).</li>
+<li><code>rollback()</code> + <code>expunge_all()</code> → OK.</li>
+<li>Nggak dua-duanya → GAGAL (<code>PendingRollbackError</code>).</li>
+</ul>
+<p>Dua hal langsung kelihatan dari situ:</p>
+<ul>
+<li><code>expunge_all()</code> sendirian nggak bahkan nurunin status transaksi yang aborted, makanya gagal sendiri.</li>
+<li>Begitu lo udah rollback, nambahin <code>expunge_all()</code> nggak ngubah apa-apa.</li>
+</ul>
+<p>Itu cuma kehati-hatian ekstra. Mau dipertahanin silakan, tapi dia bukan fix-nya, dan nggak dipakai pun baris berikutnya lo nggak akan keracunan.</p>
+<p>Setelah rollback, session-nya terverifikasi bersih. Ini angka yang dicek di spike:</p>
+<ul>
+<li><code>is_active=True</code></li>
+<li><code>in_transaction=False</code></li>
+<li><code>new</code>, <code>dirty</code>, <code>deleted</code> semuanya nol</li>
+<li><code>identity_map</code> nol</li>
+</ul>
+<p>Itu syaratnya biar baris ke-4 bisa sukses.</p>
+<h2>Biaya nyata 500 baris di Postgres 18.6</h2>
+<p>Gue jalanin loop importer asli lawan PostgreSQL 18.6 asli di schema sementara, dengan baris multi-relasi yang realistis: produk, kombinasi varian, URL gambar. Habis itu schema-nya gue drop.</p>
+<p>Recovery yang dipakai cuma <code>rollback()</code> polos. Enam dari enam skenario lolos.</p>
+<p>Kasus gagalnya pakai pelanggaran unique constraint asli dari Postgres, bukan simulasi:</p>
+<ul>
+<li>1 baris gagal dari 10 → tepat 9 produk kebentuk</li>
+<li>2 baris gagal dalam satu jalan → tepat 8 produk kebentuk</li>
+<li>nol gambar atau varian yatim di dua kasus itu</li>
+</ul>
+<p>Tiap produk yang selamat bawa gambar dan kombinasi varian dari barisnya sendiri.</p>
+<p>Sengaja gue tambahin steelman: partial flush di mana INSERT produk induknya sukses tapi anaknya gagal kena check constraint, dan <code>identity_map</code>-nya tetap nol. Cerita serem yang mungkin pernah lo denger, di mana baris ke-8 diam-diam mewarisi anak-anak baris ke-3, nggak muncul di konfigurasi mana pun yang gue tes.</p>
+<p>Lalu angka throughput yang nyelesain pertanyaan arsitekturnya:</p>
+<ul>
+<li>500 baris commit secara synchronous dalam sekitar 5 detik</li>
+<li>min ≈ 8 ms/baris, p50 ≈ 10 ms, p95 di kisaran puluhan ms bawah</li>
+<li>500/500 commit, 0 error</li>
+</ul>
+<p>Lima detik kerja synchronous masih nyaman di dalam timeout HTTP request normal. Cap import-nya sengaja dibatasi 500 baris data dan body 2 MiB, dan itu ditolak sebelum ada baris yang ditulis. Jadi ini kerjaan beberapa detik, bukan risiko timeout.</p>
+<h2>Tabrakan slug yang ternyata nggak bikin gagal</h2>
+<p>Gue awalnya ngira judul produk duplikat di CSV bakal meledak di unique constraint slug. Spike-nya mengoreksi gue.</p>
+<p><code>slugify.unique_slug</code> baca ulang slug tenant yang udah kepakai di tiap percobaan, terus tambahin <code>-2</code>, <code>-3</code>, <code>-4</code>, tanpa batas. Judul duplikat, bukan error, dia jadi produk kedua dengan slug bernomor.</p>
+<p><code>SlugAllocationFailed</code> itu hasil dari race concurrency. Buat ngehabisin tiga percobaan alokasi, set slug tenant harus berubah di antara pembacaan dan INSERT. Itulah race concurrent-create-nya.</p>
+<p>Jadi laporannya nunjukin slug yang beneran dialokasikan ke operator, termasuk yang bersufiks <code>-2</code>, daripada ngegagalin baris yang sebenarnya sehat.</p>
+<h2>Kebocoran upstream yang layak disebut</h2>
+<p>Ada satu batasan yang nggak gue tutupi. Retry di creator-nya membungkus <code>except IntegrityError</code> yang nggak difilter per constraint.</p>
+<p>Semua kegagalan integritas di INSERT itu, entah foreign key, NOT NULL, atau unique constraint lain, di-retry tiga kali terus muncul sebagai <code>SlugAllocationFailed</code>.</p>
+<p>Importer-nya nglaporin kode itu apa adanya dan nggak ngeklaim lebih dari yang diketahui creator. Mempersempitnya itu tanggung jawab <code>create_product</code>, bukan unit import. Jadi gue sebutin terang-terangan daripada disembunyiin.</p>
+<h2>Intinya</h2>
+<p>Ini bagian yang layak lo bawa ke importer lo sendiri.</p>
+<p>Recovery-nya nggak eksotis, dan bukan dua baris. Cukup <code>db.rollback()</code>, sekali per baris gagal, dan SQLAlchemy 2.0 ngerjain bersih-bersih graph-nya buat lo di dalam panggilan itu.</p>
+<p>Ukur dulu biaya per baris lo sebelum lari ke background queue. Import synchronous lima detik dengan plafon baris yang jelas itu barang yang lebih ringan diurus daripada sekawanan worker.</p>
+<p>State session lo sendiri satu-satunya hal yang wajib lo benerin.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

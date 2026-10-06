@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The SQLAlchemy Session Poisoning Trap in Bulk CSV Import — Field Notes</title>
+<meta name="description" content="One failed row in a bulk import can poison a shared SQLAlchemy session and kill the next 497. Here is the real session-lifecycle fix, with numbers from PostgreSQL 18.6.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The SQLAlchemy Session Poisoning Trap in Bulk CSV Import — Field Notes">
+<meta property="og:description" content="One failed row in a bulk import can poison a shared SQLAlchemy session and kill the next 497. Here is the real session-lifecycle fix, with numbers from PostgreSQL 18.6.">
+<meta property="og:url" content="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The SQLAlchemy Session Poisoning Trap in Bulk CSV Import — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The SQLAlchemy Session Poisoning Trap in Bulk CSV Import — Field Notes">
+<meta name="twitter:description" content="One failed row in a bulk import can poison a shared SQLAlchemy session and kill the next 497. Here is the real session-lifecycle fix, with numbers from PostgreSQL 18.6.">
+<meta name="twitter:image" content="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-06T00:00:00+00:00">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="sqlalchemy">
+<meta property="article:tag" content="postgresql">
+<meta property="article:tag" content="backend">
+<meta property="article:tag" content="architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "The SQLAlchemy Session Poisoning Trap in Bulk CSV Import", "description": "One failed row in a bulk import can poison a shared SQLAlchemy session and kill the next 497. Here is the real session-lifecycle fix, with numbers from PostgreSQL 18.6.", "datePublished": "2026-10-06T00:00:00+00:00", "dateModified": "2026-10-06T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/"}, "keywords": "python, sqlalchemy, postgresql, backend, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1096, "image": ["https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>06 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">The SQLAlchemy Session Poisoning Trap in Bulk CSV Import</h1>
+    <div class="post__tags"><span>python</span><span>sqlalchemy</span><span>postgresql</span><span>backend</span><span>architecture</span></div>
+    <div class="post__content reveal is-visible">
+<h2>A failed row should not fail its siblings</h2>
+<p>Row 3 of a 500-row CSV import trips a unique constraint. The insert raises, you log it, and you move on to row 4. Row 4 comes back with a session error, and so does row 5.</p>
+<p>So does every row after it. Your "partial success" importer is now a total failure, and the database holds two products instead of 497.</p>
+<p>That is the trap, and it does not require Celery, Redis, or a background worker queue to escape. It is a transaction-lifecycle bug, and the fix is smaller than the incident it causes.</p>
+<p>We hit it while building the bulk CSV product import for Dagango.com, a Next.js/FastAPI e-commerce platform. Rather than reach for an async queue, we ran a spike against real PostgreSQL 18.6 to test whether synchronous batching with proper session recovery holds up. It does.</p>
+<h2>Postgres aborts the transaction, not the statement</h2>
+<p>Inside a transaction block, an error on one statement does more than fail that statement. PostgreSQL marks the whole transaction aborted. Every later command gets this:</p>
+<pre><code>25P02: current transaction is aborted, commands ignored until end of transaction block
+</code></pre>
+<p>Class 25 is <code>invalid_transaction_state</code>, and <code>25P02</code> is <code>in_failed_sql_transaction</code>. This is documented Postgres behavior, not a flag you can turn off. The error is at the transaction level, not the statement level, which is exactly why a per-statement <code>try</code> block cannot save you.</p>
+<p>The exception you see next depends on how you talk to the database, and this detail matters:</p>
+<ul>
+<li><strong>Raw <code>Session.execute()</code> loop:</strong> the next statement raises <code>sqlalchemy.exc.InternalError</code> with sqlstate <code>25P02</code>, wrapping <code>psycopg.errors.InFailedSqlTransaction</code>.</li>
+<li><strong>ORM <code>add</code> + <code>commit</code> loop:</strong> the next <code>commit()</code> raises <code>sqlalchemy.exc.PendingRollbackError</code>.</li>
+</ul>
+<p>Both are the same underlying problem: you have not rolled back yet. Neither is an <code>IntegrityError</code>, so an <code>except IntegrityError: continue</code> never catches them, and the import dies on row 4.</p>
+<h2>rollback() is the whole recovery</h2>
+<p>The fix is one line. It is only one line:</p>
+<pre><code class="language-python">db.rollback()
+</code></pre>
+<p>That is the load-bearing call, and it does both jobs. It un-aborts the Postgres transaction, and it discards the pending object graph. In SQLAlchemy 2.0, <code>Session.rollback()</code> runs <code>SessionTransaction._restore_snapshot</code>, which expunges the session's new states and marks them transient:</p>
+<pre><code class="language-python">to_expunge = set(self._new).union(self.session._new)
+self.session._expunge_states(to_expunge, to_transient=True)
+</code></pre>
+<p>So the failed product, its images, and its variants leave the session with the rollback. There is no half-pending ghost left to re-attach on the next insert.</p>
+<p>This is where a lot of advice, including a comment sitting in our own code, gets it wrong. The common move is to follow <code>rollback()</code> with <code>db.expunge_all()</code>, on the theory that rollback alone leaves stale objects behind. On SQLAlchemy 2.0 that theory is false.</p>
+<p>We confirmed the recovery matrix on the real stack. This is the next row's fate under each recovery:</p>
+<ul>
+<li><code>rollback()</code> only → <strong>OK</strong>.</li>
+<li><code>expunge_all()</code> only → FAILS (<code>PendingRollbackError</code>).</li>
+<li><code>rollback()</code> + <code>expunge_all()</code> → OK.</li>
+<li>Neither → FAILS (<code>PendingRollbackError</code>).</li>
+</ul>
+<p>Two things fall out of that:</p>
+<ul>
+<li><code>expunge_all()</code> alone does not even un-abort the transaction, so it fails by itself.</li>
+<li>Once you have rolled back, adding <code>expunge_all()</code> changes nothing.</li>
+</ul>
+<p>It is explicit, defensive surplus. Keep it if you like the belt-and-braces, but it is not the fix, and skipping it will not poison your next row.</p>
+<p>After the rollback the session is verifiably clean, and those are the numbers the spike checks:</p>
+<ul>
+<li><code>is_active=True</code></li>
+<li><code>in_transaction=False</code></li>
+<li><code>new</code>, <code>dirty</code>, <code>deleted</code> all zero</li>
+<li><code>identity_map</code> zero</li>
+</ul>
+<p>That is the precondition for row 4 to succeed.</p>
+<h2>What 500 rows actually cost on Postgres 18.6</h2>
+<p>We ran the real importer loop against real PostgreSQL 18.6 in a scratch schema, with realistic multi-relational rows: products, variant combinations, image URLs. Then we dropped the schema. The recovery used was a bare <code>rollback()</code>. Six of six scenarios passed.</p>
+<p>The failure cases used a genuine unique-constraint violation from Postgres, not a simulated one:</p>
+<ul>
+<li>1 failing row out of 10 → exactly 9 products created</li>
+<li>2 failing rows in one run → exactly 8 products created</li>
+<li>zero orphan images or variants in either case</li>
+</ul>
+<p>Each surviving product carried its own row's images and variant combo. A deliberate steelman, a partial flush where the parent product INSERT succeeds and a child fails on a check constraint, also left <code>identity_map</code> at zero. The horror story you may have heard, where row 8 quietly inherits row 3's children, did not reproduce in any configuration we tested.</p>
+<p>Then the throughput number that settles the architecture question:</p>
+<ul>
+<li>500 rows committed synchronously in roughly 5 seconds</li>
+<li>min ≈ 8 ms/row, p50 ≈ 10 ms, p95 in the low tens of ms</li>
+<li>500/500 committed, 0 errors</li>
+</ul>
+<p>Five seconds of synchronous work sits comfortably inside a normal HTTP request timeout. The import cap is a deliberate 500 data rows and a 2 MiB body, refused before any row is written. That is a few seconds of work, not a timeout risk.</p>
+<h2>The slug collision that does not fail</h2>
+<p>We assumed duplicate titles in a CSV would blow up on the unique slug constraint. The spike corrected us.</p>
+<p><code>slugify.unique_slug</code> re-reads the tenant's taken slugs on every attempt and appends <code>-2</code>, <code>-3</code>, <code>-4</code>, with no bound. A duplicate title is a second product with a numbered slug, not an error.</p>
+<p><code>SlugAllocationFailed</code> is a concurrency outcome. To exhaust the three allocation attempts, the tenant's slug set has to change between the read and the INSERT, the concurrent-create race. So the report shows the operator the slug actually allocated, including a <code>-2</code> suffix, instead of failing a row that was fine.</p>
+<h2>The upstream leak worth naming</h2>
+<p>One limitation we did not paper over: the creator's retry wraps an unqualified <code>except IntegrityError</code>. It is not filtered by constraint. Any integrity failure on that INSERT, a foreign key, a NOT NULL, a different unique constraint, gets retried three times and then surfaces as <code>SlugAllocationFailed</code>.</p>
+<p>The importer reports that code verbatim and claims no more than the creator knows. Narrowing it belongs to <code>create_product</code>, not to the import unit, so we named it instead of hiding it.</p>
+<h2>The takeaway</h2>
+<p>Here is the part worth taking to your own importer. The recovery is not exotic, and it is not two lines. It is <code>db.rollback()</code>, once per failed row, and SQLAlchemy 2.0 does the graph cleanup for you inside that call. Measure your row cost before you reach for a background queue, because a five-second synchronous import with a hard row ceiling is a smaller thing to own than a worker fleet.</p>
+<p>The session's own state is the only thing you have to get right.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
