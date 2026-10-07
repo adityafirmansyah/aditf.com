@@ -38,7 +38,7 @@
 <meta property="article:tag" content="performance">
 <meta property="article:tag" content="webdev">
 <meta property="article:tag" content="architecture">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "\"Kenapa next/font/google Bikin CI Kita Jebol: Self-Host 13 Subset Font biar Build Nggak Butuh Internet\"", "description": "Master CI kita mati dua kali dalam dua belas jam, di commit yang kode font-nya sama persis. Ini cara Dagango.com nyimpen 13 subset font di disk biar next build nggak nembak internet.", "datePublished": "2026-10-07T00:00:00+00:00", "dateModified": "2026-10-07T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/"}, "keywords": "nextjs, frontend, performance, webdev, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 906, "image": ["https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "\"Kenapa next/font/google Bikin CI Kita Jebol: Self-Host 13 Subset Font biar Build Nggak Butuh Internet\"", "description": "Master CI kita mati dua kali dalam dua belas jam, di commit yang kode font-nya sama persis. Ini cara Dagango.com nyimpen 13 subset font di disk biar next build nggak nembak internet.", "datePublished": "2026-10-07T00:00:00+00:00", "dateModified": "2026-10-07T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/"}, "keywords": "nextjs, frontend, performance, webdev, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1015, "image": ["https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/", "inLanguage": "en-US"}}</script>
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">
@@ -74,36 +74,49 @@
     <div class="post__tags"><span>nextjs</span><span>frontend</span><span>performance</span><span>webdev</span><span>architecture</span></div>
     <div class="post__content reveal is-visible">
 <h2><code>next build</code> itu bukan perintah offline</h2>
-<p>Gue dulu nganggap <code>next/font/google</code> udah beresin semua urusan font. Di sisi browser iya: nggak ada layout shift, request ke Google nggak pernah datang dari mesin pengunjung, dan filenya dilayanin dari origin lo sendiri.</p>
-<p>Yang sering kelewat, mesin yang ngejalanin <code>next build</code> tetap buka koneksi HTTPS ke fonts.googleapis.com. Tiap kali.</p>
-<p>Jadi deploy lo sekarang nempel ke CDN orang lain, dan lo baru sadar pas momennya paling nggak enak.</p>
-<h2>Dua build merah dalam dua belas jam</h2>
-<p>Master CI kita mati di dalam fetch itu dua kali dengan jarak sekitar dua belas jam, dan nggak ada satu baris kode font pun di diff-nya.</p>
-<p>Dua run merah itu <code>36935742623</code> (merge <code>42875bb</code>) dan <code>36851269872</code> (<code>f6b3627</code>).</p>
-<p>Semuanya muncul sebagai <code>An error occurred in next/font</code>, terus mendarat di sini:</p>
+<p>Dulu gue pikir <code>next/font/google</code> udah ngurusin semua soal font, titik.</p>
+<p>Kalau di sisi browser, urusan font sebenarnya udah beres: nggak ada layout shift, pengunjung situs nggak pernah ikut nembak server Google, dan semua file dilayanin dari origin kita sendiri.</p>
+<p>Yang jadi masalah itu mesin yang ngejalanin <code>next build</code>, bukan browser.</p>
+<p>Loader itu tetap buka koneksi HTTPS ke fonts.googleapis.com. Tiap kali build jalan, nggak cuma sekali doang pas setup.</p>
+<p>Jadi deploy kita diam-diam gantung ke CDN orang lain. Dan kita baru nyadar pas lagi apes-apesnya.</p>
+<h2>Dua kali merah dalam dua belas jam</h2>
+<p>Master CI kita mati di tengah fetch itu, dua kali, jaraknya cuma sekitar dua belas jam.</p>
+<p>Nggak ada satu baris pun kode font yang ikut diubah di dua commit itu.</p>
+<p>Dua run yang kena merah itu <code>36935742623</code> (merge <code>42875bb</code>) sama <code>36851269872</code> (<code>f6b3627</code>), dua kejadian yang beda tapi gejalanya identik. Dua-duanya nunjukin error yang sama, <code>An error occurred in next/font</code>, terus jatuh ke sini:</p>
 <pre><code>TypeError: Cannot read properties of null (reading '1')
     at @next/font/dist/google/loader.js
 </code></pre>
-<p>Commit sebelum dan sesudah masing-masing run merah isinya kode font yang sama persis, dan dua-duanya hijau.</p>
-<p>Artinya semua kejadian itu false red yang tetap aja nyita waktu buat ditriage. Pipeline yang suka nangis palsu juga pipeline yang bisa nyembunyiin break asli.</p>
-<h2>Sumber fetch-nya di mana</h2>
-<p>Permintaan waktu build itu datang dari <code>@next/font/dist/google/fetch-resource.js</code>.</p>
-<p>Kalau CDN Google ngambek atau nge-throttle panggilan itu, loader-nya nyoba baca response yang nggak pernah datang, terus error di <code>null</code>. Dependensinya nyata dan letaknya di luar, posisinya persis di antara lo dan build yang hijau.</p>
-<h2>Latin doang nggak cukup</h2>
-<p>Jalan pintasnya: simpan file woff2 latin, selesai. Buat situs yang isinya cuma latin, itu memang cukup.</p>
-<p>Masalahnya Dagango.com itu multi-tenant. Merchant nulis copy storefront-nya dalam bahasa Vietnam, Cyrillic, Yunani, dan Devanagari, campur sama latin.</p>
-<p>Begitu subset non-latin dibuang, karakter-karakter itu jatuh ke font sistem yang metriknya beda dan glyph-nya bolong.</p>
-<p>Untuk tiga family platform kita, Google nyediain set ini:</p>
+<p>Commit sebelum dan sesudahnya, kode fontnya sama persis. Build-nya hijau.</p>
+<p>Jadi dua kejadian merah itu false alarm. Tapi tetap kena triage, tetap makan waktu tim.</p>
+<p>Dan ini yang bikin gue parno: pipeline yang suka boong soal "ada yang rusak" itu juga pipeline yang bisa nyembunyiin kerusakan yang beneran.</p>
+<h2>Request itu dari mana asalnya</h2>
+<p>File yang nembak keluar itu <code>@next/font/dist/google/fetch-resource.js</code>.</p>
+<p>Kalau CDN Google lagi ngambek atau nge-throttle, loadernya nunggu response yang nggak pernah datang. Pas dapet null, dia nyoba baca properti dari situ, dan meledak.</p>
+<p>Ketergantungan ke CDN luar kayak gini yang bikin apes: lo nggak nyentuh kode font sama sekali, tapi build lo bisa tiba-tiba merah.</p>
+<h2>Latin doang? Nggak bisa</h2>
+<p>Jalan paling gampang: vendor-in file woff2 latin aja, kelar. Buat situs marketing yang isinya cuma latin, ini udah lebih dari cukup.</p>
+<p>Tapi Dagango.com itu multi-tenant.</p>
+<p>Merchant kita nulis konten storefront-nya dalam macem-macem bahasa:</p>
 <ul>
-<li><strong>Baloo 2</strong> (display): <code>latin</code>, <code>latin-ext</code>, <code>vietnamese</code>, <code>devanagari</code>.</li>
-<li><strong>Public Sans</strong> (body): <code>latin</code>, <code>latin-ext</code>, <code>vietnamese</code>.</li>
+<li>Vietnam</li>
+<li>Cyrillic</li>
+<li>Yunani</li>
+<li>Devanagari</li>
+</ul>
+<p>Semuanya bercampur sama latin, tergantung tokonya.</p>
+<p>Buang subset non-latin, karakter-karakter itu jatuh ke font sistem. Metriknya beda, dan beberapa glyph malah nggak ada sama sekali.</p>
+<p>Buat tiga family platform kita, Google sebenarnya nyediain:</p>
+<ul>
+<li><strong>Baloo 2</strong> (buat display): <code>latin</code>, <code>latin-ext</code>, <code>vietnamese</code>, <code>devanagari</code>.</li>
+<li><strong>Public Sans</strong> (buat body text): <code>latin</code>, <code>latin-ext</code>, <code>vietnamese</code>.</li>
 <li><strong>JetBrains Mono</strong>: <code>latin</code>, <code>latin-ext</code>, <code>vietnamese</code>, <code>cyrillic</code>, <code>cyrillic-ext</code>, <code>greek</code>.</li>
 </ul>
-<p>Totalnya 13 file dan 225 KB. Semua subset yang Google sediain buat ketiga family itu ada di situ, nggak ada yang disisihin.</p>
-<h2><code>next/font/local</code> buang <code>unicodeRange</code> yang nempel di <code>src</code></h2>
-<p><code>next/font/local</code> nggak punya opsi <code>subsets</code>.</p>
-<p>Subset juga nggak bisa dikasih lewat range di entry <code>src</code>: loader bawaan cuma destructure <code>{ path, style, weight, ext, format }</code> dari tiap entry, sisanya dibuang diam-diam.</p>
-<p>Jalan keluarnya lewat <code>declarations</code>. Loader nyalin tiap declaration ke <code>@font-face</code> yang dia bikin, jadi satu call per (family, subset) bisa nenteng range persis punya subset itu.</p>
+<p>Itung-itung semua, jadi 13 file, totalnya 225 KB. Lengkap buat tiga family ini, nggak ada subset yang disisihin.</p>
+<h2><code>next/font/local</code> diam-diam buang <code>unicodeRange</code></h2>
+<p><code>next/font/local</code> nggak punya opsi <code>subsets</code>. Titik, nggak ada negosiasi.</p>
+<p>Lo juga nggak bisa nempelin unicode range di tiap entry <code>src</code>. Loader bawaannya cuma ambil <code>{ path, style, weight, ext, format }</code> dari tiap entry, property sisanya diabaikan sama loader bawaan Next.</p>
+<p>Untungnya ada <code>declarations</code>. Semua yang lo taruh di situ bakal ke-copy utuh ke <code>@font-face</code> yang dihasilkan.</p>
+<p>Jadi solusinya: satu call <code>localFont()</code> per kombinasi family dan subset, dan tiap call bawa unicode range masing-masing lewat <code>declarations</code>.</p>
 <pre><code class="language-ts">export const baloo2LatinExt = localFont({
   src: [{ path: &quot;./Baloo2-latin-ext-700.woff2&quot;, weight: &quot;700&quot;, style: &quot;normal&quot; }],
   variable: &quot;--font-baloo-2-latin-ext&quot;,
@@ -116,18 +129,22 @@
   ],
 });
 </code></pre>
-<p>Perhatiin <code>font-family</code> di situ. Theme tenant yang udah tersimpan nyari family default platform berdasarkan NAMA (<code>lib/theme/derive.ts</code>), dan storefront shell-nya sengaja nggak minta stylesheet buat family itu. Kalau namanya di-scope ke nama generated Next, tenant itu bakal render lewat fallback face tanpa kita sadar.</p>
-<h2>Jangan biarin fallback face beranak</h2>
-<p><code>next/font</code> bikin satu face <code>... Fallback</code> yang metriknya disamain, per call. Kalau defaultnya dibiarin, tiap subset nambah family fallback sendiri.</p>
-<p>Jadi kita set dua hal:</p>
+<p>Perhatiin baris <code>font-family</code> di <code>declarations</code> itu.</p>
+<p>Theme tenant yang udah tersimpan nyari nama family platform default lewat NAMA itu sendiri, nggak lewat variable (<code>lib/theme/derive.ts</code>). Storefront shell-nya sengaja nggak minta stylesheet terpisah buat nama itu.</p>
+<p>Kalau sampai nama family-nya ke-scope jadi nama generated Next, tenant itu diam-diam bakal render pakai fallback font, dan nggak ada yang notice sampai ada komplain.</p>
+<h2>Jangan sampai fallback font-nya numpuk</h2>
+<p><code>next/font</code> bikin satu fallback font yang metriknya dicocokin otomatis, per call <code>localFont()</code>.</p>
+<p>Kalau default-nya dibiarin nyala di semua 13 call, kita bakal punya 13 keluarga fallback font yang beda-beda. Padahal yang perlu cuma tiga.</p>
+<p>Makanya kita set dua hal:</p>
 <ul>
-<li><code>preload: true</code> cuma di tiga call latin, karena cuma file itu yang di-preload build.</li>
-<li><code>adjustFontFallback: false</code> di sepuluh call sisanya, biar nggak ada family <code>... Fallback</code> tambahan.</li>
+<li><code>preload: true</code> cuma di tiga call latin. Cuma tiga file itu yang di-preload build.</li>
+<li><code>adjustFontFallback: false</code> di sepuluh call sisanya, biar nggak nambah family fallback baru.</li>
 </ul>
-<p>Ketiga belas call itu dirangkai jadi satu string <code>fontVariables</code> yang dipasang di <code>&lt;html&gt;</code>.</p>
-<p>Rangkaian ini jangan sampai bolong. Call <code>localFont()</code> yang class-nya nggak pernah kepasang bakal di-tree-shake, sekalian <code>@font-face</code> dan file-nya.</p>
-<h2>Cara mastiin build-nya beneran nggak nyentuh internet</h2>
-<p>Config yang keliatan air-gapped belum tentu bukti. Jadi build-nya kita jalanin di bawah <code>strace</code>:</p>
+<p>Ketiga belas call itu akhirnya digabung jadi satu string <code>fontVariables</code>, dipasang di <code>&lt;html&gt;</code>.</p>
+<p>Rantai ini harus utuh, nggak boleh ada yang kelupaan. Call <code>localFont()</code> yang class-nya nggak kepasang bakal kena tree-shake, dan <code>@font-face</code> plus file-nya ikut hilang.</p>
+<h2>Buktiin build-nya beneran nggak nembak internet</h2>
+<p>Cuma ngandelin config lokal belum bikin gue tenang. Config bisa aja benar di atas kertas tapi salah di eksekusi.</p>
+<p>Jadi kita jalanin build-nya di bawah <code>strace</code>:</p>
 <pre><code>strace -f -e trace=connect -o /tmp/build-conn.log ./node_modules/.bin/next build
 </code></pre>
 <p>Terus kita hitung lalu lintas connect-nya:</p>
@@ -136,19 +153,25 @@ CONNECT_LINES=0
 HTS443=0
 DNS_LINES=0
 </code></pre>
-<p>Nol socket keluar, nggak ada DNS lookup, nggak ada koneksi ke port 443. Build-nya jalan penuh tanpa internet.</p>
-<h2>Satu delta yang gue catat</h2>
-<p>Semua di atas byte-nya identik dengan yang selama ini udah dipancarin loader Google. Bedanya cuma di tiga face <code>... Fallback</code> yang masih ada: angka <code>size-adjust</code>-nya berubah setelah pindah.</p>
-<p>Penyebabnya, loader Google baca tabel capsize yang udah dihitung Next, sementara loader lokal ngukur filenya sendiri pakai fontkit. Ini cuma kena teks yang digambar dari fallback face, artinya jendela sebelum swap dan dua glyph panah yang nggak dipegang subset mana pun. Teks yang pakai webfont tetap sama.</p>
-<h2>Yang gue saranin buat lo copy</h2>
-<p>Kalau <code>next build</code> lo masih ngobrol sama internet, build lo bukan build offline.</p>
-<p>Simpan woff2 yang loader-nya udah keluarin, kasih satu call per subset, terus buktiin senyapnya pakai <code>strace</code>.</p>
-<p>Terakhir, tambahin test yang gagal begitu ada font call nggak kepakai. Soalnya itu mode gagal yang lolos dari build hijau: satu <code>localFont()</code> tanpa class di <code>&lt;html&gt;</code> bikin yang ke-ship cuma tiga face, bukan 13.</p>
-<p>Kalau gue harus rangkumin, build itu tempat di mana lo pengen satu-satunya yang bikin merah ya kode lo sendiri.</p>
-<p>Selama masih ada layanan pihak ketiga yang bisa bikin pipeline lo merah tanpa lo sentuh apa-apa, itu artinya lo belum punya build yang bisa dipercaya.</p>
-<p>Dan font cuma soal kecil. Kalau yang kecil aja bisa goyangin pipeline, bayangin yang besar.</p>
-<p>Jadi ya, gue nggak nyesel ngebuang <code>next/font/google</code>. Dua belas jam sama dua run merah itu udah cukup buat gue pindah, dan sampai sekarang build kita nggak pernah nembak Google lagi.</p>
-<p>Dan buat gue sendiri, intinya sederhana: font itu cuma aset, dan aset nggak seharusnya bisa ngebobol pipeline cuma gara-gara internet lagi males. 😅</p>
+<p>Nol koneksi keluar. Nggak ada DNS lookup. Nggak ada satu pun koneksi ke port 443.</p>
+<p>Build-nya beneran jalan tanpa sentuh internet sama sekali.</p>
+<h2>Satu hal yang berubah, dan gue nggak nutupin</h2>
+<p>Byte font-nya identik sama yang di-generate sama loader Google selama ini. Nggak ada yang gue sembunyiin di sini.</p>
+<p>Yang beda cuma tiga fallback font yang masih dipertahankan: angka <code>size-adjust</code>-nya berubah dikit setelah migrasi.</p>
+<p>Alasannya teknis. Loader Google baca tabel capsize yang udah dihitung Next duluan. Loader lokal malah ngukur file-nya sendiri pakai fontkit.</p>
+<p>Ini cuma kena teks yang sempat render pakai fallback font, yaitu sebelum font aslinya selesai ke-load (<code>display: "swap"</code>), sama dua glyph panah yang dari dulu emang nggak dipegang subset mana pun.</p>
+<p>Teks yang udah pakai webfont asli, nggak kena imbas apa-apa.</p>
+<h2>Yang gue saranin kalau lo mau niru</h2>
+<p>Kalau <code>next build</code> lo masih ngobrol sama internet, berarti build lo bukan build offline. Sesederhana itu.</p>
+<p>Caranya:</p>
+<ol>
+<li>Vendor-in woff2 yang loader lo udah keluarin.</li>
+<li>Kasih satu call per subset, pakai <code>declarations</code> buat unicode range.</li>
+<li>Buktiin kalau beneran nggak ada traffic keluar, pakai <code>strace</code>.</li>
+</ol>
+<p>Terakhir, bikin test yang bakal gagal kalau ada call font yang nggak kepakai. Soalnya ini mode gagal yang paling diam-diam: satu <code>localFont()</code> tanpa class di <code>&lt;html&gt;</code>, dan yang ke-ship cuma tiga face, bukan 13, tanpa ada yang teriak.</p>
+<p>Bagi gue intinya simpel. Font itu cuma aset statis, dan aset statis nggak seharusnya bisa bikin pipeline jebol gara-gara internet lagi males. 😅</p>
+<p>Dua belas jam, dua kali merah, itu udah cukup buat gue pindah dari <code>next/font/google</code>. Sampai sekarang build kita nggak pernah nembak Google lagi.</p>
     </div>
     <div class="hero__actions post__footer-actions">
       <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
