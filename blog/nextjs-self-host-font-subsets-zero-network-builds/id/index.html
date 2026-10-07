@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>&quot;Kenapa next/font/google Bikin CI Kita Jebol: Self-Host 13 Subset Font biar Build Nggak Butuh Internet&quot; — Field Notes</title>
+<meta name="description" content="Master CI kita mati dua kali dalam dua belas jam, di commit yang kode font-nya sama persis. Ini cara Dagango.com nyimpen 13 subset font di disk biar next build nggak nembak internet.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="&quot;Kenapa next/font/google Bikin CI Kita Jebol: Self-Host 13 Subset Font biar Build Nggak Butuh Internet&quot; — Field Notes">
+<meta property="og:description" content="Master CI kita mati dua kali dalam dua belas jam, di commit yang kode font-nya sama persis. Ini cara Dagango.com nyimpen 13 subset font di disk biar next build nggak nembak internet.">
+<meta property="og:url" content="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="&quot;Kenapa next/font/google Bikin CI Kita Jebol: Self-Host 13 Subset Font biar Build Nggak Butuh Internet&quot; — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="&quot;Kenapa next/font/google Bikin CI Kita Jebol: Self-Host 13 Subset Font biar Build Nggak Butuh Internet&quot; — Field Notes">
+<meta name="twitter:description" content="Master CI kita mati dua kali dalam dua belas jam, di commit yang kode font-nya sama persis. Ini cara Dagango.com nyimpen 13 subset font di disk biar next build nggak nembak internet.">
+<meta name="twitter:image" content="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-07T00:00:00+00:00">
+<meta property="article:tag" content="nextjs">
+<meta property="article:tag" content="frontend">
+<meta property="article:tag" content="performance">
+<meta property="article:tag" content="webdev">
+<meta property="article:tag" content="architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "\"Kenapa next/font/google Bikin CI Kita Jebol: Self-Host 13 Subset Font biar Build Nggak Butuh Internet\"", "description": "Master CI kita mati dua kali dalam dua belas jam, di commit yang kode font-nya sama persis. Ini cara Dagango.com nyimpen 13 subset font di disk biar next build nggak nembak internet.", "datePublished": "2026-10-07T00:00:00+00:00", "dateModified": "2026-10-07T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/"}, "keywords": "nextjs, frontend, performance, webdev, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 906, "image": ["https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>07 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">&quot;Kenapa next/font/google Bikin CI Kita Jebol: Self-Host 13 Subset Font biar Build Nggak Butuh Internet&quot;</h1>
+    <div class="post__tags"><span>nextjs</span><span>frontend</span><span>performance</span><span>webdev</span><span>architecture</span></div>
+    <div class="post__content reveal is-visible">
+<h2><code>next build</code> itu bukan perintah offline</h2>
+<p>Gue dulu nganggap <code>next/font/google</code> udah beresin semua urusan font. Di sisi browser iya: nggak ada layout shift, request ke Google nggak pernah datang dari mesin pengunjung, dan filenya dilayanin dari origin lo sendiri.</p>
+<p>Yang sering kelewat, mesin yang ngejalanin <code>next build</code> tetap buka koneksi HTTPS ke fonts.googleapis.com. Tiap kali.</p>
+<p>Jadi deploy lo sekarang nempel ke CDN orang lain, dan lo baru sadar pas momennya paling nggak enak.</p>
+<h2>Dua build merah dalam dua belas jam</h2>
+<p>Master CI kita mati di dalam fetch itu dua kali dengan jarak sekitar dua belas jam, dan nggak ada satu baris kode font pun di diff-nya.</p>
+<p>Dua run merah itu <code>36935742623</code> (merge <code>42875bb</code>) dan <code>36851269872</code> (<code>f6b3627</code>).</p>
+<p>Semuanya muncul sebagai <code>An error occurred in next/font</code>, terus mendarat di sini:</p>
+<pre><code>TypeError: Cannot read properties of null (reading '1')
+    at @next/font/dist/google/loader.js
+</code></pre>
+<p>Commit sebelum dan sesudah masing-masing run merah isinya kode font yang sama persis, dan dua-duanya hijau.</p>
+<p>Artinya semua kejadian itu false red yang tetap aja nyita waktu buat ditriage. Pipeline yang suka nangis palsu juga pipeline yang bisa nyembunyiin break asli.</p>
+<h2>Sumber fetch-nya di mana</h2>
+<p>Permintaan waktu build itu datang dari <code>@next/font/dist/google/fetch-resource.js</code>.</p>
+<p>Kalau CDN Google ngambek atau nge-throttle panggilan itu, loader-nya nyoba baca response yang nggak pernah datang, terus error di <code>null</code>. Dependensinya nyata dan letaknya di luar, posisinya persis di antara lo dan build yang hijau.</p>
+<h2>Latin doang nggak cukup</h2>
+<p>Jalan pintasnya: simpan file woff2 latin, selesai. Buat situs yang isinya cuma latin, itu memang cukup.</p>
+<p>Masalahnya Dagango.com itu multi-tenant. Merchant nulis copy storefront-nya dalam bahasa Vietnam, Cyrillic, Yunani, dan Devanagari, campur sama latin.</p>
+<p>Begitu subset non-latin dibuang, karakter-karakter itu jatuh ke font sistem yang metriknya beda dan glyph-nya bolong.</p>
+<p>Untuk tiga family platform kita, Google nyediain set ini:</p>
+<ul>
+<li><strong>Baloo 2</strong> (display): <code>latin</code>, <code>latin-ext</code>, <code>vietnamese</code>, <code>devanagari</code>.</li>
+<li><strong>Public Sans</strong> (body): <code>latin</code>, <code>latin-ext</code>, <code>vietnamese</code>.</li>
+<li><strong>JetBrains Mono</strong>: <code>latin</code>, <code>latin-ext</code>, <code>vietnamese</code>, <code>cyrillic</code>, <code>cyrillic-ext</code>, <code>greek</code>.</li>
+</ul>
+<p>Totalnya 13 file dan 225 KB. Semua subset yang Google sediain buat ketiga family itu ada di situ, nggak ada yang disisihin.</p>
+<h2><code>next/font/local</code> buang <code>unicodeRange</code> yang nempel di <code>src</code></h2>
+<p><code>next/font/local</code> nggak punya opsi <code>subsets</code>.</p>
+<p>Subset juga nggak bisa dikasih lewat range di entry <code>src</code>: loader bawaan cuma destructure <code>{ path, style, weight, ext, format }</code> dari tiap entry, sisanya dibuang diam-diam.</p>
+<p>Jalan keluarnya lewat <code>declarations</code>. Loader nyalin tiap declaration ke <code>@font-face</code> yang dia bikin, jadi satu call per (family, subset) bisa nenteng range persis punya subset itu.</p>
+<pre><code class="language-ts">export const baloo2LatinExt = localFont({
+  src: [{ path: &quot;./Baloo2-latin-ext-700.woff2&quot;, weight: &quot;700&quot;, style: &quot;normal&quot; }],
+  variable: &quot;--font-baloo-2-latin-ext&quot;,
+  display: &quot;swap&quot;,
+  preload: false,
+  adjustFontFallback: false,
+  declarations: [
+    { prop: &quot;font-family&quot;, value: &quot;Baloo 2&quot; },
+    { prop: &quot;unicode-range&quot;, value: &quot;u+0100-02ba,...,u+a720-a7ff&quot; },
+  ],
+});
+</code></pre>
+<p>Perhatiin <code>font-family</code> di situ. Theme tenant yang udah tersimpan nyari family default platform berdasarkan NAMA (<code>lib/theme/derive.ts</code>), dan storefront shell-nya sengaja nggak minta stylesheet buat family itu. Kalau namanya di-scope ke nama generated Next, tenant itu bakal render lewat fallback face tanpa kita sadar.</p>
+<h2>Jangan biarin fallback face beranak</h2>
+<p><code>next/font</code> bikin satu face <code>... Fallback</code> yang metriknya disamain, per call. Kalau defaultnya dibiarin, tiap subset nambah family fallback sendiri.</p>
+<p>Jadi kita set dua hal:</p>
+<ul>
+<li><code>preload: true</code> cuma di tiga call latin, karena cuma file itu yang di-preload build.</li>
+<li><code>adjustFontFallback: false</code> di sepuluh call sisanya, biar nggak ada family <code>... Fallback</code> tambahan.</li>
+</ul>
+<p>Ketiga belas call itu dirangkai jadi satu string <code>fontVariables</code> yang dipasang di <code>&lt;html&gt;</code>.</p>
+<p>Rangkaian ini jangan sampai bolong. Call <code>localFont()</code> yang class-nya nggak pernah kepasang bakal di-tree-shake, sekalian <code>@font-face</code> dan file-nya.</p>
+<h2>Cara mastiin build-nya beneran nggak nyentuh internet</h2>
+<p>Config yang keliatan air-gapped belum tentu bukti. Jadi build-nya kita jalanin di bawah <code>strace</code>:</p>
+<pre><code>strace -f -e trace=connect -o /tmp/build-conn.log ./node_modules/.bin/next build
+</code></pre>
+<p>Terus kita hitung lalu lintas connect-nya:</p>
+<pre><code>BUILD_EXIT=0
+CONNECT_LINES=0
+HTS443=0
+DNS_LINES=0
+</code></pre>
+<p>Nol socket keluar, nggak ada DNS lookup, nggak ada koneksi ke port 443. Build-nya jalan penuh tanpa internet.</p>
+<h2>Satu delta yang gue catat</h2>
+<p>Semua di atas byte-nya identik dengan yang selama ini udah dipancarin loader Google. Bedanya cuma di tiga face <code>... Fallback</code> yang masih ada: angka <code>size-adjust</code>-nya berubah setelah pindah.</p>
+<p>Penyebabnya, loader Google baca tabel capsize yang udah dihitung Next, sementara loader lokal ngukur filenya sendiri pakai fontkit. Ini cuma kena teks yang digambar dari fallback face, artinya jendela sebelum swap dan dua glyph panah yang nggak dipegang subset mana pun. Teks yang pakai webfont tetap sama.</p>
+<h2>Yang gue saranin buat lo copy</h2>
+<p>Kalau <code>next build</code> lo masih ngobrol sama internet, build lo bukan build offline.</p>
+<p>Simpan woff2 yang loader-nya udah keluarin, kasih satu call per subset, terus buktiin senyapnya pakai <code>strace</code>.</p>
+<p>Terakhir, tambahin test yang gagal begitu ada font call nggak kepakai. Soalnya itu mode gagal yang lolos dari build hijau: satu <code>localFont()</code> tanpa class di <code>&lt;html&gt;</code> bikin yang ke-ship cuma tiga face, bukan 13.</p>
+<p>Kalau gue harus rangkumin, build itu tempat di mana lo pengen satu-satunya yang bikin merah ya kode lo sendiri.</p>
+<p>Selama masih ada layanan pihak ketiga yang bisa bikin pipeline lo merah tanpa lo sentuh apa-apa, itu artinya lo belum punya build yang bisa dipercaya.</p>
+<p>Dan font cuma soal kecil. Kalau yang kecil aja bisa goyangin pipeline, bayangin yang besar.</p>
+<p>Jadi ya, gue nggak nyesel ngebuang <code>next/font/google</code>. Dua belas jam sama dua run merah itu udah cukup buat gue pindah, dan sampai sekarang build kita nggak pernah nembak Google lagi.</p>
+<p>Dan buat gue sendiri, intinya sederhana: font itu cuma aset, dan aset nggak seharusnya bisa ngebobol pipeline cuma gara-gara internet lagi males. 😅</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

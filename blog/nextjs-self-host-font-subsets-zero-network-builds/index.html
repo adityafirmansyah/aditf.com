@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>&quot;Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds&quot; — Field Notes</title>
+<meta name="description" content="Our master CI died twice in twelve hours inside next/font/google, on commits that carried identical font code. Here is how Dagango.com vendors 13 font subsets on disk and makes next build fetch nothing.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="&quot;Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds&quot; — Field Notes">
+<meta property="og:description" content="Our master CI died twice in twelve hours inside next/font/google, on commits that carried identical font code. Here is how Dagango.com vendors 13 font subsets on disk and makes next build fetch nothing.">
+<meta property="og:url" content="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="&quot;Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds&quot; — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="&quot;Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds&quot; — Field Notes">
+<meta name="twitter:description" content="Our master CI died twice in twelve hours inside next/font/google, on commits that carried identical font code. Here is how Dagango.com vendors 13 font subsets on disk and makes next build fetch nothing.">
+<meta name="twitter:image" content="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-07T00:00:00+00:00">
+<meta property="article:tag" content="nextjs">
+<meta property="article:tag" content="frontend">
+<meta property="article:tag" content="performance">
+<meta property="article:tag" content="webdev">
+<meta property="article:tag" content="architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "\"Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds\"", "description": "Our master CI died twice in twelve hours inside next/font/google, on commits that carried identical font code. Here is how Dagango.com vendors 13 font subsets on disk and makes next build fetch nothing.", "datePublished": "2026-10-07T00:00:00+00:00", "dateModified": "2026-10-07T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/"}, "keywords": "nextjs, frontend, performance, webdev, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 814, "image": ["https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>07 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">4 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">&quot;Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds&quot;</h1>
+    <div class="post__tags"><span>nextjs</span><span>frontend</span><span>performance</span><span>webdev</span><span>architecture</span></div>
+    <div class="post__content reveal is-visible">
+<h2><code>next build</code> is not an offline command</h2>
+<p>I assumed <code>next/font/google</code> handled fonts. In the browser it does: no layout shift, no request from your visitor to Google, files served from your own origin.</p>
+<p>None of that says anything about the machine running <code>next build</code>. That loader still opens an HTTPS connection to fonts.googleapis.com, every single time.</p>
+<p>So your deploy now hangs off someone else's CDN, and you find out at the worst moment.</p>
+<h2>Two red builds in twelve hours</h2>
+<p>Master CI died inside that fetch twice in about twelve hours, with no font code in either diff.</p>
+<p>The red runs were <code>36935742623</code> (merge <code>42875bb</code>) and <code>36851269872</code> (<code>f6b3627</code>). Both surfaced as <code>An error occurred in next/font</code>, then this:</p>
+<pre><code>TypeError: Cannot read properties of null (reading '1')
+    at @next/font/dist/google/loader.js
+</code></pre>
+<p>The commits immediately before and after each red run carried identical font code, and built green. Every occurrence was a false red that cost a triage. A pipeline that cries wolf is also a pipeline that can hide a real break.</p>
+<h2>Where the fetch lives</h2>
+<p>The build-time request comes from <code>@next/font/dist/google/fetch-resource.js</code>.</p>
+<p>If Google's CDN flakes or throttles that call, the loader tries to destructure a response that never arrived and throws on <code>null</code>. The dependency is real, it is external, and it sits directly between you and a green build.</p>
+<h2>Latin-only was never an option</h2>
+<p>The quick fix is to vendor the Latin woff2 files and stop there. On a Latin-only marketing site, that is genuinely enough.</p>
+<p>Dagango.com is multi-tenant. Merchants write storefront copy in Vietnamese, Cyrillic, Greek and Devanagari alongside Latin. Drop the non-Latin files and those characters fall back to a system font with mismatched metrics and missing glyphs.</p>
+<p>Google serves this set for the three platform families:</p>
+<ul>
+<li>Baloo 2 (display): <code>latin</code>, <code>latin-ext</code>, <code>vietnamese</code>, <code>devanagari</code>.</li>
+<li>Public Sans (body): <code>latin</code>, <code>latin-ext</code>, <code>vietnamese</code>.</li>
+<li>JetBrains Mono: <code>latin</code>, <code>latin-ext</code>, <code>vietnamese</code>, <code>cyrillic</code>, <code>cyrillic-ext</code>, <code>greek</code>.</li>
+</ul>
+<p>That is 13 files and 225 KB, and it is the complete set for these families rather than a selection from it.</p>
+<h2>next/font/local drops a <code>unicodeRange</code> on a <code>src</code> entry</h2>
+<p><code>next/font/local</code> has no <code>subsets</code> option, and it cannot express a subset through a range on a source entry either. The bundled loader destructures each entry as <code>{ path, style, weight, ext, format }</code>, so a range you attach there is silently discarded.</p>
+<p><code>declarations</code> is the escape hatch. The loader copies every declaration into the <code>@font-face</code> it generates, so one call per (family, subset) can carry that subset's exact range.</p>
+<pre><code class="language-ts">export const baloo2LatinExt = localFont({
+  src: [{ path: &quot;./Baloo2-latin-ext-700.woff2&quot;, weight: &quot;700&quot;, style: &quot;normal&quot; }],
+  variable: &quot;--font-baloo-2-latin-ext&quot;,
+  display: &quot;swap&quot;,
+  preload: false,
+  adjustFontFallback: false,
+  declarations: [
+    { prop: &quot;font-family&quot;, value: &quot;Baloo 2&quot; },
+    { prop: &quot;unicode-range&quot;, value: &quot;u+0100-02ba,...,u+a720-a7ff&quot; },
+  ],
+});
+</code></pre>
+<p>Note the <code>font-family</code> declaration. A saved tenant theme resolves a platform default family by name (<code>lib/theme/derive.ts</code>), and the storefront shell deliberately requests no stylesheet for it. Scoped to Next's generated name, that tenant would silently render through the fallback face.</p>
+<h2>Keep the fallback faces from multiplying</h2>
+<p><code>next/font</code> emits one metric-matched <code>... Fallback</code> face per call, so leaving the defaults alone would mint one for every subset. We set two knobs instead:</p>
+<ul>
+<li><code>preload: true</code> only on the three Latin calls, which are the files the build preloads.</li>
+<li><code>adjustFontFallback: false</code> on the other ten, so no subset mints a second <code>... Fallback</code> family.</li>
+</ul>
+<p>All 13 calls get composed into a single <code>fontVariables</code> string applied on <code>&lt;html&gt;</code>. Keep that composition intact. A <code>localFont()</code> call whose class is never applied is tree-shaken away, and its <code>@font-face</code> and file go with it.</p>
+<h2>Proving the build fetches nothing</h2>
+<p>A config that looks air-gapped is not evidence. We ran the build under <code>strace</code>:</p>
+<pre><code>strace -f -e trace=connect -o /tmp/build-conn.log ./node_modules/.bin/next build
+</code></pre>
+<p>Then counted the connect traffic:</p>
+<pre><code>BUILD_EXIT=0
+CONNECT_LINES=0
+HTS443=0
+DNS_LINES=0
+</code></pre>
+<p>No outbound sockets, no DNS lookup, no port 443 connection for the whole build.</p>
+<h2>One honest delta</h2>
+<p>Everything above is byte-for-byte what the Google loader was already emitting. The nuance is the three <code>... Fallback</code> faces that remain: their <code>size-adjust</code> numbers change after the swap.</p>
+<p>The reason is that the Google loader reads Next's precomputed capsize table, while the local loader measures the font file itself with fontkit. That touches only text drawn from a fallback face, meaning the pre-swap window and the two arrow glyphs no subset carries. Everything drawn with the webfonts is unchanged.</p>
+<h2>What I would copy</h2>
+<p>If your <code>next build</code> still talks to the network, you do not have an offline build. Vendor the woff2 files your loader is already emitting, give each subset its own call, then prove the silence with <code>strace</code>.</p>
+<p>Finish with a test that fails when a font call goes unreferenced. That is the failure mode which survives every green build: a <code>localFont()</code> call with no class on <code>&lt;html&gt;</code> ships three faces instead of 13.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
