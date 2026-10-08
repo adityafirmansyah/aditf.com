@@ -72,6 +72,6 @@ Headline-nya emang "browser support akhirnya nyampe tier-1". Tapi buat platform 
 
 AVIF sendiri nggak usah dibuang. Dia tetep masuk akal buat tempat yang ongkos encode-nya udah ke-amortisasi, kayak foto editorial atau hero image yang di-encode sekali tapi dilayanin jutaan kali.
 
-Yang berubah itu ke mana JPEG XL diarahin: khusus ke jalur yang paling kena masalah gara-gara AVIF, yaitu upload katalog merchant, tempat ribuan JPEG masuk dalam ledakan dan harus diproses murah, cepat, tanpa kehilangan kualitas.
+Yang berubah itu ke mana JPEG XL diarahin: khusus ke jalur yang paling kena masalah gara-gara AVIF. Jalur itu adalah upload katalog merchant, tempat ribuan JPEG masuk dalam ledakan dan harus diproses murah dan cepat, tanpa kehilangan kualitas.
 
 Dan satu hal yang gue sadar belakangan: masalah format gambar itu nggak pernah soal format mana yang paling efisien di atas kertas. Yang nentuin itu di mana biaya komputasinya jatuh, di CPU server lo, atau di layar HP pembeli lo. 😅
