@@ -408,6 +408,11 @@ def build_post(e, lang):
         switch = f'<a class="btn btn--ghost post-lang-switch" href="{alt_url}">{label}</a>'
     body_html = markdown.markdown(
         body, extensions=["fenced_code", "tables", "sane_lists", "attr_list"])
+    sponsor_text = (
+        "Suka artikel ini? Dukung via GitHub Sponsors &hearts;"
+        if lang == "id"
+        else "Enjoyed this? Sponsor on GitHub &hearts;"
+    )
     page += f"""<main id="top">
   <article class="section post">
     <div class="post__waybill">
@@ -424,6 +429,7 @@ def build_post(e, lang):
     </div>
     <div class="hero__actions post__footer-actions">
       <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">{sponsor_text}</a>
       {switch}
     </div>
   </article>
