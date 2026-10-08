@@ -81,7 +81,11 @@ def parse_frontmatter(text):
         for line in m.group(1).splitlines():
             if ":" in line:
                 k, v = line.split(":", 1)
-                meta[k.strip().lower()] = v.strip()
+                val = v.strip()
+                # Strip leading/trailing double or single quotes from yaml frontmatter strings
+                if len(val) >= 2 and ((val[0] == '"' and val[-1] == '"') or (val[0] == "'" and val[-1] == "'")):
+                    val = val[1:-1].strip()
+                meta[k.strip().lower()] = val
     tags = [t.strip() for t in meta.get("tags", "").split(",") if t.strip()]
     meta["tags"] = tags
     return meta, strip_owner_markers(body)
@@ -270,6 +274,11 @@ def build_listing(posts, og_url=None):
         # badge could never work there. The card becomes a container holding one
         # anchor for the post and a second, independent anchor for the /id/ twin.
         if has_id:
+            footer_meta = f"""        <div class="post-card__footer">
+          <div class="post-card__tags">{tags}</div>
+          <a class="post-card__lang" href="/blog/{esc(slug)}/id/" lang="id" hreflang="id"
+             title="Baca versi Bahasa Indonesia">ID</a>
+        </div>"""
             cards.append(f"""    <div class="post-card reveal">
       <a class="post-card__main" href="/blog/{esc(slug)}/">
         <div class="post-card__date">
@@ -279,12 +288,10 @@ def build_listing(posts, og_url=None):
         <div class="post-card__body">
           <h3>{esc(meta['title'])}</h3>
           <p>{esc(meta.get('excerpt', ''))}</p>
-          <div class="post-card__tags">{tags}</div>
         </div>
         <span class="post-card__go" aria-hidden="true">&rarr;</span>
       </a>
-      <a class="post-card__lang" href="/blog/{esc(slug)}/id/" lang="id" hreflang="id"
-         title="Baca versi Bahasa Indonesia">ID</a>
+{footer_meta}
     </div>""")
         else:
             cards.append(f"""    <a class="post-card reveal" href="/blog/{esc(slug)}/">

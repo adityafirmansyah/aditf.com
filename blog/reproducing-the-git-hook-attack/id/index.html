@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>&quot;Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang&quot; — Field Notes</title>
+<title>Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang — Field Notes</title>
 <meta name="description" content="Penyerang ngirim folder Dropbox berisi .git tersembunyi, terus minta &quot;pindah ke branch NDA&quot;. Satu git checkout itu cukup buat jalanin kode mereka. Gue reproduce semuanya di git 2.53.0, dan mitigasi populer-nya nggak sekuat kelihatannya.">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -18,16 +18,16 @@
 <link rel="canonical" href="https://aditf.com/blog/reproducing-the-git-hook-attack/id/">
 <meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
 <meta property="og:type" content="article">
-<meta property="og:title" content="&quot;Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang&quot; — Field Notes">
+<meta property="og:title" content="Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang — Field Notes">
 <meta property="og:description" content="Penyerang ngirim folder Dropbox berisi .git tersembunyi, terus minta &quot;pindah ke branch NDA&quot;. Satu git checkout itu cukup buat jalanin kode mereka. Gue reproduce semuanya di git 2.53.0, dan mitigasi populer-nya nggak sekuat kelihatannya.">
 <meta property="og:url" content="https://aditf.com/blog/reproducing-the-git-hook-attack/id/">
 <meta property="og:locale" content="id_ID">
 <meta property="og:image" content="https://aditf.com/blog/reproducing-the-git-hook-attack/og.id.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="&quot;Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang&quot; — Field Notes">
+<meta property="og:image:alt" content="Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang — Field Notes">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="&quot;Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang&quot; — Field Notes">
+<meta name="twitter:title" content="Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang — Field Notes">
 <meta name="twitter:description" content="Penyerang ngirim folder Dropbox berisi .git tersembunyi, terus minta &quot;pindah ke branch NDA&quot;. Satu git checkout itu cukup buat jalanin kode mereka. Gue reproduce semuanya di git 2.53.0, dan mitigasi populer-nya nggak sekuat kelihatannya.">
 <meta name="twitter:image" content="https://aditf.com/blog/reproducing-the-git-hook-attack/og.id.png">
 <meta name="author" content="Aditya Firmansyah">
@@ -38,7 +38,7 @@
 <meta property="article:tag" content="ai-agents">
 <meta property="article:tag" content="supply-chain">
 <meta property="article:tag" content="devtools">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "\"Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang\"", "description": "Penyerang ngirim folder Dropbox berisi .git tersembunyi, terus minta \"pindah ke branch NDA\". Satu git checkout itu cukup buat jalanin kode mereka. Gue reproduce semuanya di git 2.53.0, dan mitigasi populer-nya nggak sekuat kelihatannya.", "datePublished": "2026-10-05T00:00:00+00:00", "dateModified": "2026-10-05T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/reproducing-the-git-hook-attack/id/"}, "keywords": "git, security, ai-agents, supply-chain, devtools", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1272, "image": ["https://aditf.com/blog/reproducing-the-git-hook-attack/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/reproducing-the-git-hook-attack/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang", "description": "Penyerang ngirim folder Dropbox berisi .git tersembunyi, terus minta \"pindah ke branch NDA\". Satu git checkout itu cukup buat jalanin kode mereka. Gue reproduce semuanya di git 2.53.0, dan mitigasi populer-nya nggak sekuat kelihatannya.", "datePublished": "2026-10-05T00:00:00+00:00", "dateModified": "2026-10-05T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/reproducing-the-git-hook-attack/id/"}, "keywords": "git, security, ai-agents, supply-chain, devtools", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1272, "image": ["https://aditf.com/blog/reproducing-the-git-hook-attack/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/reproducing-the-git-hook-attack/", "inLanguage": "en-US"}}</script>
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/reproducing-the-git-hook-attack/">
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/reproducing-the-git-hook-attack/id/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/reproducing-the-git-hook-attack/">
@@ -70,7 +70,7 @@
       <span class="waybill__divider" aria-hidden="true">&middot;</span>
       <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
     </div>
-    <h1 class="post__title">&quot;Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang&quot;</h1>
+    <h1 class="post__title">Gue Reproduce Serangan .git Hook: git status Ternyata Jalanin Kode Penyerang</h1>
     <div class="post__tags"><span>git</span><span>security</span><span>ai-agents</span><span>supply-chain</span><span>devtools</span></div>
     <div class="post__content reveal is-visible">
 <h2>Permintaannya sendiri yang jadi payload</h2>

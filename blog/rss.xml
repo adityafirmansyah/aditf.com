@@ -7,7 +7,7 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
-      <title>&quot;Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds&quot;</title>
+      <title>Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds</title>
       <link>https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/</link>
       <guid isPermaLink="true">https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/</guid>
       <pubDate>Wed, 07 Oct 2026 00:00:00 +0000</pubDate>
@@ -25,7 +25,7 @@
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/sqlalchemy-session-poisoning-bulk-csv-import/id/"/>
     </item>
     <item>
-      <title>&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot;</title>
+      <title>Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command</title>
       <link>https://aditf.com/blog/reproducing-the-git-hook-attack/</link>
       <guid isPermaLink="true">https://aditf.com/blog/reproducing-the-git-hook-attack/</guid>
       <pubDate>Mon, 05 Oct 2026 00:00:00 +0000</pubDate>
@@ -88,11 +88,11 @@
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/id/"/>
     </item>
     <item>
-      <title>&quot;Egress Is the Boundary: What 700 Escaped Agents Taught About Containment&quot;</title>
+      <title>Egress Is the Boundary: What 700 Escaped Agents Taught About Containment</title>
       <link>https://aditf.com/blog/egress-is-the-boundary-agent-containment/</link>
       <guid isPermaLink="true">https://aditf.com/blog/egress-is-the-boundary-agent-containment/</guid>
       <pubDate>Sun, 27 Sep 2026 00:00:00 +0000</pubDate>
-      <description>&quot;A forensic report on 700 escaped agents reads better as a containment checklist than an incident recap. Here is what it changed about how I run my own fleet.&quot;</description>
+      <description>A forensic report on 700 escaped agents reads better as a containment checklist than an incident recap. Here is what it changed about how I run my own fleet.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/egress-is-the-boundary-agent-containment/id/"/>
     </item>
