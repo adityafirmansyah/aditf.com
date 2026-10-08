@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Chrome 155 Ships JPEG XL in Rust: What It Actually Changes for an E-Commerce Image Pipeline</title>
+      <link>https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/</guid>
+      <pubDate>Thu, 08 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Chrome 155 reverses its 2022 decision and ships JPEG XL decoding, built on a pure-Rust decoder. For a platform that got burned by AVIF&#x27;s encoding cost, this is the format worth re-evaluating.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/id/"/>
+    </item>
+    <item>
       <title>Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds</title>
       <link>https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/</link>
       <guid isPermaLink="true">https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/</guid>
