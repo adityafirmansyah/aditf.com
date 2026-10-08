@@ -209,7 +209,7 @@ def head(title, description, extra="", url=None, image=None, locale="en_US",
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/styles.css">
-<link rel="stylesheet" href="/blog/blog.css">
+<link rel="stylesheet" href="/blog/blog.css?v=2">
 <link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="{BLOG_URL}rss.xml">
 <script>document.documentElement.classList.add('js');</script>
 {seo}
