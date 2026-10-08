@@ -38,7 +38,7 @@
 <meta property="article:tag" content="ecommerce">
 <meta property="article:tag" content="browsers">
 <meta property="article:tag" content="architecture">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Chrome 155 Akhirnya Dukung JPEG XL Pakai Rust: Ini Dampaknya buat Pipeline Gambar E-Commerce", "description": "Chrome 155 balik dukung JPEG XL setelah dicabut 2022, kali ini decodernya ditulis ulang pakai Rust. Buat platform yang pernah kena masalah encoding AVIF, format ini layak dilirik ulang.", "datePublished": "2026-10-08T00:00:00+00:00", "dateModified": "2026-10-08T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/id/"}, "keywords": "web-performance, rust, ecommerce, browsers, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 989, "image": ["https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Chrome 155 Akhirnya Dukung JPEG XL Pakai Rust: Ini Dampaknya buat Pipeline Gambar E-Commerce", "description": "Chrome 155 balik dukung JPEG XL setelah dicabut 2022, kali ini decodernya ditulis ulang pakai Rust. Buat platform yang pernah kena masalah encoding AVIF, format ini layak dilirik ulang.", "datePublished": "2026-10-08T00:00:00+00:00", "dateModified": "2026-10-08T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/id/"}, "keywords": "web-performance, rust, ecommerce, browsers, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1014, "image": ["https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/", "inLanguage": "en-US"}}</script>
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/">
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/id/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/">
@@ -73,54 +73,49 @@
     <h1 class="post__title">Chrome 155 Akhirnya Dukung JPEG XL Pakai Rust: Ini Dampaknya buat Pipeline Gambar E-Commerce</h1>
     <div class="post__tags"><span>web-performance</span><span>rust</span><span>ecommerce</span><span>browsers</span><span>architecture</span></div>
     <div class="post__content reveal is-visible">
-<h2>Google jilat ludah sendiri soal JPEG XL</h2>
-<p>2022, Chrome nyabut dukungan JPEG XL. Alasannya waktu itu: katanya nggak ada yang minat.</p>
-<p>6 Oktober 2026, lewat Chrome 155, Google balik lagi ke format yang sama.</p>
-<p>Thread HN yang ngebahas ini tembus 500+ poin, 350+ komentar. Satu komentar yang paling nancep nebak apa yang sebenernya kejadian di internal Google: eksekutifnya nggak butuh diyakinin pakai argumen teknis. Begitu semua browser lain udah dukung, mereka tinggal nyerah aja.</p>
-<p>Masuk akal sih. Safari udah pegang JPEG XL sejak September 2023, Firefox juga lagi nyusul.</p>
-<p>Jadi Chrome itu tier-1 terakhir yang nahan. Dan itu yang penting: format yang cuma idup di Safari doang, itu cuma trivia. Begitu Chrome ikut, baru format itu bisa dipakai buat katalog produksi sungguhan.</p>
-<h2>Rust jadi syarat, bukan bonus</h2>
-<p>Yang bikin Chrome dulu nggak mau pakai JPEG XL bukan soal kualitas kompresinya. Soalnya ada di <code>libjxl</code>, reference decoder-nya, yang ditulis dalam C++ sepanjang kurang lebih 100.000 baris.</p>
-<p>Masalahnya, decoder gambar itu kerjanya baca byte dari internet yang nggak dipercaya sama sekali, dan dia jalan di dalam renderer process yang privilege-nya tinggi.</p>
-<p>Chromium punya dokumen keamanan sendiri buat kasus kayak ini, namanya "Rule of Two". Aturannya: lo cuma boleh pegang maksimal dua dari daftar berikut.</p>
+<h2>Chrome 2026 nelen omongannya sendiri soal JPEG XL</h2>
+<p>Tahun 2022, Google nyabut dukungan JPEG XL dari Chrome. Alasannya: katanya peminatnya dikit.</p>
+<p>6 Oktober 2026, lewat Chrome 155, mereka balik total ke keputusan itu. Format yang sama, dukungan penuh.</p>
+<p>Thread HN soal ini rame, tembus 500+ poin dan 350+ komentar. Ada satu komentar yang menurut gue paling nancep nebak apa yang kejadian di internal Google: bukan argumen teknis yang akhirnya ngubah pikiran eksekutifnya, mereka cuma nyerah pas semua browser lain udah dukung duluan.</p>
+<p>Masuk akal juga kalau dipikir-pikir. Safari malah udah pegang JPEG XL duluan sejak September 2023, dan Firefox tinggal nyusul. Chrome jadi satu-satunya browser tier-1 yang masih nahan, dan itu yang penting, karena format yang cuma idup di satu browser doang statusnya masih sebatas trivia, belum layak dipakai buat katalog produksi sungguhan.</p>
+<h2>Rule of Two: kenapa kompresi bagus doang nggak cukup</h2>
+<p>Chromium punya satu prinsip keamanan sendiri namanya "Rule of Two". Isinya: kalau kode lo berurusan sama data yang nggak dipercaya lo cuma boleh pegang maksimal dua dari tiga hal berikut.</p>
 <ul>
 <li>Input yang nggak dipercaya.</li>
 <li>Bahasa implementasi yang nggak aman.</li>
 <li>Privilege yang tinggi.</li>
 </ul>
-<p>Decoder gambar C++ yang baca byte sembarangan dari internet, jalan di privilege tinggi. Itu udah melanggar semua tiga syarat sekaligus. Nggak ada cara buat lolos dari aturan itu selain ganti salah satu dari tiga variabelnya.</p>
-<p>Makanya Google bikin <code>jxl-rs</code>, nulis ulang total decoder-nya pakai Rust. Soal kenapa mereka nggak mau kompromi di performa, pengumuman resmi Chrome bilang gini:</p>
+<p>Nah, decoder JPEG XL yang lama kena semua itu sekaligus: baca data gambar langsung dari internet terbuka, ditulis pakai C++, dan jalan di renderer process yang privilege-nya tinggi. Itu akar masalahnya, bukan soal rasio kompresi, yang dari awal emang nggak pernah jadi soal. Decoder referensinya sendiri, <code>libjxl</code>, bukan kode kecil: kurang lebih 100.000 baris C++.</p>
+<p>Satu-satunya jalan keluar: tulis ulang total pakai bahasa yang aman. Makanya Google bikin <code>jxl-rs</code>, decoder penuh versi Rust. Soal tradeoff performa yang mereka tolak, pengumuman resmi Chrome nggak basa-basi:</p>
 <blockquote>
 <p>"Memory safety is crucial, but a memory-safe decoder that is approximately as fast as the best non-memory-safe alternative is a much more obvious choice than a choice with a significant performance compromise."</p>
 </blockquote>
-<p>Jadi logikanya: Rust aman, tapi kalau lambat, orang bakal tetap milih C++ yang berisiko. Makanya targetnya bukan "aman tapi lambat", tapi "aman dan secepat yang nggak aman".</p>
-<p>Buat nyampe situ, mereka butuh <code>target_feature_11</code>, fitur Rust yang baru di-stabilize, biar SIMD bisa jalan tanpa blok <code>unsafe</code>. Ini bagian yang gue anggap paling menarik dari seluruh cerita ini. Bukan "Rust itu keren", tapi satu fitur compiler yang landing tepat waktu buat ngirim decoder sekritis ini tanpa harus buka jalan pintas ke kode unsafe.</p>
-<h2>Benchmark compression nggak pernah ngomong soal CPU server</h2>
-<p>AVIF selalu dipromosikan 30-50% lebih kecil dari JPEG. Itu benar, tapi angka itu diukur di sisi browser, pas lagi download.</p>
-<p>Masalahnya nggak ada yang ngomong soal biaya nge-encode-nya di server.</p>
-<p>Kita ngerasain ini langsung di Dagango.com. Merchant bulk upload ratusan foto produk dalam satu kali import, dan itu artinya ratusan job encode AVIF nabrak worker pool yang sama, dalam waktu bersamaan.</p>
-<p>Encode JPEG buat batch yang sama kelar jauh lebih cepat dibanding AVIF, di quality target yang sebanding. Kalikan gap itu dengan beberapa ratus gambar yang masuk dalam lima menit yang sama. Yang numpuk itu queue job encode di server kita sendiri, bukan traffic decode di browser.</p>
-<p>Itu biaya yang nggak pernah keliatan di benchmark compression manapun, karena benchmark cuma bandingin ukuran file hasil, bukan berapa detik CPU yang kepake buat ngehasilin file itu.</p>
-<p>JPEG XL nggak nolong di titik ini juga, kalau lo encode dari nol. Tapi untungnya, buat katalog yang isinya JPEG lawas, lo nggak perlu encode dari nol sama sekali.</p>
-<h2>Transcoding, bukan re-encode: ini jalan migrasi yang kepake</h2>
-<p>JPEG XL bisa ngambil koefisien DCT dari JPEG yang udah ada, terus langsung masukin ke container <code>.jxl</code>, bit demi bit, tanpa decode-encode ulang.</p>
-<p>Tiga hal yang kita dapet dari ini:</p>
+<p>Logikanya gini: kalau decoder-nya aman tapi lambat, orang bakal tetep milih versi C++ yang berisiko demi performa. Makanya target Google bukan "aman meski lambat", tapi "aman dan secepat yang nggak aman".</p>
+<p>Buat nyampe situ, mereka butuh satu fitur Rust yang namanya <code>target_feature_11</code>, yang harus di-stabilize dulu biar SIMD bisa jalan tanpa blok <code>unsafe</code>. Ini bagian yang paling menarik menurut gue dari seluruh cerita ini. Bukan soal "Rust itu keren", tapi soal satu fitur compiler spesifik yang landing di waktu yang pas, buat ngirim decoder sekritis ini tanpa harus bikin jalan pintas ke kode unsafe.</p>
+<h2>Yang nggak pernah disebut benchmark compression: ongkos CPU di server</h2>
+<p>Merchant Dagango.com rutin bulk upload ratusan foto produk sekali import. Kalau encoder-nya AVIF, ratusan job itu nabrak worker pool yang sama dalam waktu bersamaan, dan AVIF itu berat banget di CPU, apalagi di setting kualitas yang emang layak di-ship.</p>
+<p>Encode JPEG buat batch yang sama bisa kelar jauh lebih cepat dari AVIF, di kualitas yang sebanding. Kalikan selisih itu dengan ratusan gambar yang masuk bersamaan dalam lima menit, dan yang numpuk bukan trafik decode di sisi browser pembeli. Yang numpuk itu queue job encode di server kita sendiri.</p>
+<p>Padahal angka yang sering dipamerin itu 30-50% lebih kecil dari JPEG, dan itu beneran benar. Masalahnya, angka itu diukur pas file-nya udah jadi, di sisi browser. Proses bikin file itu di server, ongkosnya nggak pernah ikut dihitung, soalnya benchmark cuma ngukur ukuran file hasil akhir, bukan berapa detik CPU yang kepake buat ngehasilin file itu.</p>
+<p>JPEG XL nggak otomatis ngilangin ongkos itu kalau lo tetep encode dari nol. Untungnya, buat katalog yang isinya JPEG lawas, ada jalan yang beda sama sekali.</p>
+<h2>Bukan re-encode ulang semua: ini jalan migrasi yang kepake</h2>
+<p>Coba bandingin dulu sama cara kerja AVIF. Tiap gambar di katalog kudu lewat decode-lalu-encode penuh buat jadi lebih kecil, kena ongkos CPU AVIF lagi, dan versi lossy-nya malah dikit lebih jelek tiap kali lewat proses itu.</p>
+<p>JPEG XL punya jalan lain. Dia bisa ngambil koefisien DCT dari file JPEG yang udah ada, terus langsung masukin ke container <code>.jxl</code> bit demi bit, tanpa decode-encode ulang sama sekali.</p>
+<p>Hasilnya:</p>
 <ul>
 <li>Nggak ada proses re-encode.</li>
 <li>Nggak ada degradasi kualitas antar generasi, yang biasanya numpuk tiap kali gambar lossy di-decode terus di-save ulang.</li>
 <li>Potongan ukuran nyata sekitar 20%, hasil dari transform, bukan dari compress ulang.</li>
 </ul>
-<p>Ini jalan migrasi yang kepake buat platform multi-tenant yang nyimpen foto merchant bertahun-tahun. Kita nggak nyuruh background worker ngulang encode seluruh katalog dari piksel. Kita cuma ngerepack bitstream-nya aja.</p>
-<p>Bandingin ini sama jalan AVIF, yang butuh satu putaran penuh decode-lalu-encode buat tiap gambar, kena biaya CPU-nya lagi, dan gambar lossy-nya malah dikit lebih jelek tiap kali lewat putaran itu. Transcode lossless JPEG XL skip semua masalah itu, buat semua JPEG yang udah nangkring di storage kita dari dulu.</p>
-<h2>Progressive loading gratis, tanpa pipeline thumbnail</h2>
-<p>Bitstream JPEG XL itu progresif secara desain. Browser bisa langsung render preview resolusi rendah dari potongan byte pertama yang nyampe, terus makin nyempurnain seiring sisanya datang. Server nggak perlu bikin aset thumbnail terpisah buat ini.</p>
-<p>Buat pembeli yang koneksinya pas-pasan, kayak banyak pengguna di Asia Tenggara, bedanya kerasa banget: antara liat kartu produk yang masih kosong, sama liat kartu produk yang udah bisa dikenalin walaupun gambarnya masih lagi streaming.</p>
-<p>Satu komentator di HN nutup diskusi paling tajam di thread itu dengan kesimpulan yang paling pas. Situs art dan katalog yang paling untung dari JPEG XL, karena mereka bisa ngerepack ulang semua JPEG yang udah mereka punya secara lossless, hampir tanpa biaya.</p>
-<h2>Yang bakal gue pakai, dan satu hal yang gue sadar belakangan</h2>
-<p>AVIF nggak usah dibuang. Tetap pakai di tempat biaya encode-nya udah ke-amortisasi, kayak foto editorial atau hero image yang di-encode sekali tapi dilayanin jutaan kali.</p>
-<p>JPEG XL kita arahin khusus ke jalur yang paling kena masalah gara-gara AVIF: upload katalog merchant, tempat ribuan JPEG masuk dalam ledakan dan harus diproses murah, cepat, tanpa kehilangan kualitas.</p>
-<p>Dukungan browser yang akhirnya nyampe tier-1 itu cuma headline-nya doang. Keputusan yang beneran kepake buat platform kayak kita lebih sempit dari itu. Pakai transcode lossless JPEG XL biar berhenti bayar biaya encode AVIF yang sebenarnya nggak perlu lo keluarin, buat konten yang dari awal nggak butuh di-encode ulang.</p>
-<p>Dan ini yang gue sadar belakangan: masalah format gambar itu nggak pernah soal format mana yang paling efisien di atas kertas. Yang nentuin itu di mana biaya komputasinya jatuh, di CPU server lo, atau di layar HP pembeli lo. 😅</p>
+<p>Buat platform multi-tenant yang nyimpen foto merchant bertahun-tahun, inilah jalan migrasi yang sebenarnya kepake. Background worker kita nggak perlu ngulang encode seluruh katalog dari piksel. Kita cuma ngerepack bitstream-nya aja.</p>
+<h2>Progressive loading: thumbnail pipeline yang nggak perlu dibikin</h2>
+<p>Pembeli yang koneksinya pas-pasan, banyak banget di Asia Tenggara, ngerasain beda yang kentara antara nunggu kartu produk kosong lama, sama langsung liat preview yang udah bisa dikenalin walaupun gambarnya masih nyempurna.</p>
+<p>Bedanya ada di struktur bitstream JPEG XL, yang progresif dari desain. Browser bisa langsung render preview resolusi rendah dari potongan byte pertama yang nyampe, terus makin sharp seiring sisanya ke-load, semua tanpa server perlu bikin aset thumbnail terpisah. Satu kelas infrastruktur hilang begitu aja: nggak perlu matrix ukuran thumbnail yang di-generate, disimpen, dan dijaga sinkron sama originalnya.</p>
+<p>Ada satu komentar di HN yang menurut gue nutup argumen ini dengan paling pas. Situs art dan katalog itu yang paling untung dari JPEG XL, karena mereka bisa ngerepack ulang semua JPEG yang udah mereka punya secara lossless, hampir tanpa biaya.</p>
+<h2>Yang bakal gue pakai</h2>
+<p>Headline-nya emang "browser support akhirnya nyampe tier-1". Tapi buat platform kayak kita, keputusan yang beneran kepake itu lebih spesifik. Pakai transcode lossless JPEG XL, biar nggak usah lagi keluar ongkos encode AVIF buat konten yang dari awal nggak butuh di-encode ulang sama sekali.</p>
+<p>AVIF sendiri nggak usah dibuang. Dia tetep masuk akal buat tempat yang ongkos encode-nya udah ke-amortisasi, kayak foto editorial atau hero image yang di-encode sekali tapi dilayanin jutaan kali.</p>
+<p>Yang berubah itu ke mana JPEG XL diarahin: khusus ke jalur yang paling kena masalah gara-gara AVIF, yaitu upload katalog merchant, tempat ribuan JPEG masuk dalam ledakan dan harus diproses murah, cepat, tanpa kehilangan kualitas.</p>
+<p>Dan satu hal yang gue sadar belakangan: masalah format gambar itu nggak pernah soal format mana yang paling efisien di atas kertas. Yang nentuin itu di mana biaya komputasinya jatuh, di CPU server lo, atau di layar HP pembeli lo. 😅</p>
     </div>
     <div class="hero__actions post__footer-actions">
       <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
