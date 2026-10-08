@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>&quot;Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds&quot; — Field Notes</title>
+<title>Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds — Field Notes</title>
 <meta name="description" content="Our master CI died twice in twelve hours inside next/font/google, on commits that carried identical font code. Here is how Dagango.com vendors 13 font subsets on disk and makes next build fetch nothing.">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -18,16 +18,16 @@
 <link rel="canonical" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">
 <meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
 <meta property="og:type" content="article">
-<meta property="og:title" content="&quot;Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds&quot; — Field Notes">
+<meta property="og:title" content="Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds — Field Notes">
 <meta property="og:description" content="Our master CI died twice in twelve hours inside next/font/google, on commits that carried identical font code. Here is how Dagango.com vendors 13 font subsets on disk and makes next build fetch nothing.">
 <meta property="og:url" content="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/og.en.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="&quot;Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds&quot; — Field Notes">
+<meta property="og:image:alt" content="Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds — Field Notes">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="&quot;Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds&quot; — Field Notes">
+<meta name="twitter:title" content="Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds — Field Notes">
 <meta name="twitter:description" content="Our master CI died twice in twelve hours inside next/font/google, on commits that carried identical font code. Here is how Dagango.com vendors 13 font subsets on disk and makes next build fetch nothing.">
 <meta name="twitter:image" content="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/og.en.png">
 <meta name="author" content="Aditya Firmansyah">
@@ -38,7 +38,7 @@
 <meta property="article:tag" content="performance">
 <meta property="article:tag" content="webdev">
 <meta property="article:tag" content="architecture">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "\"Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds\"", "description": "Our master CI died twice in twelve hours inside next/font/google, on commits that carried identical font code. Here is how Dagango.com vendors 13 font subsets on disk and makes next build fetch nothing.", "datePublished": "2026-10-07T00:00:00+00:00", "dateModified": "2026-10-07T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/"}, "keywords": "nextjs, frontend, performance, webdev, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 814, "image": ["https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds", "description": "Our master CI died twice in twelve hours inside next/font/google, on commits that carried identical font code. Here is how Dagango.com vendors 13 font subsets on disk and makes next build fetch nothing.", "datePublished": "2026-10-07T00:00:00+00:00", "dateModified": "2026-10-07T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/"}, "keywords": "nextjs, frontend, performance, webdev, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 814, "image": ["https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/", "inLanguage": "id-ID"}}</script>
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/">
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/">
@@ -70,7 +70,7 @@
       <span class="waybill__divider" aria-hidden="true">&middot;</span>
       <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
     </div>
-    <h1 class="post__title">&quot;Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds&quot;</h1>
+    <h1 class="post__title">Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds</h1>
     <div class="post__tags"><span>nextjs</span><span>frontend</span><span>performance</span><span>webdev</span><span>architecture</span></div>
     <div class="post__content reveal is-visible">
 <h2><code>next build</code> is not an offline command</h2>

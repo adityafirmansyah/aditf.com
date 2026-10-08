@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot; — Field Notes</title>
+<title>Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command — Field Notes</title>
 <meta name="description" content="Frank Wiles got a fake project inquiry, a Dropbox folder of specs, and a hidden .git with a post-checkout hook. I reproduced both vectors on git 2.53.0, and the popular fix is overridable.">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -18,16 +18,16 @@
 <link rel="canonical" href="https://aditf.com/blog/reproducing-the-git-hook-attack/">
 <meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
 <meta property="og:type" content="article">
-<meta property="og:title" content="&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot; — Field Notes">
+<meta property="og:title" content="Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command — Field Notes">
 <meta property="og:description" content="Frank Wiles got a fake project inquiry, a Dropbox folder of specs, and a hidden .git with a post-checkout hook. I reproduced both vectors on git 2.53.0, and the popular fix is overridable.">
 <meta property="og:url" content="https://aditf.com/blog/reproducing-the-git-hook-attack/">
 <meta property="og:locale" content="en_US">
 <meta property="og:image" content="https://aditf.com/blog/reproducing-the-git-hook-attack/og.en.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot; — Field Notes">
+<meta property="og:image:alt" content="Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command — Field Notes">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot; — Field Notes">
+<meta name="twitter:title" content="Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command — Field Notes">
 <meta name="twitter:description" content="Frank Wiles got a fake project inquiry, a Dropbox folder of specs, and a hidden .git with a post-checkout hook. I reproduced both vectors on git 2.53.0, and the popular fix is overridable.">
 <meta name="twitter:image" content="https://aditf.com/blog/reproducing-the-git-hook-attack/og.en.png">
 <meta name="author" content="Aditya Firmansyah">
@@ -38,7 +38,7 @@
 <meta property="article:tag" content="ai-agents">
 <meta property="article:tag" content="supply-chain">
 <meta property="article:tag" content="devtools">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "\"Reproducing the .git Hook Attack: git status Runs an Attacker's Command\"", "description": "Frank Wiles got a fake project inquiry, a Dropbox folder of specs, and a hidden .git with a post-checkout hook. I reproduced both vectors on git 2.53.0, and the popular fix is overridable.", "datePublished": "2026-10-05T00:00:00+00:00", "dateModified": "2026-10-05T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/reproducing-the-git-hook-attack/"}, "keywords": "git, security, ai-agents, supply-chain, devtools", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1216, "image": ["https://aditf.com/blog/reproducing-the-git-hook-attack/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/reproducing-the-git-hook-attack/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Reproducing the .git Hook Attack: git status Runs an Attacker's Command", "description": "Frank Wiles got a fake project inquiry, a Dropbox folder of specs, and a hidden .git with a post-checkout hook. I reproduced both vectors on git 2.53.0, and the popular fix is overridable.", "datePublished": "2026-10-05T00:00:00+00:00", "dateModified": "2026-10-05T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/reproducing-the-git-hook-attack/"}, "keywords": "git, security, ai-agents, supply-chain, devtools", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1216, "image": ["https://aditf.com/blog/reproducing-the-git-hook-attack/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/reproducing-the-git-hook-attack/id/", "inLanguage": "id-ID"}}</script>
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/reproducing-the-git-hook-attack/id/">
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/reproducing-the-git-hook-attack/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/reproducing-the-git-hook-attack/">
@@ -70,7 +70,7 @@
       <span class="waybill__divider" aria-hidden="true">&middot;</span>
       <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
     </div>
-    <h1 class="post__title">&quot;Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command&quot;</h1>
+    <h1 class="post__title">Reproducing the .git Hook Attack: git status Runs an Attacker&#x27;s Command</h1>
     <div class="post__tags"><span>git</span><span>security</span><span>ai-agents</span><span>supply-chain</span><span>devtools</span></div>
     <div class="post__content reveal is-visible">
 <h2>The ask was a payload</h2>
