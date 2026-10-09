@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Someone Applied for .lan: Why OpenWrt and Homelab DNS May Leak</title>
+      <link>https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/</guid>
+      <pubDate>Fri, 09 Oct 2026 00:00:00 +0000</pubDate>
+      <description>ICANN&#x27;s 2026 gTLD round includes a live application for .lan, the domain OpenWrt has hardcoded as a router default for two decades. Here&#x27;s what that means for every homelab using it.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/id/"/>
+    </item>
+    <item>
       <title>Chrome 155 Ships JPEG XL in Rust: What It Actually Changes for an E-Commerce Image Pipeline</title>
       <link>https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/</link>
       <guid isPermaLink="true">https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/</guid>

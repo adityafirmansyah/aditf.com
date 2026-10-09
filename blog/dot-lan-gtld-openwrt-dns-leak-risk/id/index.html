@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ada yang Daftar .lan ke ICANN: Kenapa DNS Router Homelab Lo Bisa Bocor — Field Notes</title>
+<meta name="description" content="ICANN lagi proses pengajuan gTLD .lan, domain yang udah 20 tahun jadi default OpenWrt. Ini yang kejadian kalau domain yang lo pikir privat itu ternyata bisa dibeli orang lain.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ada yang Daftar .lan ke ICANN: Kenapa DNS Router Homelab Lo Bisa Bocor — Field Notes">
+<meta property="og:description" content="ICANN lagi proses pengajuan gTLD .lan, domain yang udah 20 tahun jadi default OpenWrt. Ini yang kejadian kalau domain yang lo pikir privat itu ternyata bisa dibeli orang lain.">
+<meta property="og:url" content="https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ada yang Daftar .lan ke ICANN: Kenapa DNS Router Homelab Lo Bisa Bocor — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ada yang Daftar .lan ke ICANN: Kenapa DNS Router Homelab Lo Bisa Bocor — Field Notes">
+<meta name="twitter:description" content="ICANN lagi proses pengajuan gTLD .lan, domain yang udah 20 tahun jadi default OpenWrt. Ini yang kejadian kalau domain yang lo pikir privat itu ternyata bisa dibeli orang lain.">
+<meta name="twitter:image" content="https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-09T00:00:00+00:00">
+<meta property="article:tag" content="dns">
+<meta property="article:tag" content="networking">
+<meta property="article:tag" content="homelab">
+<meta property="article:tag" content="self-hosting">
+<meta property="article:tag" content="security">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Ada yang Daftar .lan ke ICANN: Kenapa DNS Router Homelab Lo Bisa Bocor", "description": "ICANN lagi proses pengajuan gTLD .lan, domain yang udah 20 tahun jadi default OpenWrt. Ini yang kejadian kalau domain yang lo pikir privat itu ternyata bisa dibeli orang lain.", "datePublished": "2026-10-09T00:00:00+00:00", "dateModified": "2026-10-09T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/id/"}, "keywords": "dns, networking, homelab, self-hosting, security", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1032, "image": ["https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>09 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Ada yang Daftar .lan ke ICANN: Kenapa DNS Router Homelab Lo Bisa Bocor</h1>
+    <div class="post__tags"><span>dns</span><span>networking</span><span>homelab</span><span>self-hosting</span><span>security</span></div>
+    <div class="post__content reveal is-visible">
+<h2>Domain yang lo kira punya lo sendiri, ternyata bisa didaftarin orang lain</h2>
+<p>7 Oktober 2026, ICANN publish daftar aplikasi gTLD baru buat tahun 2026. Salah satunya buat <code>.lan</code>.</p>
+<p>Nomor aplikasinya CD2694T-T26351, dari perusahaan bernama Coffee Danger, LLC, dan statusnya lagi pre-evaluation. Kalau lolos, <code>.lan</code> nggak lagi sekadar konvensi informal yang router lo pakai diam-diam. Itu bakal jadi zone DNS publik yang beneran, yang resolve ke server milik orang lain, bisa dibeli siapa aja.</p>
+<p>Gue sendiri jalanin box Celeron J4105 di belakang CGNAT Biznet fiber, pakai Caddy sebagai reverse proxy, dan tiap hari ngetik <code>nas.lan</code> di HP tanpa pikir panjang. Jutaan orang lain ngelakuin hal yang sama, kebanyakan nggak sadar risikonya.</p>
+<h2><code>.lan</code> nggak pernah resmi, tapi dipakai di mana-mana</h2>
+<p>Nah ini bagian yang bikin kasus <code>.lan</code> beda dari perebutan gTLD biasa: domain ini emang dari awal nggak pernah di-reserve siapa pun secara resmi.</p>
+<p>Gue cek langsung <code>dhcp.conf</code> di repo OpenWrt, dan dua baris itu masih ada sampai sekarang: <code>option domain 'lan'</code> dan <code>option local '/lan/'</code>. Udah segitu lama konfigurasi default <code>dnsmasq</code>-nya kayak gitu. DD-WRT sama router travel GL.iNet ikutan konvensi yang sama. Dua dekade jadi default pabrikan, tanpa ada reservasi resmi apa pun di baliknya.</p>
+<p>Bandingin sama domain-domain yang justru lewat proses standar beneran:</p>
+<ul>
+<li><code>.local</code> di-reserve khusus buat multicast DNS lewat RFC 6762, biar discovery link-local nggak nabrak root publik.</li>
+<li><code>home.arpa</code> diusulin RFC 8375 sebagai suffix "resmi" buat jaringan rumahan.</li>
+<li><code>.internal</code> malah di-reserve langsung sama board ICANN sendiri, lewat resolusi yang disahkan 29 Juli 2024.</li>
+</ul>
+<p>Masalahnya, <code>.lan</code> nggak dapet perlindungan apa pun dari semua itu, padahal justru itu yang paling banyak dipakai praktisi di lapangan. Thread HN yang bahas ini (116 poin, 140 komentar) banyak ngomongin ironi ini: badan standar sibuk ngelindungin nama yang orang jarang pakai, sementara nama yang dipakai semua orang malah dibiarin kebuka.</p>
+<h2>Kenapa <code>home.arpa</code> kalah padahal secara aturan dia menang</h2>
+<p><code>home.arpa</code> sembilan karakter. <code>.lan</code> cuma tiga. Beda segitu kecil, tapi coba ngetik <code>plex.home.arpa</code> di URL bar jam 11 malem dibanding <code>plex.lan</code>, dan lo bakal ngerti kenapa orang males.</p>
+<p>RFC 6762 ngunci <code>.local</code> khusus buat mDNS doang, jadi kalau ada lookup unicast ke <code>.local</code>, dia bisa nyangkut nunggu balasan multicast yang nggak bakal pernah datang. Itu timeout, bukan error, dan itu lebih nyusahin. <code>home.arpa</code> emang lolos dari jebakan itu, tapi dia kena masalah lain: nggak ada yang mau repot ngetiknya, jadi ya nggak ada yang pakai. <code>.internal</code> malah baru di-reserve ICANN tahun 2024, pas <code>.lan</code> udah 20 tahun duluan jadi standar de facto yang nggak bisa diganti cuma dengan nerbitin alternatif yang lebih bersih.</p>
+<p>Standar-standar itu kalahnya bukan di aspek keamanan. Mereka kalah di soal kenyamanan ngetik, bertahun-tahun sebelum ada yang kepikiran minta ICANN reserve string yang udah dipakai semua orang.</p>
+<h2>Ini bukan risiko teoretis, ini risiko struktural</h2>
+<p>Tiap device yang jalan-jalan keluar dari jaringan rumah lo, bawa serta search domain DNS-nya, setidaknya sampai ada yang ngereset settingan itu. Laptop yang di-suspend di rumah terus dibuka lagi di hotel, atau konek ke hotspot HP, bakal tetep nembak query buat <code>nas.lan</code> atau <code>router.lan</code> sebelum ada apa pun yang ngoreksi.</p>
+<p>Sekarang, query itu nyampe ke resolver publik, dapet NXDOMAIN, terus diem gitu aja. Tapi begitu <code>.lan</code> resmi delegated, query yang sama bakal resolve ke apa pun yang registry Coffee Danger pasang di situ. Dan HP yang bocorin <code>plex.lan</code> itu nggak cuma bocorin satu request web doang.</p>
+<p>Yang bocor biasanya lebih serius dari itu:</p>
+<ul>
+<li>Cookie session.</li>
+<li>Token autentikasi.</li>
+<li>Header auth yang sebenernya cuma dimaksudin buat server yang ada di dalem rumah lo.</li>
+</ul>
+<p>Flag <code>bogus-priv</code> di <code>dnsmasq</code> emang nge-block reverse lookup buat alamat RFC 1918, dan rebind protection-nya nahan domain luar biar nggak bisa resolve ke IP internal. Tapi dua-duanya nggak ngelakuin apa-apa buat query <code>.lan</code> yang ditembak dari LUAR jaringan lo sepenuhnya, yang justru itu skenario yang kejadian tiap hari pas device lo roaming.</p>
+<h2>Kita udah pernah ngalamin ini, namanya <code>.dev</code></h2>
+<p>Google beli <code>.dev</code> tahun 2014, dan selama tiga tahun nggak kejadian apa-apa karena belum ada yang di-delegate. Terus 2017, Chromium ngaktifin HSTS preload buat seluruh TLD itu sekaligus.</p>
+<p>Semua environment dev lokal yang diam-diam ngasumsiin <code>myapp.dev</code> nggak akan pernah resolve di internet publik, langsung rusak bareng-bareng. Soalnya <code>.dev</code> sekarang domain beneran, dan Chrome maksa HTTPS buat semuanya tanpa pengecualian. Issue GitHub dari Pow sama Laravel Valet jaman itu masih kebuka sampai sekarang, jadi bukti berapa banyak setup yang ternyata nebak-nebak doang tanpa pernah dicek.</p>
+<p><code>.lan</code> itu <code>.dev</code> versi dua dekade lebih dulu dipakai. Basis penggunanya pun jauh kurang sadar keamanan dibanding developer web yang biasa baca GitHub issue. Orang homelab nggak lagi-lagi mantengin laporan risiko name collision dari ICANN.</p>
+<h2>Solusinya bukan konvensi, tapi domain yang beneran lo punya</h2>
+<p>TLD privat itu sifatnya cuma privat sementara. Begitu ada yang ngurus paperwork buat jadiin dia publik, status itu ilang. <code>.lan</code> lagi ngalamin itu sekarang, tapi <code>home.arpa</code> atau <code>.internal</code> juga bisa aja kena nasib serupa kalau sampai praktisi rame-rame adopsi salah satunya duluan.</p>
+<p>Makanya fix yang kepake jangka panjang itu bukan nyari nama lain yang "lebih aman". Yang kepake itu split-horizon DNS, di atas domain yang beneran lo pegang registrasinya. Punya gue sendiri <code>*.internal.aditf.com</code>, dan caranya sederhana.</p>
+<ul>
+<li>Resolver internal jawab query <code>internal.aditf.com</code> pakai alamat RFC 1918, nggak pernah nyentuh internet publik.</li>
+<li>Resolver eksternal nggak liat apa-apa buat subdomain itu, atau dapet jawaban yang sengaja dibuat nggak resolve.</li>
+<li>Let's Encrypt tetep nerbitin sertifikat asli ke zone publiknya, jadi service internal tetep dapet TLS valid tanpa warning self-signed.</li>
+</ul>
+<p>Nggak ada satu pun pelamar gTLD yang bisa beli string dari bawah domain yang udah lo registrasiin sendiri duluan.</p>
+<h2>Yang bisa lo lakuin minggu ini, sebelum pre-evaluation-nya kelar</h2>
+<p>Nggak usah nunggu hasil review ICANN kelar dulu buat mulai pindah. Risiko collision-nya udah ada dari sekarang, nggak peduli aplikasi Coffee Danger itu nanti ditolak atau diterima.</p>
+<p>Pindahin hostname internal lo ke subdomain dari sesuatu yang lo punya sendiri. Arahin resolver DNS internal ke situ, terus otomatisin penerbitan sertifikatnya langsung ke zone yang asli, bukan ke <code>.lan</code>.</p>
+<p>Satu sore ngerapihin config <code>dnsmasq</code>, plus beberapa dolar setahun buat domain. Itu ongkosnya. Bandingin sama skenario sebaliknya: kredensial NAS lo nyasar ke registry punya orang asing, dan lo baru ngerti pas semuanya udah kejadian. 😅</p>
+<p>Dan percaya deh, nyesel belakangan itu jauh lebih mahal daripada ongkos domain setahun.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
