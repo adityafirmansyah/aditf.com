@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloudflare Akuisisi Deno: Ini Maksudnya buat Lo yang Lagi Build di JavaScript — Field Notes</title>
+<meta name="description" content="Ryan Dahl bakal hentiin development Deno runtime setahun lagi, dan Deno Deploy tutup dalam enam bulan. Tapi ini bukan cerita kekalahan: ini tentang abstraksi yang salah dan kenapa Durable Objects jadi taruhannya.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cloudflare Akuisisi Deno: Ini Maksudnya buat Lo yang Lagi Build di JavaScript — Field Notes">
+<meta property="og:description" content="Ryan Dahl bakal hentiin development Deno runtime setahun lagi, dan Deno Deploy tutup dalam enam bulan. Tapi ini bukan cerita kekalahan: ini tentang abstraksi yang salah dan kenapa Durable Objects jadi taruhannya.">
+<meta property="og:url" content="https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Cloudflare Akuisisi Deno: Ini Maksudnya buat Lo yang Lagi Build di JavaScript — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cloudflare Akuisisi Deno: Ini Maksudnya buat Lo yang Lagi Build di JavaScript — Field Notes">
+<meta name="twitter:description" content="Ryan Dahl bakal hentiin development Deno runtime setahun lagi, dan Deno Deploy tutup dalam enam bulan. Tapi ini bukan cerita kekalahan: ini tentang abstraksi yang salah dan kenapa Durable Objects jadi taruhannya.">
+<meta name="twitter:image" content="https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-10T00:00:00+00:00">
+<meta property="article:tag" content="javascript">
+<meta property="article:tag" content="cloudflare">
+<meta property="article:tag" content="deno">
+<meta property="article:tag" content="distributed-systems">
+<meta property="article:tag" content="architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Cloudflare Akuisisi Deno: Ini Maksudnya buat Lo yang Lagi Build di JavaScript", "description": "Ryan Dahl bakal hentiin development Deno runtime setahun lagi, dan Deno Deploy tutup dalam enam bulan. Tapi ini bukan cerita kekalahan: ini tentang abstraksi yang salah dan kenapa Durable Objects jadi taruhannya.", "datePublished": "2026-10-10T00:00:00+00:00", "dateModified": "2026-10-10T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/id/"}, "keywords": "javascript, cloudflare, deno, distributed-systems, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Full-Stack Developer"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 821, "image": ["https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>10 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">4 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Cloudflare Akuisisi Deno: Ini Maksudnya buat Lo yang Lagi Build di JavaScript</h1>
+    <div class="post__tags"><span>javascript</span><span>cloudflare</span><span>deno</span><span>distributed-systems</span><span>architecture</span></div>
+    <div class="post__content reveal is-visible">
+<h2>Dari gudang di Berlin sampai akuisisi Cloudflare</h2>
+<p>Perjalanan Ryan Dahl di dunia runtime JavaScript udah jalan tujuh belas tahun.</p>
+<p>Tahun 2009, dia berdiri di sebuah gudang di Berlin ngenalin Node.js lewat server IRC 500 baris. Idenya sederhana: async I/O bikin server jaringan jauh lebih enteng ditulis. Dan cara itu terbukti jalan.</p>
+<p>Sepuluh tahun kemudian, dia bikin Deno buat nambal kelemahan Node: izin akses diperketat, TypeScript jalan langsung tanpa compiler tambahan, dan API ngikutin standar web browser. Eksperimen itu juga terbukti berhasil secara teknis. Deno memang runtime yang jauh lebih bersih.</p>
+<p>Semua cerita itu berubah total tanggal 9 Oktober 2026 kemarin pas Cloudflare resmi mengumumkan akuisisi Deno Land.</p>
+<p>Skema pensiunnya udah dipatok jelas: runtime Deno cuma dapet patch bulanan setahun lagi sebelum dihentikan permanen, sementara layanan Deno Deploy bakal ditutup total enam bulan dari sekarang. Proyek JSR bakal dipindahin langsung ke infrastruktur Cloudflare.</p>
+<p>Di Hacker News, kabar ini meledak sampai lebih dari 1.100 poin dan 580 komentar. Komunitas kaget, tapi kalau baca penjelasan teknisnya, alasannya masuk akal.</p>
+<h2>Cacat bawaan server JavaScript yang nggak pernah selesai</h2>
+<p>Di tulisan bareng Kenton Varda di blog Cloudflare, Dahl ngebongkar ilusi di balik demo IRC tahun 2009 itu.</p>
+<p>Server itu kencang cuma karena jalan di satu proses dan satu thread. Begitu pengguna nambah banyak dan aplikasi harus dipecah ke beberapa mesin, runtime async nggak bisa bantu apa-apa lagi.</p>
+<p>Masalah aslinya pindah ke koordinasi state:</p>
+<ul>
+<li>sinkronisasi pesan antar channel,</li>
+<li>konsistensi riwayat chat,</li>
+<li>dan pembagian koneksi WebSocket di banyak server.</li>
+</ul>
+<p>Ujung-ujungnya, developer dipaksa ngerakit tumpukan infrastruktur sendiri. Lo harus pasang Redis buat pub/sub, Postgres buat nyimpen data, ditambah sticky session di load balancer biar koneksi nggak putus.</p>
+<p>Menurut Dahl, situasi itu belum berubah sampai sekarang. Bikin runtime yang lebih cepat di satu mesin nggak nyentuh akar masalahnya. Server modern butuh cara beda buat ngelola state terdistribusi.</p>
+<h2>Durable Objects: solusi stateful tanpa ribet rakit Redis</h2>
+<p>Itu sebabnya Dahl kepincut sama model Durable Objects milik Cloudflare.</p>
+<p>Durable Object itu sendiri bentuknya distributed singleton yang nempel langsung sama database SQLite lokal. Tiap object punya ID unik, jalan di lingkungan JavaScript single-threaded, dan bisa nanganin koneksi WebSocket langsung. Baca dan tulis ke SQLite di dalamnya jalan secara sinkron dan super cepat.</p>
+<p>Ambil contoh aplikasi chat tadi. Lo cukup bikin satu Durable Object buat tiap channel.</p>
+<p>Hasilnya:</p>
+<ul>
+<li>data percakapan langsung terisolasi di SQLite milik channel itu,</li>
+<li>koneksi WebSocket otomatis terkelola di tempat yang sama,</li>
+<li>dan aplikasi lo ter-shard otomatis tanpa butuh distributed lock manual.</li>
+</ul>
+<p>Masalahnya, selama ini runtime open-source Cloudflare (<code>workerd</code>) cuma bisa ngejalanin Durable Objects di satu mesin lokal. Begitu butuh routing terdistribusi lintas server, kodenya terkunci di infrastruktur internal milik Cloudflare.</p>
+<h2>Masuknya celld buat buka gembok self-hosting</h2>
+<p>Waktu ngejalanin Deno Deploy, Dahl ngerasain sendiri betapa rumitnya arsitektur cloud modern: banyak penyedia cloud, banyak jenis database, dan puluhan service yang saling terkait.</p>
+<p>Pengalaman itu yang bikin dia ngerancang <code>celld</code>.</p>
+<p>Filosofinya dibikin kebalikan dari kerumitan tadi: satu binary utuh berbasis Rust, dengan object storage sebagai satu-satunya ketergantungan eksternal.</p>
+<p>Lo cukup jalanin banyak instance <code>celld</code> dan arahin semuanya ke satu bucket penyimpanan. Sistemnya yang bakal ngurus penempatan object dan rute jaringan antar mesin secara otomatis.</p>
+<p>Peleburan <code>celld</code> ke dalam <code>workerd</code> inilah inti utama dari akuisisi ini. Cloudflare dan tim Deno pengen model pemrograman Workers dan Durable Objects bisa lo jalanin sendiri di server pribadi, bukan cuma numpang di jaringan edge Cloudflare.</p>
+<h2>Langkah realistis buat yang sekarang pakai Deno</h2>
+<p>Waktu transisi 12 bulan ini bukan sekadar janji di atas kertas. Patch keamanan dan perbaikan bug bakal tetap rilis tiap bulan, tapi penambahan fitur baru udah resmi selesai.</p>
+<p>Buat tim yang punya service produksi di atas Deno, petanya cukup jelas:</p>
+<ul>
+<li>Kalau aplikasi lo bertipe standar three-tier, pindah ke Node.js 22+ yang sekarang udah punya fitur bawaan pembersih tipe TypeScript (<code>--experimental-strip-types</code>).</li>
+<li>Kalau aplikasi lo butuh koordinasi realtime, WebSocket padat, atau sistem agent AI yang butuh state persisten, pelajari model <code>workerd</code>.</li>
+<li>Jangan pernah bikin service baru pakai Deno mulai hari ini.</li>
+</ul>
+<p>Di Dagango.com, kita nggak pakai Deno di produksi. Tapi arsitektur multi-tenant toko online kita sekarang masih bergantung sama Redis cluster buat misahin state tiap toko. Model satu database SQLite per toko milik Durable Objects jelas jadi alternatif yang sangat menarik buat kita pantau.</p>
+<h2>Perang runtime kelar, tapi pertanyaannya naik kelas</h2>
+<p>Node.js menang karena inersia ekosistemnya terlalu raksasa buat digeser. Bun menang di kecepatan mentah dan kompatibilitas instan sama ekosistem npm. Deno menang di kebersihan desain, tapi kalah di adopsi pasar.</p>
+<p>Tapi menurut Dahl, perang runtime satu mesin itu dari awal memang panggung yang salah.</p>
+<p>Abstraksi server single-process udah mentok di batas kemampuannya. Pertanyaan berikutnya: gimana bikin sistem terdistribusi jadi gampang diprogram sejak baris pertama.</p>
+<p>Taruhan Dahl sekarang ada di model Durable Objects yang bisa lo self-host di infrastruktur milik lo sendiri.</p>
+<p>Bakal kejadian atau nggak taruhannya? Kita butuh waktu lebih dari setahun buat ngeliat hasilnya di lapangan.</p>
+<p>Tapi setidaknya, industri mulai sadar kalau nambahin Redis di tiap masalah bukan satu-satunya jalan keluar. 😅</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
