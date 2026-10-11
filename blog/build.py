@@ -470,6 +470,7 @@ def build_sitemap(posts):
     # (loc, lastmod, changefreq, priority, alternates)
     entries = [
         (SITE_URL + "/", now, "weekly", "1.0", []),
+        (SITE_URL + "/consult/", now, "weekly", "0.9", []),
         (BLOG_URL, now, "daily", "0.9", []),
     ]
     for e in posts:
