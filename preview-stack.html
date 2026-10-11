@@ -345,8 +345,7 @@
       <button class="stack-tab-btn" data-index="1">02 Skills</button>
       <button class="stack-tab-btn" data-index="2">03 Projects</button>
       <button class="stack-tab-btn" data-index="3">04 Experience</button>
-      <button class="stack-tab-btn" data-index="4">05 Certs</button>
-      <button class="stack-tab-btn" data-index="5">06 Contact</button>
+      <button class="stack-tab-btn" data-index="4">05 Credentials &amp; Contact</button>
     </nav>
 
     <div class="stack-header__right">
@@ -723,43 +722,15 @@
         </div>
       </article>
 
-      <!-- CARD 4: CERTS -->
-      <article class="cargo-card" id="card-4" data-index="4" data-label="QUALITY CONTROL">
+      <!-- CARD 4: CREDENTIALS & CONTACT -->
+      <article class="cargo-card" id="card-4" data-index="4" data-label="CREDENTIALS &amp; CONTACT">
         <div class="cargo-card__head">
           <div class="cargo-card__tag">
             <i class="dot" aria-hidden="true"></i>
-            <span>PALLET CARD 05 &bull; QUALITY CONTROL</span>
+            <span>PALLET CARD 05 &bull; CREDENTIALS &amp; CONTACT</span>
           </div>
           <div class="cargo-card__controls">
-            <span style="font-family:var(--font-mono); font-size:11px; color:var(--paper-dim);">CERTIFIED SEALS</span>
-          </div>
-        </div>
-        <div class="cargo-card__body">
-          <p class="eyebrow">Quality Control &mdash; Certified Seals</p>
-          <h2 style="font-size: clamp(32px, 4vw, 48px); margin:0 0 24px; font-family:var(--font-display); text-transform:uppercase;">
-            Certifications &amp; Languages
-          </h2>
-          <div class="seal-row">
-            <div class="seal"><span>JavaScript</span><small>Course</small></div>
-            <div class="seal"><span>CSS</span><small>Fundamentals</small></div>
-            <div class="seal"><span>jQuery</span><small>Course</small></div>
-          </div>
-          <div class="lang-row" style="margin-top: 36px;">
-            <div class="lang-chip"><span class="lang-chip__name">Indonesian</span><span class="lang-chip__level">Native</span></div>
-            <div class="lang-chip"><span class="lang-chip__name">English</span><span class="lang-chip__level">Professional Working Proficiency</span></div>
-          </div>
-        </div>
-      </article>
-
-      <!-- CARD 5: CONTACT -->
-      <article class="cargo-card" id="card-5" data-index="5" data-label="FINAL DESTINATION">
-        <div class="cargo-card__head">
-          <div class="cargo-card__tag">
-            <i class="dot" aria-hidden="true"></i>
-            <span>PALLET CARD 06 &bull; FINAL DESTINATION</span>
-          </div>
-          <div class="cargo-card__controls">
-            <span style="font-family:var(--font-mono); font-size:11px; color:var(--paper-dim);">CONSIGNEE CONTACT</span>
+            <span style="font-family:var(--font-mono); font-size:11px; color:var(--paper-dim);">FINAL DESTINATION</span>
           </div>
         </div>
         <div class="cargo-card__body">
@@ -793,10 +764,26 @@
               <span class="contact-row__value">github.com/sponsors/adityafirmansyah &hearts;</span>
             </a>
           </div>
-          <div class="hero__actions" style="margin-top:28px;">
+          <div class="hero__actions" style="margin-top:24px;">
             <a class="btn btn--stamp" href="/consult/">Submit Work Order / Consult &rarr;</a>
             <a class="btn btn--ghost" href="assets/Aditya_Firmansyah_CV.pdf" download>Download CV</a>
             <a class="btn btn--ghost" href="mailto:aditf.work@gmail.com">Email Me Directly</a>
+          </div>
+
+          <!-- Quality Control: Certs & Languages sub-panel -->
+          <div style="margin-top:40px; padding-top:28px; border-top:1px solid var(--ink-line);">
+            <p class="eyebrow" style="margin-bottom:14px;">Quality Control &mdash; Certified Seals &amp; Languages</p>
+            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:20px;">
+              <div class="seal-row" style="margin-bottom:0;">
+                <div class="seal"><span>JavaScript</span><small>Course</small></div>
+                <div class="seal"><span>CSS</span><small>Fundamentals</small></div>
+                <div class="seal"><span>jQuery</span><small>Course</small></div>
+              </div>
+              <div class="lang-row">
+                <div class="lang-chip"><span class="lang-chip__name">Indonesian</span><span class="lang-chip__level">Native</span></div>
+                <div class="lang-chip"><span class="lang-chip__name">English</span><span class="lang-chip__level">Professional Working Proficiency</span></div>
+              </div>
+            </div>
           </div>
         </div>
       </article>
@@ -896,7 +883,7 @@
 
       const cardLabel = cards[activeIdx].dataset.label || '';
       const numStr = String(activeIdx + 1).padStart(2, '0');
-      footerLabel.innerHTML = `CARD [<b>${numStr}</b>/06] &mdash; ${cardLabel}`;
+      footerLabel.innerHTML = `CARD [<b>${numStr}</b>/05] &mdash; ${cardLabel}`;
     }
 
     function goToCard(targetIndex) {
@@ -928,10 +915,10 @@
       else goToCard(cards.length - 1);
     });
 
-    // Keyboard support: 1-6, Arrow keys, j/k
+    // Keyboard support: 1-5, Arrow keys, j/k
     window.addEventListener('keydown', (e) => {
       if (['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) return;
-      if (e.key >= '1' && e.key <= '6') {
+      if (e.key >= '1' && e.key <= '5') {
         goToCard(parseInt(e.key, 10) - 1);
       } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === 'j') {
         if (currentIndex < cards.length - 1) goToCard(currentIndex + 1);

@@ -502,11 +502,7 @@
           <span class="nav-status-dot"></span>
         </button>
         <button class="hud-nav-item" data-scene="4">
-          <span><span class="nav-idx">05</span> Quality Control</span>
-          <span class="nav-status-dot"></span>
-        </button>
-        <button class="hud-nav-item" data-scene="5">
-          <span><span class="nav-idx">06</span> Final Destination</span>
+          <span><span class="nav-idx">05</span> Credentials &amp; Contact</span>
           <span class="nav-status-dot"></span>
         </button>
       </nav>
@@ -529,7 +525,7 @@
       </div>
 
       <div class="hud-kbd-legend" aria-hidden="true">
-        <span><span class="kbd-key">1&ndash;6</span> JUMP</span>
+        <span><span class="kbd-key">1&ndash;5</span> JUMP</span>
         <span>&bull;</span>
         <span><span class="kbd-key">&uarr;</span><span class="kbd-key">&darr;</span> NAV</span>
       </div>
@@ -920,35 +916,15 @@
         </div>
       </section>
 
-      <!-- ================= SCENE 05: QUALITY CONTROL ================= -->
-      <section class="scene-pane" id="pane-4" data-index="4" data-label="QUALITY CONTROL">
-        <div class="scene-content">
-          <div class="scene-head">
-            <p class="scene-eyebrow reveal-item">QUALITY CONTROL &mdash; CERTIFIED SEALS</p>
-            <h2 class="scene-title reveal-item">Certifications &amp; Languages</h2>
-          </div>
-
-          <div class="seal-row reveal-item">
-            <div class="seal"><span>JavaScript</span><small>Course</small></div>
-            <div class="seal"><span>CSS</span><small>Fundamentals</small></div>
-            <div class="seal"><span>jQuery</span><small>Course</small></div>
-          </div>
-
-          <div class="lang-row reveal-item" style="margin-top: 32px;">
-            <div class="lang-chip"><span class="lang-chip__name">Indonesian</span><span class="lang-chip__level">Native</span></div>
-            <div class="lang-chip"><span class="lang-chip__name">English</span><span class="lang-chip__level">Professional Working Proficiency</span></div>
-          </div>
-        </div>
-      </section>
-
-      <!-- ================= SCENE 06: FINAL DESTINATION (CONTACT) ================= -->
-      <section class="scene-pane" id="pane-5" data-index="5" data-label="FINAL DESTINATION">
+      <!-- ================= SCENE 05: CREDENTIALS & CONTACT ================= -->
+      <section class="scene-pane" id="pane-4" data-index="4" data-label="CREDENTIALS &amp; CONTACT">
         <div class="scene-content">
           <div class="scene-head">
             <p class="scene-eyebrow reveal-item">CONSIGNEE DETAILS &mdash; FINAL DESTINATION</p>
             <h2 class="scene-title reveal-item">Let&rsquo;s ship something together.</h2>
           </div>
 
+          <!-- Contact Grid -->
           <div class="contact-grid reveal-item">
             <a class="contact-row" href="mailto:aditf.work@gmail.com">
               <span class="contact-row__label">Email</span>
@@ -976,10 +952,26 @@
             </a>
           </div>
 
-          <div class="hero__actions reveal-item" style="margin-top:28px;">
+          <div class="hero__actions reveal-item" style="margin-top:24px;">
             <a class="btn btn--stamp" href="/consult/">Submit Work Order / Consult &rarr;</a>
             <a class="btn btn--ghost" href="assets/Aditya_Firmansyah_CV.pdf" download>Download CV</a>
             <a class="btn btn--ghost" href="mailto:aditf.work@gmail.com">Email Me Directly</a>
+          </div>
+
+          <!-- Quality Control: Certifications & Languages Sub-Panel -->
+          <div class="reveal-item" style="margin-top:40px; padding-top:28px; border-top:1px solid var(--ink-line);">
+            <p class="scene-eyebrow" style="margin-bottom:14px;">QUALITY CONTROL &mdash; CERTIFIED SEALS &amp; LANGUAGES</p>
+            <div style="display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:20px;">
+              <div class="seal-row" style="margin-bottom:0;">
+                <div class="seal"><span>JavaScript</span><small>Course</small></div>
+                <div class="seal"><span>CSS</span><small>Fundamentals</small></div>
+                <div class="seal"><span>jQuery</span><small>Course</small></div>
+              </div>
+              <div class="lang-row">
+                <div class="lang-chip"><span class="lang-chip__name">Indonesian</span><span class="lang-chip__level">Native</span></div>
+                <div class="lang-chip"><span class="lang-chip__name">English</span><span class="lang-chip__level">Professional Working Proficiency</span></div>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1009,7 +1001,6 @@
       'skills',
       'projects',
       'experience',
-      'certs',
       'contact'
     ];
 
@@ -1018,8 +1009,7 @@
       'TECHNICAL PAYLOAD',
       'PERSONAL FREIGHT',
       'TRACKING LOG',
-      'QUALITY CONTROL',
-      'FINAL DESTINATION'
+      'CREDENTIALS & CONTACT'
     ];
 
     function goToScene(targetIndex, direction = 1) {
@@ -1148,7 +1138,7 @@
       if (['INPUT', 'TEXTAREA', 'SELECT'].includes(document.activeElement.tagName)) return;
 
       const key = e.key;
-      if (key >= '1' && key <= '6') {
+      if (key >= '1' && key <= '5') {
         const idx = parseInt(key, 10) - 1;
         goToScene(idx, idx > currentIndex ? 1 : -1);
       } else if (key === 'ArrowDown' || key === 'ArrowRight' || key === 'j') {
