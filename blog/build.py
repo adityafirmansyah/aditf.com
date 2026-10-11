@@ -235,6 +235,7 @@ NAV = """<div class="route-progress" aria-hidden="true"><span id="routeFill"></s
     <a href="/#certifications"><span class="idx">05</span>Certs</a>
     <a href="/#contact"><span class="idx">06</span>Contact</a>
     <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
   </nav>
 </header>
 """
