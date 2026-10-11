@@ -49,15 +49,15 @@ WORDS_PER_MIN = 200
 SITE_NAME = "Aditya Firmansyah"
 BLOG_NAME = "Field Notes"
 AUTHOR = "Aditya Firmansyah"
-AUTHOR_JOB = "Senior Software Engineer — Full-Stack Developer"
+AUTHOR_JOB = "Senior Software Engineer — Scalable Platforms & AI Workflows"
 AUTHOR_URL = SITE_URL + "/"
 SAME_AS = [
     "https://github.com/adityafirmansyah",
     "https://linkedin.com/in/aditya-firmansyah-21940845",
 ]
-SITE_DESCRIPTION = ("Aditya Firmansyah — Senior Software Engineer & Full-Stack Developer. "
-                    "13+ years building logistics platforms, microservices, and cloud-native "
-                    "applications.")
+SITE_DESCRIPTION = ("Aditya Firmansyah — Senior Software Engineer — Scalable Platforms & AI Workflows. "
+                    "13+ years building scalable platforms, microservices, and autonomous "
+                    "AI workflows.")
 BLOG_DESCRIPTION = ("Practitioner notes on software engineering, AI agents, e-commerce, and "
                     "self-hosting by Aditya Firmansyah.")
 
