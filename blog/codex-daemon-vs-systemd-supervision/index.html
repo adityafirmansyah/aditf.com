@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Codex&#x27;s Auto-Started Daemon: What systemd Would Have Done Differently — Field Notes</title>
+<meta name="description" content="Since 0.157.0, Codex CLI starts a persistent, self-updating background daemon on qualifying interactive sessions. Here is what that breaks, and what a supervised service would have done instead.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Codex&#x27;s Auto-Started Daemon: What systemd Would Have Done Differently — Field Notes">
+<meta property="og:description" content="Since 0.157.0, Codex CLI starts a persistent, self-updating background daemon on qualifying interactive sessions. Here is what that breaks, and what a supervised service would have done instead.">
+<meta property="og:url" content="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Codex&#x27;s Auto-Started Daemon: What systemd Would Have Done Differently — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Codex&#x27;s Auto-Started Daemon: What systemd Would Have Done Differently — Field Notes">
+<meta name="twitter:description" content="Since 0.157.0, Codex CLI starts a persistent, self-updating background daemon on qualifying interactive sessions. Here is what that breaks, and what a supervised service would have done instead.">
+<meta name="twitter:image" content="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-13T00:00:00+00:00">
+<meta property="article:tag" content="agents">
+<meta property="article:tag" content="systemd">
+<meta property="article:tag" content="self-hosting">
+<meta property="article:tag" content="coding-agents">
+<meta property="article:tag" content="linux">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Codex's Auto-Started Daemon: What systemd Would Have Done Differently", "description": "Since 0.157.0, Codex CLI starts a persistent, self-updating background daemon on qualifying interactive sessions. Here is what that breaks, and what a supervised service would have done instead.", "datePublished": "2026-10-13T00:00:00+00:00", "dateModified": "2026-10-13T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/codex-daemon-vs-systemd-supervision/"}, "keywords": "agents, systemd, self-hosting, coding-agents, linux", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1314, "image": ["https://aditf.com/blog/codex-daemon-vs-systemd-supervision/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/codex-daemon-vs-systemd-supervision/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>13 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">7 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Codex&#x27;s Auto-Started Daemon: What systemd Would Have Done Differently</h1>
+    <div class="post__tags"><span>agents</span><span>systemd</span><span>self-hosting</span><span>coding-agents</span><span>linux</span></div>
+    <div class="post__content reveal is-visible">
+<h2>A daemon you did not start</h2>
+<p>On 2026-09-25 the 0.157.0 release notes gained one sentence:</p>
+<blockquote>
+<p>Enabled automatic background-server startup for eligible interactive sessions, with recovery choices when server settings are incompatible.</p>
+</blockquote>
+<p>That is the entire disclosure. It names neither the persistent process, nor the 374 MB package copy, nor the updater that ships with it.</p>
+<p>Issue #48195 was filed the same day. It reached the Hacker News front page just over two weeks later, with north of 500 points and 250-plus comments. The thread kept circling one question: who owns this process, and which copy of it is running?</p>
+<p>Issue #48195 answers the first half. Since 0.157.0, opening a qualifying interactive session spawns <code>codex app-server --managed-daemon</code>.</p>
+<p>It runs in its own session with no TTY. It gets reparented to PID 1. Close every Codex window and it keeps running, until you stop it explicitly or reboot.</p>
+<p>My position, up front: a coding agent CLI should be a service I supervise, not a daemon that installs itself. That is not nostalgia for init scripts. It is the difference between one process I can name and one I have to hunt for.</p>
+<h2>It copies itself out of your package manager's reach</h2>
+<p>The daemon does not run the binary your package manager just installed. It makes a copy first.</p>
+<p>From the daemon's own README: <code>bootstrap</code> "copies the invoking package into <code>CODEX_HOME/packages/app-server-daemon</code> and prints an installation message without asking for confirmation". That copy is roughly 374 MB. It holds the <code>codex</code> binary, <code>codex-code-mode-host</code>, and bundled <code>bwrap</code>, <code>zsh</code> and <code>rg</code>. It lands under <code>~/.codex/packages/app-server-daemon/releases/&lt;version&gt;/</code>, byte-identical to the package npm installed seconds earlier.</p>
+<p>Then the provenance break arrives. The binary you audited is no longer necessarily the binary running your turn. The version you pinned is no longer the version executing.</p>
+<p>The sibling issues spell out the fallout:</p>
+<ul>
+<li><strong>#48050:</strong> the Arch package stops launching at all without <code>--no-daemon</code>.</li>
+<li><strong>#46468:</strong> an npm update leaves the app-server running the old version.</li>
+<li><strong>#41188:</strong> there is no supported way to point the daemon at an externally managed executable.</li>
+<li><strong>#42457:</strong> hooks in <code>--remote</code> mode receive the daemon's working directory, not the session's.</li>
+</ul>
+<p>Four separate reports, one root cause. The daemon owns its own copy, so the package manager no longer owns anything.</p>
+<h2>The updater and its 60-second patience</h2>
+<p>A detached process called <code>codex app-server daemon pid-update-loop</code> checks for updates five minutes after start, then hourly. You did not schedule it. The first session you opened did.</p>
+<p>Issue #40969 documents what that costs on a long-lived daemon. The app-server implements a correct graceful drain, and it waits for running turns to finish. The daemon grants that drain 60 seconds before sending <code>SIGKILL</code>.</p>
+<p>The reporter was running 13 long-lived threads where a Go build and test turn takes 3 to 30 minutes. Every auto-update destroyed in-flight work.</p>
+<p>The README now exposes two <code>settings.json</code> keys:</p>
+<pre><code class="language-json">{
+  &quot;shutdownGraceSeconds&quot;: 60,
+  &quot;updater&quot;: { &quot;autoUpdateEnabled&quot;: false }
+}
+</code></pre>
+<p>So the 60 seconds is a documented constant now, not an accident. It is still 60 seconds against a 30-minute build. At the time of that report, there was no supported way to disable auto-update at all.</p>
+<h2>Stopping it does not stop it</h2>
+<p>The clearest sign that this is a supervision bug rather than a taste question is what happens when you turn it off. The issue author found a second bug while escaping.</p>
+<p><code>codex app-server daemon stop</code> stops the app-server, and leaves the updater running. The <code>pid-update-loop</code> was still alive 70 seconds later and needed a manual <code>pkill</code>. This is his shutdown chain:</p>
+<pre><code class="language-sh">codex features disable daemon_auto_start
+codex app-server daemon stop
+pkill -f 'app-server daemon pid-update-loop'
+rm -rf ~/.codex/packages/app-server-daemon
+</code></pre>
+<p>Four commands. One of them is a <code>pkill</code> against a process the tool never admitted it started. A service manager that leaks half of itself on stop is broken at the one job service managers exist to do.</p>
+<h2>The environment of whoever started first</h2>
+<p>Yesterday's thread kept asking which copy of the daemon was running. Today a new report answered a worse question: whose credentials are inside it?</p>
+<p>Issue #53547 was filed at 2026-10-13T04:00:03Z against codex-cli 0.162.1 on macOS, under ten hours after the Hacker News thread went up. The reproduction is three commands. Export a marker variable in one directory, start Codex with the daemon enabled, then ask an unrelated session in another directory what it can see. It sees the marker.</p>
+<p>The README already concedes the mechanism: "Shared clients use the environment inherited when the daemon started. Opening a new terminal or clearing variables there does not clear the running daemon's environment; per-client environment isolation is not provided."</p>
+<p>Read that as an agent operator and the failure class is obvious. <code>HTTPS_PROXY</code>, <code>AWS_PROFILE</code>, <code>NODE_EXTRA_CA_CERTS</code> and every project-scoped token in your shell belong to whichever session started the daemon first. The #48195 reporter launched Codex through a wrapper that set a per-invocation proxy. The daemon kept the first session's proxy and routed every later session's traffic through it.</p>
+<p>That is credential and proxy bleed across workstreams you believed were separate. The #53547 reporter calls it "somewhere between a bug and a security issue". I would drop the hedge.</p>
+<h2>What systemd --user already provides</h2>
+<p>Everything the daemon improvises has been a solved problem in user services for years. I run 17 agent profiles plus a default on one box, and there the question was settled long ago by a single multiplexed service. The load-bearing lines:</p>
+<pre><code>[Service]
+Type=simple
+Restart=always
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=70
+</code></pre>
+<p>Map those across and the daemon reads as a reimplementation with the missing cases left in:</p>
+<ul>
+<li><code>Restart=always</code> with <code>RestartSec=5</code> replaces a self-installing updater.</li>
+<li><code>KillMode=mixed</code> gives the SIGTERM-then-SIGKILL ladder deliberately, main process first.</li>
+<li><code>TimeoutStopSec=70</code> makes the drain budget an explicit, reviewable line in a file I own.</li>
+<li>cgroup memory accounting replaces a hopeful <code>ps</code>.</li>
+<li><code>journalctl</code> replaces a daemon-private log directory.</li>
+</ul>
+<p>Concretely, on the box I am writing this on, <code>systemctl --user show hermes-gateway.service</code> answers in one command what the Codex daemon makes you dig for:</p>
+<ul>
+<li><code>MemoryCurrent</code> around 5.9 GiB and <code>MemoryPeak</code> at 8.6 GiB, on a 15 GiB four-core Celeron J4105.</li>
+<li><code>TasksCurrent</code> hovering near 100.</li>
+<li><code>NRestarts=2</code>, with <code>MainPID=802421</code> up since 2026-10-12 09:19:59.</li>
+<li><code>MemoryAccounting=yes</code>.</li>
+</ul>
+<p>One owner. One lifecycle. One place to read memory, restart counts and logs.</p>
+<h2>The bill, priced before adoption</h2>
+<p>A 374 MB copy per install is cheap in isolation. It stops being cheap when you multiply it.</p>
+<ul>
+<li>17 profiles times 374 MB works out to 6.21 GiB.</li>
+<li>Free space on this volume: 17 GiB of 115 GiB, at 86% used.</li>
+</ul>
+<p>That is not a hypothetical for me. It is a third of the disk I have left, spent on copies of a binary I already own.</p>
+<p>Packaging has already voted. nixpkgs ships a patch that flips the feature registry entry from <code>default_enabled: true</code> to <code>default_enabled: false</code>, and the package wiring cites issue #48195 in a comment right above it.</p>
+<p>The documentation is the last to know. The official config reference documents the CLI's own <code>check_for_update_on_startup</code> and carries zero rows for <code>daemon_auto_start</code>. Meanwhile the daemon module's README still opens by calling itself "experimental", while shipping enabled by default.</p>
+<h2>What I would pick</h2>
+<p>The defensible setup is boring, and it is the same shape as everything else I care about on that box:</p>
+<ul>
+<li>Pass the documented foreground or <code>--no-daemon</code> flag, or disable the feature and run your own unit.</li>
+<li>Own the <code>ExecStart</code> line, so the binary is the one you installed.</li>
+<li>Let the supervisor own restarts, the drain budget and the SIGKILL ladder.</li>
+<li>Read memory and logs from the cgroup and the journal.</li>
+</ul>
+<p>If a tool will not let itself be supervised and pinned, that is now a shipping criterion for me. An hourly timer is not a provenance record, and whichever session happened to open first is not an owner.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

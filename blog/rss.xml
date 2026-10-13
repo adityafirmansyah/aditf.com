@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Codex&#x27;s Auto-Started Daemon: What systemd Would Have Done Differently</title>
+      <link>https://aditf.com/blog/codex-daemon-vs-systemd-supervision/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/codex-daemon-vs-systemd-supervision/</guid>
+      <pubDate>Tue, 13 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Since 0.157.0, Codex CLI starts a persistent, self-updating background daemon on qualifying interactive sessions. Here is what that breaks, and what a supervised service would have done instead.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/id/"/>
+    </item>
+    <item>
       <title>Cloudflare Acquires Deno: What the Sunset Actually Means</title>
       <link>https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/</link>
       <guid isPermaLink="true">https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/</guid>

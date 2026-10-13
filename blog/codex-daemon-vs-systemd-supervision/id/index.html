@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalau Diurus systemd, Daemon Codex Nggak Bakal Seberantakan Ini — Field Notes</title>
+<meta name="description" content="Sejak versi 0.157.0, Codex CLI otomatis menyalakan background daemon yang meng-update dirinya sendiri. Pendekatan ini memicu banyak masalah, padahal systemd sudah punya solusi yang jauh lebih bersih.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kalau Diurus systemd, Daemon Codex Nggak Bakal Seberantakan Ini — Field Notes">
+<meta property="og:description" content="Sejak versi 0.157.0, Codex CLI otomatis menyalakan background daemon yang meng-update dirinya sendiri. Pendekatan ini memicu banyak masalah, padahal systemd sudah punya solusi yang jauh lebih bersih.">
+<meta property="og:url" content="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kalau Diurus systemd, Daemon Codex Nggak Bakal Seberantakan Ini — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kalau Diurus systemd, Daemon Codex Nggak Bakal Seberantakan Ini — Field Notes">
+<meta name="twitter:description" content="Sejak versi 0.157.0, Codex CLI otomatis menyalakan background daemon yang meng-update dirinya sendiri. Pendekatan ini memicu banyak masalah, padahal systemd sudah punya solusi yang jauh lebih bersih.">
+<meta name="twitter:image" content="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-13T00:00:00+00:00">
+<meta property="article:tag" content="agents">
+<meta property="article:tag" content="systemd">
+<meta property="article:tag" content="self-hosting">
+<meta property="article:tag" content="coding-agents">
+<meta property="article:tag" content="linux">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Kalau Diurus systemd, Daemon Codex Nggak Bakal Seberantakan Ini", "description": "Sejak versi 0.157.0, Codex CLI otomatis menyalakan background daemon yang meng-update dirinya sendiri. Pendekatan ini memicu banyak masalah, padahal systemd sudah punya solusi yang jauh lebih bersih.", "datePublished": "2026-10-13T00:00:00+00:00", "dateModified": "2026-10-13T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/codex-daemon-vs-systemd-supervision/id/"}, "keywords": "agents, systemd, self-hosting, coding-agents, linux", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1379, "image": ["https://aditf.com/blog/codex-daemon-vs-systemd-supervision/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/codex-daemon-vs-systemd-supervision/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>13 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">7 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Kalau Diurus systemd, Daemon Codex Nggak Bakal Seberantakan Ini</h1>
+    <div class="post__tags"><span>agents</span><span>systemd</span><span>self-hosting</span><span>coding-agents</span><span>linux</span></div>
+    <div class="post__content reveal is-visible">
+<h2>Daemon yang menyala diam-diam</h2>
+<p>Di release notes versi 0.157.0 tanggal 2026-09-25, terselip satu kalimat pendek:</p>
+<blockquote>
+<p>Enabled automatic background-server startup for eligible interactive sessions, with recovery choices when server settings are incompatible.</p>
+</blockquote>
+<p>Penjelasannya cuma sepotong itu. Nggak ada detail soal proses background yang bakal nongkrong terus. Nggak ada peringatan soal copy file sebesar 374 MB. Apalagi info soal background updater otomatis.</p>
+<p>Di hari yang sama, Issue #48195 langsung dibuka. Dua minggu kemudian, pembahasannya tembus front page Hacker News dengan 500-an poin dan lebih dari 250 komentar. Komunitas ramai menanyakan hal yang sama: siapa sebenarnya pemilik proses ini, dan binary mana yang sedang dieksekusi?</p>
+<p>Akar masalahnya persis seperti yang diangkat di issue itu. Sejak 0.157.0, setiap kali lo membuka sesi interaktif biasa, CLI otomatis memanggil <code>codex app-server --managed-daemon</code>.</p>
+<p>Proses ini berjalan di session mandiri tanpa TTY dan langsung di-reparent ke PID 1. Begitu terminal lo tutup, prosesnya tetap hidup di background sampai lo kill manual atau restart laptop.</p>
+<p>Prinsip gue cukup tegas: CLI coding agent harusnya menjadi service yang kita supervisi sendiri. Bukan aplikasi yang diam-diam memasang daemon di belakang punggung pengguna.</p>
+<p>Ini bukan soal nostalgia masa lalu. Ini murni soal kendali: proses yang punya nama dan batas jelas, lawan proses tersembunyi yang harus lo lacak manual.</p>
+<h2>Binary yang dieksekusi bukan yang lo instal</h2>
+<p>Masalah kedua: proses yang berjalan ternyata bukan binary yang baru lo pasang lewat package manager. Daemon-nya membuat salinan baru terlebih dahulu.</p>
+<p>Dokumentasi modulnya sendiri menyebutkan kalau proses <code>bootstrap</code> menyalin seluruh paket ke <code>CODEX_HOME/packages/app-server-daemon</code> tanpa meminta konfirmasi pengguna sama sekali.</p>
+<p>Ukuran salinannya lumayan masif, sekitar 374 MB. Paket ini membundel binary <code>codex</code> dan <code>codex-code-mode-host</code>, serta dependensi internal seperti <code>bwrap</code>, <code>zsh</code>, dan <code>rg</code>. File-file ini mendarat di <code>~/.codex/packages/app-server-daemon/releases/&lt;version&gt;/</code>, persis sama dengan file yang baru saja lo download.</p>
+<p>Di titik inilah rantai provenance langsung terputus.</p>
+<p>Binary yang lo review bukan lagi binary yang mengeksekusi prompt lo. Versi yang lo kunci di project bukan lagi versi yang memproses data.</p>
+<p>Dampaknya langsung muncul di berbagai issue GitHub:</p>
+<ul>
+<li><strong>Issue #48050:</strong> paket Arch Linux langsung crash kalau nggak dijalankan dengan flag <code>--no-daemon</code>.</li>
+<li><strong>Issue #46468:</strong> setelah lo update versi via npm, background server masih saja menyangkut di versi lama.</li>
+<li><strong>Issue #41188:</strong> nggak ada konfigurasi resmi buat mengarahkan daemon ke custom executable milik pengguna.</li>
+<li><strong>Issue #42457:</strong> hook pada mode <code>--remote</code> salah membaca direktori kerja daemon, bukan direktori proyek lo.</li>
+</ul>
+<p>Empat laporan berbeda, tapi akar masalahnya tunggal: daemon mengisolasi filenya sendiri, sehingga package manager lo kehilangan kendali penuh.</p>
+<h2>Updater otomatis dan batas toleransi 60 detik</h2>
+<p>Selain server, ada satu proses detached lagi: <code>codex app-server daemon pid-update-loop</code>. Proses ini mengecek update baru 5 menit setelah start, lalu rutin berjalan tiap jam.</p>
+<p>Jadwal ini aktif otomatis begitu sesi pertama dibuka.</p>
+<p>Risikonya dirangkum gamblang di Issue #40969. Sebenarnya app-server sudah punya mekanisme graceful shutdown buat menunggu turn selesai. Sayangnya, daemon cuma memberi waktu 60 detik sebelum menembakkan <code>SIGKILL</code>.</p>
+<p>Si pelapor issue sedang menjalankan 13 thread pengujian berdurasi panjang. Di sana, satu sesi build dan test Go butuh waktu antara 3 sampai 30 menit. Setiap kali auto-update terpicu, seluruh pekerjaan yang sedang berjalan langsung hangus.</p>
+<p>Sekarang dokumentasinya memang sudah menambahkan opsi di <code>settings.json</code>:</p>
+<pre><code class="language-json">{
+  &quot;shutdownGraceSeconds&quot;: 60,
+  &quot;updater&quot;: { &quot;autoUpdateEnabled&quot;: false }
+}
+</code></pre>
+<p>Batas 60 detik itu sekarang resmi terdokumentasi, bukan lagi misteri. Tapi tetap saja, timeout 60 detik mustahil mengejar proses kompilasi 30 menit.</p>
+<p>Apalagi waktu issue pertama kali mencuat, opsi buat mematikan auto-update ini belum tersedia sama sekali.</p>
+<h2>Perintah stop yang meninggalkan sisa proses</h2>
+<p>Kelemahan paling fatal dari sistem supervisi rakitan ini terlihat saat lo mencoba mematikannya.</p>
+<p>Ketika lo menjalankan <code>codex app-server daemon stop</code>, app-server memang mati. Namun background updater-nya tetap tertinggal di memori. Proses <code>pid-update-loop</code> masih aktif lebih dari semenit kemudian, sampai harus dimatikan paksa lewat terminal.</p>
+<p>Alur pembersihan totalnya jadi sepanjang ini:</p>
+<pre><code class="language-sh">codex features disable daemon_auto_start
+codex app-server daemon stop
+pkill -f 'app-server daemon pid-update-loop'
+rm -rf ~/.codex/packages/app-server-daemon
+</code></pre>
+<p>Empat baris perintah hanya untuk mematikan satu tool CLI. Termasuk memanggil <code>pkill</code> manual untuk membereskan sisa proses yang tertinggal.</p>
+<p>Kalau sebuah service manager masih menyisakan anak proses saat dihentikan, fungsinya sebagai supervisor otomatis gagal.</p>
+<h2>Environment variabel warisan sesi pertama</h2>
+<p>Isu kepemilikan proses ini bertambah parah dengan adanya laporan keamanan baru: kredensial siapa yang sebenarnya tersimpan di dalam daemon?</p>
+<p>Laporan Issue #53547 masuk pada 2026-10-13T04:00:03Z, menguji versi 0.162.1 di macOS. Masalah ini mencuat kurang dari sepuluh jam setelah thread Hacker News viral.</p>
+<p>Langkah ujinya sangat simpel. Cukup pasang satu variabel rahasia di terminal pertama. Lalu buka Codex dengan daemon aktif, dan periksa sesi lain di direktori terpisah. Hasilnya: sesi kedua bisa membaca variabel dari sesi pertama secara bebas.</p>
+<p>README resminya mengakui hal ini secara terbuka: klien yang berbagi daemon bakal mewarisi environment awal saat daemon pertama kali dinyalakan. Membuka terminal baru atau menghapus variabel nggak bakal membersihkan environment daemon yang sedang aktif.</p>
+<p>Bagi siapa pun yang mengelola AI agent, ini celah yang sangat riskan.</p>
+<p>Variabel seperti <code>HTTPS_PROXY</code>, <code>AWS_PROFILE</code>, <code>NODE_EXTRA_CA_CERTS</code>, sampai API key rahasia bakal terbawa dari sesi yang pertama kali memicu daemon. Pelapor Issue #48195 menjalankan Codex lewat wrapper dengan custom proxy per sesi. Akibatnya, proxy dari sesi pertama terkunci di daemon dan seluruh sesi berikutnya ikut dialihkan ke proxy tadi.</p>
+<p>Ini bukan sekadar bug kecil. Ini kebocoran kredensial dan network routing antar project yang harusnya terisolasi rapat.</p>
+<h2>Solusi yang sudah lama disediakan systemd --user</h2>
+<p>Padahal di ekosistem Linux, semua kerumitan ini sudah tuntas diselesaikan oleh user service systemd bertahun-tahun lalu.</p>
+<p>Di server homelab yang gue pakai sehari-hari, pola semacam ini ditangani rapi oleh satu service multiplexed. Gue mengelola 17 profil agent plus satu default profil tanpa masalah sama sekali. Konfigurasi intinya cukup sesederhana ini:</p>
+<pre><code>[Service]
+Type=simple
+Restart=always
+RestartSec=5
+KillMode=mixed
+TimeoutStopSec=70
+</code></pre>
+<p>Kalau kita bandingkan, pendekatan systemd jauh lebih masuk akal:</p>
+<ul>
+<li><code>Restart=always</code> dan <code>RestartSec=5</code> menggantikan script updater background yang rawan error.</li>
+<li><code>KillMode=mixed</code> memberikan sinyal SIGTERM lalu SIGKILL secara bertahap, membereskan main process terlebih dahulu.</li>
+<li><code>TimeoutStopSec=70</code> menetapkan batas toleransi drain secara transparan di dalam file konfigurasi.</li>
+<li>Alokasi memori terpantau akurat lewat cgroup bawaan kernel, bukan tebak-tebakan via <code>ps</code>.</li>
+<li>Seluruh log tersentralisasi rapi di <code>journalctl</code>, tanpa perlu folder log khusus.</li>
+</ul>
+<p>Di mesin Celeron J4105 tempat tulisan ini dibuat, satu baris perintah <code>systemctl --user show hermes-gateway.service</code> langsung menjawab metrik penting yang kita butuhkan:</p>
+<ul>
+<li><code>MemoryCurrent</code> berada di angka 5,9 GiB dengan <code>MemoryPeak</code> 8,6 GiB dari total RAM 15 GiB.</li>
+<li><code>TasksCurrent</code> stabil di kisaran 100 task.</li>
+<li>Status restart tercatat rapi (<code>NRestarts=2</code>), dengan <code>MainPID=802421</code> yang aktif stabil.</li>
+<li><code>MemoryAccounting=yes</code> memastikan nggak ada kebocoran resource yang luput.</li>
+</ul>
+<p>Satu pemilik yang jelas. Satu siklus hidup proses yang pasti. Pemantauan memori, restart, dan log bisa dicek dari satu tempat.</p>
+<h2>Hitung kapasitas disk sebelum mengadopsi</h2>
+<p>Menyalin file 374 MB untuk satu instalasi mungkin terasa sepele. Tapi beban itu membengkak cepat ketika lo punya banyak environment kerja.</p>
+<ul>
+<li>17 profil dikalikan 374 MB memakan ruang sekitar 6,21 GiB.</li>
+<li>Sisa kapasitas disk di storage server gue cuma 17 GiB dari total 115 GiB (pemakaian sudah 86%).</li>
+</ul>
+<p>Ini bukan simulasi di atas kertas. Menyerahkan 6 GiB kapasitas penyimpanan cuma buat menyalin binary yang sudah ada jelas pemborosan yang nggak masuk akal.</p>
+<p>Komunitas packaging Linux bahkan sudah mengambil tindakan. Repositori nixpkgs menyertakan patch khusus yang membalik konfigurasi default <code>daemon_auto_start</code> dari true menjadi false, dengan menyertakan referensi langsung ke Issue #48195.</p>
+<p>Dokumentasi resminya malah yang paling lambat beradaptasi. Halaman konfigurasi hanya mencatat parameter <code>check_for_update_on_startup</code>, tanpa penjelasan detail soal <code>daemon_auto_start</code>. Sementara modul daemon-nya masih dilabeli eksperimental meski sudah diaktifkan secara default.</p>
+<h2>Kesimpulan praktis</h2>
+<p>Untuk lingkungan kerja yang stabil dan minim kejutan, pendekatan gue tetap konsisten:</p>
+<ul>
+<li>Jalankan CLI dengan flag foreground atau <code>--no-daemon</code>, atau matikan fiturnya dan buat service unit sendiri.</li>
+<li>Pastikan baris <code>ExecStart</code> mengeksekusi binary asli yang lo pasang secara sadar.</li>
+<li>Serahkan urusan restart, batas waktu shutdown, dan pembersihan proses ke supervisor sistem.</li>
+<li>Pantau konsumsi memori dan jejak log langsung dari cgroup serta system journal.</li>
+</ul>
+<p>Sebagai developer yang tiap hari bereksperimen dengan berbagai AI tooling dan sistem automasi, gue selalu memegang satu patokan: jangan biarkan kenyamanan instan mengorbankan transparansi sistem lo sendiri. Otomasi yang bagus itu bukan yang bekerja diam-diam tanpa izin, melainkan yang perilakunya bisa lo prediksi, lo pantau, dan lo batasi kapan pun dibutuhkan.</p>
+<p>Kalau sebuah developer tool menolak untuk disupervisi secara transparan, tool itu belum siap masuk ke pipeline kerja harian kita. Jangan biarkan background process mengambil alih kendali sistem lo sendiri. 😅</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
