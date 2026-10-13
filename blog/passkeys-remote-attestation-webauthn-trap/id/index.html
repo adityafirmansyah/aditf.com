@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jebakan Remote Attestation di Passkeys: Kenapa WebAuthn Bisa Mengancam Kendali Pengguna — Field Notes</title>
+<meta name="description" content="Passkey dipromosikan sebagai pengganti password yang kebal phishing. Masalahnya, standar WebAuthn menyimpan mekanisme remote attestation yang bisa mengunci pengguna ke ekosistem raksasa teknologi.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Jebakan Remote Attestation di Passkeys: Kenapa WebAuthn Bisa Mengancam Kendali Pengguna — Field Notes">
+<meta property="og:description" content="Passkey dipromosikan sebagai pengganti password yang kebal phishing. Masalahnya, standar WebAuthn menyimpan mekanisme remote attestation yang bisa mengunci pengguna ke ekosistem raksasa teknologi.">
+<meta property="og:url" content="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Jebakan Remote Attestation di Passkeys: Kenapa WebAuthn Bisa Mengancam Kendali Pengguna — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Jebakan Remote Attestation di Passkeys: Kenapa WebAuthn Bisa Mengancam Kendali Pengguna — Field Notes">
+<meta name="twitter:description" content="Passkey dipromosikan sebagai pengganti password yang kebal phishing. Masalahnya, standar WebAuthn menyimpan mekanisme remote attestation yang bisa mengunci pengguna ke ekosistem raksasa teknologi.">
+<meta name="twitter:image" content="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-12T00:00:00+00:00">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="authentication">
+<meta property="article:tag" content="webauthn">
+<meta property="article:tag" content="privacy">
+<meta property="article:tag" content="architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Jebakan Remote Attestation di Passkeys: Kenapa WebAuthn Bisa Mengancam Kendali Pengguna", "description": "Passkey dipromosikan sebagai pengganti password yang kebal phishing. Masalahnya, standar WebAuthn menyimpan mekanisme remote attestation yang bisa mengunci pengguna ke ekosistem raksasa teknologi.", "datePublished": "2026-10-12T00:00:00+00:00", "dateModified": "2026-10-12T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/id/"}, "keywords": "security, authentication, webauthn, privacy, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 883, "image": ["https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>12 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">4 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Jebakan Remote Attestation di Passkeys: Kenapa WebAuthn Bisa Mengancam Kendali Pengguna</h1>
+    <div class="post__tags"><span>security</span><span>authentication</span><span>webauthn</span><span>privacy</span><span>architecture</span></div>
+    <div class="post__content reveal is-visible">
+<h2>Janji manis passkey dan realitas di balik kodenya</h2>
+<p>Narasi yang dijual ke publik terdengar meyakinkan: lupakan password yang gampang ditebak, beralihlah ke kriptografi kunci publik.</p>
+<p>Lo nggak perlu lagi pusing mikirin serangan phishing. HP lo bakal otomatis nyinkronkan kredensial antar perangkat, dan semuanya terasa instan.</p>
+<p>Sekilas, teknologinya mirip lompatan besar kayak TOTP di RFC 6238. Kita membayangkan standar terbuka yang bisa dijalankan di aplikasi pengelola password mana pun yang kita percaya.</p>
+<p>Tapi kalau lo buka spesifikasi resmi W3C WebAuthn Level 3, ada cerita lain yang jarang dibahas.</p>
+<p>Di dalam protokol itu, tersimpan satu fitur bernama remote attestation. Begitu pemilik website mengaktifkan opsi ini, fungsi passkey langsung bergeser. Kredensial ini bukan lagi milik pengguna seutuhnya, melainkan sertifikat perangkat yang terikat mati ke Apple, Google, atau Microsoft.</p>
+<h2>Cara kerja remote attestation di balik layar</h2>
+<p>Setiap kali browser memanggil <code>navigator.credentials.create()</code>, server mengirimkan sejumlah opsi pendaftaran. Sebagian besar website saat ini memang masih memakai opsi default:</p>
+<pre><code class="language-js">const options = {
+  publicKey: {
+    challenge: new Uint8Array([/* ... */]),
+    rp: { name: &quot;Dagango&quot; },
+    user: { id: new Uint8Array([/* ... */]), name: &quot;merchant@dagango.com&quot; },
+    pubKeyCredParams: [{ alg: -7, type: &quot;public-key&quot; }],
+    authenticatorSelection: {
+      authenticatorAttachment: &quot;platform&quot;,
+      userVerification: &quot;required&quot;
+    },
+    attestation: &quot;direct&quot; // Parameter penentunya ada di sini.
+  }
+};
+</code></pre>
+<p>Kunci permasalahannya ada pada parameter <code>attestation</code> tersebut.</p>
+<p>Secara default, nilainya disetel ke <code>"none"</code>. Tapi begitu server menyetelnya ke <code>"direct"</code> atau <code>"enterprise"</code>, browser nggak bisa cuma mengirim public key biasa.</p>
+<p>Perangkat lo diwajibkan mengirim sertifikat attestation yang ditandatangani langsung oleh chip keamanan bawaan pabrik:</p>
+<ul>
+<li>Apple Secure Enclave buat perangkat iOS dan macOS.</li>
+<li>Android StrongBox atau Google Titan buat ekosistem Android.</li>
+<li>Chip TPM fisik buat laptop atau PC Windows.</li>
+</ul>
+<p>Server bukan cuma memverifikasi apakah lo memegang private key yang cocok. Server bakal memeriksa tipe perangkat lo, keaslian sistem operasinya, dan apakah kuncinya dikunci permanen di dalam silikon fisik yang nggak bisa diekspor.</p>
+<h2>Nasib aplikasi seperti KeePassXC</h2>
+<p>Di sinilah letak benturan utamanya. Aplikasi pengelola password open-source seperti KeePassXC sebenarnya sangat mampu menyimpan passkey.</p>
+<p>KeePassXC tinggal menghitung kurva kriptografi ECDSA atau Ed25519 di memori, lalu menyimpan private key di file database terenkripsi lokal. File database ini bebas lo salin, lo backup ke hard disk eksternal, atau lo sinkronkan ke server pribadi.</p>
+<p>Kebebasan mengekspor kunci inilah yang menjadi dasar kedaulatan data pengguna.</p>
+<p>Namun, di bawah aturan remote attestation yang ketat, skenario ini langsung tumbang.</p>
+<p>KeePassXC cuma aplikasi biasa di ruang pengguna (userspace). Aplikasi ini mustahil memalsukan sertifikat chip buatan Apple atau Google.</p>
+<p>Kalau sebuah bank atau layanan e-commerce menolak authenticator tanpa attestation hardware, brankas KeePassXC lo otomatis ditolak saat registrasi. Server bakal ngotot meminta authenticator dari sistem operasi arus utama.</p>
+<h2>Pola lama yang berulang dari dunia mobile</h2>
+<p>Bagi developer mobile, manuver ini bukan barang baru. Kita sudah melihat pola yang sama persis lewat Google Play Integrity dan Apple App Attest di smartphone.</p>
+<p>Awalnya, fitur pengecekan integritas ini cuma dipakai buat mencegah kecurangan di game online.</p>
+<p>Lalu aplikasi perbankan mulai ikutan.</p>
+<p>Sekarang, siapa pun yang memakai custom ROM bersih seperti LineageOS atau GrapheneOS harus pasrah: aplikasi bank, transportasi online, sampai portal resmi pemerintah menolak berjalan sama sekali.</p>
+<p>Pihak server mengambil alih hak untuk menentukan lingkungan komputasi apa yang boleh mengakses layanannya. Kalau sistem lo nggak masuk daftar putih mereka, lo disingkirkan.</p>
+<p>WebAuthn attestation membawa model DRM perangkat keras ini langsung ke dalam browser web. Padahal selama tiga dekade, kekuatan terbesar web adalah independensi klien: peramban apa pun yang memahami HTTP dan HTML dianggap warga kelas satu. Attestation membalik filosofi itu sepenuhnya.</p>
+<h2>Titik buta di otomasi dan agen mandiri</h2>
+<p>Bukan cuma privasi pengguna rumahan yang terancam. Passkey yang terkunci di hardware juga merusak alur kerja otomasi perangkat lunak.</p>
+<p>Di Dagango.com, kita menjalankan test suite end-to-end, pipeline CI/CD, dan bot pengadaan barang yang berinteraksi langsung dengan dashboard web. Server runner di cloud tentu nggak punya sensor sidik jari manusia atau chip Secure Enclave fisik.</p>
+<p>Sistem passkey yang mewajibkan attestation membikin browser headless lumpuh:</p>
+<ul>
+<li>Mesin runner otomatis nggak bisa mensimulasikan sentuhan biometrik tanpa emulator khusus dari vendor tertentu.</li>
+<li>Worker latar belakang nggak bisa memegang kunci perangkat keras yang sifatnya non-transferable.</li>
+<li>Agen AI mandiri yang berjalan di server Linux headless bakal gagal menembus autentikasi berbasis web.</li>
+</ul>
+<p>Kalau website menolak login tanpa passkey hardware, tim engineer akhirnya terpaksa membuat jalur belakang darurat: API key statis, token rahasia tanpa rotasi, atau bypass di environment staging. Upaya menyingkirkan password malah melahirkan tumpukan kredensial baru yang lebih rawan bocor.</p>
+<h2>Sikap yang perlu diambil developer backend</h2>
+<p>Kriptografi kunci publik di WebAuthn memang terbukti ampuh menangkal phishing. Yang bermasalah adalah ketika proses login dipakai untuk menyortir perangkat keras yang sah.</p>
+<p>Kalau lo bertanggung jawab membangun sistem autentikasi aplikasi web, ada tiga prinsip yang perlu lo pegang:</p>
+<ul>
+<li><strong>Selalu pakai <code>attestation: "none"</code>.</strong> Jangan meminta bukti attestation hardware kecuali regulasi hukum benar-benar memaksa. Izinkan pengguna mendaftar pakai alat apa pun yang mereka pilih, termasuk KeePassXC atau extension browser.</li>
+<li><strong>Dukung authenticator lintas platform.</strong> Jangan mengunci opsi ke <code>authenticatorAttachment: "platform"</code>. Berikan ruang buat kunci fisik mandiri seperti YubiKey lewat jalur cross-platform.</li>
+<li><strong>Pertahankan opsi fallback terbuka.</strong> Tetap sediakan 2FA berbasis TOTP (RFC 6238). TOTP bisa diekspor, bekerja offline, mudah diotomasi di pipeline pengujian, dan nggak bergantung pada chip buatan korporasi tertentu.</li>
+</ul>
+<p>Autentikasi semestinya melindungi akun pengguna dari penyusup di jaringan. Fungsinya bukan untuk melindungi dominasi vendor teknologi dari pengguna yang ingin mengontrol perangkat mereka sendiri. 😅</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

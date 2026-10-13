@@ -16,6 +16,15 @@
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/id/"/>
     </item>
     <item>
+      <title>The Remote Attestation Trap in Passkeys: Why WebAuthn Threatens User Sovereignty</title>
+      <link>https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/</guid>
+      <pubDate>Mon, 12 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Passkeys promise phishing-resistant logins, but WebAuthn carries a remote attestation switch. If relying parties turn it on, user-controlled password managers like KeePassXC get locked out.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/id/"/>
+    </item>
+    <item>
       <title>Cloudflare Acquires Deno: What the Sunset Actually Means</title>
       <link>https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/</link>
       <guid isPermaLink="true">https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/</guid>
@@ -176,15 +185,6 @@
       <description>Coding agents made writing PRs nearly free, which means your pipeline is now the bottleneck. Here&#x27;s what Linear&#x27;s CI rework maps to on a small-team budget.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/ci-bottleneck-in-agent-era/id/"/>
-    </item>
-    <item>
-      <title>Why I Self-Host Everything on a Mini PC</title>
-      <link>https://aditf.com/blog/why-i-self-host-on-a-mini-pc/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/why-i-self-host-on-a-mini-pc/</guid>
-      <pubDate>Tue, 22 Sep 2026 00:00:00 +0000</pubDate>
-      <description>A Celeron box with 14GB RAM in the corner of my room runs my stores, my agents, and this blog. Here is the math on why cloud bills stopped making sense.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/why-i-self-host-on-a-mini-pc/id/"/>
     </item>
   </channel>
 </rss>

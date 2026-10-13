@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Remote Attestation Trap in Passkeys: Why WebAuthn Threatens User Sovereignty — Field Notes</title>
+<meta name="description" content="Passkeys promise phishing-resistant logins, but WebAuthn carries a remote attestation switch. If relying parties turn it on, user-controlled password managers like KeePassXC get locked out.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The Remote Attestation Trap in Passkeys: Why WebAuthn Threatens User Sovereignty — Field Notes">
+<meta property="og:description" content="Passkeys promise phishing-resistant logins, but WebAuthn carries a remote attestation switch. If relying parties turn it on, user-controlled password managers like KeePassXC get locked out.">
+<meta property="og:url" content="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Remote Attestation Trap in Passkeys: Why WebAuthn Threatens User Sovereignty — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Remote Attestation Trap in Passkeys: Why WebAuthn Threatens User Sovereignty — Field Notes">
+<meta name="twitter:description" content="Passkeys promise phishing-resistant logins, but WebAuthn carries a remote attestation switch. If relying parties turn it on, user-controlled password managers like KeePassXC get locked out.">
+<meta name="twitter:image" content="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-12T00:00:00+00:00">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="authentication">
+<meta property="article:tag" content="webauthn">
+<meta property="article:tag" content="privacy">
+<meta property="article:tag" content="architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "The Remote Attestation Trap in Passkeys: Why WebAuthn Threatens User Sovereignty", "description": "Passkeys promise phishing-resistant logins, but WebAuthn carries a remote attestation switch. If relying parties turn it on, user-controlled password managers like KeePassXC get locked out.", "datePublished": "2026-10-12T00:00:00+00:00", "dateModified": "2026-10-12T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/"}, "keywords": "security, authentication, webauthn, privacy, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 901, "image": ["https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>12 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">The Remote Attestation Trap in Passkeys: Why WebAuthn Threatens User Sovereignty</h1>
+    <div class="post__tags"><span>security</span><span>authentication</span><span>webauthn</span><span>privacy</span><span>architecture</span></div>
+    <div class="post__content reveal is-visible">
+<h2>The pitch vs the protocol</h2>
+<p>Big Tech marketed passkeys as the death of passwords. The consumer story sounds simple: public-key cryptography replaces shared secrets, phishing becomes mathematically impossible, and your phone syncs the credentials across your devices.</p>
+<p>On the surface, it sounds like an upgrade similar to RFC 6238 TOTP. You get an open standard that any password manager can implement.</p>
+<p>The actual W3C WebAuthn Level 3 specification tells a different story.</p>
+<p>Deep inside the protocol lies a mechanism called remote attestation. If relying parties choose to mandate it, passkeys stop being exportable user credentials. They turn into non-transferable device certificates that tether your identity to Apple, Google, and Microsoft.</p>
+<h2>How remote attestation actually works</h2>
+<p>When your browser creates a credential via <code>navigator.credentials.create()</code>, the server sends a set of options. Most sites today keep the defaults:</p>
+<pre><code class="language-js">const options = {
+  publicKey: {
+    challenge: new Uint8Array([/* ... */]),
+    rp: { name: &quot;Dagango&quot; },
+    user: { id: new Uint8Array([/* ... */]), name: &quot;merchant@dagango.com&quot; },
+    pubKeyCredParams: [{ alg: -7, type: &quot;public-key&quot; }],
+    authenticatorSelection: {
+      authenticatorAttachment: &quot;platform&quot;,
+      userVerification: &quot;required&quot;
+    },
+    attestation: &quot;direct&quot; // This is the dial.
+  }
+};
+</code></pre>
+<p>That <code>attestation</code> parameter is the trapdoor. In consumer applications, it defaults to <code>"none"</code>.</p>
+<p>When a relying party sets <code>attestation: "direct"</code> or <code>"enterprise"</code>, the authenticator cannot simply return a new public key. It must return an attestation statement signed by a private key embedded inside the device's secure hardware.</p>
+<p>That certificate traces back to a root authority owned by the hardware manufacturer:</p>
+<ul>
+<li>Apple Secure Enclave for iOS and macOS.</li>
+<li>Android StrongBox or Google Titan for Android devices.</li>
+<li>A discrete TPM for Windows machines.</li>
+</ul>
+<p>The server does not just verify that you possess the private key. It verifies the exact model of your phone, the integrity of the operating system, and whether the private key was generated inside an unexportable cryptoprocessor.</p>
+<h2>Why open-source password managers cannot survive attestation</h2>
+<p>Here is the collision: software password managers like KeePassXC can easily generate and store passkey credentials. They do the ECDSA or Ed25519 math in memory, save the private key in an encrypted local database, and let you export or sync that database wherever you want.</p>
+<p>That exportability is the foundation of user sovereignty. If I want to move my credentials from a Linux desktop to a phone, I copy my vault.</p>
+<p>Under strict hardware attestation, that workflow dies.</p>
+<p>KeePassXC cannot produce an Apple or Google hardware signature, because KeePassXC is a regular userspace application. It has no hardware root certificate.</p>
+<p>If a bank, an airline, or a social network configures its WebAuthn registration endpoint to reject unattested authenticators, your KeePassXC vault fails registration. The server insists on a platform authenticator tied to a sanctioned operating system.</p>
+<h2>We already watched this happen on mobile</h2>
+<p>This is not a theoretical slippery slope. Mobile developers have lived through this exact progression with Google Play Integrity and Apple App Attest.</p>
+<p>First, mobile attestation was introduced to stop bots and cheaters in mobile games. Then banking applications adopted it. Today, running a clean Android distribution like LineageOS or GrapheneOS comes with a harsh penalty. Standard banking apps, ride-hailing services, and government portals simply refuse to launch.</p>
+<p>The relying party asserts control over your local device. If your client environment does not match their corporate whitelist, you are locked out.</p>
+<p>WebAuthn attestation brings that exact DRM architecture to the web browser. For thirty years, the web was defined by client independence: any user agent that spoke HTTP and HTML was a first-class citizen. Attested passkeys flip that model on its head. The server decides whether your browser and password manager are allowed to exist.</p>
+<h2>The automation and agent blind spot</h2>
+<p>Beyond personal privacy, hardware-bound passkeys break automated software.</p>
+<p>At Dagango.com, we run automated end-to-end test suites, continuous integration pipelines, and scheduled procurement bots that interact with web interfaces. None of those systems have a human fingerprint scanner or an Apple Secure Enclave attached to the CI runner.</p>
+<p>A pure passkey architecture with mandatory hardware attestation makes headless browsers impossible:</p>
+<ul>
+<li>Automated test runners cannot simulate biometric platform gestures without proprietary vendor mocks.</li>
+<li>Background integration workers cannot hold non-transferable hardware keys.</li>
+<li>Autonomous AI agents running on headless Linux servers cannot authenticate to third-party APIs through web flows.</li>
+</ul>
+<p>When a service mandates hardware passkeys without a fallback, engineering teams are forced to build fragile backdoor mechanisms: static API keys, bypass flags in staging, or shadow password paths. The "death of passwords" turns into the proliferation of unmonitored service credentials.</p>
+<h2>What engineering teams should actually build</h2>
+<p>Passkeys are genuinely great at preventing credential phishing. The problem is not the cryptography; the problem is using authentication to enforce client certification.</p>
+<p>If you are designing authentication for a web platform, follow three rules:</p>
+<ul>
+<li><strong>Always set <code>attestation: "none"</code>.</strong> Never request hardware attestation unless a binding regulatory compliance standard explicitly forces your hand. Accept credentials from any tool the user chooses, including KeePassXC, browser extensions, and standalone vaults.</li>
+<li><strong>Support cross-platform authenticators.</strong> Do not lock users into <code>authenticatorAttachment: "platform"</code>. Allow standalone hardware security keys like YubiKeys alongside platform authenticators.</li>
+<li><strong>Keep open fallbacks alive.</strong> Provide RFC 6238 TOTP as a supported second factor. TOTP is exportable, offline, scriptable in headless test runners, and entirely client-agnostic.</li>
+</ul>
+<p>Passkeys should protect users from attackers on the network. They should never protect platform vendors from users who want to control their own machines.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
