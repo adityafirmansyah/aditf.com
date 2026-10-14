@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kenapa Fleet Coding AI Gue Mandek Waktu Jalan Bareng — Field Notes</title>
+<meta name="description" content="Tiga coding agent di satu repo berhenti gagal karena kualitas model. Gagalnya jadi file lock, port yang bentrok, dan race di database. Ini isolasi yang beresin semuanya.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/multi-agent-concurrency-bottleneck/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kenapa Fleet Coding AI Gue Mandek Waktu Jalan Bareng — Field Notes">
+<meta property="og:description" content="Tiga coding agent di satu repo berhenti gagal karena kualitas model. Gagalnya jadi file lock, port yang bentrok, dan race di database. Ini isolasi yang beresin semuanya.">
+<meta property="og:url" content="https://aditf.com/blog/multi-agent-concurrency-bottleneck/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/multi-agent-concurrency-bottleneck/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kenapa Fleet Coding AI Gue Mandek Waktu Jalan Bareng — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kenapa Fleet Coding AI Gue Mandek Waktu Jalan Bareng — Field Notes">
+<meta name="twitter:description" content="Tiga coding agent di satu repo berhenti gagal karena kualitas model. Gagalnya jadi file lock, port yang bentrok, dan race di database. Ini isolasi yang beresin semuanya.">
+<meta name="twitter:image" content="https://aditf.com/blog/multi-agent-concurrency-bottleneck/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-14T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="devops">
+<meta property="article:tag" content="software-engineering">
+<meta property="article:tag" content="architecture">
+<meta property="article:tag" content="git">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Kenapa Fleet Coding AI Gue Mandek Waktu Jalan Bareng", "description": "Tiga coding agent di satu repo berhenti gagal karena kualitas model. Gagalnya jadi file lock, port yang bentrok, dan race di database. Ini isolasi yang beresin semuanya.", "datePublished": "2026-10-14T00:00:00+00:00", "dateModified": "2026-10-14T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/multi-agent-concurrency-bottleneck/id/"}, "keywords": "ai-agents, devops, software-engineering, architecture, git", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1195, "image": ["https://aditf.com/blog/multi-agent-concurrency-bottleneck/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/multi-agent-concurrency-bottleneck/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/multi-agent-concurrency-bottleneck/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/multi-agent-concurrency-bottleneck/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/multi-agent-concurrency-bottleneck/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>14 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Kenapa Fleet Coding AI Gue Mandek Waktu Jalan Bareng</h1>
+    <div class="post__tags"><span>ai-agents</span><span>devops</span><span>software-engineering</span><span>architecture</span><span>git</span></div>
+    <div class="post__content reveal is-visible">
+<h2>Fleet lo mandek, dan itu bukan soal reasoning</h2>
+<p>Waktu lo baru pakai satu coding agent, setiap kegagalan biasanya kelihatan kayak masalah reasoning. Wajar kalau reflek pertama kita adalah ngutak-atik prompt, nambahin context, atau upgrade ke model yang lebih pintar.</p>
+<p>Tapi dinamika ini berubah total begitu lo mulai menjalankan beberapa agent sekaligus dalam satu repo.</p>
+<p>Di fleet kita, dispatch automated review tiba-tiba mati pas jam 05:35 pagi. Log-nya cuma ninggalin satu baris: <code>duplicate session: main</code>. Model LLM-nya nggak ada masalah sama sekali. Masalahnya murni ada di runtime: session write guard mendeteksi turn lain yang masih aktif di session yang sama, lalu langsung nolak request baru.</p>
+<p>Di titik ini lo bakal sadar: ketika agent lo bertambah banyak, bottleneck utamanya bukan lagi kepintaran model, melainkan sistem operasi di bawahnya.</p>
+<p>Fleet agent kita sehari-hari bekerja untuk Dagango.com, monorepo dengan frontend Next.js App Router dan backend FastAPI.</p>
+<p>Berikut catatan lapangan dari beberapa bottleneck yang sempat bikin pipeline kita macet parah, beserta lapisan isolasi yang akhirnya membereskan semuanya.</p>
+<h2>1. Satu session cuma boleh punya satu penulis</h2>
+<p>Platform agent biasanya punya kecenderungan mengarahkan semua task ke satu session chat kanonikal. Buat interaksi personal atau chatting biasa, pendekatan ini memang praktis. Tapi buat sistem fleet yang berjalan paralel, ini resep bencana.</p>
+<p>Semua request yang datang bersamaan bakal berebut satu write guard yang sama. Nama error-nya bakal cepat lo hafal di luar kepala:</p>
+<ul>
+<li><code>SessionActiveWriteGuardError</code></li>
+<li>Response HTTP 409 pada turn terkait</li>
+<li>State error <code>session_active_turn</code></li>
+<li>Pesan mental <code>duplicate session: main</code></li>
+</ul>
+<p>Mekanisme locking ini sebenarnya benar karena satu session memang nggak boleh ditulis oleh dua proses sekaligus. Yang keliru adalah arsitektur kita: menaruh banyak agent mandiri di belakang satu session tunggal.</p>
+<p>Masalah ini nggak bisa diselesaikan cuma dengan retry loop. Melempar retry ke guard yang masih terkunci cuma bikin antrean baru yang buang-buang token.</p>
+<p>Solusinya adalah membuat ephemeral session sekali pakai untuk setiap task yang di-dispatch, dengan penamaan unik:</p>
+<pre><code class="language-bash">SESSION_ID=&quot;${PROFILE}-pr${PR_NUM}-$(date +%s)&quot;
+hermes -p &quot;$PROFILE&quot; chat -Q --oneshot \
+  --session &quot;$SESSION_ID&quot; \
+  --query-file &quot;$BRIEF_FILE&quot;
+</code></pre>
+<p>Kita sempat membayar mahal untuk kesalahan sepele ini. Review yang macet sempat dikira cuma proses lambat biasa. Begitu dicek, agent-nya cuma meninggalkan file catatan 1.114 byte yang terputus di tengah jalan, dan PR yang harusnya diaudit malah lolos tanpa review sama sekali.</p>
+<h2>2. Port jaringan adalah shared resource</h2>
+<p>File dan folder di disk bisa lo pisah per agent, tapi network socket nggak bisa.</p>
+<p>Awalnya, proses QA otomatis kita memakai port statis yang di-hardcode. Satu run memakai backend di port 8012 dan frontend di 3312, sementara run berikutnya memakai port 8003 dan 3303. Setup ini aman selama pengujian dijalankan bergiliran satu per satu.</p>
+<p>Begitu ada dua QA run jalan berbarengan, cuma ada dua kemungkinan yang terjadi:</p>
+<ul>
+<li>Server kedua langsung crash dengan error <code>EADDRINUSE</code>.</li>
+<li>Skenario yang jauh lebih berbahaya: server kedua gagal bind, tapi diam-diam numpang ke server pertama yang sudah jalan.</li>
+</ul>
+<p>Skenario kedua ini jebakan paling licin. Laporan QA keluar dengan status hijau dan semua test lulus, padahal kode yang baru saja diuji adalah build lama milik task sebelumnya.</p>
+<p>Solusinya, turunkan port server secara deterministik dari nomor PR atau ID task:</p>
+<pre><code class="language-bash">BACKEND_PORT=$((8100 + PR_NUM))
+FRONTEND_PORT=$((3400 + PR_NUM))
+</code></pre>
+<p>Pola jebakan serupa juga sering muncul di config Playwright lewat flag <code>reuseExistingServer</code>. Di lingkungan multi-agent, flag ini cuma bikin agent lo ngetes server random yang kebetulan lagi nyala. Kunci port-nya ke port unik masing-masing, atau matikan opsi itu sama sekali.</p>
+<h2>3. Dua runner, satu database</h2>
+<p>Ini jenis kegagalan yang paling banyak membuang waktu investigasi, karena gejalanya mirip banget sama bug aplikasi.</p>
+<p>Bayangkan dua runner QA mulai bekerja di detik yang sama. Keduanya menjalankan migration, lalu keduanya menyuntikkan data fixture ke satu instance PostgreSQL staging yang sama.</p>
+<p>Eksekusinya langsung jadi non-deterministik. Test yang jam 10:00 lulus bisa mendadak gagal jam 10:05 tanpa ada satu baris kode pun yang berubah. Penyebabnya sepele: runner sebelah baru saja menjalankan <code>TRUNCATE</code> pada tabel yang lagi dibaca runner pertama.</p>
+<p>Lo bisa habis seharian mengira kode lo yang bermasalah.</p>
+<p>Solusinya adalah memberikan database terisolasi untuk setiap run. Database dibuat otomatis sebelum agent mulai, dan di-drop begitu verifikasi tuntas:</p>
+<pre><code class="language-bash">TEST_DB_NAME=&quot;dagango_test_${PR_NUM}&quot;
+createdb &quot;$TEST_DB_NAME&quot;
+</code></pre>
+<p>Satu catatan penting: sekadar menyalin file <code>.env</code> ke direktori baru belum cukup. Connection string di dalamnya wajib diarahkan ke database per-run tadi, kalau nggak agent lo bakal diam-diam tetap nyambung ke database shared.</p>
+<h2>4. Satu repositori, satu git index</h2>
+<p>Ini titik di mana kerjaan lo bisa hilang tanpa ada jejak suara.</p>
+<p>Kalau lo membiarkan dua agent bekerja di dalam satu working tree yang sama, mereka bakal tabrakan di hampir semua operasi Git. File index <code>.git/index</code> adalah shared state tunggal. Perintah <code>git checkout</code> di satu agent bisa langsung menimpa uncommitted change milik agent lain, dan <code>reflog</code> jadi satu-satunya harapan buat menyelamatkan kode lo.</p>
+<p>Daftar bencananya panjang banget kalau direktori kerja dibagi barengan:</p>
+<ul>
+<li><code>git checkout</code> menimpa file yang belum sempat di-commit agent lain.</li>
+<li>Perintah <code>git stash</code> saling bertumpuk dan rawan salah pop.</li>
+<li><code>npm ci</code> atau install package nulis ke folder <code>node_modules</code> barengan sampai lockfile rusak.</li>
+<li>Build frontend paralel mencampur source code dua branch ke dalam satu bundle output.</li>
+</ul>
+<p>Jawaban struktural untuk masalah ini adalah <code>git worktree</code>. Repositori tetap memakai satu object database Git yang sama, tapi tiap agent mendapatkan working directory, file index, dan branch terpisah:</p>
+<pre><code class="language-bash">git worktree add --detach /home/aditf/e2e-verify/wt-pr105 fix/gate-checkout
+</code></pre>
+<p>Git punya satu aturan bawaan yang sangat membantu: satu branch cuma boleh di-checkout di satu worktree. Artinya, filesystem itu sendiri yang mencegah dua agent mengutak-atik branch yang sama.</p>
+<p>Dua hal yang perlu diperhatikan saat memakai worktree:</p>
+<ul>
+<li>File yang ada di <code>.gitignore</code> seperti <code>.env</code> nggak otomatis ikut disalin ke worktree baru, jadi harus di-copy manual saat inisialisasi.</li>
+<li>Worktree bakal terus menumpuk di disk kalau nggak dirapikan. Pastikan ada proses cleanup otomatis atau pruning berkala setelah PR selesai.</li>
+</ul>
+<h2>Lapisan yang sering terlewat: browser session</h2>
+<p>Verifikasi visual via browser adalah lapisan kelima, dan ini sering kali memproduksi bukti palsu tanpa kita sadari.</p>
+<p>Dua agent yang mengontrol Chrome lewat Chrome DevTools Protocol (CDP) secara default bakal berbagi cookie jar dan local storage yang sama. Keduanya juga berbagi daftar tab aktif. Ketika Agent B membuka halaman login admin, assertion milik Agent A yang lagi menguji landing page storefront bisa nyasar ke tab milik Agent B.</p>
+<p>Solusinya, isolasi sesi browser secara eksplisit di level perintah pengujian:</p>
+<pre><code>browser_exec(session=&quot;pr-&lt;PR_NUM&gt;&quot;)
+</code></pre>
+<p>Perubahannya cuma satu parameter, tapi dampaknya masif. Tanpa isolasi ini, audit accessibility atau screenshot UI yang lo anggap valid bisa jadi cuma memotret halaman milik task lain.</p>
+<h2>Kesimpulan: isolasi itu paket lengkap</h2>
+<p>Arsitektur untuk mengatasi semua ini sebenarnya sederhana dan bisa diringkas ke dalam satu script dispatch:</p>
+<ul>
+<li>Session ID sementara yang unik per dispatch.</li>
+<li>Port server yang dihitung dari nomor PR.</li>
+<li>Database terisolasi per pengujian.</li>
+<li>Git worktree khusus untuk tiap agent.</li>
+<li>Browser session terpisah untuk visual QA.</li>
+</ul>
+<p>Kelima lapisan ini menangani jenis shared resource yang berbeda, tanpa ada yang tumpang tindih. Kalau lo cuma membereskan tiga di antaranya, lapisan keempat bakal tetap jebol dan bikin pipeline lo mogok lagi.</p>
+<p>Sebelum lo menambah agent baru ke dalam tim, bereskan dulu isolasi infrastrukturnya dari awal. Jauh lebih murah menyiapkan lima baris bash script di awal daripada menghabiskan waktu berhari-hari mendebug race condition yang cuma muncul saat dua agent jalan barengan. 😅</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/multi-agent-concurrency-bottleneck/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

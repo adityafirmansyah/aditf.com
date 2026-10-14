@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>The Multi-Agent Concurrency Bottleneck: Why Your Coding Fleet Locks Up</title>
+      <link>https://aditf.com/blog/multi-agent-concurrency-bottleneck/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/multi-agent-concurrency-bottleneck/</guid>
+      <pubDate>Wed, 14 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Three coding agents on one repository stop failing on model quality. The failures become file locks, bound ports, and database races. Here is the isolation that fixes it.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/multi-agent-concurrency-bottleneck/id/"/>
+    </item>
+    <item>
       <title>Codex&#x27;s Auto-Started Daemon: What systemd Would Have Done Differently</title>
       <link>https://aditf.com/blog/codex-daemon-vs-systemd-supervision/</link>
       <guid isPermaLink="true">https://aditf.com/blog/codex-daemon-vs-systemd-supervision/</guid>
@@ -176,15 +185,6 @@
       <description>Port forwarding stopped working and it wasn&#x27;t your router&#x27;s fault. Here&#x27;s the outbound WireGuard tunnel pattern that gets a homelab back on the public internet under CGNAT.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/id/"/>
-    </item>
-    <item>
-      <title>AI Agents Flooded Our PR Queue: Fixing CI Before It Breaks</title>
-      <link>https://aditf.com/blog/ci-bottleneck-in-agent-era/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/ci-bottleneck-in-agent-era/</guid>
-      <pubDate>Tue, 22 Sep 2026 00:00:00 +0000</pubDate>
-      <description>Coding agents made writing PRs nearly free, which means your pipeline is now the bottleneck. Here&#x27;s what Linear&#x27;s CI rework maps to on a small-team budget.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/ci-bottleneck-in-agent-era/id/"/>
     </item>
   </channel>
 </rss>
