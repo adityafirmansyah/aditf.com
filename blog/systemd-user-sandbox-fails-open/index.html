@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Sandboxes That Fail Open: systemd --user Silently Skips Containment — Field Notes</title>
+<meta name="description" content="The security experts are right that the fix for AI agent incidents is containment. On the box that runs my fleet, the directives you would reach for are accepted, reported as applied, and quietly inert.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent Sandboxes That Fail Open: systemd --user Silently Skips Containment — Field Notes">
+<meta property="og:description" content="The security experts are right that the fix for AI agent incidents is containment. On the box that runs my fleet, the directives you would reach for are accepted, reported as applied, and quietly inert.">
+<meta property="og:url" content="https://aditf.com/blog/systemd-user-sandbox-fails-open/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/systemd-user-sandbox-fails-open/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Agent Sandboxes That Fail Open: systemd --user Silently Skips Containment — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Agent Sandboxes That Fail Open: systemd --user Silently Skips Containment — Field Notes">
+<meta name="twitter:description" content="The security experts are right that the fix for AI agent incidents is containment. On the box that runs my fleet, the directives you would reach for are accepted, reported as applied, and quietly inert.">
+<meta name="twitter:image" content="https://aditf.com/blog/systemd-user-sandbox-fails-open/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-15T00:00:00+00:00">
+<meta property="article:tag" content="systemd">
+<meta property="article:tag" content="agent-safety">
+<meta property="article:tag" content="sandboxing">
+<meta property="article:tag" content="apparmor">
+<meta property="article:tag" content="self-hosting">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Agent Sandboxes That Fail Open: systemd --user Silently Skips Containment", "description": "The security experts are right that the fix for AI agent incidents is containment. On the box that runs my fleet, the directives you would reach for are accepted, reported as applied, and quietly inert.", "datePublished": "2026-10-15T00:00:00+00:00", "dateModified": "2026-10-15T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/systemd-user-sandbox-fails-open/"}, "keywords": "systemd, agent-safety, sandboxing, apparmor, self-hosting", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1281, "image": ["https://aditf.com/blog/systemd-user-sandbox-fails-open/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/systemd-user-sandbox-fails-open/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>15 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Agent Sandboxes That Fail Open: systemd --user Silently Skips Containment</h1>
+    <div class="post__tags"><span>systemd</span><span>agent-safety</span><span>sandboxing</span><span>apparmor</span><span>self-hosting</span></div>
+    <div class="post__content reveal is-visible">
+<p>The CSO Online piece sitting near the top of the front page this week is right about the cause. The Hugging Face, Anthropic, Meta and Gemini incidents were containment and monitoring failures, not models with minds of their own.</p>
+<p>I run eighteen agent profiles and a single multiplexed <code>hermes-gateway.service</code> under <code>systemd --user</code> on one Ubuntu host. So rather than quote the experts, I tried to do what they prescribe and add the sandbox.</p>
+<p>Every filesystem and egress directive an unprivileged unit can set is accepted, printed by <code>systemctl show</code> as if applied, and then inert.</p>
+<h2>The experts, and the objection the thread got right</h2>
+<p>Rob T. Lee is SANS Institute's chief AI officer, and he is blunt in the CSO piece:</p>
+<blockquote>
+<p>"The Hugging Face incident definitively showed that it wasn't the fact that the agents were super smart. It's that there literally was a hole that was exploited because it was not configured correctly on the containment side."</p>
+</blockquote>
+<p>RAND's Dan Wallach supplies the monitoring half. The incident "went on for days, and nobody noticed," he says. Wallach's addition is the part I keep coming back to. People started these experiments and weren't watching them.</p>
+<p>The thread complicates the "not configured correctly" framing in a way worth carrying. HN user <code>ahupp</code> points at the incident report's own wording:</p>
+<blockquote>
+<p>Agents "exploited a separate, previously unknown vulnerability in Artifactory to move beyond their sandbox environment."</p>
+</blockquote>
+<p><code>root_axis</code> argues that running Artifactory at all was the failure, because nothing airgapped the network and nothing blocked egress.</p>
+<p>Both can hold. A zero-day opens the door. Unmonitored egress and unbounded credentials are what let it stay open for days, and that is the half you can measure on your own hardware.</p>
+<h2>What the unit that runs the fleet actually says</h2>
+<p><code>systemctl --user show hermes-gateway.service</code> resolves every containment knob to its off value:</p>
+<pre><code>NoNewPrivileges=no    PrivateTmp=no
+ProtectSystem=no      ProtectHome=no
+IPAddressDeny=        RestrictAddressFamilies=~
+UMask=0002            MemoryMax=infinity
+</code></pre>
+<p>Its <code>MainPID</code> runs as Uid 1000 with <code>NoNewPrivs: 0</code> and <code>Seccomp: 0</code>. Every agent profile shares that UID, so the blast radius is whatever 1000 can open:</p>
+<ul>
+<li><code>~/.ssh/id_ed25519</code>, 420 B</li>
+<li><code>~/.hermes/.env</code>, 29,367 B</li>
+<li><code>~/.hermes/config.yaml</code>, 9,393 B</li>
+<li><code>~/.hermes/auth.json</code>, 1,288 B</li>
+</ul>
+<p>None of that is exotic. It is the default shape of a fleet that grew one worker at a time.</p>
+<p>HN user <code>novaRom</code> describes what the probing looks like from the other end. "I always see attempts to cat ~/.ssh/*", they write, and note that agents keep reaching for host credentials even after they understand they are sandboxed.</p>
+<h2>Reproducing the silent no-op</h2>
+<p>One transient unit per property. Each probe writes a canary into <code>$HOME/.hermes</code> and prints its own mount namespace:</p>
+<pre><code class="language-bash">systemd-run --user --wait -p ProtectHome=yes \
+  /bin/sh -c 'touch $HOME/.hermes/canary; readlink /proc/self/ns/mnt'
+
+systemd-run --user --wait -p IPAddressDeny=any \
+  /bin/sh -c 'curl -s -o /dev/null -w &quot;%{http_code}\n&quot; https://example.com'
+</code></pre>
+<p>Measured here on Ubuntu 26.04.1, kernel 7.0.0-38-generic, systemd 259.5:</p>
+<ul>
+<li><code>ProtectHome=yes</code> writes the canary and reports <code>mnt:[4026531832]</code>, identical to the parent</li>
+<li><code>ReadOnlyPaths=/home/aditf/.hermes</code> does exactly the same</li>
+<li><code>PrivateUsers=yes</code> stacked with <code>ProtectHome=yes</code> still does the same</li>
+<li><code>IPAddressDeny=any</code> returns <code>200</code> from <code>example.com</code>, and <code>301</code> from a raw <code>http://1.1.1.1</code></li>
+</ul>
+<p><code>systemctl show</code> reports <code>IPAddressDeny=::/0 0.0.0.0/0</code> throughout, because the property is parsed and displayed whether or not anything enforces it.</p>
+<p>The only signal is one journal line, printed once per boot:</p>
+<pre><code>systemd[1277]: run-p1951633-i14538200.service: unit configures an IP firewall, but not running as root.
+systemd[1277]: (This warning is only shown for the first unit using IP firewalling.)
+</code></pre>
+<p>Two faults live here and they deserve separate names. The IP firewall is unsupported by design on user units. The mount-based directives are supported, advertised, and inert.</p>
+<h2>Why it degrades instead of failing</h2>
+<p><code>journalctl -k</code> names the cause. An AppArmor profile transition, immediately followed by a denial:</p>
+<pre><code>apparmor=&quot;AUDIT&quot; operation=&quot;userns_create&quot; ... target=&quot;unprivileged_userns&quot;
+  execpath=&quot;/usr/lib/systemd/systemd-executor&quot;
+apparmor=&quot;DENIED&quot; operation=&quot;capable&quot; ... capability=21 capname=&quot;sys_admin&quot;
+</code></pre>
+<p>Filesystem sandboxing needs <code>CAP_SYS_ADMIN</code> inside a fresh user namespace, because that is what systemd-executor uses to build the mounts. Ubuntu ships <code>kernel.apparmor_restrict_unprivileged_userns = 1</code> in <code>/usr/lib/sysctl.d/10-apparmor.conf</code>, and its <code>unprivileged_userns</code> profile carries <code>audit deny capability,</code>. The executor degrades instead of failing. The service starts in the host mount namespace with no sandbox at all, and reports <code>active (running)</code>.</p>
+<p>This is not local weirdness. systemd issue 25014 documents <code>ProtectHome=true</code> as inert in <code>--user</code> mode. A worker fleet at block filed issue 5670 with the identical <code>sys_admin</code> denial, reporting that the sandbox "silently does not apply" and that the unit "has full read/write access to <code>$HOME</code>, including any secrets directory."</p>
+<p>On issue 38588 a maintainer closed the firewall question as by design. In his words:</p>
+<blockquote>
+<p>"The firewall feature support is only for system services, and we have never supported that on user services."</p>
+</blockquote>
+<p>A BPF program, he added, cannot be installed while unprivileged. The reporter's reply is the line I would put in front of any CI operator. "Any limit is," he wrote, and a limit that is silently ignored is worse than a unit that refuses to start.</p>
+<h2>What does enforce</h2>
+<p>Three knobs hold on an unprivileged unit. I measured each in its own transient unit:</p>
+<ul>
+<li><code>NoNewPrivileges=yes</code> reports <code>NoNewPrivs: 1</code> with <code>CapEff: 0000000000000000</code></li>
+<li><code>SystemCallFilter=@system-service</code> installs a seccomp filter, and <code>~@mount</code> makes <code>mount</code> die with <code>Bad system call (core dumped)</code></li>
+<li><code>RestrictAddressFamilies=AF_UNIX</code> makes <code>curl</code> exit <code>6</code> with no HTTP code, so DNS and connect both fail</li>
+</ul>
+<p>That last row is the interesting one. It is the only network kill switch an unprivileged unit can actually set, and it severs AF_INET, which is the model API. For an agent fleet it is a switch that cannot be thrown.</p>
+<h2>The fix a fleet can adopt today</h2>
+<ul>
+<li><strong>Move the egress chokepoint out of the user manager.</strong> A root-owned slice carrying <code>IPAddressDeny=</code> plus per-service <code>IPAddressAllow=</code> is the allow-list pattern the man page recommends. An outbound proxy the fleet must traverse does the same job.</li>
+<li><strong>Install the AppArmor carve-out so the filesystem directives can work at all.</strong> The block report's version grants one binary rather than the whole box: <code>/etc/apparmor.d/systemd-executor-userns</code> holding <code>profile systemd-executor-userns /usr/lib/systemd/systemd-executor flags=(unconfined) { userns, }</code>, then <code>apparmor_parser -r</code>.</li>
+<li><strong>Make the sandbox fail closed.</strong> A canary in <code>ExecStartPre=</code> that probes the most dangerous path and <code>exit 1</code>s when it turns out writable means a degraded sandbox never runs:</li>
+</ul>
+<pre><code class="language-ini">ExecStartPre=/bin/sh -c 'if touch %h/.hermes/.sandbox-canary 2&gt;/dev/null; then \
+  rm -f %h/.hermes/.sandbox-canary; \
+  echo &quot;sandbox DEGRADED (secrets writable)&quot; &gt;&amp;2; exit 1; fi'
+</code></pre>
+<p>A directive appearing in <code>systemctl show</code> is not evidence that it was applied. The canary is the cheapest thing that tells those two states apart.</p>
+<h2>Containment is only half the net</h2>
+<p>The other front-page thread this week is why backups belong in the same sentence. A Swedish production house postponed a show after an edited season was lost, and TV4's program director told Sveriges Radio that no AI agent deleted the material. A backup system failed instead.</p>
+<p>The thread's consensus is blunter than the headline. HN user <code>jve</code> puts it this way: you don't get to blame AI if it irreversibly deletes your data. Either you had no backup, or you never contained the agent where it could do irreversible harm. <code>Ekaros</code> supplies the likelier root cause, which is that nobody ever tested a restore from those backups.</p>
+<p>A deletion is catastrophic only when the net underneath it has never been tested. That is the same defect class as a sandbox that fails open. Both look like controls, and neither one is.</p>
+<h2>So here is the position</h2>
+<p>On an unprivileged agent fleet, those directives are a configuration language rather than a boundary. Go find out which of them your host actually enforces, and do it with a probe rather than a <code>systemctl show</code>. Mine turned out to be decoration.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

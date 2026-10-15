@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Agent Sandboxes That Fail Open: systemd --user Silently Skips Containment</title>
+      <link>https://aditf.com/blog/systemd-user-sandbox-fails-open/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/systemd-user-sandbox-fails-open/</guid>
+      <pubDate>Thu, 15 Oct 2026 00:00:00 +0000</pubDate>
+      <description>The security experts are right that the fix for AI agent incidents is containment. On the box that runs my fleet, the directives you would reach for are accepted, reported as applied, and quietly inert.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/id/"/>
+    </item>
+    <item>
       <title>The Multi-Agent Concurrency Bottleneck: Why Your Coding Fleet Locks Up</title>
       <link>https://aditf.com/blog/multi-agent-concurrency-bottleneck/</link>
       <guid isPermaLink="true">https://aditf.com/blog/multi-agent-concurrency-bottleneck/</guid>
@@ -176,15 +185,6 @@
       <description>Claude Code shipped AGENTS.md support gated behind a remote flag, so telemetry-off users got silent failures. Here&#x27;s the five-second test that catches this class of bug in any agent setup.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/agent-config-canary-test/id/"/>
-    </item>
-    <item>
-      <title>Self-Hosting Behind CGNAT: A WireGuard Bridge That Actually Works</title>
-      <link>https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/</guid>
-      <pubDate>Wed, 23 Sep 2026 00:00:00 +0000</pubDate>
-      <description>Port forwarding stopped working and it wasn&#x27;t your router&#x27;s fault. Here&#x27;s the outbound WireGuard tunnel pattern that gets a homelab back on the public internet under CGNAT.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/self-hosting-behind-cgnat-wireguard-bridge/id/"/>
     </item>
   </channel>
 </rss>
