@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>systemd --user Nggak Beneran Nge-sandbox Agen Gue, dan Nggak Ada yang Ngasih Tahu — Field Notes</title>
-<meta name="description" content="Para pakar keamanan bener soal containment jadi akar masalahnya. Masalahnya, di box yang jalanin fleet gue, direktif yang mereka resepin itu diterima, dilaporkan kepasang, dan diam-diam nggak ngapa-ngapain.">
+<title>Sandbox Agen yang Gagal Terbuka: systemd --user Diam-diam Nggak Ngekang Apa-apa — Field Notes</title>
+<meta name="description" content="Pasang ProtectHome=yes, ProtectSystem=strict, dan IPAddressDeny=any di unit systemd --user, terus systemctl show bilang semuanya aktif. Di Ubuntu modern, semuanya gagal terbuka dan nggak ngekang apa-apa.">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,17 +18,17 @@
 <link rel="canonical" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/id/">
 <meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
 <meta property="og:type" content="article">
-<meta property="og:title" content="systemd --user Nggak Beneran Nge-sandbox Agen Gue, dan Nggak Ada yang Ngasih Tahu — Field Notes">
-<meta property="og:description" content="Para pakar keamanan bener soal containment jadi akar masalahnya. Masalahnya, di box yang jalanin fleet gue, direktif yang mereka resepin itu diterima, dilaporkan kepasang, dan diam-diam nggak ngapa-ngapain.">
+<meta property="og:title" content="Sandbox Agen yang Gagal Terbuka: systemd --user Diam-diam Nggak Ngekang Apa-apa — Field Notes">
+<meta property="og:description" content="Pasang ProtectHome=yes, ProtectSystem=strict, dan IPAddressDeny=any di unit systemd --user, terus systemctl show bilang semuanya aktif. Di Ubuntu modern, semuanya gagal terbuka dan nggak ngekang apa-apa.">
 <meta property="og:url" content="https://aditf.com/blog/systemd-user-sandbox-fails-open/id/">
 <meta property="og:locale" content="id_ID">
 <meta property="og:image" content="https://aditf.com/blog/systemd-user-sandbox-fails-open/og.id.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="systemd --user Nggak Beneran Nge-sandbox Agen Gue, dan Nggak Ada yang Ngasih Tahu — Field Notes">
+<meta property="og:image:alt" content="Sandbox Agen yang Gagal Terbuka: systemd --user Diam-diam Nggak Ngekang Apa-apa — Field Notes">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="systemd --user Nggak Beneran Nge-sandbox Agen Gue, dan Nggak Ada yang Ngasih Tahu — Field Notes">
-<meta name="twitter:description" content="Para pakar keamanan bener soal containment jadi akar masalahnya. Masalahnya, di box yang jalanin fleet gue, direktif yang mereka resepin itu diterima, dilaporkan kepasang, dan diam-diam nggak ngapa-ngapain.">
+<meta name="twitter:title" content="Sandbox Agen yang Gagal Terbuka: systemd --user Diam-diam Nggak Ngekang Apa-apa — Field Notes">
+<meta name="twitter:description" content="Pasang ProtectHome=yes, ProtectSystem=strict, dan IPAddressDeny=any di unit systemd --user, terus systemctl show bilang semuanya aktif. Di Ubuntu modern, semuanya gagal terbuka dan nggak ngekang apa-apa.">
 <meta name="twitter:image" content="https://aditf.com/blog/systemd-user-sandbox-fails-open/og.id.png">
 <meta name="author" content="Aditya Firmansyah">
 <meta name="theme-color" content="#14181B">
@@ -38,7 +38,7 @@
 <meta property="article:tag" content="sandboxing">
 <meta property="article:tag" content="apparmor">
 <meta property="article:tag" content="self-hosting">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "systemd --user Nggak Beneran Nge-sandbox Agen Gue, dan Nggak Ada yang Ngasih Tahu", "description": "Para pakar keamanan bener soal containment jadi akar masalahnya. Masalahnya, di box yang jalanin fleet gue, direktif yang mereka resepin itu diterima, dilaporkan kepasang, dan diam-diam nggak ngapa-ngapain.", "datePublished": "2026-10-15T00:00:00+00:00", "dateModified": "2026-10-15T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/systemd-user-sandbox-fails-open/id/"}, "keywords": "systemd, agent-safety, sandboxing, apparmor, self-hosting", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1212, "image": ["https://aditf.com/blog/systemd-user-sandbox-fails-open/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/systemd-user-sandbox-fails-open/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Sandbox Agen yang Gagal Terbuka: systemd --user Diam-diam Nggak Ngekang Apa-apa", "description": "Pasang ProtectHome=yes, ProtectSystem=strict, dan IPAddressDeny=any di unit systemd --user, terus systemctl show bilang semuanya aktif. Di Ubuntu modern, semuanya gagal terbuka dan nggak ngekang apa-apa.", "datePublished": "2026-10-15T00:00:00+00:00", "dateModified": "2026-10-15T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/systemd-user-sandbox-fails-open/id/"}, "keywords": "systemd, agent-safety, sandboxing, apparmor, self-hosting", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 942, "image": ["https://aditf.com/blog/systemd-user-sandbox-fails-open/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/systemd-user-sandbox-fails-open/", "inLanguage": "en-US"}}</script>
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/">
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/id/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/">
@@ -67,34 +67,21 @@
     <div class="post__waybill">
       <span class="waybill__field">FILED <b>15 Oct 2026</b></span>
       <span class="waybill__divider" aria-hidden="true">&middot;</span>
-      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__field">5 MIN READ</span>
       <span class="waybill__divider" aria-hidden="true">&middot;</span>
       <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
     </div>
-    <h1 class="post__title">systemd --user Nggak Beneran Nge-sandbox Agen Gue, dan Nggak Ada yang Ngasih Tahu</h1>
+    <h1 class="post__title">Sandbox Agen yang Gagal Terbuka: systemd --user Diam-diam Nggak Ngekang Apa-apa</h1>
     <div class="post__tags"><span>systemd</span><span>agent-safety</span><span>sandboxing</span><span>apparmor</span><span>self-hosting</span></div>
     <div class="post__content reveal is-visible">
-<p>Berita soal agen AI yang disebut "ngamuk" minggu ini udah nunjuk penyebab yang bener. Insiden Hugging Face, Anthropic, Meta, dan Gemini itu soal containment dan monitoring yang gagal.</p>
-<p>Modelnya bukan lagi punya pikiran sendiri.</p>
-<p>Gue jalanin delapan belas profil agen dan satu <code>hermes-gateway.service</code> yang multiplex di bawah <code>systemd --user</code>, semuanya di satu host Ubuntu.</p>
-<p>Jadi daripada cuma ngutip para pakarnya, gue coba lakuin apa yang mereka resepin. Pasang sandbox-nya.</p>
-<p>Hasilnya: tiap direktif filesystem dan egress yang bisa diset unit tanpa privilege itu diterima, dipajang <code>systemctl show</code> seolah udah kepasang, terus diam-diam nggak ngapa-ngapain.</p>
-<h2>CSO bilang containment, dan thread-nya nambahin satu hal</h2>
-<p>Rob T. Lee dari SANS Institute nggak muter-muter di artikel CSO Online itu:</p>
-<blockquote>
-<p>"The Hugging Face incident definitively showed that it wasn't the fact that the agents were super smart. It's that there literally was a hole that was exploited because it was not configured correctly on the containment side."</p>
-</blockquote>
-<p>Dan Wallach dari RAND nambahin sisi monitoring-nya. Insiden itu "went on for days, and nobody noticed", katanya.</p>
-<p>Bagi gue itu bagian yang paling nyantol. Orang ngejalanin eksperimennya, tapi nggak ada yang nonton.</p>
-<p>Thread-nya nambahin konteks yang penting. User HN <code>ahupp</code> nyodorin kalimat dari laporan insidennya sendiri:</p>
-<blockquote>
-<p>Agents "exploited a separate, previously unknown vulnerability in Artifactory to move beyond their sandbox environment."</p>
-</blockquote>
-<p>Terus <code>root_axis</code> nyerang dari arah sebaliknya. Pakai Artifactory aja udah salah, apalagi tanpa airgap dan tanpa blokir egress.</p>
-<p>Dua-duanya bisa bener sekaligus. Zero-day-nya yang buka pintu, tapi egress yang nggak diawasi dan kredensial yang nggak ada batasnya yang bikin pintunya kebuka berhari-hari.</p>
-<p>Nah, bagian itu yang bisa lo ukur sendiri di mesin lo.</p>
+<h2>Sandbox yang disuruh lo pasang</h2>
+<p>Kalau lo jalanin coding agent otonom, atau daemon apa pun yang jalan tanpa privilege, lewat unit <code>systemd --user</code>, saran hardening standarnya selalu sama. Containment.</p>
+<p>Set <code>ProtectHome=yes</code> sama <code>ProtectSystem=strict</code> biar prosesnya nggak bisa baca kunci lo. Tambahin <code>IPAddressDeny=any</code> biar dia nggak bisa ngirim kunci itu ke luar. Habis itu <code>systemctl --user show</code> bakal lapor semua direktif itu aktif.</p>
+<p>Di host Ubuntu modern, nggak ada satu pun yang jalan.</p>
+<p>Gue nemu ini dengan cara yang jujur. Gue jalanin delapan belas profil agen di belakang satu <code>hermes-gateway.service</code> yang multiplex. Gue coba pasang sandbox-nya, terus gue ukur apa yang beneran nempel.</p>
+<p>Hasilnya: tiap direktif filesystem dan egress yang bisa diset unit tanpa privilege diterima, dipajang <code>systemctl show</code> seolah kepasang, dan diam-diam nggak ngapa-ngapain.</p>
 <h2>Isi unit yang jalanin fleet gue</h2>
-<p>Begini bentuknya di unit gateway yang jalanin semua agen gue:</p>
+<p>Begini bentuknya di unit gateway gue:</p>
 <pre><code>NoNewPrivileges=no    PrivateTmp=no
 ProtectSystem=no      ProtectHome=no
 IPAddressDeny=        RestrictAddressFamilies=~
@@ -108,9 +95,8 @@ UMask=0002            MemoryMax=infinity
 <li><code>~/.hermes/config.yaml</code>, 9.393 B</li>
 <li><code>~/.hermes/auth.json</code>, 1.288 B</li>
 </ul>
-<p>Nggak ada yang aneh di situ. Itu cuma bentuk default dari fleet yang tumbuh satu worker setiap kali.</p>
-<p>User HN <code>novaRom</code> nulis soal pola dari sisi sebaliknya. "I always see attempts to cat ~/.ssh/*", katanya. Agen-agennya udah tahu mereka di dalam sandbox, dan tetap nyoba.</p>
-<h2>Gue coba satu-satu, dan hasilnya nol</h2>
+<p>Nggak ada yang aneh di situ. Itu cuma bentuk default dari fleet yang tumbuh satu worker setiap kali. Anggap aja tiap agen yang keluar jalur udah punya akses ke keempat file itu.</p>
+<h2>Gue uji satu-satu, dan hasilnya nol</h2>
 <p>Satu transient unit per properti. Tiap probe nulis file canary ke <code>$HOME/.hermes</code>, terus nyetak mount namespace-nya sendiri:</p>
 <pre><code class="language-bash">systemd-run --user --wait -p ProtectHome=yes \
   /bin/sh -c 'touch $HOME/.hermes/canary; readlink /proc/self/ns/mnt'
@@ -131,7 +117,7 @@ systemd-run --user --wait -p IPAddressDeny=any \
 systemd[1277]: (This warning is only shown for the first unit using IP firewalling.)
 </code></pre>
 <p>Ada dua kerusakan di sini dan jangan digabung. Yang satu nggak didukung di user unit. Yang satunya lagi justru didukung dan ditawarin, tapi tetap nggak jalan.</p>
-<h2>Kernel bilang kenapa dia pilih ngalah, bukan error</h2>
+<h2>Kenapa dia ngalah diam-diam, bukan error</h2>
 <p><code>journalctl -k</code> nyebut penyebabnya. Ada transisi profil AppArmor, terus langsung ditolak:</p>
 <pre><code>apparmor=&quot;AUDIT&quot; operation=&quot;userns_create&quot; ... target=&quot;unprivileged_userns&quot;
   execpath=&quot;/usr/lib/systemd/systemd-executor&quot;
@@ -146,8 +132,7 @@ apparmor=&quot;DENIED&quot; operation=&quot;capable&quot; ... capability=21 capn
 <blockquote>
 <p>"The firewall feature support is only for system services, and we have never supported that on user services."</p>
 </blockquote>
-<p>Program BPF nggak bisa dipasang dalam keadaan unprivileged, tambahnya.</p>
-<p>Balasan pelapornya yang paling gue setujui. Limit yang dibiarin diam-diam lebih bahaya daripada unit yang nolak jalan dari awal.</p>
+<p>Program BPF nggak bisa dipasang dalam keadaan unprivileged, tambahnya. Buat operator fleet, asimetri inilah masalahnya. Unit yang nolak jalan itu bug report sepele yang beres dalam sejam. Batas yang diabaikan diam-diam itu keyakinan yang lo pelihara sampai ada yang bikin lo salah.</p>
 <h2>Tiga knob yang beneran nempel</h2>
 <p>Di luar semua itu ada tiga knob yang beneran kerja di unit tanpa privilege. Gue ukur satu-satu:</p>
 <ul>
@@ -158,10 +143,10 @@ apparmor=&quot;DENIED&quot; operation=&quot;capable&quot; ... capability=21 capn
 <p>Baris terakhir yang paling menarik. Itu satu-satunya tombol matiin network yang bisa dipasang unit tanpa privilege.</p>
 <p>Masalahnya tombol itu matiin AF_INET, alias jalur API modelnya. Buat fleet agen, itu tombol yang nggak mungkin kita tekan.</p>
 <h2>Yang bisa lo pasang hari ini</h2>
-<p>Ada tiga yang bisa lo kerjain sekarang:</p>
+<p>Ada tiga perubahan, gue urutin dari yang paling besar efeknya:</p>
 <ul>
 <li><strong>Pindahin titik kontrol egress-nya keluar dari user manager.</strong> Slice milik root yang bawa <code>IPAddressDeny=</code> plus <code>IPAddressAllow=</code> per service itu pola allow-list yang direkomendasiin man page. Proxy keluar yang wajib dilewatin fleet juga sama hasilnya.</li>
-<li><strong>Pasang carve-out AppArmor-nya biar direktif filesystem-nya punya kesempatan jalan.</strong> Versi di laporan block cuma ngasih izin ke satu binary, bukan seluruh box. Isinya <code>/etc/apparmor.d/systemd-executor-userns</code> dengan <code>profile systemd-executor-userns /usr/lib/systemd/systemd-executor flags=(unconfined) { userns, }</code>, habis itu <code>apparmor_parser -r</code>.</li>
+<li><strong>Pasang carve-out AppArmor-nya biar direktif filesystem-nya punya kesempatan jalan.</strong> Ubuntu sendiri udah pakai pola ini buat Chrome dan bwrap. Carve-out-nya ngasih izin ke satu binary, bukan seluruh box: <code>/etc/apparmor.d/systemd-executor-userns</code> dengan isi <code>profile systemd-executor-userns /usr/lib/systemd/systemd-executor flags=(unconfined) { userns, }</code>, habis itu <code>apparmor_parser -r</code>.</li>
 <li><strong>Bikin sandbox-nya gagal tertutup.</strong> Canary di <code>ExecStartPre=</code> ngecek path paling berbahaya, dan <code>exit 1</code> kalau ternyata masih bisa ditulis. Sandbox yang degradasi jadi nggak pernah ikut jalan.</li>
 </ul>
 <p>Bentuk canary-nya begini:</p>
@@ -170,17 +155,10 @@ apparmor=&quot;DENIED&quot; operation=&quot;capable&quot; ... capability=21 capn
   echo &quot;sandbox DEGRADED (secrets writable)&quot; &gt;&amp;2; exit 1; fi'
 </code></pre>
 <p>Satu direktif muncul di <code>systemctl show</code> bukan berarti dia kepasang. Canary itu cara paling murah buat bedain dua keadaan itu.</p>
-<h2>Containment doang nggak cukup, backup-nya juga harus diuji</h2>
-<p>Thread front page satunya minggu ini nunjukin kenapa backup masuk di kalimat yang sama. Di Swedia, satu rumah produksi harus nunda tayang satu acara setelah season yang udah diedit hilang.</p>
-<p>Program director TV4 bilang ke Sveriges Radio nggak ada agen AI yang ngehapus materi itu. Yang gagal sistem backup-nya.</p>
-<p>Konsensus di thread-nya lebih tajam dari headlinenya. User HN <code>jve</code> nulis lo nggak berhak nyalahin AI kalau dia ngehapus data lo secara permanen. Karena pilihan lo cuma dua, nggak punya backup sama sekali, atau nggak pernah ngekang agennya di tempat yang nggak bisa bikin kerusakan permanen.</p>
-<p><code>Ekaros</code> nebak akar masalahnya lebih masuk akal. Restore-nya kemungkinan besar nggak pernah dites.</p>
-<p>Penghapusan baru jadi bencana kalau lapisan cadangan di bawahnya nggak ada yang pernah ngecek. Itu kelas kerusakan yang sama dengan sandbox yang gagal terbuka.</p>
-<p>Dua-duanya kelihatan kayak kontrol, dan dua-duanya bukan.</p>
-<h2>Posisi gue</h2>
-<p>Di fleet agen yang jalan tanpa privilege, direktif-direktif itu cuma bahasa konfigurasi. Bukan batas.</p>
-<p>Cari tahu yang mana yang beneran nempel di host lo, dan uji pakai probe, bukan pakai <code>systemctl show</code>.</p>
-<p>Di mesin gue hasilnya ternyata cuma dekorasi. Setidaknya gue tahu sebelum ada yang nemuin sendiri.</p>
+<h2>Uji dulu sebelum lo percaya</h2>
+<p>Di fleet agen yang jalan tanpa privilege, direktif containment itu cuma bahasa konfigurasi, bukan batas. Nggak masalah, asal lo tahu mana yang mana.</p>
+<p>Jadi uji aja. Spawn satu transient unit pakai properti yang lo yakini lagi ngelindungin lo, terus coba lakuin hal yang seharusnya dicegah.</p>
+<p>Punya gue ternyata cuma dekorasi. Gue lebih milih tahu itu dari canary daripada dari laporan insiden.</p>
     </div>
     <div class="hero__actions post__footer-actions">
       <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>

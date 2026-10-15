@@ -1,44 +1,26 @@
 ---
-title: systemd --user Nggak Beneran Nge-sandbox Agen Gue, dan Nggak Ada yang Ngasih Tahu
+title: Sandbox Agen yang Gagal Terbuka: systemd --user Diam-diam Nggak Ngekang Apa-apa
 slug: systemd-user-sandbox-fails-open
 date: 2026-10-15
-excerpt: Para pakar keamanan bener soal containment jadi akar masalahnya. Masalahnya, di box yang jalanin fleet gue, direktif yang mereka resepin itu diterima, dilaporkan kepasang, dan diam-diam nggak ngapa-ngapain.
+excerpt: Pasang ProtectHome=yes, ProtectSystem=strict, dan IPAddressDeny=any di unit systemd --user, terus systemctl show bilang semuanya aktif. Di Ubuntu modern, semuanya gagal terbuka dan nggak ngekang apa-apa.
 tags: systemd, agent-safety, sandboxing, apparmor, self-hosting
 ---
 
-Berita soal agen AI yang disebut "ngamuk" minggu ini udah nunjuk penyebab yang bener. Insiden Hugging Face, Anthropic, Meta, dan Gemini itu soal containment dan monitoring yang gagal.
+## Sandbox yang disuruh lo pasang
 
-Modelnya bukan lagi punya pikiran sendiri.
+Kalau lo jalanin coding agent otonom, atau daemon apa pun yang jalan tanpa privilege, lewat unit `systemd --user`, saran hardening standarnya selalu sama. Containment.
 
-Gue jalanin delapan belas profil agen dan satu `hermes-gateway.service` yang multiplex di bawah `systemd --user`, semuanya di satu host Ubuntu.
+Set `ProtectHome=yes` sama `ProtectSystem=strict` biar prosesnya nggak bisa baca kunci lo. Tambahin `IPAddressDeny=any` biar dia nggak bisa ngirim kunci itu ke luar. Habis itu `systemctl --user show` bakal lapor semua direktif itu aktif.
 
-Jadi daripada cuma ngutip para pakarnya, gue coba lakuin apa yang mereka resepin. Pasang sandbox-nya.
+Di host Ubuntu modern, nggak ada satu pun yang jalan.
 
-Hasilnya: tiap direktif filesystem dan egress yang bisa diset unit tanpa privilege itu diterima, dipajang `systemctl show` seolah udah kepasang, terus diam-diam nggak ngapa-ngapain.
+Gue nemu ini dengan cara yang jujur. Gue jalanin delapan belas profil agen di belakang satu `hermes-gateway.service` yang multiplex. Gue coba pasang sandbox-nya, terus gue ukur apa yang beneran nempel.
 
-## CSO bilang containment, dan thread-nya nambahin satu hal
-
-Rob T. Lee dari SANS Institute nggak muter-muter di artikel CSO Online itu:
-
-> "The Hugging Face incident definitively showed that it wasn't the fact that the agents were super smart. It's that there literally was a hole that was exploited because it was not configured correctly on the containment side."
-
-Dan Wallach dari RAND nambahin sisi monitoring-nya. Insiden itu "went on for days, and nobody noticed", katanya.
-
-Bagi gue itu bagian yang paling nyantol. Orang ngejalanin eksperimennya, tapi nggak ada yang nonton.
-
-Thread-nya nambahin konteks yang penting. User HN `ahupp` nyodorin kalimat dari laporan insidennya sendiri:
-
-> Agents "exploited a separate, previously unknown vulnerability in Artifactory to move beyond their sandbox environment."
-
-Terus `root_axis` nyerang dari arah sebaliknya. Pakai Artifactory aja udah salah, apalagi tanpa airgap dan tanpa blokir egress.
-
-Dua-duanya bisa bener sekaligus. Zero-day-nya yang buka pintu, tapi egress yang nggak diawasi dan kredensial yang nggak ada batasnya yang bikin pintunya kebuka berhari-hari.
-
-Nah, bagian itu yang bisa lo ukur sendiri di mesin lo.
+Hasilnya: tiap direktif filesystem dan egress yang bisa diset unit tanpa privilege diterima, dipajang `systemctl show` seolah kepasang, dan diam-diam nggak ngapa-ngapain.
 
 ## Isi unit yang jalanin fleet gue
 
-Begini bentuknya di unit gateway yang jalanin semua agen gue:
+Begini bentuknya di unit gateway gue:
 
 ```
 NoNewPrivileges=no    PrivateTmp=no
@@ -56,11 +38,9 @@ Semua profil agen pakai UID yang sama. Jadi radius ledakannya seluas apa pun yan
 - `~/.hermes/config.yaml`, 9.393 B
 - `~/.hermes/auth.json`, 1.288 B
 
-Nggak ada yang aneh di situ. Itu cuma bentuk default dari fleet yang tumbuh satu worker setiap kali.
+Nggak ada yang aneh di situ. Itu cuma bentuk default dari fleet yang tumbuh satu worker setiap kali. Anggap aja tiap agen yang keluar jalur udah punya akses ke keempat file itu.
 
-User HN `novaRom` nulis soal pola dari sisi sebaliknya. "I always see attempts to cat ~/.ssh/*", katanya. Agen-agennya udah tahu mereka di dalam sandbox, dan tetap nyoba.
-
-## Gue coba satu-satu, dan hasilnya nol
+## Gue uji satu-satu, dan hasilnya nol
 
 Satu transient unit per properti. Tiap probe nulis file canary ke `$HOME/.hermes`, terus nyetak mount namespace-nya sendiri:
 
@@ -90,7 +70,7 @@ systemd[1277]: (This warning is only shown for the first unit using IP firewalli
 
 Ada dua kerusakan di sini dan jangan digabung. Yang satu nggak didukung di user unit. Yang satunya lagi justru didukung dan ditawarin, tapi tetap nggak jalan.
 
-## Kernel bilang kenapa dia pilih ngalah, bukan error
+## Kenapa dia ngalah diam-diam, bukan error
 
 `journalctl -k` nyebut penyebabnya. Ada transisi profil AppArmor, terus langsung ditolak:
 
@@ -114,9 +94,7 @@ Di issue 38588, seorang maintainer nutup pertanyaan firewall-nya sebagai by desi
 
 > "The firewall feature support is only for system services, and we have never supported that on user services."
 
-Program BPF nggak bisa dipasang dalam keadaan unprivileged, tambahnya.
-
-Balasan pelapornya yang paling gue setujui. Limit yang dibiarin diam-diam lebih bahaya daripada unit yang nolak jalan dari awal.
+Program BPF nggak bisa dipasang dalam keadaan unprivileged, tambahnya. Buat operator fleet, asimetri inilah masalahnya. Unit yang nolak jalan itu bug report sepele yang beres dalam sejam. Batas yang diabaikan diam-diam itu keyakinan yang lo pelihara sampai ada yang bikin lo salah.
 
 ## Tiga knob yang beneran nempel
 
@@ -132,10 +110,10 @@ Masalahnya tombol itu matiin AF_INET, alias jalur API modelnya. Buat fleet agen,
 
 ## Yang bisa lo pasang hari ini
 
-Ada tiga yang bisa lo kerjain sekarang:
+Ada tiga perubahan, gue urutin dari yang paling besar efeknya:
 
 - **Pindahin titik kontrol egress-nya keluar dari user manager.** Slice milik root yang bawa `IPAddressDeny=` plus `IPAddressAllow=` per service itu pola allow-list yang direkomendasiin man page. Proxy keluar yang wajib dilewatin fleet juga sama hasilnya.
-- **Pasang carve-out AppArmor-nya biar direktif filesystem-nya punya kesempatan jalan.** Versi di laporan block cuma ngasih izin ke satu binary, bukan seluruh box. Isinya `/etc/apparmor.d/systemd-executor-userns` dengan `profile systemd-executor-userns /usr/lib/systemd/systemd-executor flags=(unconfined) { userns, }`, habis itu `apparmor_parser -r`.
+- **Pasang carve-out AppArmor-nya biar direktif filesystem-nya punya kesempatan jalan.** Ubuntu sendiri udah pakai pola ini buat Chrome dan bwrap. Carve-out-nya ngasih izin ke satu binary, bukan seluruh box: `/etc/apparmor.d/systemd-executor-userns` dengan isi `profile systemd-executor-userns /usr/lib/systemd/systemd-executor flags=(unconfined) { userns, }`, habis itu `apparmor_parser -r`.
 - **Bikin sandbox-nya gagal tertutup.** Canary di `ExecStartPre=` ngecek path paling berbahaya, dan `exit 1` kalau ternyata masih bisa ditulis. Sandbox yang degradasi jadi nggak pernah ikut jalan.
 
 Bentuk canary-nya begini:
@@ -148,24 +126,10 @@ ExecStartPre=/bin/sh -c 'if touch %h/.hermes/.sandbox-canary 2>/dev/null; then \
 
 Satu direktif muncul di `systemctl show` bukan berarti dia kepasang. Canary itu cara paling murah buat bedain dua keadaan itu.
 
-## Containment doang nggak cukup, backup-nya juga harus diuji
+## Uji dulu sebelum lo percaya
 
-Thread front page satunya minggu ini nunjukin kenapa backup masuk di kalimat yang sama. Di Swedia, satu rumah produksi harus nunda tayang satu acara setelah season yang udah diedit hilang.
+Di fleet agen yang jalan tanpa privilege, direktif containment itu cuma bahasa konfigurasi, bukan batas. Nggak masalah, asal lo tahu mana yang mana.
 
-Program director TV4 bilang ke Sveriges Radio nggak ada agen AI yang ngehapus materi itu. Yang gagal sistem backup-nya.
+Jadi uji aja. Spawn satu transient unit pakai properti yang lo yakini lagi ngelindungin lo, terus coba lakuin hal yang seharusnya dicegah.
 
-Konsensus di thread-nya lebih tajam dari headlinenya. User HN `jve` nulis lo nggak berhak nyalahin AI kalau dia ngehapus data lo secara permanen. Karena pilihan lo cuma dua, nggak punya backup sama sekali, atau nggak pernah ngekang agennya di tempat yang nggak bisa bikin kerusakan permanen.
-
-`Ekaros` nebak akar masalahnya lebih masuk akal. Restore-nya kemungkinan besar nggak pernah dites.
-
-Penghapusan baru jadi bencana kalau lapisan cadangan di bawahnya nggak ada yang pernah ngecek. Itu kelas kerusakan yang sama dengan sandbox yang gagal terbuka.
-
-Dua-duanya kelihatan kayak kontrol, dan dua-duanya bukan.
-
-## Posisi gue
-
-Di fleet agen yang jalan tanpa privilege, direktif-direktif itu cuma bahasa konfigurasi. Bukan batas.
-
-Cari tahu yang mana yang beneran nempel di host lo, dan uji pakai probe, bukan pakai `systemctl show`.
-
-Di mesin gue hasilnya ternyata cuma dekorasi. Setidaknya gue tahu sebelum ada yang nemuin sendiri.
+Punya gue ternyata cuma dekorasi. Gue lebih milih tahu itu dari canary daripada dari laporan insiden.

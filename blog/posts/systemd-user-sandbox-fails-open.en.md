@@ -2,31 +2,19 @@
 title: Agent Sandboxes That Fail Open: systemd --user Silently Skips Containment
 slug: systemd-user-sandbox-fails-open
 date: 2026-10-15
-excerpt: The security experts are right that the fix for AI agent incidents is containment. On the box that runs my fleet, the directives you would reach for are accepted, reported as applied, and quietly inert.
+excerpt: Configure ProtectHome=yes, ProtectSystem=strict and IPAddressDeny=any on a systemd --user unit and systemctl show reports them all as active. On modern Ubuntu they fail open and enforce nothing.
 tags: systemd, agent-safety, sandboxing, apparmor, self-hosting
 ---
 
-The CSO Online piece sitting near the top of the front page this week is right about the cause. The Hugging Face, Anthropic, Meta and Gemini incidents were containment and monitoring failures, not models with minds of their own.
+## The sandbox you were told to configure
 
-I run eighteen agent profiles and a single multiplexed `hermes-gateway.service` under `systemd --user` on one Ubuntu host. So rather than quote the experts, I tried to do what they prescribe and add the sandbox.
+If you run autonomous coding agents, or any unprivileged daemon, as a `systemd --user` unit, the standard hardening advice is containment.
 
-Every filesystem and egress directive an unprivileged unit can set is accepted, printed by `systemctl show` as if applied, and then inert.
+Set `ProtectHome=yes` and `ProtectSystem=strict` so the process cannot read your keys. Add `IPAddressDeny=any` so it cannot phone home with them. Then `systemctl --user show` reports every one of those directives as active.
 
-## The experts, and the objection the thread got right
+On a modern Ubuntu host, they do nothing at all.
 
-Rob T. Lee is SANS Institute's chief AI officer, and he is blunt in the CSO piece:
-
-> "The Hugging Face incident definitively showed that it wasn't the fact that the agents were super smart. It's that there literally was a hole that was exploited because it was not configured correctly on the containment side."
-
-RAND's Dan Wallach supplies the monitoring half. The incident "went on for days, and nobody noticed," he says. Wallach's addition is the part I keep coming back to. People started these experiments and weren't watching them.
-
-The thread complicates the "not configured correctly" framing in a way worth carrying. HN user `ahupp` points at the incident report's own wording:
-
-> Agents "exploited a separate, previously unknown vulnerability in Artifactory to move beyond their sandbox environment."
-
-`root_axis` argues that running Artifactory at all was the failure, because nothing airgapped the network and nothing blocked egress.
-
-Both can hold. A zero-day opens the door. Unmonitored egress and unbounded credentials are what let it stay open for days, and that is the half you can measure on your own hardware.
+I found this the honest way. I run eighteen agent profiles behind a single multiplexed `hermes-gateway.service`. I tried to add the sandbox, and then I measured what actually enforced. Every filesystem and egress directive an unprivileged unit can set was accepted, printed by `systemctl show` as applied, and inert.
 
 ## What the unit that runs the fleet actually says
 
@@ -39,16 +27,14 @@ IPAddressDeny=        RestrictAddressFamilies=~
 UMask=0002            MemoryMax=infinity
 ```
 
-Its `MainPID` runs as Uid 1000 with `NoNewPrivs: 0` and `Seccomp: 0`. Every agent profile shares that UID, so the blast radius is whatever 1000 can open:
+Its `MainPID` runs as Uid 1000 with `NoNewPrivs: 0` and `Seccomp: 0`. Every agent profile shares that UID, so the blast radius is whatever UID 1000 can open:
 
 - `~/.ssh/id_ed25519`, 420 B
 - `~/.hermes/.env`, 29,367 B
 - `~/.hermes/config.yaml`, 9,393 B
 - `~/.hermes/auth.json`, 1,288 B
 
-None of that is exotic. It is the default shape of a fleet that grew one worker at a time.
-
-HN user `novaRom` describes what the probing looks like from the other end. "I always see attempts to cat ~/.ssh/*", they write, and note that agents keep reaching for host credentials even after they understand they are sandboxed.
+None of that is exotic. It is the default shape of a fleet that grew one worker at a time. Assume any agent that goes off-script already has all four of those files within reach.
 
 ## Reproducing the silent no-op
 
@@ -90,15 +76,17 @@ apparmor="AUDIT" operation="userns_create" ... target="unprivileged_userns"
 apparmor="DENIED" operation="capable" ... capability=21 capname="sys_admin"
 ```
 
-Filesystem sandboxing needs `CAP_SYS_ADMIN` inside a fresh user namespace, because that is what systemd-executor uses to build the mounts. Ubuntu ships `kernel.apparmor_restrict_unprivileged_userns = 1` in `/usr/lib/sysctl.d/10-apparmor.conf`, and its `unprivileged_userns` profile carries `audit deny capability,`. The executor degrades instead of failing. The service starts in the host mount namespace with no sandbox at all, and reports `active (running)`.
+Filesystem sandboxing needs `CAP_SYS_ADMIN` inside a fresh user namespace, because that is what systemd-executor builds the mounts with. Ubuntu ships `kernel.apparmor_restrict_unprivileged_userns = 1` in `/usr/lib/sysctl.d/10-apparmor.conf`, and its `unprivileged_userns` profile carries `audit deny capability,`.
+
+So the executor degrades instead of failing. The service starts in the host mount namespace with no sandbox at all, and still reports `active (running)`.
 
 This is not local weirdness. systemd issue 25014 documents `ProtectHome=true` as inert in `--user` mode. A worker fleet at block filed issue 5670 with the identical `sys_admin` denial, reporting that the sandbox "silently does not apply" and that the unit "has full read/write access to `$HOME`, including any secrets directory."
 
-On issue 38588 a maintainer closed the firewall question as by design. In his words:
+On issue 38588 a maintainer closed the firewall question as by design:
 
 > "The firewall feature support is only for system services, and we have never supported that on user services."
 
-A BPF program, he added, cannot be installed while unprivileged. The reporter's reply is the line I would put in front of any CI operator. "Any limit is," he wrote, and a limit that is silently ignored is worse than a unit that refuses to start.
+A BPF program, he added, cannot be installed while unprivileged. For a fleet operator, the asymmetry is the whole problem. A unit that refuses to start is a bug report you fix on a Tuesday. A limit that is silently ignored is a belief you keep until something proves it wrong.
 
 ## What does enforce
 
@@ -112,8 +100,10 @@ That last row is the interesting one. It is the only network kill switch an unpr
 
 ## The fix a fleet can adopt today
 
+Three changes, in the order of what buys you the most:
+
 - **Move the egress chokepoint out of the user manager.** A root-owned slice carrying `IPAddressDeny=` plus per-service `IPAddressAllow=` is the allow-list pattern the man page recommends. An outbound proxy the fleet must traverse does the same job.
-- **Install the AppArmor carve-out so the filesystem directives can work at all.** The block report's version grants one binary rather than the whole box: `/etc/apparmor.d/systemd-executor-userns` holding `profile systemd-executor-userns /usr/lib/systemd/systemd-executor flags=(unconfined) { userns, }`, then `apparmor_parser -r`.
+- **Install the AppArmor carve-out so the filesystem directives can work at all.** Ubuntu already ships this pattern for Chrome and bwrap. The carve-out grants one binary rather than the whole box: `/etc/apparmor.d/systemd-executor-userns` holding `profile systemd-executor-userns /usr/lib/systemd/systemd-executor flags=(unconfined) { userns, }`, then `apparmor_parser -r`.
 - **Make the sandbox fail closed.** A canary in `ExecStartPre=` that probes the most dangerous path and `exit 1`s when it turns out writable means a degraded sandbox never runs:
 
 ```ini
@@ -124,14 +114,8 @@ ExecStartPre=/bin/sh -c 'if touch %h/.hermes/.sandbox-canary 2>/dev/null; then \
 
 A directive appearing in `systemctl show` is not evidence that it was applied. The canary is the cheapest thing that tells those two states apart.
 
-## Containment is only half the net
+## Probe it before you trust it
 
-The other front-page thread this week is why backups belong in the same sentence. A Swedish production house postponed a show after an edited season was lost, and TV4's program director told Sveriges Radio that no AI agent deleted the material. A backup system failed instead.
+On an unprivileged agent fleet, those containment directives are a configuration language rather than a boundary. That is fine as long as you know which is which.
 
-The thread's consensus is blunter than the headline. HN user `jve` puts it this way: you don't get to blame AI if it irreversibly deletes your data. Either you had no backup, or you never contained the agent where it could do irreversible harm. `Ekaros` supplies the likelier root cause, which is that nobody ever tested a restore from those backups.
-
-A deletion is catastrophic only when the net underneath it has never been tested. That is the same defect class as a sandbox that fails open. Both look like controls, and neither one is.
-
-## So here is the position
-
-On an unprivileged agent fleet, those directives are a configuration language rather than a boundary. Go find out which of them your host actually enforces, and do it with a probe rather than a `systemctl show`. Mine turned out to be decoration.
+So test it. Spawn a transient unit with the properties you believe are protecting you, and try to do the thing they are supposed to prevent. Mine turned out to be decoration, and I would rather learn that from a canary than from an incident report.

@@ -11,7 +11,7 @@
       <link>https://aditf.com/blog/systemd-user-sandbox-fails-open/</link>
       <guid isPermaLink="true">https://aditf.com/blog/systemd-user-sandbox-fails-open/</guid>
       <pubDate>Thu, 15 Oct 2026 00:00:00 +0000</pubDate>
-      <description>The security experts are right that the fix for AI agent incidents is containment. On the box that runs my fleet, the directives you would reach for are accepted, reported as applied, and quietly inert.</description>
+      <description>Configure ProtectHome=yes, ProtectSystem=strict and IPAddressDeny=any on a systemd --user unit and systemctl show reports them all as active. On modern Ubuntu they fail open and enforce nothing.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/id/"/>
     </item>
