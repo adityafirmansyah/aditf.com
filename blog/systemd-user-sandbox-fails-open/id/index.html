@@ -38,7 +38,7 @@
 <meta property="article:tag" content="sandboxing">
 <meta property="article:tag" content="apparmor">
 <meta property="article:tag" content="self-hosting">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Sandbox Agen yang Gagal Terbuka: systemd --user Diam-diam Nggak Ngekang Apa-apa", "description": "Pasang ProtectHome=yes, ProtectSystem=strict, dan IPAddressDeny=any di unit systemd --user, terus systemctl show bilang semuanya aktif. Di Ubuntu modern, semuanya gagal terbuka dan nggak ngekang apa-apa.", "datePublished": "2026-10-15T00:00:00+00:00", "dateModified": "2026-10-15T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/systemd-user-sandbox-fails-open/id/"}, "keywords": "systemd, agent-safety, sandboxing, apparmor, self-hosting", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 942, "image": ["https://aditf.com/blog/systemd-user-sandbox-fails-open/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/systemd-user-sandbox-fails-open/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Sandbox Agen yang Gagal Terbuka: systemd --user Diam-diam Nggak Ngekang Apa-apa", "description": "Pasang ProtectHome=yes, ProtectSystem=strict, dan IPAddressDeny=any di unit systemd --user, terus systemctl show bilang semuanya aktif. Di Ubuntu modern, semuanya gagal terbuka dan nggak ngekang apa-apa.", "datePublished": "2026-10-15T00:00:00+00:00", "dateModified": "2026-10-15T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/systemd-user-sandbox-fails-open/id/"}, "keywords": "systemd, agent-safety, sandboxing, apparmor, self-hosting", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 954, "image": ["https://aditf.com/blog/systemd-user-sandbox-fails-open/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/systemd-user-sandbox-fails-open/", "inLanguage": "en-US"}}</script>
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/">
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/id/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/">
@@ -74,11 +74,11 @@
     <h1 class="post__title">Sandbox Agen yang Gagal Terbuka: systemd --user Diam-diam Nggak Ngekang Apa-apa</h1>
     <div class="post__tags"><span>systemd</span><span>agent-safety</span><span>sandboxing</span><span>apparmor</span><span>self-hosting</span></div>
     <div class="post__content reveal is-visible">
-<h2>Sandbox yang disuruh lo pasang</h2>
+<h2>Resep sandbox yang biasa disaranin orang</h2>
 <p>Kalau lo jalanin coding agent otonom, atau daemon apa pun yang jalan tanpa privilege, lewat unit <code>systemd --user</code>, saran hardening standarnya selalu sama. Containment.</p>
 <p>Set <code>ProtectHome=yes</code> sama <code>ProtectSystem=strict</code> biar prosesnya nggak bisa baca kunci lo. Tambahin <code>IPAddressDeny=any</code> biar dia nggak bisa ngirim kunci itu ke luar. Habis itu <code>systemctl --user show</code> bakal lapor semua direktif itu aktif.</p>
 <p>Di host Ubuntu modern, nggak ada satu pun yang jalan.</p>
-<p>Gue nemu ini dengan cara yang jujur. Gue jalanin delapan belas profil agen di belakang satu <code>hermes-gateway.service</code> yang multiplex. Gue coba pasang sandbox-nya, terus gue ukur apa yang beneran nempel.</p>
+<p>Gue nemu ini bukan dari teori doang, tapi pas nyoba langsung di mesin sendiri. Gue jalanin delapan belas profil agen di belakang satu <code>hermes-gateway.service</code> yang multiplex. Gue coba pasang sandbox-nya, terus gue ukur apa yang beneran nempel.</p>
 <p>Hasilnya: tiap direktif filesystem dan egress yang bisa diset unit tanpa privilege diterima, dipajang <code>systemctl show</code> seolah kepasang, dan diam-diam nggak ngapa-ngapain.</p>
 <h2>Isi unit yang jalanin fleet gue</h2>
 <p>Begini bentuknya di unit gateway gue:</p>
@@ -132,7 +132,7 @@ apparmor=&quot;DENIED&quot; operation=&quot;capable&quot; ... capability=21 capn
 <blockquote>
 <p>"The firewall feature support is only for system services, and we have never supported that on user services."</p>
 </blockquote>
-<p>Program BPF nggak bisa dipasang dalam keadaan unprivileged, tambahnya. Buat operator fleet, asimetri inilah masalahnya. Unit yang nolak jalan itu bug report sepele yang beres dalam sejam. Batas yang diabaikan diam-diam itu keyakinan yang lo pelihara sampai ada yang bikin lo salah.</p>
+<p>Program BPF nggak bisa dipasang dalam keadaan unprivileged, tambahnya. Buat operator fleet, asimetri inilah masalahnya. Unit yang nolak jalan itu bug report sepele yang beres dalam sejam. Batas yang diabaikan diam-diam itu ilusi aman yang lo percaya sampai akhirnya sistem lo jebol.</p>
 <h2>Tiga knob yang beneran nempel</h2>
 <p>Di luar semua itu ada tiga knob yang beneran kerja di unit tanpa privilege. Gue ukur satu-satu:</p>
 <ul>
@@ -156,7 +156,7 @@ apparmor=&quot;DENIED&quot; operation=&quot;capable&quot; ... capability=21 capn
 </code></pre>
 <p>Satu direktif muncul di <code>systemctl show</code> bukan berarti dia kepasang. Canary itu cara paling murah buat bedain dua keadaan itu.</p>
 <h2>Uji dulu sebelum lo percaya</h2>
-<p>Di fleet agen yang jalan tanpa privilege, direktif containment itu cuma bahasa konfigurasi, bukan batas. Nggak masalah, asal lo tahu mana yang mana.</p>
+<p>Di fleet agen yang jalan tanpa privilege, direktif containment itu cuma konfigurasi di atas kertas, bukan pagar keamanan. Nggak masalah, asal lo tahu mana yang beneran jalan.</p>
 <p>Jadi uji aja. Spawn satu transient unit pakai properti yang lo yakini lagi ngelindungin lo, terus coba lakuin hal yang seharusnya dicegah.</p>
 <p>Punya gue ternyata cuma dekorasi. Gue lebih milih tahu itu dari canary daripada dari laporan insiden.</p>
     </div>

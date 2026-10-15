@@ -6,7 +6,7 @@ excerpt: Pasang ProtectHome=yes, ProtectSystem=strict, dan IPAddressDeny=any di 
 tags: systemd, agent-safety, sandboxing, apparmor, self-hosting
 ---
 
-## Sandbox yang disuruh lo pasang
+## Resep sandbox yang biasa disaranin orang
 
 Kalau lo jalanin coding agent otonom, atau daemon apa pun yang jalan tanpa privilege, lewat unit `systemd --user`, saran hardening standarnya selalu sama. Containment.
 
@@ -14,7 +14,7 @@ Set `ProtectHome=yes` sama `ProtectSystem=strict` biar prosesnya nggak bisa baca
 
 Di host Ubuntu modern, nggak ada satu pun yang jalan.
 
-Gue nemu ini dengan cara yang jujur. Gue jalanin delapan belas profil agen di belakang satu `hermes-gateway.service` yang multiplex. Gue coba pasang sandbox-nya, terus gue ukur apa yang beneran nempel.
+Gue nemu ini bukan dari teori doang, tapi pas nyoba langsung di mesin sendiri. Gue jalanin delapan belas profil agen di belakang satu `hermes-gateway.service` yang multiplex. Gue coba pasang sandbox-nya, terus gue ukur apa yang beneran nempel.
 
 Hasilnya: tiap direktif filesystem dan egress yang bisa diset unit tanpa privilege diterima, dipajang `systemctl show` seolah kepasang, dan diam-diam nggak ngapa-ngapain.
 
@@ -94,7 +94,7 @@ Di issue 38588, seorang maintainer nutup pertanyaan firewall-nya sebagai by desi
 
 > "The firewall feature support is only for system services, and we have never supported that on user services."
 
-Program BPF nggak bisa dipasang dalam keadaan unprivileged, tambahnya. Buat operator fleet, asimetri inilah masalahnya. Unit yang nolak jalan itu bug report sepele yang beres dalam sejam. Batas yang diabaikan diam-diam itu keyakinan yang lo pelihara sampai ada yang bikin lo salah.
+Program BPF nggak bisa dipasang dalam keadaan unprivileged, tambahnya. Buat operator fleet, asimetri inilah masalahnya. Unit yang nolak jalan itu bug report sepele yang beres dalam sejam. Batas yang diabaikan diam-diam itu ilusi aman yang lo percaya sampai akhirnya sistem lo jebol.
 
 ## Tiga knob yang beneran nempel
 
@@ -128,7 +128,7 @@ Satu direktif muncul di `systemctl show` bukan berarti dia kepasang. Canary itu 
 
 ## Uji dulu sebelum lo percaya
 
-Di fleet agen yang jalan tanpa privilege, direktif containment itu cuma bahasa konfigurasi, bukan batas. Nggak masalah, asal lo tahu mana yang mana.
+Di fleet agen yang jalan tanpa privilege, direktif containment itu cuma konfigurasi di atas kertas, bukan pagar keamanan. Nggak masalah, asal lo tahu mana yang beneran jalan.
 
 Jadi uji aja. Spawn satu transient unit pakai properti yang lo yakini lagi ngelindungin lo, terus coba lakuin hal yang seharusnya dicegah.
 
