@@ -29,7 +29,7 @@
 <meta name="twitter:title" content="Aditya Firmansyah — Senior Software Engineer — Scalable Platforms &amp; AI Workflows">
 <meta name="twitter:description" content="13+ years building scalable platforms, microservices, and autonomous AI workflows.">
 <meta name="twitter:image" content="https://aditf.com/og.png">
-<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Person","name":"Aditya Firmansyah","jobTitle":"Senior Software Engineer","description":"Senior Software Engineer with 13+ years building scalable platforms, microservices, and autonomous AI workflows.","url":"https://aditf.com/","image":"https://aditf.com/og.png","sameAs":["https://github.com/adityafirmansyah","https://linkedin.com/in/aditya-firmansyah-21940845","https://dagango.com","https://mycv.ai.id"],"address":{"@type":"PostalAddress","addressLocality":"Surakarta","addressRegion":"Central Java","addressCountry":"ID"},"knowsAbout":["JavaScript","TypeScript","Python","React","Next.js","FastAPI","Node.js","NestJS","Rust","Kubernetes","Microservices","E-commerce","SEO","AI Agents","PostgreSQL","SQLite"],"alumniOf":[],"worksFor":{"@type":"Organization","name":"Dagango"}},{"@type":"WebSite","name":"Aditya Firmansyah","url":"https://aditf.com/","inLanguage":"en","publisher":{"@type":"Person","name":"Aditya Firmansyah","url":"https://aditf.com/"}},{"@type":"Blog","name":"Field Notes","url":"https://aditf.com/blog/","description":"Practitioner notes on software engineering, AI agents, e-commerce, and self-hosting.","inLanguage":["en-US","id-ID"],"publisher":{"@type":"Person","name":"Aditya Firmansyah","url":"https://aditf.com/"}}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"Person","name":"Aditya Firmansyah","jobTitle":"Senior Software Engineer","description":"Senior Software Engineer with 13+ years building scalable platforms, microservices, and autonomous AI workflows.","url":"https://aditf.com/","image":"https://aditf.com/og.png","sameAs":["https://github.com/adityafirmansyah","https://linkedin.com/in/aditya-firmansyah-21940845","https://dagango.com","https://mycv.ai.id","https://tirtadesa.com"],"address":{"@type":"PostalAddress","addressLocality":"Surakarta","addressRegion":"Central Java","addressCountry":"ID"},"knowsAbout":["JavaScript","TypeScript","Python","React","Next.js","FastAPI","Node.js","NestJS","Rust","Kubernetes","Microservices","E-commerce","SEO","AI Agents","PostgreSQL","SQLite"],"alumniOf":[],"worksFor":{"@type":"Organization","name":"Dagango"}},{"@type":"WebSite","name":"Aditya Firmansyah","url":"https://aditf.com/","inLanguage":"en","publisher":{"@type":"Person","name":"Aditya Firmansyah","url":"https://aditf.com/"}},{"@type":"Blog","name":"Field Notes","url":"https://aditf.com/blog/","description":"Practitioner notes on software engineering, AI agents, e-commerce, and self-hosting.","inLanguage":["en-US","id-ID"],"publisher":{"@type":"Person","name":"Aditya Firmansyah","url":"https://aditf.com/"}}]}</script>
 
 <style>
 /* ============================================================
@@ -414,12 +414,17 @@
           <div class="ticket-role">Treasury Management &bull; FastAPI + React TS</div>
         </button>
         <button class="terminal-ticket" data-pane="3">
-          <div class="ticket-num">SHIPMENT 04 &bull; GAMIFIED FITNESS</div>
+          <div class="ticket-num">SHIPMENT 04 &bull; CIVIC UTILITY</div>
+          <div class="ticket-title">TirtaDesa</div>
+          <div class="ticket-role">Water Utility &amp; Billing &bull; FastAPI + React PWA</div>
+        </button>
+        <button class="terminal-ticket" data-pane="4">
+          <div class="ticket-num">SHIPMENT 05 &bull; GAMIFIED FITNESS</div>
           <div class="ticket-title">GainForge</div>
           <div class="ticket-role">Fitness RPG &bull; Full-Stack Rust WASM</div>
         </button>
-        <button class="terminal-ticket" data-pane="4">
-          <div class="ticket-num">SHIPMENT 05 &bull; AI PROPOSAL TOOL</div>
+        <button class="terminal-ticket" data-pane="5">
+          <div class="ticket-num">SHIPMENT 06 &bull; AI PROPOSAL TOOL</div>
           <div class="ticket-title">Cover Letter Gen</div>
           <div class="ticket-role">LLM Proposal Suite &bull; React + Node.js</div>
         </button>
@@ -510,8 +515,36 @@
           </div>
         </div>
 
-        <!-- PANE 3: GAINFORGE -->
+        <!-- PANE 3: TIRTADESA -->
         <div class="terminal-pane" id="pane-3">
+          <div class="project-card" style="border:none; padding:0; background:none;">
+            <div class="project-card__top">
+              <div>
+                <p class="project-card__eyebrow">Open-Source Build &mdash; FastAPI + React PWA</p>
+                <h3>TirtaDesa <span>Rural Water Utility &amp; Progressive Billing Platform</span></h3>
+              </div>
+              <a class="project-card__badge" href="https://tirtadesa.com" target="_blank" rel="noopener noreferrer">
+                <i class="dot" aria-hidden="true"></i>LIVE
+              </a>
+            </div>
+            <p class="project-card__lede">Open-source water utility management and progressive billing system designed for Indonesian rural community water associations (WSLIC, PAMSIMAS, HIPPAM, KPSPAMS). Features offline-first meter recording in blank-spot zones, tiered progressive tariff calculation, Web Bluetooth thermal receipt printing, and transparent non-revenue water (NRW) leak audit ledgers.</p>
+            <ul class="project-card__points">
+              <li>Architected offline-first PWA field engine using Dexie.js (IndexedDB) allowing meter officers to record consumption in zero-signal rural blank spots, with automated background sync, proof-photo attachment, and &gt;200% surge anomaly alerts.</li>
+              <li>Engineered flexible progressive water billing and cash management: multi-tiered consumption brackets (0-10 m³, 11-20 m³, &gt;20 m³), fixed maintenance fees, late penalty rules, and open operational ledger accounting for submersible pump electricity and water treatment supplies.</li>
+              <li>Built browser-native thermal receipt printing via Web Bluetooth API using pure ESC/POS protocol (58mm/80mm) without third-party middleware, paired with public zero-login citizen lookup portals for bill checking and water loss transparency.</li>
+            </ul>
+            <div class="project-card__stack">
+              <span>Python</span><span>FastAPI</span><span>React</span><span>TypeScript</span><span>Dexie.js (IndexedDB)</span><span>Web Bluetooth (ESC/POS)</span><span>PostgreSQL</span><span>Tailwind CSS</span><span>Docker</span>
+            </div>
+            <div class="hero__actions" style="margin-top:24px;">
+              <a class="btn btn--stamp" href="https://tirtadesa.com" target="_blank" rel="noopener noreferrer">Visit TirtaDesa.com &rarr;</a>
+              <a class="btn btn--ghost" href="https://github.com/adityafirmansyah/tirtadesa" target="_blank" rel="noopener noreferrer">GitHub Repo &rarr;</a>
+            </div>
+          </div>
+        </div>
+
+        <!-- PANE 4: GAINFORGE -->
+        <div class="terminal-pane" id="pane-4">
           <div class="project-card" style="border:none; padding:0; background:none;">
             <div class="project-card__top">
               <div>
@@ -537,8 +570,8 @@
           </div>
         </div>
 
-        <!-- PANE 4: COVER LETTER GEN -->
-        <div class="terminal-pane" id="pane-4">
+        <!-- PANE 5: COVER LETTER GEN -->
+        <div class="terminal-pane" id="pane-5">
           <div class="project-card" style="border:none; padding:0; background:none;">
             <div class="project-card__top">
               <div>
