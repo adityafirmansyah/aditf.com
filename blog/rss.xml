@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Why I Built mycv.ai.id: How AI Resume Tools Silently Strip Technical Depth and Hallucinate Dates</title>
+      <link>https://aditf.com/blog/why-i-built-mycv-ai-id/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/why-i-built-mycv-ai-id/</guid>
+      <pubDate>Fri, 16 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Standard AI resume builders quietly strip concrete tech stacks into corporate fluff and hallucinate that 2026 dates are from the future. Here is how I engineered mycv.ai.id to stop them.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/why-i-built-mycv-ai-id/id/"/>
+    </item>
+    <item>
       <title>Agent Sandboxes That Fail Open: systemd --user Silently Skips Containment</title>
       <link>https://aditf.com/blog/systemd-user-sandbox-fails-open/</link>
       <guid isPermaLink="true">https://aditf.com/blog/systemd-user-sandbox-fails-open/</guid>
@@ -176,15 +185,6 @@
       <description>On a default en_US.UTF-8 Postgres, a UNIQUE (tenant_id, slug) index cannot serve LIKE &#x27;prefix%&#x27; queries. Here are the benchmark numbers at 20,000 rows and the varchar_pattern_ops index that fixes it.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/id/"/>
-    </item>
-    <item>
-      <title>Your Agent&#x27;s Config Silently Failed: The Canary Test That Catches It</title>
-      <link>https://aditf.com/blog/agent-config-canary-test/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/agent-config-canary-test/</guid>
-      <pubDate>Thu, 24 Sep 2026 00:00:00 +0000</pubDate>
-      <description>Claude Code shipped AGENTS.md support gated behind a remote flag, so telemetry-off users got silent failures. Here&#x27;s the five-second test that catches this class of bug in any agent setup.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/agent-config-canary-test/id/"/>
     </item>
   </channel>
 </rss>

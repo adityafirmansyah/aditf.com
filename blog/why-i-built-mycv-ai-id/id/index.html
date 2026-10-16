@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kenapa Gue Bikin mycv.ai.id: Cara Tool Resume AI Diam-diam Menghapus Kedalaman Teknis dan Halusinasi Tanggal — Field Notes</title>
+<meta name="description" content="Tool resume AI biasa diam-diam ngabur-in tech stack konkret jadi omong kosong korporat, terus nganggep tahun 2026 tanggal masa depan. Ini cara gue ngerancang mycv.ai.id buat ngatasin itu.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/why-i-built-mycv-ai-id/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kenapa Gue Bikin mycv.ai.id: Cara Tool Resume AI Diam-diam Menghapus Kedalaman Teknis dan Halusinasi Tanggal — Field Notes">
+<meta property="og:description" content="Tool resume AI biasa diam-diam ngabur-in tech stack konkret jadi omong kosong korporat, terus nganggep tahun 2026 tanggal masa depan. Ini cara gue ngerancang mycv.ai.id buat ngatasin itu.">
+<meta property="og:url" content="https://aditf.com/blog/why-i-built-mycv-ai-id/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/why-i-built-mycv-ai-id/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kenapa Gue Bikin mycv.ai.id: Cara Tool Resume AI Diam-diam Menghapus Kedalaman Teknis dan Halusinasi Tanggal — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kenapa Gue Bikin mycv.ai.id: Cara Tool Resume AI Diam-diam Menghapus Kedalaman Teknis dan Halusinasi Tanggal — Field Notes">
+<meta name="twitter:description" content="Tool resume AI biasa diam-diam ngabur-in tech stack konkret jadi omong kosong korporat, terus nganggep tahun 2026 tanggal masa depan. Ini cara gue ngerancang mycv.ai.id buat ngatasin itu.">
+<meta name="twitter:image" content="https://aditf.com/blog/why-i-built-mycv-ai-id/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-16T00:00:00+00:00">
+<meta property="article:tag" content="ai-engineering">
+<meta property="article:tag" content="resume-optimization">
+<meta property="article:tag" content="ats-parser">
+<meta property="article:tag" content="python">
+<meta property="article:tag" content="fastapi">
+<meta property="article:tag" content="anti-slop">
+<meta property="article:tag" content="self-hosting">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Kenapa Gue Bikin mycv.ai.id: Cara Tool Resume AI Diam-diam Menghapus Kedalaman Teknis dan Halusinasi Tanggal", "description": "Tool resume AI biasa diam-diam ngabur-in tech stack konkret jadi omong kosong korporat, terus nganggep tahun 2026 tanggal masa depan. Ini cara gue ngerancang mycv.ai.id buat ngatasin itu.", "datePublished": "2026-10-16T00:00:00+00:00", "dateModified": "2026-10-16T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/why-i-built-mycv-ai-id/id/"}, "keywords": "ai-engineering, resume-optimization, ats-parser, python, fastapi, anti-slop, self-hosting", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1129, "image": ["https://aditf.com/blog/why-i-built-mycv-ai-id/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/why-i-built-mycv-ai-id/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/why-i-built-mycv-ai-id/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/why-i-built-mycv-ai-id/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/why-i-built-mycv-ai-id/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>16 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Kenapa Gue Bikin mycv.ai.id: Cara Tool Resume AI Diam-diam Menghapus Kedalaman Teknis dan Halusinasi Tanggal</h1>
+    <div class="post__tags"><span>ai-engineering</span><span>resume-optimization</span><span>ats-parser</span><span>python</span><span>fastapi</span><span>anti-slop</span><span>self-hosting</span></div>
+    <div class="post__content reveal is-visible">
+<h2>Jebakan bikin CV pakai prompt AI biasa</h2>
+<p>Sekarang hampir semua software engineer disuruh poles resume pakai AI sebelum berani apply ke mana pun.</p>
+<p>Katanya bakal otomatis lolos screening ATS. Janjinya manis banget.</p>
+<p>Tapi pas gue tes pakai resume gue sendiri dengan tiga belas tahun pengalaman bangun software, hasilnya bikin geleng-geleng kepala.</p>
+<p>Semua detail arsitektur yang konkret disikat habis.</p>
+<p>Kalimat asli gue soal arsitektur Next.js App Router dan FastAPI monorepo dengan isolasi database PostgreSQL diubah jadi kalimat klise: "memprakarsai arsitektur aplikasi untuk mendorong pertumbuhan bisnis."</p>
+<p>Bukan cuma itu. Sistemnya juga nganggep masa kerja gue di tahun 2026 sebagai halusinasi masa depan.</p>
+<p>Gara-gara training cut-off model mentok di akhir 2024 atau awal 2025, masa kerja kayak "Agustus 2024 – Juli 2026" langsung dicap nggak valid. Nilai audit CV gue dipotong cuma gara-gara modelnya nggak paham kalender nyata.</p>
+<p>Makanya minggu ini gue ngebangun mycv.ai.id.</p>
+<p>Mesin resume ini gue host sendiri di VPS Linux pakai FastAPI dan React 19. Prinsipnya sederhana: kalau lo nggak pasang pagar deterministik di sekitar LLM, hasil kerjanya bakal ngancurin sinyal teknis lo.</p>
+<h2>Kenapa LLM demen banget hapus tech stack</h2>
+<p>Waktu lo minta LLM biasa buat optimasi CV ke format ATS, bias bawaan dari proses RLHF-nya langsung aktif. Model bakal ngira kalau tulisan profesional itu harus pakai gaya bahasa HR korporat.</p>
+<p>Efek sampingnya fatal buat engineer:</p>
+<ul>
+<li>Framework spesifik kayak Next.js, FastAPI, Medusa, atau React 19 digeneralisir jadi "teknologi web modern."</li>
+<li>Pola arsitektur kayak monorepo, Kubernetes, service gRPC, dan isolasi tenant diringkas jadi "sistem yang scalable."</li>
+<li>Disiplin engineering kayak TDD dan automated quality gate di CI cuma disebut "menjaga kualitas kode."</li>
+</ul>
+<p>Di commit <code>4490e8b</code>, gue pasang aturan anti-slop yang ketat di <code>backend/app/services/optimizer.py</code>. Gue bikin daftar hitam kata kerja korporat dan jargon kosong yang haram dipakai sama sekali:</p>
+<pre><code class="language-python"># From backend/app/services/optimizer.py (commit 4490e8b)
+SYSTEM_CV_EXPERT = &quot;&quot;&quot;
+STRICT ZERO-AI-SLOP RULES (Non-Negotiable):
+
+1. ABSOLUTE BAN ON AI RESUME SLOP &amp; EMPTY CORPORATE CLICHÉS:
+   - FORBIDDEN ACTION VERBS: NEVER use &quot;Spearhead&quot;, &quot;Spearheaded&quot;, &quot;Spearheading&quot;,
+     &quot;Pioneered&quot;, &quot;Orchestrated&quot;, &quot;Fostered&quot;, &quot;Leveraged&quot;, &quot;Championed&quot;, &quot;Catalyzed&quot;.
+   - FORBIDDEN BUZZWORDS: NEVER use &quot;robust&quot;, &quot;seamless&quot;, &quot;cutting-edge&quot;, &quot;game-changer&quot;,
+     &quot;revolutionary&quot;, &quot;holistic&quot;, &quot;synergistic&quot;, &quot;dynamic environment&quot;.
+&quot;&quot;&quot;
+</code></pre>
+<p>Prompt sistemnya gue paksa cuma boleh pakai kata kerja praktisi. Tiap poin harus buka kalimat pakai kata kerja konkret kayak Built, Architected, Engineered, atau Deployed.</p>
+<p>Tiap bullet point juga wajib lolos tiga syarat teknis:</p>
+<ul>
+<li>Sistem nyata apa yang lo bangun atau refactor.</li>
+<li>Tool dan framework spesifik apa yang lo pakai.</li>
+<li>Hasil teknis apa yang berhasil lo capai dan bisa diukur.</li>
+</ul>
+<p>Kalau di input asli lo nyebut Kubernetes dan gRPC, kata itu pantang dihilangin. Model nggak boleh sok pintar ngerangkum istilah teknis jadi kata-kata abstrak.</p>
+<h2>Bug tanggal 2026 yang dianggap fiktif</h2>
+<p>Masalah kedua ini jauh lebih ngeselin kalau lo nggak teliti merhatiin log.</p>
+<p>Waktu ngetes sistem audit ATS, nilai kepatuhan kandidat sering anjlok dari skor 96 ke 88. Penyebabnya konyol: halusinasi waktu.</p>
+<p>Waktu model ngeliat masa kerja "Agustus 2024 – Juli 2026", dia mikir bulan Juli 2026 itu belum pernah kejadian di dunia nyata. Pengetahuan model berhenti di pertengahan 2025, jadi dia nuduh kandidat ngarang riwayat kerja.</p>
+<p>Di commit <code>4b90aba</code>, gue beresin ini lewat injeksi kalender dinamis dari sisi server:</p>
+<pre><code class="language-python"># From backend/app/services/optimizer.py (commit 4b90aba)
+from datetime import datetime
+
+def get_current_date_context() -&gt; str:
+    now = datetime.now()
+    return f&quot;{now.strftime('%B %Y')} (Year {now.year})&quot;
+
+# Injected directly into the system prompt and audit evaluator:
+&quot;&quot;&quot;
+REAL-WORLD DATE CONTEXT:
+- The current calendar date is October 2026 (Year 2026).
+- All employment dates through October 2026 are valid, normal historical dates.
+- NEVER flag dates occurring in or before October 2026 as 'the future'.
+&quot;&quot;&quot;
+</code></pre>
+<p>Begitu model dikasih konteks tanggal nyata pas runtime, halusinasi itu langsung hilang.</p>
+<p>Dia bakal ngerti kalau tahun 2026 itu masa lalu yang valid, bukan fiksi ilmiah.</p>
+<h2>PDF vektor langsung vs kanvas HTML yang sering bikin error</h2>
+<p>Banyak tool resume online jualan template visual cantik yang dirancang pakai Figma atau kanvas HTML. Tampilannya kelihatan keren di layar browser, tapi langsung berantakan waktu masuk ke parser ATS kayak Workday, Greenhouse, atau Taleo:</p>
+<ul>
+<li>Layout dua kolom bikin alur teks kepotong, sampai nama skill nyampur ke dalam judul pekerjaan.</li>
+<li>Fitur print bawaan browser ngasilin margin yang nggak konsisten dan font yang nggak kebaca mesin.</li>
+<li>Elemen grafis dekoratif kayak progress bar skill cuma kebaca sebagai artefak binary yang bikin parsing gagal.</li>
+</ul>
+<p>Gue milih pakai ReportLab di Python buat ngehasilin PDF vektor satu kolom yang bersih. Semua font gue daftarin lewat <code>pdfmetrics</code> pakai file TrueType resmi: Inter buat sans modern, Merriweather buat serif, dan IBM Plex Mono buat profil teknis.</p>
+<p>Di commit <code>7678422</code>, gue beresin dua masalah render yang sempat bikin layout bergeser:</p>
+<pre><code class="language-python"># From backend/app/services/pdf_generator.py (commit 7678422)
+# Frame content box is [margin+6 .. PAGE_WIDTH-margin-6], i.e. doc.width - 12.
+usable_width = doc.width - 12
+
+# Dynamic glyph advance calculation for hanging indents:
+bullet_glyph = &quot;\u2022&quot;
+bullet_gap = &quot;\u00a0\u00a0&quot;
+bullet_indent = (
+    pdfmetrics.stringWidth(bullet_glyph, cfg[&quot;font_body&quot;], cfg[&quot;body_size&quot;])
+    + pdfmetrics.stringWidth(bullet_gap, cfg[&quot;font_body&quot;], cfg[&quot;body_size&quot;])
+)
+</code></pre>
+<p>Komponen <code>SimpleDocTemplate</code> bawaan ReportLab nambahin padding 6pt di dalam Frame internalnya.</p>
+<p>Kalau lo pakai lebar halaman mentah, tabel riwayat kerja bakal tumpah 6pt ke margin kiri dan kelihatan mencong.</p>
+<p>Rumus <code>usable_width = doc.width - 12</code> bikin posisi tabel pas rata sama tepi teks.</p>
+<p>Menghitung hanging indent dari lebar glif font juga bikin baris teks kedua sejajar rapi di bawah huruf pertama, bukan nyangkut di bawah simbol bullet.</p>
+<h2>Bayar lokal pakai QRIS dinamis tanpa ribet langganan</h2>
+<p>Platform resume luar negeri biasanya maksa lo langganan kartu kredit bulanan. Buat engineer dan pencari kerja di Indonesia, langganan auto-debit dolar kayak gitu jelas bikin males.</p>
+<p>Makanya di commit <code>90c4584</code>, gue bikin integrasi QRIS dinamis berbasis spesifikasi resmi EMVCo Bank Indonesia:</p>
+<ul>
+<li>Backend ngebaca string payload QRIS statis berbasis Tag-Length-Value (TLV).</li>
+<li>Tag 01 diubah dari statis (<code>11</code>) jadi dinamis (<code>12</code>).</li>
+<li>Tag 54 disuntik langsung dengan nominal transaksi persis plus tiga digit kode unik verifikasi.</li>
+<li>Checksum CRC-16/CCITT-FALSE di Tag 63 dihitung ulang biar QR code valid pas discan.</li>
+</ul>
+<p>User tinggal scan QR pakai GoPay, OVO, BCA, atau mobile banking apa pun. Pembayaran terverifikasi otomatis di VPS Linux milik kita sendiri, tanpa perlu nitipin nomor kartu ke layanan pihak ketiga.</p>
+<h2>Pelajaran penting soal batasan sistem AI</h2>
+<p>Nilai utama dari aplikasi berbasis AI itu bukan sekadar manggil API model bahasa. Nilai aslinya ada pada pagar deterministik yang kita pasang di sekeliling model itu.</p>
+<p>Kalau dibiarin jalan tanpa kendali, LLM bakal milih jalan gampang:</p>
+<ul>
+<li>Nelen detail teknis penting dan ngegantinya pakai jargon manajemen yang hambar.</li>
+<li>Nuduh riwayat kerja bermasalah cuma gara-gara modelnya nggak tahu hari ini tanggal berapa.</li>
+<li>Ngasilin format visual cantik yang justru nggak bisa dibaca sama mesin parser.</li>
+</ul>
+<p>Begitu kita kurung modelnya pakai aturan prompt yang keras, konteks tanggal real-time, dan render PDF vektor yang presisi, hasilnya baru bisa diandalkan. AI nggak lagi bersikap kayak intern sotoy, tapi jadi mesin kompilasi yang beneran nolong karier lo.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/why-i-built-mycv-ai-id/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
