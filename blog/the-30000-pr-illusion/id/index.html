@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ilusi 30.000 PR: Kenapa Numpuk AI Reviewer Malah Ngerusak Arsitektur — Field Notes</title>
+<meta name="description" content="Anthropic nge-merge 30.000 pull request per hari pakai bot yang nge-review bot tanpa manusia. Tapi review serba otomatis ini cuma mindahin diskusi arsitektur jadi bom waktu di production.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/the-30000-pr-illusion/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Ilusi 30.000 PR: Kenapa Numpuk AI Reviewer Malah Ngerusak Arsitektur — Field Notes">
+<meta property="og:description" content="Anthropic nge-merge 30.000 pull request per hari pakai bot yang nge-review bot tanpa manusia. Tapi review serba otomatis ini cuma mindahin diskusi arsitektur jadi bom waktu di production.">
+<meta property="og:url" content="https://aditf.com/blog/the-30000-pr-illusion/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/the-30000-pr-illusion/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Ilusi 30.000 PR: Kenapa Numpuk AI Reviewer Malah Ngerusak Arsitektur — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Ilusi 30.000 PR: Kenapa Numpuk AI Reviewer Malah Ngerusak Arsitektur — Field Notes">
+<meta name="twitter:description" content="Anthropic nge-merge 30.000 pull request per hari pakai bot yang nge-review bot tanpa manusia. Tapi review serba otomatis ini cuma mindahin diskusi arsitektur jadi bom waktu di production.">
+<meta name="twitter:image" content="https://aditf.com/blog/the-30000-pr-illusion/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-17T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="code-review">
+<meta property="article:tag" content="software-engineering">
+<meta property="article:tag" content="devops">
+<meta property="article:tag" content="software-architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Ilusi 30.000 PR: Kenapa Numpuk AI Reviewer Malah Ngerusak Arsitektur", "description": "Anthropic nge-merge 30.000 pull request per hari pakai bot yang nge-review bot tanpa manusia. Tapi review serba otomatis ini cuma mindahin diskusi arsitektur jadi bom waktu di production.", "datePublished": "2026-10-17T00:00:00+00:00", "dateModified": "2026-10-17T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/the-30000-pr-illusion/id/"}, "keywords": "ai-agents, code-review, software-engineering, devops, software-architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 900, "image": ["https://aditf.com/blog/the-30000-pr-illusion/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/the-30000-pr-illusion/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/the-30000-pr-illusion/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/the-30000-pr-illusion/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/the-30000-pr-illusion/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>17 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">4 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Ilusi 30.000 PR: Kenapa Numpuk AI Reviewer Malah Ngerusak Arsitektur</h1>
+    <div class="post__tags"><span>ai-agents</span><span>code-review</span><span>software-engineering</span><span>devops</span><span>software-architecture</span></div>
+    <div class="post__content reveal is-visible">
+<h2>Ledakan 30.000 PR dan hilangnya kebiasaan baca diff</h2>
+<p>Tanggal 15 Oktober 2026, tim Claude Code ngerilis tulisan teknis yang langsung ramai dibahas orang. Addy Osmani, Morgan Westlee Lunt, bareng Qing Wang ngebedah cara mereka nge-review code di Anthropic.</p>
+<p>Angka skalanya luar biasa gila.</p>
+<p>Bulan Mei 2026 mereka baru nge-merge 2.500 perubahan per hari. Pas masuk September 2026, volumenya melonjak sampai tembus 30.000 perubahan tiap hari.</p>
+<p>Kalau diff masuk sebanyak itu, baca code baris demi baris pakai mata manusia jelas mustahil. Ditambah lagi, Claude sendiri yang nulis sekitar 90 persen codebase Claude Code. Anthropic akhirnya milih ngotomatisasi seluruh alur review mereka dari ujung ke ujung.</p>
+<h2>Cara kerja mesin review enam lapis di Anthropic</h2>
+<p>Biar sanggup nelen puluhan ribu diff harian, Anthropic ngebangun jalur perakitan otomatis. Tiap perubahan disaring lewat enam filter berurutan:</p>
+<ul>
+<li>Pengecekan author dan verifikasi fresh-context sebelum PR dibuka.</li>
+<li>Rangkaian test suite CI lintas platform yang wajib hijau.</li>
+<li>Bot pemburu bug paralel yang dipasangkan bareng voting verifiers.</li>
+<li>Security scan otomatis yang langsung ngeblok merge kalau nemu celah.</li>
+<li>Approval berjenjang berbasis risiko, di mana kategori Low jalan tanpa reviewer manusia.</li>
+<li>Antrean merge otomatis yang punya mekanisme canary rollback.</li>
+</ul>
+<p>Bagian pembagian risiko ini yang paling nunjukin arah filosofi mereka. PR risiko tinggi butuh dua persetujuan manusia, dan risiko sedang butuh satu.</p>
+<p>Khusus kategori Low, kodenya langsung meluncur ke trunk tanpa pernah dilihat engineer manusia sama sekali.</p>
+<h2>Paradoks regresi di balik 15.155 issue terbuka</h2>
+<p>Data internal yang dipamerin Anthropic kelihatan meyakinkan banget. Antara Juni sampai September, jumlah PR yang ke-merge naik dua kali lipat. Hebatnya lagi, angka revert malah turun lebih dari 40 persen.</p>
+<p>Di atas kertas, pipeline ini kelihatan kayak kemenangan mutlak otomatisasi.</p>
+<p>Tapi komunitas engineer di Hacker News ngeliat sisi sebaliknya. Pada thread 50122951 yang dapet 297 poin dan 278 komentar, para praktisi langsung nunjuk repository anthropics/claude-code di GitHub. Proyek dengan 151k stars itu ternyata nyimpen 15.155 issue terbuka.</p>
+<p>Di titik ini paradoks regresi review berbasis bot mulai kebongkar. Bot verifier emang jago banget nangkep error mekanis kayak sintaks typo, unit test patah, atau salah tipe data. Masalahnya, bot gampang buta kalau udah urusan semantic drift, perubahan perilaku CLI, atau ekspektasi user yang mendadak rusak.</p>
+<h2>Review kode dari awal punya dua peran berbeda</h2>
+<p>Anthropic mandang code review murni sebagai adu cepat throughput pabrik. Di kepala mereka, review cuma saringan pencegah bug sebelum kode nyentuh branch utama. Kalau mesin bisa nemuin error lebih cepat dari manusia, campur tangan engineer dianggap cuma bikin lambat rilis.</p>
+<p>Sudut pandang kayak gitu keliru nangkep esensi review code di tim engineering. Di sistem nyata, review kode megang dua peran yang beda jauh:</p>
+<ul>
+<li>Deteksi kerusakan mekanis, mulai dari sintaks error, kegagalan regresi, sampai pelanggaran tipe data.</li>
+<li>Penjajaran arsitektur, yang ngebangun pemahaman bersama dan jagain batas domain antar engineer.</li>
+</ul>
+<p>Mesin emang luar biasa buat urusan verifikasi mekanis. Begitu bot nge-review kode buatan bot lain tanpa campur tangan manusia, fungsi penjaga arsitektur langsung lenyap. Reviewer otomatis ngasih approval ke diff terisolasi tanpa ngerti arah besar dari sistem kita.</p>
+<h2>Kenapa zero-human review bikin utang teknis makin numpuk</h2>
+<p>Di Dagango.com, stack kita jalanin frontend Next.js App Router bareng backend FastAPI di atas Kubernetes. Buat ngebantu tim, ada armada agen mandiri Hermes di Linux bare-metal yang kerja tiap hari nulis kode dan QA. Tapi pengalaman 13 tahun lebih ngerilis software production ngajarin gue satu batasan mutlak: jangan pernah biarin mesin nge-merge ke production sendirian.</p>
+<p>Persetujuan serba bot emang kerasa kayak mukjizat di hari pertama. Agen bikin patch, bot verifier ngasih centang hijau, terus dalam hitungan menit PR udah merge. Nggak ada engineer yang perlu mecah fokus cuma buat melototin diff pendek beberapa baris.</p>
+<p>Tapi di production nyata, tumpukan perubahan kecil yang lolos tanpa dicek manusia ini pelan-pelan berubah jadi bom waktu. Kita udah kenyang ngeliat penyesuaian sepele yang ujungnya bikin sistem rontok berjamaah:</p>
+<ul>
+<li>Perubahan TTL cache yang kelihatan aman di lokal, tapi langsung nguras connection pool database pas traffic puncak.</li>
+<li>Poller background yang lupa pasang exponential backoff terus ngehajar microservice sendiri lewat thundering herd.</li>
+<li>Helper mutasi data yang ngerusak isolasi multi-tenant tanpa bikin satu pun unit test gagal.</li>
+</ul>
+<p>Ngehemat lima menit waktu review di PR terisolasi sering kali dibayar mahal dengan berhari-hari investigasi pas server tumbang. Kodenya lolos semua saringan bot, tapi nggak ada satu pun manusia yang paham gimana kepingan baru itu nyambung. Itu bukan kecepatan kerja. Itu utang arsitektur yang sengaja lo tunda.</p>
+<h2>Playbook realistis buat review di era agent</h2>
+<p>Jalan keluarnya jelas bukan nolak otomatisasi secara membabi buta. Baca 30.000 PR pakai mata manusia itu mustahil, dan manusia emang linter yang buruk. Kuncinya ada di pembagian batas yang tegas antara verifikasi mesin dan pengawasan arsitektur oleh manusia.</p>
+<p>Di tim kita, pipeline review berbasis agen ditata lewat empat aturan operasional:</p>
+<ul>
+<li>Manfaatkan bot otomatis buat bikin matriks reproduksi bug, jalanin linter, dan ngecek invarian tipe statis.</li>
+<li>Wajibkan agen bikin ringkasan markdown mandiri yang ngejelasin alasan teknis kenapa perubahannya aman.</li>
+<li>Wajibkan persetujuan manusia buat setiap perubahan kontrak API publik, migrasi database, dan batas domain antar service.</li>
+<li>Jangan pernah ngasih izin zero-human review ke pull request yang ngerubah shared state sistem kita.</li>
+</ul>
+<p>Serahin aja tugas mekanis ke agen: tes kasus ekstrem, buru memory leak, dan pastiin compliance di semua environment. Tapi urusan arsitektur tetap butuh mata manusia. Kalau tim lo sendiri udah nggak paham gimana sistemnya bekerja, ngebut nge-merge puluhan ribu PR cuma bakal nganter lo ke satu tempat: insiden besar berikutnya. 😅</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/the-30000-pr-illusion/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

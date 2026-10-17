@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>The 30,000 PR Illusion: Why Stacking AI Reviewers Degrades Architectural Cohesion</title>
+      <link>https://aditf.com/blog/the-30000-pr-illusion/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/the-30000-pr-illusion/</guid>
+      <pubDate>Sat, 17 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Anthropic merges 30,000 changes daily by having AI review AI with zero human sign-off. But machine-only reviews turn immediate architectural alignment into delayed production regressions.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/the-30000-pr-illusion/id/"/>
+    </item>
+    <item>
       <title>Why I Built mycv.ai.id: How AI Resume Tools Silently Strip Technical Depth and Hallucinate Dates</title>
       <link>https://aditf.com/blog/why-i-built-mycv-ai-id/</link>
       <guid isPermaLink="true">https://aditf.com/blog/why-i-built-mycv-ai-id/</guid>
@@ -176,15 +185,6 @@
       <description>A public /stores directory would have made Dagango.com behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/"/>
-    </item>
-    <item>
-      <title>Why Your Postgres LIKE Query Silently Seq Scans (And the One-Line Fix)</title>
-      <link>https://aditf.com/blog/postgres-like-queries-seq-scan-fix/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/postgres-like-queries-seq-scan-fix/</guid>
-      <pubDate>Fri, 25 Sep 2026 00:00:00 +0000</pubDate>
-      <description>On a default en_US.UTF-8 Postgres, a UNIQUE (tenant_id, slug) index cannot serve LIKE &#x27;prefix%&#x27; queries. Here are the benchmark numbers at 20,000 rows and the varchar_pattern_ops index that fixes it.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/postgres-like-queries-seq-scan-fix/id/"/>
     </item>
   </channel>
 </rss>
