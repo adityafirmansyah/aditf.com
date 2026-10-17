@@ -54,7 +54,7 @@ Mesin emang luar biasa buat urusan verifikasi mekanis. Begitu bot nge-review kod
 
 ## Kenapa zero-human review bikin utang teknis makin numpuk
 
-Di Dagango.com, stack kita jalanin frontend Next.js App Router bareng backend FastAPI di atas Kubernetes. Buat ngebantu tim, ada armada agen mandiri Hermes di Linux bare-metal yang kerja tiap hari nulis kode dan QA. Tapi pengalaman 13 tahun lebih ngerilis software production ngajarin gue satu batasan mutlak: jangan pernah biarin mesin nge-merge ke production sendirian.
+Di Dagango.com, stack kita jalanin frontend Next.js App Router bareng backend FastAPI di atas server Linux. Buat ngebantu tim, ada armada agen mandiri Hermes di Linux bare-metal yang kerja tiap hari nulis kode dan QA. Tapi pengalaman 13 tahun lebih ngerilis software production ngajarin gue satu batasan mutlak: jangan pernah biarin mesin nge-merge ke production tanpa approval manusia.
 
 Persetujuan serba bot emang kerasa kayak mukjizat di hari pertama. Agen bikin patch, bot verifier ngasih centang hijau, terus dalam hitungan menit PR udah merge. Nggak ada engineer yang perlu mecah fokus cuma buat melototin diff pendek beberapa baris.
 
@@ -64,7 +64,7 @@ Tapi di production nyata, tumpukan perubahan kecil yang lolos tanpa dicek manusi
 - Poller background yang lupa pasang exponential backoff terus ngehajar microservice sendiri lewat thundering herd.
 - Helper mutasi data yang ngerusak isolasi multi-tenant tanpa bikin satu pun unit test gagal.
 
-Ngehemat lima menit waktu review di PR terisolasi sering kali dibayar mahal dengan berhari-hari investigasi pas server tumbang. Kodenya lolos semua saringan bot, tapi nggak ada satu pun manusia yang paham gimana kepingan baru itu nyambung. Itu bukan kecepatan kerja. Itu utang arsitektur yang sengaja lo tunda.
+Ngehemat lima menit waktu review di PR terisolasi sering kali dibayar mahal dengan begadang semalaman buat debugging darurat. Kalau solusinya nggak ketemu cepet, ops bakal langsung rollback ke versi stabil sementara tim engineer pontang-panting bikin hotfix di hari yang sama. Kodenya lolos semua saringan bot, tapi nggak ada satu pun manusia yang paham gimana kepingan baru itu nyambung. Itu bukan kecepatan kerja, tapi utang arsitektur yang sengaja lo tunda.
 
 ## Playbook realistis buat review di era agent
 

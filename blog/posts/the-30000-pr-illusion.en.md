@@ -46,7 +46,7 @@ Machines excel at mechanical verification. But when bots review diffs written by
 
 ## Why zero-human review acts as a debt multiplier
 
-I have spent over 13 years shipping production software. At Dagango.com, we run Next.js App Router frontends and FastAPI services on Kubernetes, backed by an autonomous Hermes agent fleet on bare-metal Linux. We rely on agents for coding and QA, but we never let machines approve production changes alone.
+I have spent over 13 years shipping production software. At Dagango.com, we run Next.js App Router frontends and FastAPI services across dedicated Linux servers, backed by an autonomous Hermes agent fleet on bare-metal hardware. We rely on agents for coding and QA, but we never let machines approve production changes without human approval.
 
 Zero-human approval feels like pure leverage on day one. An agent generates a patch, a verifier bot votes green, and the PR lands within minutes. Nobody leaves their focus flow to parse a short diff.
 
@@ -56,7 +56,7 @@ In production, unreviewed low-risk changes compound into messy incident postmort
 - Background pollers that bypass queue backoff logic and create thundering herd problems across microservices.
 - Data mutation helpers that quietly break multi-tenant isolation guarantees without failing a single unit test.
 
-Saving five minutes of review on an isolated PR creates days of distributed debugging. The code passed every automated filter, but nobody understood how the pieces fit together. That is not velocity. It is deferred confusion.
+Saving five minutes of review on an isolated PR creates sleepless nights of emergency debugging. When an issue hits production without an instant fix, ops rolls back to the stable build while engineers scramble on same-day hotfixes. The code passed every automated filter, but nobody understood how the pieces fit together. That is not velocity; it is deferred confusion.
 
 ## A realistic playbook for agentic review
 

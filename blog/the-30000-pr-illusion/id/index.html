@@ -38,7 +38,7 @@
 <meta property="article:tag" content="software-engineering">
 <meta property="article:tag" content="devops">
 <meta property="article:tag" content="software-architecture">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Ilusi 30.000 PR: Kenapa Numpuk AI Reviewer Malah Ngerusak Arsitektur", "description": "Anthropic nge-merge 30.000 pull request per hari pakai bot yang nge-review bot tanpa manusia. Tapi review serba otomatis ini cuma mindahin diskusi arsitektur jadi bom waktu di production.", "datePublished": "2026-10-17T00:00:00+00:00", "dateModified": "2026-10-17T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/the-30000-pr-illusion/id/"}, "keywords": "ai-agents, code-review, software-engineering, devops, software-architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 900, "image": ["https://aditf.com/blog/the-30000-pr-illusion/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/the-30000-pr-illusion/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Ilusi 30.000 PR: Kenapa Numpuk AI Reviewer Malah Ngerusak Arsitektur", "description": "Anthropic nge-merge 30.000 pull request per hari pakai bot yang nge-review bot tanpa manusia. Tapi review serba otomatis ini cuma mindahin diskusi arsitektur jadi bom waktu di production.", "datePublished": "2026-10-17T00:00:00+00:00", "dateModified": "2026-10-17T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/the-30000-pr-illusion/id/"}, "keywords": "ai-agents, code-review, software-engineering, devops, software-architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 925, "image": ["https://aditf.com/blog/the-30000-pr-illusion/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/the-30000-pr-illusion/", "inLanguage": "en-US"}}</script>
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/the-30000-pr-illusion/">
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/the-30000-pr-illusion/id/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/the-30000-pr-illusion/">
@@ -67,7 +67,7 @@
     <div class="post__waybill">
       <span class="waybill__field">FILED <b>17 Oct 2026</b></span>
       <span class="waybill__divider" aria-hidden="true">&middot;</span>
-      <span class="waybill__field">4 MIN READ</span>
+      <span class="waybill__field">5 MIN READ</span>
       <span class="waybill__divider" aria-hidden="true">&middot;</span>
       <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
     </div>
@@ -105,7 +105,7 @@
 </ul>
 <p>Mesin emang luar biasa buat urusan verifikasi mekanis. Begitu bot nge-review kode buatan bot lain tanpa campur tangan manusia, fungsi penjaga arsitektur langsung lenyap. Reviewer otomatis ngasih approval ke diff terisolasi tanpa ngerti arah besar dari sistem kita.</p>
 <h2>Kenapa zero-human review bikin utang teknis makin numpuk</h2>
-<p>Di Dagango.com, stack kita jalanin frontend Next.js App Router bareng backend FastAPI di atas Kubernetes. Buat ngebantu tim, ada armada agen mandiri Hermes di Linux bare-metal yang kerja tiap hari nulis kode dan QA. Tapi pengalaman 13 tahun lebih ngerilis software production ngajarin gue satu batasan mutlak: jangan pernah biarin mesin nge-merge ke production sendirian.</p>
+<p>Di Dagango.com, stack kita jalanin frontend Next.js App Router bareng backend FastAPI di atas server Linux. Buat ngebantu tim, ada armada agen mandiri Hermes di Linux bare-metal yang kerja tiap hari nulis kode dan QA. Tapi pengalaman 13 tahun lebih ngerilis software production ngajarin gue satu batasan mutlak: jangan pernah biarin mesin nge-merge ke production tanpa approval manusia.</p>
 <p>Persetujuan serba bot emang kerasa kayak mukjizat di hari pertama. Agen bikin patch, bot verifier ngasih centang hijau, terus dalam hitungan menit PR udah merge. Nggak ada engineer yang perlu mecah fokus cuma buat melototin diff pendek beberapa baris.</p>
 <p>Tapi di production nyata, tumpukan perubahan kecil yang lolos tanpa dicek manusia ini pelan-pelan berubah jadi bom waktu. Kita udah kenyang ngeliat penyesuaian sepele yang ujungnya bikin sistem rontok berjamaah:</p>
 <ul>
@@ -113,7 +113,7 @@
 <li>Poller background yang lupa pasang exponential backoff terus ngehajar microservice sendiri lewat thundering herd.</li>
 <li>Helper mutasi data yang ngerusak isolasi multi-tenant tanpa bikin satu pun unit test gagal.</li>
 </ul>
-<p>Ngehemat lima menit waktu review di PR terisolasi sering kali dibayar mahal dengan berhari-hari investigasi pas server tumbang. Kodenya lolos semua saringan bot, tapi nggak ada satu pun manusia yang paham gimana kepingan baru itu nyambung. Itu bukan kecepatan kerja. Itu utang arsitektur yang sengaja lo tunda.</p>
+<p>Ngehemat lima menit waktu review di PR terisolasi sering kali dibayar mahal dengan begadang semalaman buat debugging darurat. Kalau solusinya nggak ketemu cepet, ops bakal langsung rollback ke versi stabil sementara tim engineer pontang-panting bikin hotfix di hari yang sama. Kodenya lolos semua saringan bot, tapi nggak ada satu pun manusia yang paham gimana kepingan baru itu nyambung. Itu bukan kecepatan kerja, tapi utang arsitektur yang sengaja lo tunda.</p>
 <h2>Playbook realistis buat review di era agent</h2>
 <p>Jalan keluarnya jelas bukan nolak otomatisasi secara membabi buta. Baca 30.000 PR pakai mata manusia itu mustahil, dan manusia emang linter yang buruk. Kuncinya ada di pembagian batas yang tegas antara verifikasi mesin dan pengawasan arsitektur oleh manusia.</p>
 <p>Di tim kita, pipeline review berbasis agen ditata lewat empat aturan operasional:</p>
