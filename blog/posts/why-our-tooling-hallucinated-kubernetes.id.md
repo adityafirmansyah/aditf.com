@@ -58,9 +58,9 @@ Masalahnya, klaim arsitektur punya karakter yang beda total. Di mata LLM, wajar-
 
 LLM cuma mengukur tingkat kewajaran kalimat ketimbang kebenaran empiris di server nyata. Tanpa adanya aturan mutlak yang dikunci lewat kode, kebohongan yang terdengar canggih bakal selalu lolos sensor otomatis.
 
-## Jebakan konsensus palsu di ruang gema multi-agent
+## Jebakan konsensus palsu di echo chamber multi-agent
 
-Numpuk beberapa agent dalam satu pipeline tooling sering dikira menghasilkan pengujian yang objektif. Nyatanya, susunan bertingkat begini gampang banget menjelma jadi ruang gema tertutup.
+Numpuk beberapa agent dalam satu pipeline tooling sering dikira menghasilkan pengujian yang objektif. Nyatanya, susunan bertingkat begini gampang banget menjelma jadi echo chamber tertutup.
 
 Ketika sebuah premis palsu terlanjur merayap ke dalam konteks prompt bersama, model-model setelahnya justru sibuk mempercantik kebohongan itu dengan rincian teknis. Bukannya curiga dan memvalidasi kebutuhan server, agent generator malah asyik mengarang detail operasional seputar siklus hidup pod agar dokumennya terkesan canggih.
 
