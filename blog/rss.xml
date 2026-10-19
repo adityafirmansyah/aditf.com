@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Why Our Multi-Agent Tooling Hallucinated Kubernetes (And How We Fix Context Poisoning)</title>
+      <link>https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/</guid>
+      <pubDate>Mon, 19 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Our internal developer tooling for docs and runbooks cleanly approved a specification claiming Dagango.com runs on Kubernetes. Here is how context poisoning broke verification.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/id/"/>
+    </item>
+    <item>
       <title>The 30,000 PR Illusion: Why Stacking AI Reviewers Degrades Architectural Cohesion</title>
       <link>https://aditf.com/blog/the-30000-pr-illusion/</link>
       <guid isPermaLink="true">https://aditf.com/blog/the-30000-pr-illusion/</guid>
@@ -176,15 +185,6 @@
       <description>A forensic report on 700 escaped agents reads better as a containment checklist than an incident recap. Here is what it changed about how I run my own fleet.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/egress-is-the-boundary-agent-containment/id/"/>
-    </item>
-    <item>
-      <title>Why We Built Isolated Subdomains Instead of a Public Store Directory</title>
-      <link>https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/</guid>
-      <pubDate>Sat, 26 Sep 2026 00:00:00 +0000</pubDate>
-      <description>A public /stores directory would have made Dagango.com behave like a marketplace. We shipped per-tenant host routing and metadata instead, and the crawl-budget argument is what settled it.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/isolated-subdomains-vs-public-store-directory/id/"/>
     </item>
   </channel>
 </rss>

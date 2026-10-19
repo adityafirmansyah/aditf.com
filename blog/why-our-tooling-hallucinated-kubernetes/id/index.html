@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kenapa Pipeline AI Kita Bikin Halusinasi Kubernetes (Dan Cara Tangkal Context Poisoning) — Field Notes</title>
+<meta name="description" content="Pipeline tooling developer kita mendadak meloloskan spesifikasi arsitektur yang nyebut Dagango.com jalan di Kubernetes. Ini investigasi teknis dan solusi kami.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kenapa Pipeline AI Kita Bikin Halusinasi Kubernetes (Dan Cara Tangkal Context Poisoning) — Field Notes">
+<meta property="og:description" content="Pipeline tooling developer kita mendadak meloloskan spesifikasi arsitektur yang nyebut Dagango.com jalan di Kubernetes. Ini investigasi teknis dan solusi kami.">
+<meta property="og:url" content="https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kenapa Pipeline AI Kita Bikin Halusinasi Kubernetes (Dan Cara Tangkal Context Poisoning) — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kenapa Pipeline AI Kita Bikin Halusinasi Kubernetes (Dan Cara Tangkal Context Poisoning) — Field Notes">
+<meta name="twitter:description" content="Pipeline tooling developer kita mendadak meloloskan spesifikasi arsitektur yang nyebut Dagango.com jalan di Kubernetes. Ini investigasi teknis dan solusi kami.">
+<meta name="twitter:image" content="https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-19T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="software-architecture">
+<meta property="article:tag" content="devops">
+<meta property="article:tag" content="prompt-engineering">
+<meta property="article:tag" content="software-engineering">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Kenapa Pipeline AI Kita Bikin Halusinasi Kubernetes (Dan Cara Tangkal Context Poisoning)", "description": "Pipeline tooling developer kita mendadak meloloskan spesifikasi arsitektur yang nyebut Dagango.com jalan di Kubernetes. Ini investigasi teknis dan solusi kami.", "datePublished": "2026-10-19T00:00:00+00:00", "dateModified": "2026-10-19T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/id/"}, "keywords": "ai-agents, software-architecture, devops, prompt-engineering, software-engineering", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1080, "image": ["https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>19 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Kenapa Pipeline AI Kita Bikin Halusinasi Kubernetes (Dan Cara Tangkal Context Poisoning)</h1>
+    <div class="post__tags"><span>ai-agents</span><span>software-architecture</span><span>devops</span><span>prompt-engineering</span><span>software-engineering</span></div>
+    <div class="post__content reveal is-visible">
+<h2>Tumpukan arsitektur yang nggak pernah kita bikin</h2>
+<p>Di Dagango.com, kita ngejalanin fleet agent otonom buat bantu bikin dokumentasi internal, review kode, dan nulis spesifikasi sistem. Pada 17 Oktober 2026, pipeline internal ini dengan percaya diri meloloskan dokumen arsitektur yang mengklaim platform kita jalan di atas cluster Kubernetes. Gue sempat bengong bacanya, karena sejak hari pertama dibangun, Dagango.com sama sekali nggak pernah nyentuh Kubernetes buat production.</p>
+<p>Arsitektur server kita di dunia nyata jauh lebih bersahaja:</p>
+<ul>
+<li>unit service systemd biasa buat ngawasi proses background,</li>
+<li>reverse proxy nginx buat terminasi SSL dan routing traffic,</li>
+<li>dan worker antrean yang jalan langsung di bawah user Linux lokal.</li>
+</ul>
+<p>Repositori kita bersih total dari pod, manifest Helm, maupun ingress controller. Anehnya, dokumen yang lolos review internal itu nggak cuma nyenggol Kubernetes sepintas lalu, melainkan ngejelasin kebijakan scaling cluster sampai siklus restart pod secara meyakinkan lewat beberapa paragraf panjang.</p>
+<h2>Asal muasal racun konteks di level periset</h2>
+<p>Setelah gue telusuri run log-nya, biang keroknya ternyata ada di luar agent generator ataupun verifier. Kerusakan dimulai jauh di hulu, tepatnya di berkas ringkasan <code>brief.md</code>. Model LLM pas disuruh merangkum catatan sistem itu sering kali kebablasan mengolah informasi mentah, karena mereka punya kecenderungan bawaan buat merangkum dan menghubung-hubungkan titik informasi yang sebenernya terpisah:</p>
+<ul>
+<li>agent periset baca profil bio gue yang nyebut pengalaman masa lalu megang microservices,</li>
+<li>terus dia baca catatan terpisah soal Dagango.com yang pakai monorepo Next.js dan FastAPI,</li>
+<li>nah, dari dua info itu dia langsung narik kesimpulan sendiri kalau Dagango.com jalan di cluster container Kubernetes.</li>
+</ul>
+<p>Klaim palsu ini kemudian ditulis ke dalam brief riset sebagai fakta fondasi. Di sinilah letak jebakan arsitekturnya bekerja.</p>
+<p>Dalam desain tooling kita, dokumen brief hasil riset diperlakukan sebagai pegangan fakta mutlak yang pantang digugat oleh agent tahap berikutnya tanpa ada kontradiksi eksternal yang nyata. Kerusakan ini murni hasil sintesis semantik agresif dari agent hulu yang mencemari seluruh konteks kerja ke bawahnya.</p>
+<h2>Ilusi audit independen antar-LLM</h2>
+<p>Kita sengaja masang verifier mandiri di pengujung pipeline demi mencegah masuknya klaim teknis fiktif ke spesifikasi internal kita. Tugas reviewer ini galak: dia wajib nolak spesifikasi yang ketahuan ngarang metrik atau bikin cerita fiktif.</p>
+<p>Tapi pas dokumen Kubernetes itu diverifikasi, skornya malah keluar bersih tanpa cacat kritis sama sekali:</p>
+<ul>
+<li>verifier ngecek apakah tulisan yang digenerate cocok sama arahan berkas brief riset,</li>
+<li>dia nemu kalau kata Kubernetes emang udah tertulis jelas di brief dari awal,</li>
+<li>ya udah, verifier langsung nyimpulin kalau generator cuma ngejalanin tugasnya dengan patuh.</li>
+</ul>
+<p>Ini ilusi paling berbahaya pas kita numpuk LLM buat saling ngoreksi. Verifier yang cuma disuruh ngecek keselarasan teks terhadap konteks hulu nggak bakal pernah bisa tahu kalau konteks hulunya sendiri murni karangan bebas.</p>
+<p>Reviewer kita cuma bertindak sebagai pemeriksa kepatuhan alih-alih penguji kebenaran faktual. Karena kebohongan arsitektur tadi udah hadir di prompt awal, verifier otomatis nganggepnya sebagai fakta yang sah.</p>
+<h2>Tebakan masuk akal vs kepastian arsitektur</h2>
+<p>Verifier pipeline kita sebenernya terbukti sangat jeli kalau urusannya mendeteksi fabrikasi angka performa maupun rekayasa statistik. Di run sebelumnya, sistem ini langsung nolak draf yang nyelipin angka hit ratio cache 91% tanpa rujukan jelas.</p>
+<p>Angka statistik punya sifat yang gampang diverifikasi lewat log dan data riil:</p>
+<ul>
+<li>nilai numerik biasanya punya tautan sumber primer yang konkret,</li>
+<li>angka persentase harus sinkron sama rekaman telemetri di server,</li>
+<li>dan metrik pengujian bakal langsung gugur kalau nggak tertulis di URL referensi.</li>
+</ul>
+<p>Masalahnya, klaim arsitektur punya karakter yang beda total. Di mata LLM, wajar-wajar aja kalau monorepo Next.js dan FastAPI ditaruh di Kubernetes. Kalimat itu terdengar sangat masuk akal secara statistik, meski faktanya nol besar buat infrastruktur kita.</p>
+<p>LLM cuma mengukur tingkat kewajaran kalimat ketimbang kebenaran empiris di server nyata. Tanpa adanya aturan mutlak yang dikunci lewat kode, kebohongan yang terdengar canggih bakal selalu lolos sensor otomatis.</p>
+<h2>Jebakan konsensus palsu di ruang gema multi-agent</h2>
+<p>Numpuk beberapa agent dalam satu pipeline tooling sering dikira menghasilkan pengujian yang objektif. Nyatanya, susunan bertingkat begini gampang banget menjelma jadi ruang gema tertutup.</p>
+<p>Ketika sebuah premis palsu terlanjur merayap ke dalam konteks prompt bersama, model-model setelahnya justru sibuk mempercantik kebohongan itu dengan rincian teknis. Bukannya curiga dan memvalidasi kebutuhan server, agent generator malah asyik mengarang detail operasional seputar siklus hidup pod agar dokumennya terkesan canggih.</p>
+<p>Rantai konsensus palsu ini bergulir mulus melewati empat babak:</p>
+<ul>
+<li>periset mengarang tumpukan stack dari sintesis profil yang keliru,</li>
+<li>generator mengembangkan premis itu dengan rincian arsitektur yang meyakinkan,</li>
+<li>verifier memberi lampu hijau lantaran naskahnya patuh terhadap brief,</li>
+<li>dan otomatisasi alur kerja bersiap menyerahkan dokumen ke tim internal.</li>
+</ul>
+<p>Semua model kompak mengamini narasi fiktif ini tanpa ada satu pun yang memeriksa kondisi server fisik kita. Menyamakan tiga giliran LLM dengan tiga lapis verifikasi manusia jelas kekeliruan fatal dalam rekayasa sistem otonom.</p>
+<h2>Benteng pertahanan buat tangkal racun konteks</h2>
+<p>Buat beresin celah ini, kita nggak bisa cuma ngandelin revisi prompt yang sifatnya imbauan halus. Di tooling produksi kita, solusi instan yang langsung kita eksekusi cukup jelas:</p>
+<ul>
+<li><strong>Aturan arsitektur mutlak di berkas SOUL.</strong> Kita nambahin batasan negatif yang tegas di prompt dasar. Kontrak agent periset dan auditor sekarang mengunci aturan mutlak: Dagango.com cuma jalan di VPS Linux dan bare-metal pakai systemd serta nginx, dan haram hukumnya nyebut Kubernetes.</li>
+<li><strong>Pemisahan validasi fakta dari isi brief.</strong> Verifier nggak boleh lagi nganggep teks brief riset sebagai sumber kebenaran mutlak tanpa verifikasi batas arsitektur sistem yang nyata.</li>
+<li><strong>Peran krusial pengawasan manusia.</strong> Agent otonom emang hebat buat urusan riset, nulis spesifikasi, sampai ngecek format, tapi insting manusia tetap mutlak diperlukan buat nyetop halusinasi semantik yang lolos dari sensor bot.</li>
+</ul>
+<p>Batasan negatif di profil prompt ampuh buat ngeblok halusinasi yang polanya udah ketahuan. Tapi buat jangka panjang, intinya jangan pernah nelen mentah-mentah output teks dari LLM hulu sebagai kebenaran mutlak.</p>
+<h2>Catatan lapangan buat arsitek sistem AI</h2>
+<p>Arsitektur multi-agent sekarang lagi naik daun dan mulai banyak dipakai di sistem tooling developer. Tapi kalau kita ngasih mandat besar ke kawanan agent tanpa mitigasi racun konteks, sistem verifikasi kita tinggal nunggu waktu buat jebol. Begitu agent penguji lo bergantung pada prompt yang di-generate sama agent lain, rantai validasi lo sebenernya udah rusak dari dalam.</p>
+<p>Pelajaran mahal dari insiden ini ngasih kita tiga pegangan operasional:</p>
+<ul>
+<li>anggap semua output teks dari LLM hulu sebagai data mentah yang belum tentu benar,</li>
+<li>kunci batasan arsitektur penting lewat kode pengujian deterministik daripada sekadar bisikan prompt,</li>
+<li>dan pertahankan peran manusia sebagai pemegang kendali akhir di gerbang deployment.</li>
+</ul>
+<p>Agent cerdas emang jago nulis dan ngerapihin dokumentasi dengan kecepatan luar biasa. Tapi memastikan sistem tetap berpijak pada arsitektur server yang nyata tetap jadi tanggung jawab kita sebagai engineer.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
