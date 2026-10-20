@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compiler Jadi CA: Kenapa Go Hardcode Delapan Sertifikat — Field Notes</title>
+<meta name="description" content="Delapan intermediate eMudhra dicabut karena private key bocor. Sehari kemudian Go rilis patch yang jadi satu-satunya penegakan yang bakal diterima backend kita.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/go-distrusts-eight-intermediate-cas/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Compiler Jadi CA: Kenapa Go Hardcode Delapan Sertifikat — Field Notes">
+<meta property="og:description" content="Delapan intermediate eMudhra dicabut karena private key bocor. Sehari kemudian Go rilis patch yang jadi satu-satunya penegakan yang bakal diterima backend kita.">
+<meta property="og:url" content="https://aditf.com/blog/go-distrusts-eight-intermediate-cas/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/go-distrusts-eight-intermediate-cas/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Compiler Jadi CA: Kenapa Go Hardcode Delapan Sertifikat — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Compiler Jadi CA: Kenapa Go Hardcode Delapan Sertifikat — Field Notes">
+<meta name="twitter:description" content="Delapan intermediate eMudhra dicabut karena private key bocor. Sehari kemudian Go rilis patch yang jadi satu-satunya penegakan yang bakal diterima backend kita.">
+<meta name="twitter:image" content="https://aditf.com/blog/go-distrusts-eight-intermediate-cas/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-20T00:00:00+00:00">
+<meta property="article:tag" content="golang">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="pki">
+<meta property="article:tag" content="tls">
+<meta property="article:tag" content="devops">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Compiler Jadi CA: Kenapa Go Hardcode Delapan Sertifikat", "description": "Delapan intermediate eMudhra dicabut karena private key bocor. Sehari kemudian Go rilis patch yang jadi satu-satunya penegakan yang bakal diterima backend kita.", "datePublished": "2026-10-20T00:00:00+00:00", "dateModified": "2026-10-20T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/go-distrusts-eight-intermediate-cas/id/"}, "keywords": "golang, security, pki, tls, devops", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1020, "image": ["https://aditf.com/blog/go-distrusts-eight-intermediate-cas/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/go-distrusts-eight-intermediate-cas/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/go-distrusts-eight-intermediate-cas/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/go-distrusts-eight-intermediate-cas/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/go-distrusts-eight-intermediate-cas/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>20 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Compiler Jadi CA: Kenapa Go Hardcode Delapan Sertifikat</h1>
+    <div class="post__tags"><span>golang</span><span>security</span><span>pki</span><span>tls</span><span>devops</span></div>
+    <div class="post__content reveal is-visible">
+<p>Tanggal 18 Oktober 2026, log revocation CCADB nambah delapan intermediate eMudhra dengan alasan <code>cACompromise</code>.</p>
+<p>Enam di antaranya rantainya nyambung ke emSign Root TLS CA - G3. Dua sisanya ke emSign Root CS CA - G3. Cakupannya termasuk penerbit DV sampai EV.</p>
+<p>Sehari setelah catatan itu nongol, bentuk mitigasi yang realistis kita terima keluar sebagai literal di standard library. Go rilis go1.27.3 dan go1.26.10 lewat CVE-2026-111943.</p>
+<p>Di dalam <code>crypto/x509</code> sekarang ada map isi delapan hash SHA-256 SPKI. Ada juga filter yang membuang rantai sertifikat begitu salah satu isinya cocok sama hash itu.</p>
+<p>Commit-nya ditulis Roland Shoemaker, dilacak di issue 82345, di-review sebagai CL 851047. Backport-nya lewat CL 851145 buat Go 1.26 dan CL 851165 buat Go 1.27. Totalnya 42 baris nambah, nol baris hapus. Isinya nyebar di tiga file.</p>
+<p>Gue penasaran apakah daftar itu benar-benar cocok sama catatan CCADB. Jadi gue ambil delapan nilai dari <code>verify.go</code>, terus hitung ulang SPKI SHA-256 dari sertifikat yang dicabut.</p>
+<p>Hasilnya delapan dari delapan cocok.</p>
+<p>Nggak ada tebak-tebakan issuer di sini. Yang di-pin itu sertifikat spesifiknya, lewat public key.</p>
+<h2>Diff-nya cuma satu map dan satu filter</h2>
+<pre><code class="language-go">// src/crypto/x509/verify.go
+var distrustedSPKIHashes = map[string]struct{}{
+    &quot;ebed6475c2c2d80fcb199f3fe8dd6e6b3ce60b77eb15d4e42c3dec0c6f5b5105&quot;: {},
+    &quot;49dd353dc2b919a3770645117d0e60c16115e7d1bc259eefe734b00ea434fe5f&quot;: {},
+    // ... enam entri lagi, dipotong di sini
+}
+
+func containsDistrustedSPKIHash(chain []*Certificate) bool {
+    for _, c := range chain {
+        h := sha256.Sum256(c.RawSubjectPublicKeyInfo)
+        if _, ok := distrustedSPKIHashes[hex.EncodeToString(h[:])]; ok {
+            return true
+        }
+    }
+    return false
+}
+</code></pre>
+<p>Dua detail yang bikin patch ini benar-benar kerja. Penolakannya berdasarkan hash SPKI, jadi sertifikat yang di-reissue dengan serial baru tetap kena selama key pair-nya sama. Lalu loop-nya jalan di seluruh rantai, termasuk leaf-nya.</p>
+<p>Call site-nya lebih menarik daripada map-nya. <code>root_darwin.go</code> ngecek <code>containsDistrustedSPKIHash(chain[0])</code>. <code>root_windows.go</code> pakai <code>slices.DeleteFunc(chains, containsDistrustedSPKIHash)</code>.</p>
+<p>Dua-duanya jalan di atas rantai yang sudah dibangun OS lewat <code>SecTrustCopyCertificateChain</code> dan <code>CertGetCertificateChain</code>. Platform bilang rantai itu valid. Go tetap membuangnya.</p>
+<h2>Revocation di backend praktis nggak jalan</h2>
+<p>Semua tim yang jalanin API ngadepin hitungan availability yang sama soal OCSP. Hasilnya selalu mendarat di titik yang sama:</p>
+<ul>
+<li><strong>OCSP hard-fail</strong> mengubah responder yang lambat jadi outage, jadi hampir nggak ada yang berani masang di depan traffic produksi.</li>
+<li><strong>OCSP soft-fail</strong> jawab "good" tiap kali pengecekannya error. Penyerang yang pegang jalur jaringan tinggal drop traffic ke IP responder.</li>
+<li><strong>CRL</strong> datang sesuai jadwal publish CA, ukurannya berat buat di-fetch per koneksi, dan jarang ada yang ngambil tiap request.</li>
+<li><strong><code>x509.Verify</code> di Go</strong> nggak melakukan network lookup sama sekali. Certificate-nya cuma bawa field <code>OCSPServer</code> plus parser response. Sisanya lo yang putusin.</li>
+</ul>
+<p>Trade-off-nya masuk akal secara engineering. Efek strukturalnya tetap ada: intermediate yang sudah dicabut terus bisa nandatanganin leaf yang valid sampai ada sesuatu di luar proses lo yang bilang berhenti.</p>
+<p>Kalau nggak ada yang bilang berhenti, komprominya nggak kelihatan dari sisi client. Semua client yang masih percaya root induknya jalan seperti biasa.</p>
+<h2>Bundle CA di Linux nggak pernah jadi blocklist</h2>
+<p>Gue cek di mesin yang gue pakai nulis ini. <code>/etc/ssl/certs/ca-certificates.crt</code> isinya 121 sertifikat, total 178 KB.</p>
+<p>Semuanya root trust anchor.</p>
+<p>Dan root justru lapisan yang nggak kena masalah di kasus ini. Delapan sertifikat tadi itu intermediate, ditandatangani root emSign yang statusnya masih dipercaya.</p>
+<p>Bundle root yang baru di-download nggak bisa nyatakan satu kalimat pun soal "intermediate ini jelek". Di situ nggak ada kosakata buat intermediate.</p>
+<p>Windows sama macOS emang nyimpen data revocation intermediate di store masing-masing. Itu bagian yang di server Linux memang nggak ada.</p>
+<p>Makanya diff yang nyentuh <code>root_darwin.go</code> dan <code>root_windows.go</code> itu bagian paling menarik. Di dua OS itu pun Go tetap harus buang rantainya sendiri.</p>
+<p>Store platform itu bakal nangkep kedelapannya atau nggak, nggak ada yang sempat cek. Go buang rantainya duluan.</p>
+<h2>Rebuild binary-nya, jangan cuma restart</h2>
+<p>Di binary yang statically linked, validasi rantai ya kode <code>crypto/x509</code> yang lo compile.</p>
+<p>Update paket <code>ca-certificates</code> di host cuma ngaruh ke root mana yang di-load saat runtime. Sampai situ doang.</p>
+<p>Paket itu nggak bisa mencabut intermediate. Dan sama sekali nggak bisa nyentuh daftar hash yang sudah ke-compile di binary lo.</p>
+<pre><code class="language-bash"># toolchain apa yang build binary yang benar-benar jalan?
+go version -m ./service | grep goversion
+
+# pertanyaan yang sama buat semua binary di dalam image
+for b in /app/bin/*; do go version -m &quot;$b&quot; | head -2; done
+</code></pre>
+<p>Apa pun yang dibuild pakai go1.27.2, go1.26.9, atau versi lebih lama harus di-rebuild dan di-redeploy. Tanpa itu, filter-nya belum ada di proses yang jalan.</p>
+<p>Bukan restart. Rebuild, terus redeploy semua image yang bawa binary Go dan bikin koneksi TLS keluar.</p>
+<h2>Yang gue lakuin minggu ini</h2>
+<ul>
+<li>Cek <code>go version -m</code> di artefak yang benar-benar jalan, jangan cuma <code>go.mod</code> di repo.</li>
+<li>Subscribe golang-announce dan perlakukan patch release toolchain sebagai channel keamanan. Karena memang itu fungsinya.</li>
+<li>Inventaris koneksi TLS keluar. Service mana yang nyambung ke endpoint pihak ketiga yang rantainya bisa mengandung intermediate yang baru dicabut?</li>
+<li>Buat service yang nggak bisa cepat di-rebuild, terminasi TLS-nya di proxy yang bisa lo ubah tanpa nyentuh binary.</li>
+<li>Pantau log revocation publik CCADB langsung. Sumber itu sudah melaporkannya 18 Oktober, sebelum ada release note apa pun.</li>
+</ul>
+<p>Otomasi sertifikat nggak ngasih isolasi sebesar yang dipercaya tim platform. Rotasi ACME mengganti leaf milik kita sendiri, dan buat itu dia memang jalan baik.</p>
+<p><code>cpach</code> di thread Hacker News nunjuk ke ACME plus ARI (RFC 9773) sebagai jawaban dari sisi client. Di situ CA yang kasih tahu client kalau sertifikatnya perlu diganti.</p>
+<p>Tapi nggak ada satu pun dari itu yang mencabut intermediate bocor di rantai orang lain.</p>
+<p>Thread itu juga ngasih lelucon terbaik minggu ini. <code>accountrequired</code> bilang ini momen <code>"Sir, this is a Wendy's" where my compiler thought it was a root certificate authority</code>.</p>
+<p><code>TheDong</code> mengoreksi framing-nya: sertifikatnya nempel di paket TLS standard library, bukan di compiler, dan Go ngirim keduanya dalam satu rilis.</p>
+<p>Oke, dan hasil operasionalnya tetap sama. Upgrade toolchain artinya ganti kebijakan sertifikat.</p>
+<p>Yang bikin nggak nyaman bukan soal Go hardcode delapan hash. Yang bikin nggak nyaman: toolchain bahasa jadi tempat terakhir di mana hal ini bisa ditegakkan sama sekali.</p>
+<p>Trust root sebuah service Go bukan file yang lo atur. Bentuknya commit yang sudah nempel di setiap binary yang lo kirim, dan dia cuma diperbarui kalau lo rebuild.</p>
+<p>Dulu itu cuma poin filosofis soal supply chain. Sekarang jadi satu baris di <code>verify.go</code> yang isinya hash.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/go-distrusts-eight-intermediate-cas/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
