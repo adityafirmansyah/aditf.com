@@ -3,21 +3,39 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://aditf.com/</loc>
-    <lastmod>2026-10-20</lastmod>
+    <lastmod>2026-10-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://aditf.com/consult/</loc>
-    <lastmod>2026-10-20</lastmod>
+    <lastmod>2026-10-21</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://aditf.com/blog/</loc>
-    <lastmod>2026-10-20</lastmod>
+    <lastmod>2026-10-21</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/id/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/"/>
+    <lastmod>2026-10-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/id/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/id/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/"/>
+    <lastmod>2026-10-21</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://aditf.com/blog/go-distrusts-eight-intermediate-cas/</loc>

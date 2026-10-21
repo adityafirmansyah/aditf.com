@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kenapa Cloudflare Porting TypeScript ke Rust Demi Wasm, Bukan Demi Kecepatan — Field Notes</title>
+<meta name="description" content="tsrs dari Cloudflare sampai 8x lebih cepat dari TypeScript 7.0 dengan memori ~70% lebih hemat. Angka itu bonus. WebAssembly alasan sebenarnya port ini dibuat.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kenapa Cloudflare Porting TypeScript ke Rust Demi Wasm, Bukan Demi Kecepatan — Field Notes">
+<meta property="og:description" content="tsrs dari Cloudflare sampai 8x lebih cepat dari TypeScript 7.0 dengan memori ~70% lebih hemat. Angka itu bonus. WebAssembly alasan sebenarnya port ini dibuat.">
+<meta property="og:url" content="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kenapa Cloudflare Porting TypeScript ke Rust Demi Wasm, Bukan Demi Kecepatan — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kenapa Cloudflare Porting TypeScript ke Rust Demi Wasm, Bukan Demi Kecepatan — Field Notes">
+<meta name="twitter:description" content="tsrs dari Cloudflare sampai 8x lebih cepat dari TypeScript 7.0 dengan memori ~70% lebih hemat. Angka itu bonus. WebAssembly alasan sebenarnya port ini dibuat.">
+<meta name="twitter:image" content="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-21T00:00:00+00:00">
+<meta property="article:tag" content="typescript">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="webassembly">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="performance">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Kenapa Cloudflare Porting TypeScript ke Rust Demi Wasm, Bukan Demi Kecepatan", "description": "tsrs dari Cloudflare sampai 8x lebih cepat dari TypeScript 7.0 dengan memori ~70% lebih hemat. Angka itu bonus. WebAssembly alasan sebenarnya port ini dibuat.", "datePublished": "2026-10-21T00:00:00+00:00", "dateModified": "2026-10-21T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/id/"}, "keywords": "typescript, rust, webassembly, ai-agents, performance", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1236, "image": ["https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>21 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Kenapa Cloudflare Porting TypeScript ke Rust Demi Wasm, Bukan Demi Kecepatan</h1>
+    <div class="post__tags"><span>typescript</span><span>rust</span><span>webassembly</span><span>ai-agents</span><span>performance</span></div>
+    <div class="post__content reveal is-visible">
+<p>Waktu Microsoft memindahkan compiler TypeScript dari JavaScript ke Go, sebagian besar alasan performa sudah selesai di situ. <code>tsc</code> jadi sekitar 10x lebih cepat dan jauh lebih hemat memori.</p>
+<p>Selama beberapa waktu, ceritanya kelihatan berhenti di titik itu.</p>
+<p>Terus tanggal 20 Oktober 2026, Cloudflare dan VoidZero ngumumin <code>tsrs</code>. Ini port compiler TypeScript ke Rust, dikerjain bareng Max Schwenk dari Owner.com dan diinkubasi di dalam toolchain Oxc.</p>
+<p>Benchmark awalnya sampai 8x lebih cepat dari TypeScript 7.0, dengan pemakaian memori sekitar 70% lebih sedikit.</p>
+<p>Gue baca angka itu dua kali, terus tetap ngerasa ada yang kelewat.</p>
+<p>Yang bikin port ini masuk akal bukan kecepatannya. Compiler Rust bisa di-compile ke WebAssembly tanpa ikut bawa garbage collector.</p>
+<p>Dan properti itu yang nentuin typechecker lo boleh hidup di mana.</p>
+<p>Gue pegang beberapa monorepo TypeScript, dan ada fleet agent yang jalanin typecheck di dalam loop. Jadi buat gue ini perubahan infrastruktur, bukan perang bahasa.</p>
+<h2>Cloudflare sendiri yang nulis batasan angkanya</h2>
+<p>Dua angka itu datang dengan kontrol. Jumlah worker-nya sama, dan konfigurasinya disepakati bareng tim TypeScript.</p>
+<p>Bagian kedua itu yang bobotnya lebih berat.</p>
+<p>Benchmark port compiler selama ini campur aduk. Angkanya sering diambil dari mesin lebih besar dengan flag lebih longgar. Cloudflare nyebut pola itu duluan.</p>
+<p>Yang gue catat buat evaluasi sendiri:</p>
+<ul>
+<li>8x itu plafon di satu suite benchmark, bukan angka tetap di repo lo,</li>
+<li><code>tsrs</code> secara default pakai konfigurasi adaptif yang makan memori lebih banyak demi jalan lebih cepat,</li>
+<li>TypeScript 7.1 beta sudah sampai 2.5x lebih cepat dari 7.0, dan sebagian perbaikan itu datang dari kerjaan <code>tsrs</code>.</li>
+</ul>
+<p>Jadi buat tim yang masih di TS 7.0, pembanding jujurnya 7.1. Ini yang bikin angka 8x itu terasa lebih besar dari kenyataannya.</p>
+<h2>Masalah Go di Wasm itu GC yang ikut nebeng</h2>
+<p>Compile program Go ke WebAssembly, dan garbage collector Go ikut masuk. Nggak ada build flag yang bisa buang itu.</p>
+<p>Collector-nya ada di dalam module, dan dia ngatur memori yang nggak bisa dilihat host.</p>
+<p>Rust nggak punya masalah itu. Module yang bisa ngobrol langsung sama memori host lebih murah dijalanin, dan pola aksesnya bisa diprediksi.</p>
+<p>Module-nya jadi lebih kecil dan resident footprint-nya turun. Nggak ada collector yang muter di dalam Worker lo.</p>
+<p>Ukuran, misalnya. <code>jerf</code> di HN lebih blak-blakan daripada announcement-nya: waktu Go dikirim ke Wasm hasilnya "very large WASM packages for small amounts of code".</p>
+<p>Compiler jelas bukan kode sedikit, jadi pengalinya juga nggak sedikit.</p>
+<p>Buat gue ini bagian yang paling sering kelewat. Yang dibandingin biasanya waktu eksekusi.</p>
+<p>Padahal yang lebih penting: seberapa besar barang itu setelah dijadikan module dan dikirim ke tempat di luar server.</p>
+<h2>Yang bikin port ini masuk akal itu target deploy-nya</h2>
+<p>Worker sudah bisa jalanin Wasm sejak lama.</p>
+<p>Dukungan Rust native di Worker sendiri baru mendarat beberapa minggu sebelum pengumuman ini. Jalurnya lewat target Emscripten baru buat <code>wasm-bindgen</code>, dan itu yang bikin hitungannya berubah.</p>
+<p>Kalau dua fakta itu digabung, satu development toolchain bisa jalan dari awal sampai akhir tanpa keluar dari sandbox. Dan nggak ada satu pun container terpisah yang perlu di-shell-out.</p>
+<p>Tempat-tempat yang jadi kebuka, gue urutin dari yang paling cepat gue pakai sendiri:</p>
+<ul>
+<li>typecheck lengkap di dalam Worker, buat preview build per PR,</li>
+<li>toolchain yang sama di tab browser, jadi kontributor tanpa setup lokal tetap dapat diagnostics asli,</li>
+<li>compiler di perangkat embedded atau langkah build IoT, tempat runtime Go plus collector-nya kegedean.</li>
+</ul>
+<p>Buat yang jalanin agent, kasus browser itu yang paling menarik. Kalau compiler-nya muat di satu tab, dia juga muat di batas isolasi yang sudah dipakai agent. Satu shared volume hilang dari desain. Satu kategori kejutan antar-tenant ikut hilang.</p>
+<h2>Satu agent tiap pagi, satu matrix tiap malam</h2>
+<p>Cloudflare tegas soal satu hal: ini bukan fork. Tim TypeScript tetap pegang kendali desain bahasa.</p>
+<p>Wajar. Tapi bagian maintenance-nya yang bikin gue berhenti sekadar baca cepat.</p>
+<p>Modelnya nyontek dari Vinext, reimplementasi Next.js mereka. Tiap pagi satu agent nge-review perubahan upstream dan buka tracking issue buat apa pun yang bisa ngaruh ke port-nya. Tiap malam compatibility matrix di-regenerate dengan jalanin test suite Next.js ke Vinext.</p>
+<p>Kalau ada yang jebol, agent nyari perubahannya di dua codebase sekaligus. Dia bikin reproduction, port test yang relevan, terus ngajuin fix. Proses yang sama sekarang dipakai buat TypeScript.</p>
+<p>Buat port downstream, ini ngubah bentuk kegagalannya. Project kayak gini biasanya mati pelan-pelan karena parity sama ribuan test upstream itu kerjaan manusia yang nggak ada yang mau bayar.</p>
+<p>Kalau parity jadi job malam yang draft fix-nya disiapin agent, biayanya jadi pos anggaran biasa. Bukan lagi sumber kelelahan tim.</p>
+<p>Ada satu bagian di postingan itu yang gampang dilewatin. Cloudflare sendiri yang bilang bahwa slopfork (clone cepat hasil AI yang nggak teliti) dan port besar sekarang bisa dikerjain model frontier dalam hitungan hari. Di antara semua itu, yang nentuin <code>tsrs</code> bukan angkanya. Dua hal ini yang bikin dia beda:</p>
+<ul>
+<li>dia ngikutin keputusan desain tim TypeScript,</li>
+<li>dan temuan performanya dikirim balik ke upstream.</li>
+</ul>
+<p>Tanpa keduanya, dia cuma satu lagi fork cepat.</p>
+<p>Dua detail kecil nunjukin timnya paham di mana titik rawannya. Theo Browne lagi nggabungin <code>tsc-rs</code> dan <code>tsrs</code> jadi satu package yang nutup semua fitur TypeScript, LSP dan content mappers termasuk. Divergensi yang mereka akui sempit, contohnya urutan diagnostics yang dicetak.</p>
+<h2>Ujian sebenarnya ada di upstream</h2>
+<p>Hubungan sama Microsoft lebih akur daripada perang fork biasanya. Dan Rosenwasser dari tim TypeScript muncul di thread Hacker News (383 poin, 184 komentar) buat ngomong bagian yang biasanya disimpan: "a lot of the speed does not just come down to language choice".</p>
+<p>Dia juga konfirmasi kalau sebagian yang bikin TS 7.1 lebih cepat dan lebih ringan datang dari optimasi yang ketemu waktu port Rust dikerjain.</p>
+<p>Contoh konkretnya PR #64476 dari <code>maschwenk</code>. PR itu bikin checker berhenti bikin intersection property yang nggak mungkin menyusut jadi <code>never</code>. Angka di body PR-nya yang menarik.</p>
+<p>Di benchmark <code>mui-docs</code> dengan empat checker: heap turun 41,8% dan waktu check turun 38,9%. Semua itu dari perubahan nyata sekitar 80 baris.</p>
+<p>PR itu ditutup tanpa di-merge, dan kalimat itu lebih penting daripada semua benchmark tadi. Temuan jalan ke upstream lebih cepat daripada patch-nya. Anggap saja hasilnya bakal mendarat di TypeScript, tapi jangan anggap diff-nya ikut mendarat.</p>
+<h2>Yang gue ubah duluan</h2>
+<p>Ekonomi inner loop beda sama ekonomi CI. Lima belas detik typecheck di pipeline itu nggak ada rasanya.</p>
+<p>Agent yang ngejalanin loop edit, typecheck, test puluhan kali buat satu task bayar biaya itu puluhan kali juga. Dan dia bayarnya sambil nahan container tetap hidup.</p>
+<pre><code>npm install tsrs
+npx tsrs
+</code></pre>
+<p>Yang lebih dulu nendang buat gue justru memori. Tiap checker paralel punya heap sendiri. Jadi di box yang jalanin empat container agent, hemat 70% RSS per checker itu yang nentuin apakah container kelima muat.</p>
+<p>Empat langkah yang gue ambil sekarang:</p>
+<ul>
+<li>catat peak RSS per typecheck bareng wall time, karena di situ kemenangan memorinya kelihatan,</li>
+<li>taruh <code>tsrs</code> sebagai job pelaporan di samping gate yang asli selama masih eksperimental,</li>
+<li>biarin urutan diagnostics dipegang <code>tsc</code> versi Go sampai divergensinya menutup,</li>
+<li>taruh loop-nya di dalam sandbox agent sendiri, jangan di shared build volume.</li>
+</ul>
+<p>Dua implementasi, satu bahasa, dan nggak ada yang jadi fork. Go ngembalikin kecepatan TypeScript di CLI. Rust ngasih tempat kedua buat hidup, dan itu yang bakal tetap relevan nanti waktu compiler-nya harus jalan di sesuatu yang jauh lebih kecil dari VM.</p>
+<p>Bedanya cuma satu, dan ini yang gue pegang: pertanyaan "ini berapa kali lebih cepat" bakal cepat basi. Pertanyaan "compiler ini harus bisa hidup di mana" nggak.</p>
+<p>Yang gue nggak akan lakuin: mindahin semua gate ke <code>tsrs</code> minggu ini cuma karena angkanya bagus di mesin orang lain.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

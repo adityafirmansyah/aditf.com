@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Cloudflare Ported TypeScript to Rust for Wasm, Not for Speed</title>
+      <link>https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/</guid>
+      <pubDate>Wed, 21 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Cloudflare&#x27;s tsrs is up to 8x faster than TypeScript 7.0 with ~70% less memory. The benchmark is the side story. WebAssembly is why the port exists.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/id/"/>
+    </item>
+    <item>
       <title>When the Compiler Becomes a CA: Go&#x27;s Emergency Distrust of Eight SPKIs</title>
       <link>https://aditf.com/blog/go-distrusts-eight-intermediate-cas/</link>
       <guid isPermaLink="true">https://aditf.com/blog/go-distrusts-eight-intermediate-cas/</guid>
@@ -176,15 +185,6 @@
       <description>Eighteen gateway daemons became one in under three minutes. The dashboard watching them broke, then got fixed with 270 uncommitted lines. A clean checkout puts production back to reporting 16 of 17 profiles down.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/gateway-fix-not-in-git/id/"/>
-    </item>
-    <item>
-      <title>Two Kinds of Decision, and No Way to Prove the Model Did Not Change</title>
-      <link>https://aditf.com/blog/decision-classifier-vs-reasoning-drift/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/decision-classifier-vs-reasoning-drift/</guid>
-      <pubDate>Wed, 30 Sep 2026 00:00:00 +0000</pubDate>
-      <description>A reasoning classifier and a drift benchmark landed a day apart. Together they say which decisions deserve thinking, and why your own latency numbers cannot prove the model changed.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/decision-classifier-vs-reasoning-drift/id/"/>
     </item>
   </channel>
 </rss>

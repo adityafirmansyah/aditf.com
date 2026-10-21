@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cloudflare Ported TypeScript to Rust for Wasm, Not for Speed — Field Notes</title>
+<meta name="description" content="Cloudflare&#x27;s tsrs is up to 8x faster than TypeScript 7.0 with ~70% less memory. The benchmark is the side story. WebAssembly is why the port exists.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Cloudflare Ported TypeScript to Rust for Wasm, Not for Speed — Field Notes">
+<meta property="og:description" content="Cloudflare&#x27;s tsrs is up to 8x faster than TypeScript 7.0 with ~70% less memory. The benchmark is the side story. WebAssembly is why the port exists.">
+<meta property="og:url" content="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Cloudflare Ported TypeScript to Rust for Wasm, Not for Speed — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cloudflare Ported TypeScript to Rust for Wasm, Not for Speed — Field Notes">
+<meta name="twitter:description" content="Cloudflare&#x27;s tsrs is up to 8x faster than TypeScript 7.0 with ~70% less memory. The benchmark is the side story. WebAssembly is why the port exists.">
+<meta name="twitter:image" content="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-21T00:00:00+00:00">
+<meta property="article:tag" content="typescript">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="webassembly">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="performance">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Cloudflare Ported TypeScript to Rust for Wasm, Not for Speed", "description": "Cloudflare's tsrs is up to 8x faster than TypeScript 7.0 with ~70% less memory. The benchmark is the side story. WebAssembly is why the port exists.", "datePublished": "2026-10-21T00:00:00+00:00", "dateModified": "2026-10-21T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/"}, "keywords": "typescript, rust, webassembly, ai-agents, performance", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1151, "image": ["https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>21 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Cloudflare Ported TypeScript to Rust for Wasm, Not for Speed</h1>
+    <div class="post__tags"><span>typescript</span><span>rust</span><span>webassembly</span><span>ai-agents</span><span>performance</span></div>
+    <div class="post__content reveal is-visible">
+<p>When Microsoft rewrote the TypeScript compiler from JavaScript to Go, the performance argument mostly closed. <code>tsc</code> got roughly 10x faster and far leaner.</p>
+<p>On October 20, 2026, Cloudflare and VoidZero announced <code>tsrs</code>, a Rust port built with Max Schwenk of Owner.com and incubated inside the Oxc toolchain. It benchmarks up to 8x faster than TypeScript 7.0 while using about 70% less memory.</p>
+<p>Sit with those numbers and you can still miss the point.</p>
+<p>The port exists because a Rust compiler compiles to WebAssembly without dragging a garbage collector behind it. That property decides where your typechecker is allowed to live.</p>
+<p>I maintain TypeScript monorepos and run agent fleets that typecheck in a loop. Read this as an infrastructure change rather than a language war.</p>
+<h2>The benchmark is real, and Cloudflare printed its own caveats</h2>
+<p>Both figures come with a control attached. The worker count matches, and the configuration was agreed with the TypeScript team.</p>
+<p>That second half is worth more than the headline.</p>
+<p>Compiler-port benchmarking has been a mess of numbers from bigger machines with looser flags. Cloudflare names that pattern first. What I carry into my evaluation:</p>
+<ul>
+<li>the 8x is a ceiling across a benchmark suite, not a constant on your repository,</li>
+<li><code>tsrs</code> ships an adaptive configuration by default that spends more memory to run faster than the pinned config,</li>
+<li>TypeScript 7.1 beta is already up to 2.5x faster than 7.0, with part of that coming back from <code>tsrs</code> work.</li>
+</ul>
+<p>So the honest comparison for a team on TS 7.0 is <code>tsrs</code> against 7.1. Nobody is comparing against nothing.</p>
+<h2>A Go binary carries its collector into Wasm</h2>
+<p>Compile a Go program to WebAssembly and Go's garbage collector comes along for the ride. No build flag shaves it off.</p>
+<p>The collector ships inside the module and manages memory the host cannot inspect.</p>
+<p>Rust does not have that problem. A guest module with direct, predictable memory access costs less to run. That is the efficiency Cloudflare is selling.</p>
+<p>The module gets smaller and the footprint drops. No collector spins inside your Worker.</p>
+<p>HN commenter <code>jerf</code> put the size half more directly: shipping Go to Wasm "results in very large WASM packages for small amounts of code". A compiler is hardly small code, so that multiplier is large.</p>
+<h2>The deployment target is the argument</h2>
+<p>Workers have run Wasm for years. Native Rust support arrived a few weeks before this announcement, through a new Emscripten target for <code>wasm-bindgen</code>.</p>
+<p>Stack them and a development toolchain runs end to end inside a sandbox, with nothing shelled out to a container.</p>
+<p>Places that opens up, ordered by how soon I would use them:</p>
+<ul>
+<li>a complete typecheck inside a Worker, for per-PR preview builds,</li>
+<li>the same toolchain in a browser tab, so a contributor with no local setup still sees real diagnostics,</li>
+<li>the compiler on an embedded device, where a Go runtime plus collector is too heavy to consider.</li>
+</ul>
+<p>The browser case matters most for agent runners. If the compiler fits in a tab, it fits inside whatever isolation boundary the agent already has. That removes a shared volume from the design, plus a category of cross-tenant surprises.</p>
+<h2>A morning agent and a nightly matrix keep this alive</h2>
+<p>Cloudflare is explicit that <code>tsrs</code> is not a fork. The TypeScript team keeps control of language design, and the port follows it.</p>
+<p>The maintenance section is where I stopped skimming. The model is copied from Vinext, their Next.js reimplementation. Each morning an agent reviews upstream changes and opens tracking issues for anything that could affect the port. Every night the compatibility matrix is regenerated by running the Next.js test suite against Vinext.</p>
+<p>When something breaks, agents locate the change across both codebases. They build a reproduction, port the relevant tests, and propose a fix. Cloudflare says the same process now runs for TypeScript.</p>
+<p>For a downstream port, that changes the failure mode. These projects rot because parity with thousands of upstream tests is human work nobody funds. Turn it into a nightly job with agents drafting the fixes, and it becomes a cost line instead of a burnout line.</p>
+<p>Cloudflare also admits the field is crowded. Frontier models can now do large ports in days, so slopforks (a fast low-rigor AI clone) and fully re-architected ports keep appearing. Two things separate <code>tsrs</code> from that pile:</p>
+<ul>
+<li>it follows the TypeScript team's design decisions,</li>
+<li>and its performance findings go back upstream.</li>
+</ul>
+<p>Without both, it is one more fast fork.</p>
+<p>Two details show the team knows the sharp edges. Theo Browne is merging <code>tsc-rs</code> and <code>tsrs</code> into one package covering every TypeScript feature, LSP and content mappers included. Known divergences stay small, like the order diagnostics print in.</p>
+<h2>Where upstream is the real test</h2>
+<p>The relationship with Microsoft is friendlier than the usual fork war. Dan Rosenwasser of the TypeScript team turned up in the Hacker News thread (383 points, 184 comments) to say the quiet part: "a lot of the speed does not just come down to language choice".</p>
+<p>He confirmed that some of what makes TS 7.1 faster and leaner came from optimizations discovered during the Rust port.</p>
+<p>The concrete case is PR #64476 from <code>maschwenk</code>, which stopped the checker from building intersection properties that cannot reduce to <code>never</code>. The numbers in the PR body are the interesting bit.</p>
+<p>On the <code>mui-docs</code> benchmark with four checkers, heap fell 41.8% and check time fell 38.9%. That came from roughly 80 lines of real change.</p>
+<p>That PR was closed without being merged, which matters more than any benchmark here. Findings travel upstream faster than patches do. Assume the discovery lands in TypeScript eventually, and do not assume the diff will.</p>
+<h2>What I would change on Monday</h2>
+<p>Inner-loop economics are not CI economics. Fifteen seconds of typecheck in a pipeline is nothing.</p>
+<p>An agent running an edit, typecheck, test loop dozens of times on one task pays that cost dozens of times. It pays while holding a container open.</p>
+<pre><code>npm install tsrs
+npx tsrs
+</code></pre>
+<p>Memory is the wall I hit first. Each parallel checker owns its heap. On a box running four agent containers, 70% less RSS per checker decides whether a fifth fits.</p>
+<p>Four moves I would make now:</p>
+<ul>
+<li>track peak RSS per typecheck alongside wall time, because that is where the memory win shows up,</li>
+<li>keep <code>tsrs</code> as a reporting job next to the real gate while it is experimental,</li>
+<li>leave diagnostic ordering to the Go <code>tsc</code> until the divergences close,</li>
+<li>put the loop inside the agent's own sandbox rather than on a shared build volume.</li>
+</ul>
+<p>Two implementations, one language, and neither of them a fork. Go gave TypeScript its speed back in the CLI. Rust is giving it a second place to live, which is the win that matters once the compiler has to run somewhere far smaller than a VM.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
