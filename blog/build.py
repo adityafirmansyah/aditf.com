@@ -211,6 +211,8 @@ def head(title, description, extra="", url=None, image=None, locale="en_US",
 <link rel="stylesheet" href="/styles.css">
 <link rel="stylesheet" href="/blog/blog.css">
 <link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="{BLOG_URL}rss.xml">
+<link rel="describedby" href="{SITE_URL}/llms.txt">
+<link rel="llms-txt" href="{SITE_URL}/llms.txt">
 <script>document.documentElement.classList.add('js');</script>
 {seo}
 {extra}
@@ -508,8 +510,27 @@ def build_sitemap(posts):
 
 
 def build_robots():
-    """robots.txt at repo root: allow everything, point at the sitemap."""
+    """robots.txt at repo root: allow everything, point at sitemap."""
     txt = f"""User-agent: *
+Allow: /
+
+# Explicit AI search & generative crawlers
+User-agent: GPTBot
+Allow: /
+
+User-agent: OAI-SearchBot
+Allow: /
+
+User-agent: PerplexityBot
+Allow: /
+
+User-agent: ClaudeBot
+Allow: /
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: Applebot-Extended
 Allow: /
 
 # Crawl-delay kept low: static site, no backend load.
@@ -518,6 +539,59 @@ Crawl-delay: 1
 Sitemap: {SITE_URL}/sitemap.xml
 """
     (REPO_DIR / "robots.txt").write_text(txt, encoding="utf-8")
+
+
+def build_llms_txt(posts):
+    """Generate llms.txt at repo root per the llmstxt.org specification.
+
+    Provides a clean, concise, LLM-friendly index of site identity, core engineering domains,
+    flagship projects, and all published field notes for Generative Engine Optimization (GEO).
+    """
+    lines = [
+        f"# {SITE_NAME}",
+        "",
+        f"> {AUTHOR_JOB}. 13+ years building scalable platforms, microservices, and autonomous multi-agent AI workflows. Practitioner notes, architecture war stories, and engineering benchmarks.",
+        "",
+        "## Overview",
+        f"- Website: {SITE_URL}/",
+        f"- Blog: {BLOG_URL}",
+        f"- Consultation & Advisory: {SITE_URL}/consult/",
+        f"- RSS Feed: {BLOG_URL}rss.xml",
+        f"- GitHub: https://github.com/adityafirmansyah",
+        f"- LinkedIn: https://linkedin.com/in/aditya-firmansyah-21940845",
+        "- Location: Surakarta, Central Java, Indonesia",
+        "",
+        "## Core Competencies & Technical Stack",
+        "- AI & Autonomous Agents: Multi-agent orchestration, LLM tool-calling, Hermes Agent, Claude Code, evaluation harnesses, prompt workflows.",
+        "- Backend & Microservices: Python (FastAPI), Node.js (NestJS, Express), TypeScript, Rust, PostgreSQL, SQLite (WAL mode), Redis.",
+        "- Frontend & Web: Next.js, React, TypeScript, Tailwind CSS, static site generation, responsive UI/UX.",
+        "- Systems & Infrastructure: Linux homelab self-hosting, Docker, Caddy, Nginx, Git post-receive deploy hooks, systemd services, Cloudflare.",
+        "- E-Commerce & Domain Platforms: Multi-tenant SaaS, order orchestration, Indonesian QRIS payment flows.",
+        "",
+        "## Flagship Projects",
+        "- [Dagango.com](https://dagango.com): High-performance multi-tenant e-commerce storefront platform built with Next.js and FastAPI.",
+        "- [mycv.ai.id](https://mycv.ai.id): Automated 8-stage AI resume and ATS optimization web application.",
+        "- [TirtaDesa](https://tirtadesa.com): Rural clean water utility management SaaS for Indonesian village communities.",
+        "",
+        "## Field Notes & Technical Articles",
+        "Practitioner notes from production engineering, agent orchestration, and self-hosted infrastructure:",
+        "",
+    ]
+    for e in posts:
+        meta = e["en"]["meta"]
+        slug = e["slug"]
+        url = f"{BLOG_URL}{slug}/"
+        title = meta["title"]
+        date_str = fmt_date(meta["date"])
+        excerpt = meta.get("excerpt", "").strip()
+        tags = ", ".join(meta.get("tags", []))
+        has_id = "id" in e
+        id_note = f" (also available in [Indonesian]({BLOG_URL}{slug}/id/))" if has_id else ""
+        lines.append(f"- [{title}]({url}): {excerpt} (Filed {date_str}, tags: {tags}){id_note}")
+
+    lines.append("")
+    content = "\n".join(lines)
+    (REPO_DIR / "llms.txt").write_text(content, encoding="utf-8")
 
 
 FONT_CANDIDATES = [
@@ -665,9 +739,10 @@ def main():
     build_rss(posts)
     n_urls = build_sitemap(posts)
     build_robots()
+    build_llms_txt(posts)
     print(f"built: listing + {len(posts)} post(s) "
           f"({sum(1 for e in posts if 'id' in e)} bilingual), rss.xml, "
-          f"sitemap.xml ({n_urls} URLs), robots.txt, "
+          f"sitemap.xml ({n_urls} URLs), robots.txt, llms.txt, "
           f"og images={'yes' if (HAVE_PIL and blog_og) else 'skipped (no Pillow)'}")
     if not HAVE_PIL:
         print("  note: Pillow unavailable — social share cards skipped; "
