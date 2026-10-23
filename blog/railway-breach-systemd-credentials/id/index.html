@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Railway Bocor Bukan Karena Env Var. Tapi Env Var Tetap Tempat Nyimpen Secret yang Salah. — Field Notes</title>
+<meta name="description" content="Kebocoran Railway Oktober 2026 ngebongkar isi database secret mereka, bukan sekadar env var. Masalahnya, kebiasaan naruh kredensial produksi di env var yang bikin kerusakannya sebesar itu.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/railway-breach-systemd-credentials/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Railway Bocor Bukan Karena Env Var. Tapi Env Var Tetap Tempat Nyimpen Secret yang Salah. — Field Notes">
+<meta property="og:description" content="Kebocoran Railway Oktober 2026 ngebongkar isi database secret mereka, bukan sekadar env var. Masalahnya, kebiasaan naruh kredensial produksi di env var yang bikin kerusakannya sebesar itu.">
+<meta property="og:url" content="https://aditf.com/blog/railway-breach-systemd-credentials/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/railway-breach-systemd-credentials/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Railway Bocor Bukan Karena Env Var. Tapi Env Var Tetap Tempat Nyimpen Secret yang Salah. — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Railway Bocor Bukan Karena Env Var. Tapi Env Var Tetap Tempat Nyimpen Secret yang Salah. — Field Notes">
+<meta name="twitter:description" content="Kebocoran Railway Oktober 2026 ngebongkar isi database secret mereka, bukan sekadar env var. Masalahnya, kebiasaan naruh kredensial produksi di env var yang bikin kerusakannya sebesar itu.">
+<meta name="twitter:image" content="https://aditf.com/blog/railway-breach-systemd-credentials/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-23T00:00:00+00:00">
+<meta property="article:tag" content="devops">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="self-hosting">
+<meta property="article:tag" content="cloud">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Railway Bocor Bukan Karena Env Var. Tapi Env Var Tetap Tempat Nyimpen Secret yang Salah.", "description": "Kebocoran Railway Oktober 2026 ngebongkar isi database secret mereka, bukan sekadar env var. Masalahnya, kebiasaan naruh kredensial produksi di env var yang bikin kerusakannya sebesar itu.", "datePublished": "2026-10-23T00:00:00+00:00", "dateModified": "2026-10-23T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/railway-breach-systemd-credentials/id/"}, "keywords": "devops, security, linux, self-hosting, cloud", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1126, "image": ["https://aditf.com/blog/railway-breach-systemd-credentials/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/railway-breach-systemd-credentials/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/railway-breach-systemd-credentials/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/railway-breach-systemd-credentials/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/railway-breach-systemd-credentials/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>23 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Railway Bocor Bukan Karena Env Var. Tapi Env Var Tetap Tempat Nyimpen Secret yang Salah.</h1>
+    <div class="post__tags"><span>devops</span><span>security</span><span>linux</span><span>self-hosting</span><span>cloud</span></div>
+    <div class="post__content reveal is-visible">
+<p>Tanggal 21 Oktober 2026 Railway ngasih tahu customer-nya kalau ada pihak luar yang nyasar ke sistem penyimpanan environment variable mereka. Buat sebagian akun, isinya terbaca utuh setelah didekripsi. Build dimatikan total pagi itu juga.</p>
+<p>Berita utamanya kebocoran. Pelajaran yang lebih mahal justru soal keputusan desain yang melandasinya.</p>
+<p>Yang kena itu database secret mereka. Artinya besar-kecilnya kerusakan sudah ditentukan bertahun-tahun sebelumnya, oleh tiap tim yang nganggep dashboard vendor sebagai tempat nyimpen kredensial produksi.</p>
+<h2>Apa yang Railway benar-benar bocorkan</h2>
+<p>Pengumuman resminya cukup jelas soal mekanismenya. Provider AI inference dihubungi langsung supaya revoke key duluan, sebelum ada yang sempat dipakai.</p>
+<p>Deploy beku semua selama investigasi jalan.</p>
+<p>Sehari kemudian, 22 Oktober, Railway nambah dua panduan perbaikan. Dua-duanya atas nama Mykal Machon: satu buat AWS access key, satu buat service account key Google Cloud. Yang AWS lebih konkret isinya:</p>
+<ul>
+<li><strong>Jangan langsung hapus.</strong> Deactivate dulu key yang kena, biar masih bisa dihidupkan sebentar kalau ada service yang lo lupa masih pakai key itu.</li>
+<li><strong>Cari di CloudTrail pakai access key ID.</strong> Event history nyimpen panggilan management API sampai 90 hari ke belakang.</li>
+<li><strong>Lihat panggilan yang aplikasi lo nggak mungkin bikin:</strong></li>
+</ul>
+<p><code>RunInstances
+  CreateUser
+  CreateAccessKey
+  AttachUserPolicy
+  CreateRole
+  PutBucketPolicy</code>
+- <strong>Ulangi di semua Region</strong>, termasuk Region yang lo nggak pernah pakai.</p>
+<p>Panduan GCP nambahin satu detail yang gampang kelewat pas panik. Matiin service account key cuma ngeblok login baru. Token yang sudah terbit dari key itu masih berlaku sampai satu jam ke depan. Kalau lo butuh aksesnya putus sekarang, matiin service account-nya sekalian, terus copot juga grant <code>Service Account Token Creator</code> yang lo nggak kenal.</p>
+<p>Nah, ada satu jebakan yang cuma ada di PaaS. Kata panduan Railway sendiri, ganti key itu berarti edit variable plus redeploy. Deploy-nya lagi beku.</p>
+<p>Jadi saran yang paling benar itu ya rotate sekarang. Masalahnya, saran itu nempel sama kalimat kedua yang nggak sempat kebaca siapa-siapa: rotate nggak ada gunanya sampai control plane yang barusan jebol itu hidup lagi.</p>
+<p>Urutan kayak gitu bukan detail kecil. Prosedur rotasi yang bergantung ke sistem yang lagi jebol itu bukan prosedur.</p>
+<h2>Thread HN-nya nyalahin lapisan yang salah</h2>
+<p>Diskusi di Hacker News 50188228 (590 poin, 334 komentar) pecah cepat, dan dua-duanya ada benarnya.</p>
+<p>Satu kubu pengin env var jadi penunjuk arah, bukan tempat nilai disimpan: <em>"Use environment variables to point to where secrets are located, not to store their values."</em> Itu kalimat numbsafari.</p>
+<p>tptacek nyerang premisnya langsung: <em>"there's no reason to believe 'environment variables' were the reason this data was breached."</em></p>
+<p>Buat insiden ini, gue setuju sama tptacek. Yang diserang database secret, bukan environment proses. Andai semua customer Railway naruh kredensial sebagai file, database itu tetap sama menggiurkan, dan freeze-nya bakal kelihatan persis sama.</p>
+<p>Tapi buat insiden berikutnya, numbsafari yang benar. Env var itu wadah yang lemah buat kredensial, siapa pun yang nyimpen.</p>
+<p>Masalahnya dua klaim berbeda itu dicampur jadi satu di thread. Campuran itulah yang bikin praktik buruk yang udah berlangsung lima belas tahun tetap jalan lewat kebocoran yang ramai banget.</p>
+<h2>Gue tes sendiri: env var bocor lewat mana</h2>
+<p>Gue nggak mau debat teori, jadi gue tes langsung di mesin ini. systemd 259, unit level user, satu variable:</p>
+<pre><code class="language-bash">systemd-run --user --unit=probe-longrun --collect \
+  --property=Environment=PROBE_HMAC=super-secret-value \
+  /bin/sleep 12
+</code></pre>
+<p>Terus dari shell biasa, user yang sama:</p>
+<pre><code class="language-bash">PID=$(systemctl --user show -p MainPID --value probe-longrun)
+tr '\0' '\n' &lt; /proc/$PID/environ | grep PROBE_HMAC
+ps eww -p &quot;$PID&quot; | tr ' ' '\n' | grep PROBE_HMAC
+</code></pre>
+<p>Dua-duanya ngeprint <code>PROBE_HMAC=super-secret-value</code>. Nggak perlu root. Nggak perlu debugger atau container escape. Nggak perlu nembus proteksi <code>/proc</code> sama sekali.</p>
+<p>Trik yang sama juga berlaku buat proses mana pun yang mewarisi variable itu, termasuk semua child process dan tiap <code>sh -c</code> di dalam script deploy.</p>
+<p>Twelve-Factor nyuruh simpan config di environment karena config nggak boleh nempel di code. Buat hostname database, alasan itu masuk akal. Buat API key yang masih aktif, nggak pernah masuk akal.</p>
+<p>Environment satu proses bisa dibaca siapa pun yang bisa baca proses itu. Jumlah orangnya lebih banyak daripada yang biasanya kita kira.</p>
+<p>Bagian yang bikin repot: bocornya nggak ninggalin jejak. Nggak ada file yang berubah, nggak ada log yang aneh, nggak ada alert yang bunyi. Env var yang dibaca dari <code>/proc</code> kelihatan persis sama kayak env var yang nggak pernah disentuh siapa-siapa.</p>
+<h2>systemd credential itu sebenarnya kerjaannya apa</h2>
+<p>Credential systemd bukan secrets manager. Tugasnya cuma satu: service manager nyerahin file ke unit. File itu read-only buat unit-nya, dan isinya nggak pernah nongol di <code>process.env</code>.</p>
+<pre><code class="language-ini">[Service]
+User=dagango-api
+LoadCredentialEncrypted=dbpass:/etc/credstore.encrypted/dbpass.enc
+ExecStart=/usr/local/bin/api
+</code></pre>
+<p>Unit-nya baca <code>$CREDENTIALS_DIRECTORY/dbpass</code>. Probe yang sama, cuma variable-nya diganti credential:</p>
+<pre><code>cred_dir=/run/user/1000/credentials/run-p2707281-i11091151.service
+-r-------- 1 aditf aditf 18 dbpass
+environ_has_credname=0
+touch $CREDENTIALS_DIRECTORY/newfile  -&gt;  Permission denied
+NAME   SECURE SIZE PATH
+dbpass weak    18B  .../run-p2707281-i11091151.service/dbpass
+</code></pre>
+<p>Empat hal kebukti waktu itu juga:</p>
+<ul>
+<li><strong>Direktori read-only buat unit</strong>, dan posisinya di luar environment sama sekali.</li>
+<li><strong>File credential mode 0400</strong>, pemiliknya UID unit itu.</li>
+<li><strong>Isinya nggak muncul</strong> di <code>/proc/$PID/environ</code> atau di <code>ps eww</code>.</li>
+<li><strong>Ciphertext-nya terikat ke nama credential.</strong> Gue copy <code>dbpass.enc</code> jadi <code>renamed.enc</code>, dan dekripsinya ditolak: <em>"Name in credential doesn't match expectations."</em></li>
+</ul>
+<p>Poin terakhir itu justru yang nggak mungkin dikasih platform multi-tenant. Platform-nya memang harus megang kunci, itu bagian dari desain mereka.</p>
+<p>Kalau lo mau cek sendiri tanpa percaya tulisan gue, jalankan <code>systemd-creds list</code> dari dalam unit-nya. Kolom <code>SECURE</code> langsung bilang credential lo ditaruh di ramfs, cuma numpang di memory biasa, atau malah kebuka buat user lain. Nggak perlu nebak dari dokumentasi.</p>
+<h2>Yang belum kelar</h2>
+<p>TPM2 bukan barang gratis. <code>systemd-analyze has-tpm2</code> di mesin ini jawabnya <code>partial</code> dan exit 16. Efeknya jalur encrypt turun ke <code>/var/lib/systemd/credential.secret</code>, yang cuma bisa dibaca root.</p>
+<p>File itu plus host-nya sudah cukup buat dekripsi. TPM2 yang bikin file itu nggak lagi jadi syarat, dan TPM2 nggak ada di semua mesin.</p>
+<p>Lihat juga label <code>weak</code> di daftar tadi. Credential level user yang numpang di memory biasa memang jujur ngaku lebih lemah daripada yang dapat ramfs.</p>
+<p>Biaya kedua yang jarang disebut: migrasi. Semua service kesentuh, semua secret diterbitkan ulang, tiap unit file dapat baris <code>LoadCredential=</code>. Buat fleet kecil, itu satu akhir pekan.</p>
+<p>Buat ratusan service, itu dua kuartal dan satu rapat panjang soal siapa yang pegang rencana rollback.</p>
+<p>Semua itu bukan alasan buat ninggalin kredensial produksi di database vendor. Yang lebih mendesak justru versi membosankannya:</p>
+<ul>
+<li>rotate semua yang pernah nongkrong di Railway,</li>
+<li>baca CloudTrail dan Cloud Audit Logs buat rentang waktu itu,</li>
+<li>baru habis itu pilih secret mana yang pantas dapat file terikat host, bukan kotak teks.</li>
+</ul>
+<p>Yang paling gue bawa dari minggu ini justru satu kebiasaan yang kelihatan rapi. Kotak teks di dashboard yang bikin deploy jadi gampang itu juga pintu yang sama buat orang lain ngambil semua yang lo punya dalam satu malam.</p>
+<p>Harga kenyamanan itu nyata, cuma ditagih belakangan. 😅</p>
+<p>Kolom di dashboard itu dari dulu titik terlemahnya. Freeze minggu ini cuma bikin orang yang nggak pernah mikirin sejak 2011 akhirnya lihat.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/railway-breach-systemd-credentials/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

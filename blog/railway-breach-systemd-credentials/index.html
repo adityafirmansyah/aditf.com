@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Railway&#x27;s Breach Was a Database. Your Env Vars Are Still the Wrong Vault. — Field Notes</title>
+<meta name="description" content="Railway&#x27;s October 2026 breach exposed decrypted environment variables from a secrets database. The storage plane was the target, but the habit of storing credentials in env vars made the blast radius huge.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/railway-breach-systemd-credentials/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Railway&#x27;s Breach Was a Database. Your Env Vars Are Still the Wrong Vault. — Field Notes">
+<meta property="og:description" content="Railway&#x27;s October 2026 breach exposed decrypted environment variables from a secrets database. The storage plane was the target, but the habit of storing credentials in env vars made the blast radius huge.">
+<meta property="og:url" content="https://aditf.com/blog/railway-breach-systemd-credentials/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/railway-breach-systemd-credentials/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Railway&#x27;s Breach Was a Database. Your Env Vars Are Still the Wrong Vault. — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Railway&#x27;s Breach Was a Database. Your Env Vars Are Still the Wrong Vault. — Field Notes">
+<meta name="twitter:description" content="Railway&#x27;s October 2026 breach exposed decrypted environment variables from a secrets database. The storage plane was the target, but the habit of storing credentials in env vars made the blast radius huge.">
+<meta name="twitter:image" content="https://aditf.com/blog/railway-breach-systemd-credentials/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-23T00:00:00+00:00">
+<meta property="article:tag" content="devops">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="self-hosting">
+<meta property="article:tag" content="cloud">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Railway's Breach Was a Database. Your Env Vars Are Still the Wrong Vault.", "description": "Railway's October 2026 breach exposed decrypted environment variables from a secrets database. The storage plane was the target, but the habit of storing credentials in env vars made the blast radius huge.", "datePublished": "2026-10-23T00:00:00+00:00", "dateModified": "2026-10-23T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/railway-breach-systemd-credentials/"}, "keywords": "devops, security, linux, self-hosting, cloud", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1046, "image": ["https://aditf.com/blog/railway-breach-systemd-credentials/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/railway-breach-systemd-credentials/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/railway-breach-systemd-credentials/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/railway-breach-systemd-credentials/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/railway-breach-systemd-credentials/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>23 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Railway&#x27;s Breach Was a Database. Your Env Vars Are Still the Wrong Vault.</h1>
+    <div class="post__tags"><span>devops</span><span>security</span><span>linux</span><span>self-hosting</span><span>cloud</span></div>
+    <div class="post__content reveal is-visible">
+<p>On October 21, 2026, Railway told customers that an unauthorized third party had reached the systems storing their environment variables. For some of them, the disclosure reads, attackers "obtained the decrypted contents." Builds stopped worldwide that morning. The next day, teams were rotating AWS keys they had no way to redeploy.</p>
+<p>The breach is the news. The design decision behind it is the lesson. Railway's storage plane got hit, which means the size of the damage was set years earlier by every team that treated a vendor dashboard as the place production credentials live.</p>
+<h2>What Railway actually disclosed</h2>
+<p>The disclosure is unusually direct about the mechanism. Upstream AI inference providers were notified to revoke keys proactively. All deployments were paused while the investigation ran.</p>
+<p>On October 22, Railway published two remediation guides under Mykal Machon's byline, one for AWS access keys and one for Google Cloud service account keys. The AWS guide is the more useful of the two:</p>
+<ul>
+<li>Deactivate the exposed key instead of deleting it, so you can revive it if something you forgot about breaks.</li>
+<li>Search CloudTrail event history by access key ID, which keeps management API calls for 90 days.</li>
+<li><strong>Look for calls your app never makes:</strong></li>
+</ul>
+<p><code>RunInstances
+  CreateUser
+  CreateAccessKey
+  AttachUserPolicy
+  CreateRole
+  PutBucketPolicy</code>
+- Repeat the search in every Region, including the ones you don't use.</p>
+<p>The GCP guide adds a detail people miss under pressure. Disabling a service account key blocks new logins, but tokens already issued from it stay valid for up to an hour. If you need the access cut now, disable the whole service account and revoke any unexpected <code>Service Account Token Creator</code> grants.</p>
+<p>There is also a trap that only exists on a PaaS. Railway's own guide says updating a key is a variable edit plus a redeploy. Deploys were frozen. So the correct advice, rotate immediately, arrived with a second sentence nobody parsed in time: rotating is useless until the control plane that just failed comes back.</p>
+<p>That ordering matters more than it looks. A rotation procedure that depends on the compromised plane is not a procedure.</p>
+<h2>The thread blamed the wrong layer</h2>
+<p>Hacker News thread 50188228 (590 points, 334 comments) split fast, and both halves were partly right.</p>
+<p>One camp wanted a pointer instead of a stored value: "Use environment variables to point to where secrets are located, not to store their values." That is numbsafari's line. Then tptacek pushed back on the premise itself: "there's no reason to believe 'environment variables' were the reason this data was breached."</p>
+<p>I think tptacek is right about this incident. The attacker hit a database of secrets, not a process environment. Had every Railway customer injected credentials as files, that database would have been just as juicy, and the freeze would have looked identical.</p>
+<p>Numbsafari is right about the next incident. An environment variable is a weak container for a credential regardless of who stores it. Two separate claims got merged in that thread, and merging them is how fifteen years of bad practice survives a very public breach.</p>
+<h2>Where a variable leaks, concretely</h2>
+<p>I ran the comparison on this box instead of arguing it. systemd 259, a user unit, one variable:</p>
+<pre><code class="language-bash">systemd-run --user --unit=probe-longrun --collect \
+  --property=Environment=PROBE_HMAC=super-secret-value \
+  /bin/sleep 12
+</code></pre>
+<p>Then, from an ordinary shell as the same user:</p>
+<pre><code class="language-bash">PID=$(systemctl --user show -p MainPID --value probe-longrun)
+tr '\0' '\n' &lt; /proc/$PID/environ | grep PROBE_HMAC
+ps eww -p &quot;$PID&quot; | tr ' ' '\n' | grep PROBE_HMAC
+</code></pre>
+<p>Both printed <code>PROBE_HMAC=super-secret-value</code>. No root, no debugger, no container escape, no <code>/proc</code> hardening to defeat. The same trick works on any process that inherited the variable, which includes every child and every <code>sh -c</code> in a deploy script.</p>
+<p>Twelve-Factor said to keep config in the environment because config must not live in code. That reasoning was sound for database hostnames. It was never sound for a live API key. A process's environment is readable by whoever can read that process, and that set is larger than most teams assume.</p>
+<h2>What the Linux alternative actually does</h2>
+<p>systemd credentials are not a secrets manager. They are a way for the service manager to hand a unit a file it cannot modify, read from outside, or find in <code>process.env</code>.</p>
+<pre><code class="language-ini">[Service]
+User=dagango-api
+LoadCredentialEncrypted=dbpass:/etc/credstore.encrypted/dbpass.enc
+ExecStart=/usr/local/bin/api
+</code></pre>
+<p>The unit reads <code>$CREDENTIALS_DIRECTORY/dbpass</code>. Same probe, with the variable replaced by a credential:</p>
+<pre><code>cred_dir=/run/user/1000/credentials/run-p2707281-i11091151.service
+-r-------- 1 aditf aditf 18 dbpass
+environ_has_credname=0
+touch $CREDENTIALS_DIRECTORY/newfile  -&gt;  Permission denied
+NAME   SECURE SIZE PATH
+dbpass weak    18B  .../run-p2707281-i11091151.service/dbpass
+</code></pre>
+<p>Four properties held up:</p>
+<ul>
+<li>The directory is read-only to the unit and sits outside the environment entirely.</li>
+<li>Credential files are mode 0400, owned by the unit's UID.</li>
+<li>Nothing usable appears in <code>/proc/$PID/environ</code> or <code>ps eww</code>.</li>
+<li>The ciphertext is bound to a credential name. Copying <code>dbpass.enc</code> to <code>renamed.enc</code> made decryption refuse it: <code>Name in credential doesn't match expectations</code>.</li>
+</ul>
+<p>That last one is the property a multi-tenant platform cannot give you, because the platform holds the key by design.</p>
+<h2>What this does not solve</h2>
+<p>TPM2 is not free money. <code>systemd-analyze has-tpm2</code> on this machine reports <code>partial</code> and exits 16, so the encrypt path falls back to <code>/var/lib/systemd/credential.secret</code>, readable only by root. That file plus the host is enough to decrypt, which is the whole point of TPM2 binding: it removes the file from the equation. Not every box has the chip.</p>
+<p>Note the <code>weak</code> label in the listing above. A user-scope credential backed by ordinary memory is honest about being weaker than a ramfs-backed one.</p>
+<p>The other honest cost is migration. Every service gets touched, every secret re-issued, every unit file gets a <code>LoadCredential=</code> line. On a small fleet that is a weekend. On hundreds of services it is two quarters and a long argument about who owns the rollback plan.</p>
+<p>None of that argues for leaving production credentials in a vendor's database. It argues for doing the boring version first:</p>
+<ul>
+<li>rotate everything that ever lived in Railway,</li>
+<li>read CloudTrail and Cloud Audit Logs for that window,</li>
+<li>then decide which secrets deserve a host-bound file instead of a text box.</li>
+</ul>
+<p>The dashboard field was always the weak link. The freeze just made it visible to people who had not thought about it since 2011.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/railway-breach-systemd-credentials/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
