@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Inside NVIDIA OpenShell: SMT Provers and Credential Proxies for Agent Fleets</title>
+      <link>https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/</guid>
+      <pubDate>Sat, 24 Oct 2026 00:00:00 +0000</pubDate>
+      <description>OpenShell hides credentials behind a mediated proxy and gates policy changes with a Z3 solver. The sandbox is the easy half to copy. The per-sandbox model is the half that bites.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/id/"/>
+    </item>
+    <item>
       <title>Railway&#x27;s Breach Was a Database. Your Env Vars Are Still the Wrong Vault.</title>
       <link>https://aditf.com/blog/railway-breach-systemd-credentials/</link>
       <guid isPermaLink="true">https://aditf.com/blog/railway-breach-systemd-credentials/</guid>
@@ -176,15 +185,6 @@
       <description>Pi spent a year saying it would never speak MCP, then shipped it in the core. The reason was not that MCP got better. The sandbox underneath it did.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/mcp-in-core-tool-loadout-tradeoff/id/"/>
-    </item>
-    <item>
-      <title>Git 3.0&#x27;s SHA-256 Default Is a Primary-Key Migration</title>
-      <link>https://aditf.com/blog/git-3-sha256-primary-key-migration/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/git-3-sha256-primary-key-migration/</guid>
-      <pubDate>Fri, 02 Oct 2026 00:00:00 +0000</pubDate>
-      <description>I created a SHA-256 repository with the git I already have. Two of three daily operations failed outright, and the third is documented to die on older clients. The hash is not the migration; the key is.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/git-3-sha256-primary-key-migration/id/"/>
     </item>
   </channel>
 </rss>

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NVIDIA OpenShell: Kenapa Fleet Agent Butuh Prover SMT dan Proxy Kredensial — Field Notes</title>
+<meta name="description" content="OpenShell nggak pernah kasih kredensial asli ke agent, dan tiap perubahan policy dicek dulu pakai solver Z3. Bagian sandbox-nya gampang ditiru. Model per-sandbox-nya yang bikin repot.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="NVIDIA OpenShell: Kenapa Fleet Agent Butuh Prover SMT dan Proxy Kredensial — Field Notes">
+<meta property="og:description" content="OpenShell nggak pernah kasih kredensial asli ke agent, dan tiap perubahan policy dicek dulu pakai solver Z3. Bagian sandbox-nya gampang ditiru. Model per-sandbox-nya yang bikin repot.">
+<meta property="og:url" content="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="NVIDIA OpenShell: Kenapa Fleet Agent Butuh Prover SMT dan Proxy Kredensial — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="NVIDIA OpenShell: Kenapa Fleet Agent Butuh Prover SMT dan Proxy Kredensial — Field Notes">
+<meta name="twitter:description" content="OpenShell nggak pernah kasih kredensial asli ke agent, dan tiap perubahan policy dicek dulu pakai solver Z3. Bagian sandbox-nya gampang ditiru. Model per-sandbox-nya yang bikin repot.">
+<meta name="twitter:image" content="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-24T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="sandboxing">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="devops">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "NVIDIA OpenShell: Kenapa Fleet Agent Butuh Prover SMT dan Proxy Kredensial", "description": "OpenShell nggak pernah kasih kredensial asli ke agent, dan tiap perubahan policy dicek dulu pakai solver Z3. Bagian sandbox-nya gampang ditiru. Model per-sandbox-nya yang bikin repot.", "datePublished": "2026-10-24T00:00:00+00:00", "dateModified": "2026-10-24T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/id/"}, "keywords": "ai-agents, sandboxing, rust, security, devops", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1034, "image": ["https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>24 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">NVIDIA OpenShell: Kenapa Fleet Agent Butuh Prover SMT dan Proxy Kredensial</h1>
+    <div class="post__tags"><span>ai-agents</span><span>sandboxing</span><span>rust</span><span>security</span><span>devops</span></div>
+    <div class="post__content reveal is-visible">
+<p>OpenShell mendarat di Hacker News 22 Oktober 2026 dengan 490 poin dan 211 komentar.</p>
+<p>Versinya sekarang 0.1.5, sudah lima patch lewat dari tag 0.1.0 di akhir September. Lisensinya Apache 2.0. Sebagian besar isi thread-nya perang soal telemetry. Yang gue baca ulang justru arsitektur di bawahnya.</p>
+<p>Sampai beberapa waktu lalu, cara gue jalanin coding agent cuma satu container plus <code>-e OPENAI_API_KEY</code>.</p>
+<p>Itu bukan isolasi. Itu bungkus praktis buat nyerahin tagihan cloud gue ke proses yang nurut sama teks apa pun yang kebetulan dia baca.</p>
+<p>Container cuma jawab satu pertanyaan: apakah dua proses ini bisa lihat memori satu sama lain. Pertanyaan yang nggak dijawab: apakah proses ini bisa lihat secret.</p>
+<p>Begitu key-nya nangkring di environment, semua mekanisme yang bikin agent berguna berubah jadi jalur keluar.</p>
+<ul>
+<li>Dependency jahat di lockfile.</li>
+<li>Build script yang kena poisoning.</li>
+<li><code>curl</code> yang tiba-tiba muncul jam dua pagi karena modelnya ngarang.</li>
+</ul>
+<p>DNS tunneling aja udah cukup. Beberapa ratus lookup nggak akan ada yang sadar.</p>
+<h2>Kredensial berhenti di proxy, nggak pernah masuk sandbox</h2>
+<p>Yang OpenShell ubah itu strukturnya. Agent-nya nggak pegang kredensial sama sekali. Yang bikin ini jalan bukan panjangnya daftar fitur, tapi di mana kredensialnya disimpan.</p>
+<p>Kredensial baru nempel waktu request-nya benar-benar keluar, dan cuma buat endpoint yang sudah di-approve. Yang nempelin supervisor, yang rumahnya di luar sandbox.</p>
+<p>Sisi sandbox-nya justru bagian yang paling murah ditiru:</p>
+<ul>
+<li><code>Landlock</code> membatasi file mana yang bisa dibuka workload.</li>
+<li><code>seccomp</code> user notification menahan operasi jaringan sebelum dieksekusi.</li>
+<li>Workload-nya jalan sebagai satu identitas non-root, tanpa capability Linux apa pun.</li>
+</ul>
+<p>Yang bikin semua itu jadi satu kesatuan justru koneksi antara dua sisi itu. Supervisor dan sandbox ngobrol lewat satu kanal HTTP/2 yang saling terautentikasi, dan kanal itu nampung banyak stream independen.</p>
+<p>Transport-nya dipilih compute driver:</p>
+<ul>
+<li>Unix socket buat Docker dan Podman,</li>
+<li>TCP buat Kubernetes,</li>
+<li>vsock buat MicroVM.</li>
+</ul>
+<p>Tiap koneksi TCP dapet stream sendiri, lengkap dengan backpressure sendiri. Download paket yang lambat nggak bisa nyumbat resolusi DNS atau exec.</p>
+<p>Siapa pun yang pernah jalanin agent lewat proxy single-thread pasti tahu betapa nyebelinnya waktu satu request nyangkut dan sisanya ikut mati.</p>
+<h2>Solver-nya cuma jawab empat pertanyaan</h2>
+<p>Policy expansion itu titik di mana sandboxing agent biasanya mulai rusak.</p>
+<p>Agent nabrak tembok, ngusulin satu rule, rule-nya di-approve. Setahun kemudian file policy-nya jadi tumpukan pengecualian yang nggak ada yang berani cabut.</p>
+<p>Jawaban NVIDIA: <code>openshell-prover</code>.</p>
+<p>Krate Rust ini nyusun tiga input jadi satu model Z3 SMT, yaitu policy-nya, set kredensial yang nempel di sandbox, dan registry kemampuan tiap binary.</p>
+<p>Habis itu dia jalanin reachability query di empat kategori:</p>
+<ul>
+<li><code>link_local_reach</code>: policy-nya nembus host di <code>169.254.0.0/16</code> atau <code>fe80::/10</code>? Itu alamat metadata cloud.</li>
+<li><code>l7_bypass_credentialed</code>: ada binary pakai protokol non-HTTP yang bisa nyampe host yang kredensialnya masuk scope?</li>
+<li><code>credential_reach_expansion</code>: ada binary nyampe pasangan host dan port baru, padahal kredensialnya masuk scope?</li>
+<li><code>capability_expansion</code>: di endpoint yang udah dicapai binary itu, perubahannya nambah HTTP method?</li>
+</ul>
+<p>Dua yang pertama unconditional. Dua sisanya sifat delta: gateway buktiin policy baseline dan policy gabungan, terus cuma nampilin jalur yang baru muncul.</p>
+<p>Ada temuan? Auto-approval diblokir. Delta yang kosong baru boleh lewat kalau reviewer sudah opt-in lewat <code>proposal_approval_mode</code> di scope gateway atau sandbox.</p>
+<p>Yang sering ketuker: boundary check dan proposal risk check jawab pertanyaan beda. Lolos yang satu sama sekali nggak bilang apa-apa soal yang lain.</p>
+<p>CLI-nya buat boundary check, dipakai agent yang perlu mastiin policy subagent tetap di dalam policy induknya. Advisor jalanin proposal risk check tiap agent ngusulin rule baru.</p>
+<h2>Satu sandbox aman, fleet-nya belum tentu</h2>
+<p>Kalimat ini yang gue tempel di dokumen desain internal: model-nya per sandbox.</p>
+<p>README krate-nya sendiri nyebut dia nggak nalar soal intent lintas sandbox atau lintas binary. Dua sandbox yang berbagi kredensial lewat policy eksternal dianalisis sendiri-sendiri.</p>
+<p>Itu confused deputy, dan nggak perlu penyerang canggih buat manfaatinnya.</p>
+<p>Agent yang koneksinya dibatasi, tapi boleh ngirim task ke deployment agent yang bebas lewat message bus, punya jalur keluar yang nggak dijelasin policy mana pun. Sandbox-nya masih utuh. Yang bocor fleet kita.</p>
+<p>Formal verification nggak bikin ini lebih buruk. Dia bikin ini kelihatan, karena batas modelnya ditulis terbuka di README.</p>
+<p>Kalau lo nyambungin delegasi antar agent, graf-nya yang harus diverifikasi. Siapa boleh ngirim ke siapa, dan kredensial siapa yang nempel di ujung rantai.</p>
+<p>Buktiin satu node doang itu syarat minimum, bukan kontrak lengkapnya.</p>
+<h2>Telemetry nyala dari awal, ada tiga jalan keluar</h2>
+<p>Telemetry dibawa sebagai Cargo feature, dan default-nya nyala. Cakupannya sempit menurut dokumentasi: sandbox lifecycle outcomes, provider profile buckets, policy decision counts, plus agregat kategori penolakan jaringan.</p>
+<p>Nggak ada nama sandbox. Nggak ada hostname atau file path. Prompt dan kredensial juga nggak ikut.</p>
+<p>Di thread, <code>overflowy</code> nempel policy itu plus flag opt-out-nya. Debatnya ngalir dari situ.</p>
+<p><code>lcampbell</code> nyorot pilihan katanya: kategori yang dikumpulkan dibuka dengan "such as" dan bukan daftar lengkap. Tapi dia juga bilang disable yang didokumentasikan itu sudah cukup.</p>
+<p><code>Lammy</code> beda arah. Buat dia nggak ada koneksi yang anonim, karena koneksinya sendiri udah bocorin IP dan jam kerja lo.</p>
+<p><code>dangoodmanUT</code> paling jelas nyebut tradeoff-nya: default telemetry itu default yang buruk, sementara kontrol yang disediain "almost too pedantic".</p>
+<p>Gue setuju dua-duanya. Justru karena bagian kedua itu, bagian pertama masih bisa dimaafkan.</p>
+<p>Jalan keluarnya tiga, dan nggak setara:</p>
+<ul>
+<li><code>OPENSHELL_TELEMETRY_ENABLED=false</code> di deployment gateway.</li>
+<li><code>server.telemetryEnabled=false</code> buat instalasi Helm.</li>
+<li>Build ulang dengan <code>--no-default-features --features defaults-without-telemetry</code>, yang bikin binary-nya nggak punya endpoint maupun kode pengirim.</li>
+</ul>
+<p>Dua yang pertama itu konfigurasi. Yang ketiga satu-satunya yang gue percaya di box yang megang kredensial produksi, karena flag bisa dicabut sama orang berikutnya yang buka values file.</p>
+<h2>Yang gue bawa pulang</h2>
+<p>Runtime-nya bukan pelajarannya. Pelajarannya ada di pemisahan antara apa yang bisa dilakukan agent dan apa yang dia tahu.</p>
+<p>Mediated channel-nya OpenShell jawab pertanyaan kedua dengan benar. Harness buatan sendiri biasanya nggak kepikiran nanya.</p>
+<p>Yang kedua: verifier dengan batas yang ditulis lebih berguna, bukan heuristik dengan landing page bagus. Model per sandbox itu keterbatasan nyata.</p>
+<p>Bedanya, keterbatasan itu ditulis di README. Jadi gue bisa desain di sekitarnya sebelum ketemu langsung waktu incident.</p>
+<p>Kalau gue mulai fleet besok, urutannya membosankan:</p>
+<ul>
+<li>Kredensial cuma lewat proxy dulu.</li>
+<li>Batas filesystem dan syscall kedua.</li>
+<li>Prover SMT paling akhir, setelah dua itu ada.</li>
+</ul>
+<p>Solver yang nge-review policy yang udah ngasih API key mentah cuma ngitung rapi di masalah yang salah.</p>
+<p>Dan itu bukan salah OpenShell. Itu urutan kerja gue sendiri yang kebalik. 😅</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

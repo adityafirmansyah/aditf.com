@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Inside NVIDIA OpenShell: SMT Provers and Credential Proxies for Agent Fleets — Field Notes</title>
+<meta name="description" content="OpenShell hides credentials behind a mediated proxy and gates policy changes with a Z3 solver. The sandbox is the easy half to copy. The per-sandbox model is the half that bites.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Inside NVIDIA OpenShell: SMT Provers and Credential Proxies for Agent Fleets — Field Notes">
+<meta property="og:description" content="OpenShell hides credentials behind a mediated proxy and gates policy changes with a Z3 solver. The sandbox is the easy half to copy. The per-sandbox model is the half that bites.">
+<meta property="og:url" content="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Inside NVIDIA OpenShell: SMT Provers and Credential Proxies for Agent Fleets — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Inside NVIDIA OpenShell: SMT Provers and Credential Proxies for Agent Fleets — Field Notes">
+<meta name="twitter:description" content="OpenShell hides credentials behind a mediated proxy and gates policy changes with a Z3 solver. The sandbox is the easy half to copy. The per-sandbox model is the half that bites.">
+<meta name="twitter:image" content="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-24T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="sandboxing">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="devops">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Inside NVIDIA OpenShell: SMT Provers and Credential Proxies for Agent Fleets", "description": "OpenShell hides credentials behind a mediated proxy and gates policy changes with a Z3 solver. The sandbox is the easy half to copy. The per-sandbox model is the half that bites.", "datePublished": "2026-10-24T00:00:00+00:00", "dateModified": "2026-10-24T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/"}, "keywords": "ai-agents, sandboxing, rust, security, devops", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1115, "image": ["https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>24 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Inside NVIDIA OpenShell: SMT Provers and Credential Proxies for Agent Fleets</h1>
+    <div class="post__tags"><span>ai-agents</span><span>sandboxing</span><span>rust</span><span>security</span><span>devops</span></div>
+    <div class="post__content reveal is-visible">
+<p>OpenShell hit Hacker News on 22 October 2026 with 490 points and 211 comments. It is NVIDIA's Apache-2.0 runtime for autonomous agent fleets, and it currently sits at 0.1.5, five patch releases past the 0.1.0 tag in late September. Most of the thread fought about telemetry. The architecture underneath is the part I keep re-reading.</p>
+<p>My own default for a coding agent, until recently, was a container plus <code>-e OPENAI_API_KEY</code>. That is not isolation. It is a convenience wrapper for handing my cloud bill to a process that takes orders from whatever text it happens to read.</p>
+<p>Container isolation answers "can these two processes see each other's memory". It does not answer "can this process see a secret".</p>
+<p>Once the key lives in the environment, every mechanism that gives an agent useful access becomes an exfiltration path. A malicious dependency in a lockfile. A poisoned build script. A <code>curl</code> the model invented at 2am.</p>
+<p>DNS tunneling alone is enough, and nobody notices a few hundred lookups.</p>
+<h2>Put the secret behind a proxy, not in the box</h2>
+<p>OpenShell's bet is structural. The agent holds zero resident credentials. Requests bound for an approved endpoint get credentials injected on the way out, by a supervisor that runs outside the sandbox.</p>
+<p>The sandbox side is the cheap part to reproduce:</p>
+<ul>
+<li><code>Landlock</code> confines which files the workload can open.</li>
+<li><code>seccomp</code> user notification stages network operations before they execute.</li>
+<li>The workload runs under one non-root identity, with no Linux capabilities.</li>
+</ul>
+<p>What makes it work is the seam. Supervisor and sandbox talk over a single mutually authenticated HTTP/2 connection carrying many independent streams. The compute driver picks the transport:</p>
+<ul>
+<li>a Unix socket for Docker and Podman,</li>
+<li>TCP for Kubernetes,</li>
+<li>vsock for MicroVM.</li>
+</ul>
+<p>Each TCP connection gets its own stream with its own backpressure. A slow package download cannot stall DNS resolution or an exec. Anyone who has run an agent behind a single-threaded proxy has felt the alternative.</p>
+<h2>Four questions the solver answers</h2>
+<p>Policy expansion is where agent sandboxing usually rots. An agent hits a wall, proposes a rule, gets it approved, and a year later the policy file is a museum of one-off exceptions nobody dares revoke.</p>
+<p>NVIDIA's answer is <code>openshell-prover</code>. It is a Rust crate, and it encodes three inputs as a Z3 SMT model: the policy, the credential set attached to the sandbox, and a registry of what each binary can do.</p>
+<p>Then it runs reachability queries over four categories:</p>
+<ul>
+<li><code>link_local_reach</code>: does the policy reach a host in <code>169.254.0.0/16</code> or <code>fe80::/10</code>? That covers cloud metadata endpoints.</li>
+<li><code>l7_bypass_credentialed</code>: can a binary on a non-HTTP wire protocol reach a host where a credential is in scope?</li>
+<li><code>credential_reach_expansion</code>: does a binary reach a new host and port tuple with a credential in scope?</li>
+<li><code>capability_expansion</code>: on an endpoint the binary already reaches, does the change add an HTTP method?</li>
+</ul>
+<p>The first two are unconditional risks. The last two are delta properties: the gateway proves the baseline and the merged policy, then surfaces only the new paths.</p>
+<p>Any finding blocks auto-approval. An empty delta lets the proposal through, but only once a reviewer opts in through <code>proposal_approval_mode</code> at gateway or sandbox scope.</p>
+<p>One distinction trips people up. Boundary checks and proposal-risk checks answer different questions, so passing one tells you nothing about the other. The CLI runs boundary checks, written for agents that need to confirm a subagent's policy stays inside the parent's. The advisor runs proposal-risk checks on every rule an agent proposes.</p>
+<h2>The prover is per-sandbox, and your fleet is not</h2>
+<p>Here is the line I would staple to any internal design doc: the model is per-sandbox. The crate's own README states that it does not reason about cross-sandbox or cross-binary intent, and that two sandboxes sharing a credential through external policy get analysed independently.</p>
+<p>That is the confused deputy problem, and it needs no exotic attacker. A network-restricted agent that can post a task to an unconstrained deployment agent over your message bus has an egress path no per-sandbox policy describes. The sandbox holds. The fleet leaks.</p>
+<p>Formal verification does not make this worse. It makes it legible, because the model's scope is written down instead of implied by marketing.</p>
+<p>If you are wiring delegation between agents, the graph is what to verify. Who may dispatch to whom, and which credential ends up attached to a request at the far end of the chain. Proving each node alone is table stakes, not the whole contract.</p>
+<h2>Default-on telemetry, and three exits</h2>
+<p>Telemetry ships as a default-on Cargo feature. The documentation draws the line narrowly: sandbox lifecycle outcomes, provider profile buckets, policy decision counts, aggregate network denial categories. No sandbox names. No hostnames, file paths, prompts, or credentials.</p>
+<p>HN user <code>overflowy</code> pasted that policy into a thread comment along with the opt-out flags, and much of the argument ran from there. <code>lcampbell</code> objected to the wording on the grounds that collected categories are introduced with "such as" rather than an exhaustive list, while calling the documented disable good enough. <code>Lammy</code> argued that no network connection is anonymous, since the connection alone leaks your IP and the hours you work.</p>
+<p><code>dangoodmanUT</code> put the tradeoff most plainly: default telemetry is a bad default, and the control surface is "almost too pedantic". I think both halves are correct, and the second half is why the first is forgivable.</p>
+<p>Three exits exist, and they are not equivalent:</p>
+<ul>
+<li><code>OPENSHELL_TELEMETRY_ENABLED=false</code> on the gateway deployment.</li>
+<li><code>server.telemetryEnabled=false</code> for Helm installs.</li>
+<li>A build with <code>--no-default-features --features defaults-without-telemetry</code>, which leaves no endpoint and no emission code in the binary.</li>
+</ul>
+<p>The first two are configuration. The third is the only one I would trust on a box holding production credentials, because a flag can be unset by the next person to touch the values file.</p>
+<h2>What I actually took from it</h2>
+<p>The runtime is not the lesson. The lesson is the split between what an agent can do and what an agent knows. OpenShell's mediated channel answers the second question properly, and most homegrown harnesses never think to ask it.</p>
+<p>The second lesson is that a verifier with a documented scope beats a heuristic with a landing page. Per-sandbox modelling is a genuine limitation. It is also printed in the README, which means I can design around it instead of meeting it during an incident.</p>
+<p>If I were starting a fleet tomorrow, the order would be boring: credentials behind a proxy first, filesystem and syscall limits second, and the SMT prover only once those two exist. A solver reviewing a policy that already hands out raw API keys is doing careful arithmetic on the wrong problem.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
