@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Distributed SQLite Paradox: You Pay for Consensus, Then Queue Behind One Writer — Field Notes</title>
+<meta name="description" content="Raft-replicated SQLite buys you failover and charges you milliseconds per write. Most production apps need WAL streaming to S3, not a cluster.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/distributed-sqlite-consensus-paradox/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="The Distributed SQLite Paradox: You Pay for Consensus, Then Queue Behind One Writer — Field Notes">
+<meta property="og:description" content="Raft-replicated SQLite buys you failover and charges you milliseconds per write. Most production apps need WAL streaming to S3, not a cluster.">
+<meta property="og:url" content="https://aditf.com/blog/distributed-sqlite-consensus-paradox/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/distributed-sqlite-consensus-paradox/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Distributed SQLite Paradox: You Pay for Consensus, Then Queue Behind One Writer — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Distributed SQLite Paradox: You Pay for Consensus, Then Queue Behind One Writer — Field Notes">
+<meta name="twitter:description" content="Raft-replicated SQLite buys you failover and charges you milliseconds per write. Most production apps need WAL streaming to S3, not a cluster.">
+<meta name="twitter:image" content="https://aditf.com/blog/distributed-sqlite-consensus-paradox/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-25T00:00:00+00:00">
+<meta property="article:tag" content="sqlite">
+<meta property="article:tag" content="distributed-systems">
+<meta property="article:tag" content="databases">
+<meta property="article:tag" content="devops">
+<meta property="article:tag" content="architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "The Distributed SQLite Paradox: You Pay for Consensus, Then Queue Behind One Writer", "description": "Raft-replicated SQLite buys you failover and charges you milliseconds per write. Most production apps need WAL streaming to S3, not a cluster.", "datePublished": "2026-10-25T00:00:00+00:00", "dateModified": "2026-10-25T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/distributed-sqlite-consensus-paradox/"}, "keywords": "sqlite, distributed-systems, databases, devops, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1014, "image": ["https://aditf.com/blog/distributed-sqlite-consensus-paradox/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/distributed-sqlite-consensus-paradox/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/distributed-sqlite-consensus-paradox/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/distributed-sqlite-consensus-paradox/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/distributed-sqlite-consensus-paradox/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>25 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">The Distributed SQLite Paradox: You Pay for Consensus, Then Queue Behind One Writer</h1>
+    <div class="post__tags"><span>sqlite</span><span>distributed-systems</span><span>databases</span><span>devops</span><span>architecture</span></div>
+    <div class="post__content reveal is-visible">
+<p>Philip O'Toole published a twelve-year retrospective on rqlite on October 23. It is the cleanest map of distributed SQLite anyone has written, and I think it quietly argues against the way most teams buy the category.</p>
+<p>My position, up front: for the majority of production applications, a consensus-replicated SQLite cluster is the wrong purchase.</p>
+<p>Here is the arithmetic.</p>
+<p>Every write goes through a leader, crosses the network, and waits for a quorum of nodes to acknowledge it on disk. When that finishes, you still write through SQLite's single-writer lock. You traded microseconds for milliseconds and bought failover, which a backup file in object storage also gives you.</p>
+<h2>Three corners, one question each</h2>
+<p>His chronology is tidy.</p>
+<p>Consensus came first: rqlite in September 2014, Canonical's dqlite in 2017. Streaming came second, when Ben Johnson released Litestream in early 2021. Merge came third, with cr-sqlite adding CRDTs to the engine in 2022.</p>
+<p>Each corner exists to answer one question.</p>
+<ul>
+<li><strong>Consensus (rqlite, dqlite):</strong> what if the machine dies and I cannot wait to restore?</li>
+<li><strong>Streaming (Litestream, LiteFS):</strong> what if the machine dies?</li>
+<li><strong>Merge (cr-sqlite):</strong> what if two machines both accept writes while offline?</li>
+</ul>
+<p>That list is the whole argument. Most of the Hacker News thread is people defending different answers to different questions, which is why nobody there converts anybody.</p>
+<p>O'Toole's own framing is the sentence to memorize: "The first question is more common, the second is the one people have when they come to rqlite."</p>
+<p>Read it twice. The common question does not need a cluster. The rare question does, and it is a question about restore time rather than scale.</p>
+<h2>What consensus costs</h2>
+<p>A single-node SQLite database in WAL mode runs inside your process. No socket between your query and the page cache, no serialization layer, no membership protocol. HN commenter rapind benchmarked that in Rust: 193,000 writes per second, each write holding the lock for roughly 5 µs.</p>
+<p>A Raft write cannot look like that. The leader appends the entry, ships it to a majority, waits for their disk acknowledgements, then applies it.</p>
+<p>Every transaction pays a network round trip and at least one extra fsync over the single-node case. Microseconds become milliseconds.</p>
+<p>Then the paradox lands.</p>
+<p>After paying for replication, you are still writing through one writer. Consensus replicates a log; it does not make writers concurrent. SQLite serializes writes in every configuration, so contention appears in a cluster exactly as it appears on one box:</p>
+<pre><code>SQLITE_BUSY: database is locked
+</code></pre>
+<p>What changes is the retry cost. On one node, a busy timeout and a shorter transaction usually absorb the retry. Behind consensus, each retry also pays a round trip.</p>
+<p>There is one more limit worth knowing before you move. gregsadetsky flagged it in the thread: rqlite does not officially support BEGIN/COMMIT, so interactive multi-statement transactions are off the table.</p>
+<h2>The field reports</h2>
+<p>Clustered SQLite does not read like a success story in that thread.</p>
+<ul>
+<li>Commenter esafak runs dqlite in a small cluster and wants out, citing "Loads of '500 database locked' errors".</li>
+<li>Canonical issue #908, opened on 2026-09-28 and still open, is an assertion abort in the dqlite VFS after hours of locked-database retries.</li>
+<li>In that report the cluster lost its only voting member, and the abort took the node's control plane down with it.</li>
+<li>Commenter piterrro calls Cloudflare D1 unreliable next to raw Durable Objects, and unconscionable agrees.</li>
+<li>Commenter ruther4d adds that D1 databases cannot be created dynamically, which makes per-tenant isolation harder.</li>
+</ul>
+<p>There is counter-evidence, and it is more instructive than the complaints. qaq runs rqlite in production and is happy with it.</p>
+<p>What rqlite holds is a tenant and operator registry that app nodes pull down, so the load stays very light. When the control layer dies, the platform degrades to "no new tenants" instead of going dark.</p>
+<p>That is the shape worth copying: the writes are small and failover has to be instant.</p>
+<h2>The stack I would run on a VPS</h2>
+<p>For a multi-tenant commerce platform on a Linux VPS, my default is one SQLite database per tenant on local NVMe, with Litestream shipping the WAL to object storage. Queries and writes never leave the machine. Durability leaves on a timer.</p>
+<p>A replica stanza looks like this:</p>
+<pre><code class="language-yaml">dbs:
+  - path: /srv/app/tenants/acme/store.db
+    replicas:
+      - type: s3
+        bucket: acme-wal
+        path: tenants/acme
+        retention: 720h
+        sync-interval: 1s
+</code></pre>
+<p>Restore is one command:</p>
+<pre><code class="language-bash">litestream restore -o /srv/app/tenants/acme/store.db s3://acme-wal/tenants/acme
+</code></pre>
+<p>The database side needs three pragmas at open time.</p>
+<pre><code class="language-sql">PRAGMA journal_mode = WAL;
+PRAGMA synchronous = NORMAL;
+PRAGMA busy_timeout = 5000;
+</code></pre>
+<p>What you give up is precise, so state it plainly. Your recovery point objective is the sync interval, which means one second of committed writes can vanish in a hard failure. Your recovery time objective is however long an object download and a process restart take.</p>
+<p>If that arithmetic clears your requirements, you do not need consensus. The decision collapses into three cases.</p>
+<ol>
+<li>A restore measured in tens of seconds is acceptable, so run single-node SQLite with Litestream.</li>
+<li>Failover must be automatic and the write path touches money, so run rqlite and budget for millisecond writes.</li>
+<li>Writes must land in several regions at once, so stop wrapping a file and move to Postgres or CockroachDB.</li>
+</ol>
+<h2>Twelve years later</h2>
+<p>O'Toole closes with a line the category rarely repeats: the idea was open source for eight years before anyone sold it. Turso raised venture money on a fork of the engine and was acquired by Supabase in 2026. Cloudflare sells D1 as a managed product from a company that sees no obligation to explain the internals.</p>
+<p>The lesson I take is narrower than "distributed wins". Ask what a dead node actually costs you: an hour of manual restore, or an outage you have to explain to a customer.</p>
+<p>Most teams answer "an hour" and then buy the cluster anyway. The next year goes into lock timeouts sitting behind a consensus round trip, in a system whose only real requirement was a backup that works.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/distributed-sqlite-consensus-paradox/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
