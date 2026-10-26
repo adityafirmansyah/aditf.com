@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Agent Skills Are Environment Notes, Not Prompt Tricks</title>
+      <link>https://aditf.com/blog/agent-skills-environment-notes/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/agent-skills-environment-notes/</guid>
+      <pubDate>Mon, 26 Oct 2026 00:00:00 +0000</pubDate>
+      <description>The &quot;skills are worthless&quot; argument is aimed at prompt folklore. What runs on a 19-profile agent fleet is closer to operational code, and it carries a real context bill.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/agent-skills-environment-notes/id/"/>
+    </item>
+    <item>
       <title>The Distributed SQLite Paradox: You Pay for Consensus, Then Queue Behind One Writer</title>
       <link>https://aditf.com/blog/distributed-sqlite-consensus-paradox/</link>
       <guid isPermaLink="true">https://aditf.com/blog/distributed-sqlite-consensus-paradox/</guid>
@@ -176,15 +185,6 @@
       <description>A memory plugin attaches the five most similar snippets to every prompt. I run 17 agents, and their durable knowledge is 1,069 Markdown skill files plus a memory file I keep under a kilobyte.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/agents-remember-with-markdown-skills-not-vectors/id/"/>
-    </item>
-    <item>
-      <title>A Database Per Agent Costs More Than a File</title>
-      <link>https://aditf.com/blog/database-per-agent-costs-more-than-a-file/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/database-per-agent-costs-more-than-a-file/</guid>
-      <pubDate>Sat, 03 Oct 2026 00:00:00 +0000</pubDate>
-      <description>Supabase says agents should be able to create a database as cheaply as a file. I already run one database per agent on a mini-PC, so I counted. The create is free; everything after it is the bill.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/database-per-agent-costs-more-than-a-file/id/"/>
     </item>
   </channel>
 </rss>

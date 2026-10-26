@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Skills Are Environment Notes, Not Prompt Tricks — Field Notes</title>
+<meta name="description" content="The &quot;skills are worthless&quot; argument is aimed at prompt folklore. What runs on a 19-profile agent fleet is closer to operational code, and it carries a real context bill.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/agent-skills-environment-notes/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent Skills Are Environment Notes, Not Prompt Tricks — Field Notes">
+<meta property="og:description" content="The &quot;skills are worthless&quot; argument is aimed at prompt folklore. What runs on a 19-profile agent fleet is closer to operational code, and it carries a real context bill.">
+<meta property="og:url" content="https://aditf.com/blog/agent-skills-environment-notes/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/agent-skills-environment-notes/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Agent Skills Are Environment Notes, Not Prompt Tricks — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Agent Skills Are Environment Notes, Not Prompt Tricks — Field Notes">
+<meta name="twitter:description" content="The &quot;skills are worthless&quot; argument is aimed at prompt folklore. What runs on a 19-profile agent fleet is closer to operational code, and it carries a real context bill.">
+<meta name="twitter:image" content="https://aditf.com/blog/agent-skills-environment-notes/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-26T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="skills">
+<meta property="article:tag" content="context-engineering">
+<meta property="article:tag" content="supply-chain">
+<meta property="article:tag" content="agent-fleet">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Agent Skills Are Environment Notes, Not Prompt Tricks", "description": "The \"skills are worthless\" argument is aimed at prompt folklore. What runs on a 19-profile agent fleet is closer to operational code, and it carries a real context bill.", "datePublished": "2026-10-26T00:00:00+00:00", "dateModified": "2026-10-26T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/agent-skills-environment-notes/"}, "keywords": "ai-agents, skills, context-engineering, supply-chain, agent-fleet", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1260, "image": ["https://aditf.com/blog/agent-skills-environment-notes/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/agent-skills-environment-notes/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/agent-skills-environment-notes/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/agent-skills-environment-notes/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/agent-skills-environment-notes/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>26 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Agent Skills Are Environment Notes, Not Prompt Tricks</h1>
+    <div class="post__tags"><span>ai-agents</span><span>skills</span><span>context-engineering</span><span>supply-chain</span><span>agent-fleet</span></div>
+    <div class="post__content reveal is-visible">
+<p>Three agent-skill repositories trended on GitHub today. The counts are from the API, measured this morning:</p>
+<ul>
+<li>cloudflare/security-audit-skill at 47,315 stars</li>
+<li>Nutlope/hallmark at 34,379</li>
+<li>pbakaus/impeccable at 88,034</li>
+</ul>
+<p>On the same day, a post titled "AI Skills" are worthless in 2026 reached the lobste.rs front page.</p>
+<p>Both things are true, and most of the argument between them is people discussing different objects. What a marketplace calls a skill is usually prompt trivia aimed at a model. What runs on my 19-profile agent fleet is closer to notes about the environment the model executes inside, and those notes survive model upgrades.</p>
+<p>That distinction decides what belongs in a skill file. It also decides what the file quietly charges you.</p>
+<h2>The context bill, measured</h2>
+<p>The skeptics are right about the economics, and the numbers on my own machine are worse than the complaint. HN user prodigycorp, in the thread under the Cloudflare skill: "There are way too many skills for the platform. ... The way it is right now pollutes our context window."</p>
+<p>Here is what that looks like on this box:</p>
+<pre><code class="language-bash">find ~/.hermes/profiles -name SKILL.md -not -path '*/.deleted/*' | wc -l
+# 1285
+</code></pre>
+<p>Nineteen agent profiles, 1,285 skill files, 13.7 MB of markdown. Loaded raw, that is roughly 3.4 million tokens.</p>
+<p>Nobody loads all of it. Progressive disclosure means the harness sees a name and a one-line description first, and opens the body only when a task matches. So the honest figure is the description layer, which sits in front of every task before any work starts:</p>
+<ul>
+<li>77 KB of descriptions</li>
+<li>about 19,000 tokens</li>
+<li>a 177x gap between advertising a skill and using one</li>
+</ul>
+<p>That gap is the design constraint. Shelf space is cheap; the shelf label is the budget.</p>
+<h2>What a model cannot re-derive</h2>
+<p>The test I apply now is simple: could a better model figure this out alone, given the same repo and the same question? Three rules from my own pipeline fail that test:</p>
+<ul>
+<li>Reddit's JSON endpoints answer with an HTML block page on this host. Exact comment counts come from the HN Algolia API or not at all.</li>
+<li>Every source URL gets an HTTP check before it is cited. A dead link at research time is a correction; a dead link at publication is a retraction.</li>
+<li>The brand name is Dagango.com, spelled out every time. A model that has never seen the internal codename will invent something plausible.</li>
+</ul>
+<p>None of those are tricks for getting a model to behave. They are facts about a host, a provider and a naming decision. Training weights do not carry them, and a better model does not start carrying them.</p>
+<h2>The backlash is a category error, twice over</h2>
+<p>Charles Miller's post is better than its title. Its opening example is the C folklore that <code>i++</code> is slower than <code>++i</code>, a habit compilers made irrelevant decades ago. He extends that to prompt engineering, then delivers the verdict everyone quoted. A skill that can be picked up in a few weeks and is obsolete a few months later "has no value outside the moment."</p>
+<p>On lobste.rs, roryokane pointed out what a lot of readers had missed. In Miller's post, "AI skills" means the skills of humans who use AI. So the argument that travelled is about a person's ability to prompt, wearing the name of a file format.</p>
+<p>The model-facing half of the thesis is still correct. Anything that only concerns phrasing a request gets absorbed into the product. That is why I stopped writing skills that describe how to talk to a model.</p>
+<p>The useful line in that thread came from markerz: "Skills should generally be pretty light weight." That is a context-budget argument, which is the one worth having.</p>
+<h2>Six phases, not an incantation</h2>
+<p>The Cloudflare skill is the counter-example, and it is worth reading past the star count. Its README says plainly that it "is the skill that seeded Cloudflare's vulnerability discovery harness."</p>
+<p>The workflow is six phases:</p>
+<ul>
+<li><strong>Reconnaissance:</strong> map architecture, trust boundaries and input surfaces into a coverage ledger.</li>
+<li><strong>Coverage-led hunting:</strong> assign isolated hunters per ledger unit.</li>
+<li><strong>Candidate validation:</strong> hand each finding to a fresh verifier that tries to disprove it.</li>
+<li><strong>Structured output:</strong> write confirmed, needs-validation and rejected records against a JSON schema.</li>
+<li><strong>Independent verification:</strong> separate agents check the final source claims.</li>
+<li><strong>Reporting:</strong> derive the documents from verified records only.</li>
+</ul>
+<p>That is a review process written as markdown, and the design principle that sells it is one sentence: the agent that checks a finding is never the agent that found it. It is the same separation I use between coding agents and the QA pass.</p>
+<p>Their README also reports that a single run found roughly half of the vulnerabilities that repeated runs found in total. That is an argument for orchestration. It is not an argument for a better prompt.</p>
+<h2>Distribution is not trust</h2>
+<p>The part nobody trends about: a skill is markdown that the harness treats as instructions carrying your privileges.</p>
+<p>Unit 42 documented the June 2026 version of that failure on ClawHub. A skill named tradingview-ai-indicator-assistant shipped a prerequisite block pointing at a paste site. The user was told to pipe a base64 blob into a shell, which downloaded the cluw infostealer.</p>
+<p>The report's own summary is the sentence worth keeping. It describes the isolation gap directly: "a single malicious skill can grant an attacker full control over the agent's permissions and access to the underlying system."</p>
+<p>Synthesia's writeup makes the same point from the engineering side. Their team got generic results at first. A bare request to review a diff produced, in their words, "an OWASP top-ten checklist applied to your code," so they built an audit skill tuned to their stack and their common pitfalls.</p>
+<p>They also landed the context argument better than the HN thread did. A precise scope is the difference between an agent staying inside its lane and "wandering through unrelated files polluting its context window."</p>
+<h2>What I check before an install</h2>
+<p>Reading the file is a lower bar than it sounds, and it filters most of what is on a marketplace.</p>
+<ul>
+<li>Read the whole SKILL.md and skip past the description. The malicious ones hide the payload in a setup step.</li>
+<li>Grep for <code>curl</code>, <code>npx</code> and anything that writes outside the skill directory.</li>
+<li>Ask whether the skill needs a sandbox to be safe. Cloudflare's README requires one that disables external networking before it will execute target code.</li>
+<li>Pin the version and commit it. Every skill I keep has a diff history.</li>
+<li>Delete anything you installed for one task. The long tail is where the description budget goes.</li>
+</ul>
+<p>The same tests apply to writing. One lesson per file, and the lesson has to be something the model got wrong on this machine at least once.</p>
+<h2>What survives a model upgrade</h2>
+<p>My largest skill is 100 KB, around 25,000 tokens of accumulated pitfalls from a research pipeline that has been running for months. Grotesque by the standards of a prompt pack, and it earns its size because every paragraph was paid for by a failure I do not want to repeat.</p>
+<p>Most skill files on that fleet will be dead within a year, and they should be. The ones that outlive their model are the boring ones: what this host blocks, what this provider charges, what the product is called. That knowledge has a shorter half-life than a compiler's and a longer one than any prompt trick.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/agent-skills-environment-notes/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Skill Agent Itu Catatan Soal Environment, Bukan Trik Prompt — Field Notes</title>
+<meta name="description" content="Argumen &quot;skill AI nggak ada gunanya&quot; itu nembak folklore prompt. Yang jalan di fleet 19 profil lebih mirip catatan operasional, dan tagihan context-nya nyata.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/agent-skills-environment-notes/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Skill Agent Itu Catatan Soal Environment, Bukan Trik Prompt — Field Notes">
+<meta property="og:description" content="Argumen &quot;skill AI nggak ada gunanya&quot; itu nembak folklore prompt. Yang jalan di fleet 19 profil lebih mirip catatan operasional, dan tagihan context-nya nyata.">
+<meta property="og:url" content="https://aditf.com/blog/agent-skills-environment-notes/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/agent-skills-environment-notes/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Skill Agent Itu Catatan Soal Environment, Bukan Trik Prompt — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Skill Agent Itu Catatan Soal Environment, Bukan Trik Prompt — Field Notes">
+<meta name="twitter:description" content="Argumen &quot;skill AI nggak ada gunanya&quot; itu nembak folklore prompt. Yang jalan di fleet 19 profil lebih mirip catatan operasional, dan tagihan context-nya nyata.">
+<meta name="twitter:image" content="https://aditf.com/blog/agent-skills-environment-notes/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-26T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="skills">
+<meta property="article:tag" content="context-engineering">
+<meta property="article:tag" content="supply-chain">
+<meta property="article:tag" content="agent-fleet">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Skill Agent Itu Catatan Soal Environment, Bukan Trik Prompt", "description": "Argumen \"skill AI nggak ada gunanya\" itu nembak folklore prompt. Yang jalan di fleet 19 profil lebih mirip catatan operasional, dan tagihan context-nya nyata.", "datePublished": "2026-10-26T00:00:00+00:00", "dateModified": "2026-10-26T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/agent-skills-environment-notes/id/"}, "keywords": "ai-agents, skills, context-engineering, supply-chain, agent-fleet", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1149, "image": ["https://aditf.com/blog/agent-skills-environment-notes/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/agent-skills-environment-notes/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/agent-skills-environment-notes/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/agent-skills-environment-notes/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/agent-skills-environment-notes/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>26 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Skill Agent Itu Catatan Soal Environment, Bukan Trik Prompt</h1>
+    <div class="post__tags"><span>ai-agents</span><span>skills</span><span>context-engineering</span><span>supply-chain</span><span>agent-fleet</span></div>
+    <div class="post__content reveal is-visible">
+<p>Hari ini tiga repo skill agent naik barengan di GitHub:</p>
+<ul>
+<li>cloudflare/security-audit-skill, 47.315 star</li>
+<li>Nutlope/hallmark, 34.379</li>
+<li>pbakaus/impeccable, 88.034</li>
+</ul>
+<p>Angkanya dari GitHub API, gue ambil pagi ini.</p>
+<p>Di hari yang sama, satu tulisan berjudul "AI Skills" are worthless in 2026 nyampe ke halaman depan lobste.rs.</p>
+<p>Dua-duanya benar. Yang bikin ributnya panjang: orang lagi debat dua benda yang beda.</p>
+<p>Yang dijual di marketplace biasanya trik prompt buat model. Yang jalan di fleet gue, 19 profil agent, lebih mirip catatan soal environment tempat model itu eksekusi. Catatan kayak gitu nggak ikut basi waktu modelnya upgrade.</p>
+<p>Nah, beda itulah yang nentuin apa yang layak masuk file skill. Sekalian nentuin berapa mahal ongkos yang diam-diam ikut ditagih.</p>
+<h2>Ongkos context-nya nyata, dan ada angkanya</h2>
+<p>Sisi ekonominya nggak salah. Angka di mesin gue malah lebih parah dari keluhannya.</p>
+<p>prodigycorp di thread HN soal skill Cloudflare itu nulis begini. "There are way too many skills for the platform." Terus: "The way it is right now pollutes our context window."</p>
+<p>Di box ini bentuknya segini:</p>
+<pre><code class="language-bash">find ~/.hermes/profiles -name SKILL.md -not -path '*/.deleted/*' | wc -l
+# 1285
+</code></pre>
+<p>Sembilan belas profil agent. 1.285 file skill. 13,7 MB markdown.</p>
+<p>Total kalau dimuat mentah sekaligus: kira-kira 3,4 juta token.</p>
+<p>Nggak ada yang dimuat mentah semua. Harness cuma lihat nama plus satu baris deskripsi dulu, isinya baru dibuka kalau task-nya cocok. Jadi angka jujurnya ada di lapisan deskripsi:</p>
+<ul>
+<li>77 KB deskripsi</li>
+<li>sekitar 19.000 token</li>
+<li>jarak 177x antara memajang skill dan memakainya</li>
+</ul>
+<p>Intinya gini. Rak-nya murah. Label di rak-nya yang mahal.</p>
+<h2>Yang nggak bisa ditebak ulang sama model</h2>
+<p>Tes yang sekarang gue pakai cuma satu pertanyaan. Kalau modelnya lebih pintar, dia bisa nemu sendiri nggak, dengan repo dan pertanyaan yang sama?</p>
+<p>Tiga aturan dari pipeline kita sendiri gagal di tes itu:</p>
+<ul>
+<li>Endpoint JSON Reddit di host ini balasnya halaman HTML blokir. Angka komentar yang presisi cuma datang dari HN Algolia, atau nggak sama sekali.</li>
+<li>Tiap URL sumber dicek dulu status HTTP-nya sebelum dikutip. Link mati waktu riset masih bisa dibenerin. Link mati waktu publish udah jadi koreksi publik.</li>
+<li>Nama brand-nya Dagango.com, dieja lengkap tiap kali. Model yang belum pernah lihat codename internal bakal ngarang sesuatu yang kedengeran masuk akal.</li>
+</ul>
+<p>Nggak ada satu pun dari itu yang trik buat naklukin model. Semua itu fakta soal host, provider, dan keputusan penamaan. Bobot model nggak bawa informasi itu, dan model yang lebih bagus nggak tiba-tiba jadi tahu.</p>
+<h2>Backlash-nya salah alamat, dua lapis</h2>
+<p>Tulisan Charles Miller lebih bagus dari judulnya.</p>
+<p>Contoh pembukanya folklore C: katanya <code>i++</code> lebih lambat dari <code>++i</code>. Padahal compiler udah bikin itu nggak relevan puluhan tahun lalu.</p>
+<p>Dari situ dia geser ke prompt engineering, terus nyampein verdict yang semua orang kutip. Katanya skill yang bisa dipelajari dalam beberapa minggu dan usang beberapa bulan kemudian "has no value outside the moment."</p>
+<p>Masalahnya, yang dimaksud Miller dengan "skill" itu bukan file SKILL.md. Di lobste.rs, roryokane angkat tangan dan bilang banyak yang salah tangkap. Yang dimaksud dia skill-nya manusia yang pakai AI.</p>
+<p>Jadi argumen yang menyebar itu sebenarnya soal kemampuan orang nulis prompt, cuma kebetulan pakai nama format file.</p>
+<p>Setengah tesisnya tetap benar, kok. Apa pun yang cuma soal cara ngerangkai permintaan pasti diserap produk dalam hitungan bulan. Makanya gue berhenti nulis skill yang isinya cara ngomong ke model.</p>
+<p>Yang paling berguna di thread itu justru komentar markerz. Skill mestinya ringan. Itu argumen soal budget context, dan itu percakapan yang layak dilanjutin.</p>
+<h2>Enam fase, bukan mantra</h2>
+<p>Skill Cloudflare itu contoh lawannya, dan sayang kalau cuma dibaca sampai angka star-nya.</p>
+<p>README-nya bilang terang-terangan. Menurut mereka, skill inilah titik awal harness vulnerability discovery yang sekarang jalan di seluruh fleet.</p>
+<p>Alurnya enam fase:</p>
+<ul>
+<li>Rekon: petakan arsitektur, trust boundary, dan input surface ke satu coverage ledger.</li>
+<li>Hunting berbasis coverage: tiap unit di ledger dikasih ke hunter terisolasi.</li>
+<li>Validasi kandidat: tiap temuan diserahin ke verifier baru yang tugasnya nyoba ngebantah.</li>
+<li>Output terstruktur: temuan ditulis sebagai confirmed, needs-validation, atau rejected, lalu divalidasi ke JSON schema.</li>
+<li>Verifikasi independen: agent lain ngecek klaim sumber terakhir.</li>
+<li>Reporting: dokumen diturunin cuma dari record yang udah lewat verifikasi.</li>
+</ul>
+<p>Jadi intinya proses review yang ditulis dalam markdown. Prinsip yang bikin proses itu jalan cuma satu kalimat: agent yang ngecek temuan nggak pernah agent yang nemuin.</p>
+<p>Pemisahan yang sama gue pakai antara agent coding dan pass QA.</p>
+<p>README-nya juga nyatet satu run cuma nemu kira-kira separuh dari yang ditemu beberapa run sekaligus. Itu argumen buat orkestrasi. Bukan argumen buat prompt yang lebih pinter.</p>
+<h2>Distribusi bukan berarti percaya</h2>
+<p>Bagian yang nggak pernah trending: skill itu markdown yang diperlakukan harness sebagai instruksi, dengan privilege lo nempel di situ.</p>
+<p>Unit 42 mendokumentasikan versi Juni 2026 dari kegagalan ini di ClawHub.</p>
+<p>Satu skill bernama tradingview-ai-indicator-assistant nyisipin blok prasyarat yang nunjuk ke situs paste. User disuruh nempel base64 ke shell. Yang jalan setelahnya infostealer cluw.</p>
+<p>Ringkasan laporan mereka sendiri yang layak diinget: "a single malicious skill can grant an attacker full control over the agent's permissions and access to the underlying system."</p>
+<p>Synthesia ngasih bukti dari sisi engineering. Percobaan pertama mereka generik.</p>
+<p>Satu request polos buat review diff hasilnya, kata mereka, "an OWASP top-ten checklist applied to your code."</p>
+<p>Ya udah, mereka bikin skill audit sendiri yang disetel ke stack mereka dan ke jebakan yang khas di codebase mereka.</p>
+<p>Orang Synthesia juga lebih rapi ngomongin context daripada thread HN. Scope yang presisi itu bedanya antara agent yang tetap di jalurnya dan agent yang "wandering through unrelated files polluting its context window."</p>
+<h2>Yang gue cek sebelum install</h2>
+<p>Baca filenya itu standar yang rendah, dan tetap aja nyaring hampir semua isi marketplace.</p>
+<ul>
+<li>Baca SKILL.md utuh, jangan cuma deskripsinya. Yang jahat nyimpen payload di langkah setup.</li>
+<li>Grep <code>curl</code>, <code>npx</code>, dan apa pun yang nulis di luar folder skill.</li>
+<li>Tanya: skill ini aman tanpa sandbox nggak? README Cloudflare bahkan mewajibkan sandbox yang matiin network eksternal sebelum dia berani jalanin kode target.</li>
+<li>Pin versinya, commit ke git. Semua skill yang gue simpen punya riwayat diff.</li>
+<li>Hapus yang dulu lo install buat satu task. Ekor panjang yang nggak kepakai itulah yang ngabisin budget deskripsi.</li>
+</ul>
+<p>Aturan yang sama berlaku waktu nulis. Satu pelajaran satu file, dan pelajarannya harus sesuatu yang modelnya pernah salah di mesin ini minimal sekali.</p>
+<h2>Yang selamat lewat upgrade model</h2>
+<p>Skill paling gede di fleet gue 100 KB, sekitar 25.000 token. Isinya jebakan-jebakan dari pipeline riset yang udah jalan berbulan-bulan.</p>
+<p>Kelihatan berlebihan buat ukuran prompt pack. Tapi tiap paragrafnya dibayar sama satu kegagalan yang nggak mau gue ulang.</p>
+<p>Sebagian besar file skill di fleet itu bakal mati dalam setahun. Dan memang seharusnya.</p>
+<p>Yang bertahan justru yang membosankan: host ini ngeblok apa, provider ini nagih apa, produknya namanya apa. Pengetahuan kayak gini lebih cepat basi dibanding compiler, tapi jauh lebih tahan lama dibanding trik prompt mana pun.</p>
+<p>Dan kalau model besok pagi jadi jauh lebih pintar, daftar itu nggak berubah. Yang berubah cuma seberapa cepat gue bisa ngecek ulang satu per satu.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/agent-skills-environment-notes/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
