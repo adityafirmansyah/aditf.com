@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Bug 14 Tahun di Core PHP Mendadak Bikin 70% Web Kena RCE Pre-Auth — Field Notes</title>
+<meta name="description" content="Celah di parser request PHP yang umurnya sejak 2012 bikin penyerang tanpa login bisa eksekusi kode di konfigurasi default. PHP sendiri jalan di sekitar 70% web dunia.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Bug 14 Tahun di Core PHP Mendadak Bikin 70% Web Kena RCE Pre-Auth — Field Notes">
+<meta property="og:description" content="Celah di parser request PHP yang umurnya sejak 2012 bikin penyerang tanpa login bisa eksekusi kode di konfigurasi default. PHP sendiri jalan di sekitar 70% web dunia.">
+<meta property="og:url" content="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Bug 14 Tahun di Core PHP Mendadak Bikin 70% Web Kena RCE Pre-Auth — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Bug 14 Tahun di Core PHP Mendadak Bikin 70% Web Kena RCE Pre-Auth — Field Notes">
+<meta name="twitter:description" content="Celah di parser request PHP yang umurnya sejak 2012 bikin penyerang tanpa login bisa eksekusi kode di konfigurasi default. PHP sendiri jalan di sekitar 70% web dunia.">
+<meta name="twitter:image" content="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-27T00:00:00+00:00">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="php">
+<meta property="article:tag" content="devops">
+<meta property="article:tag" content="vulnerability">
+<meta property="article:tag" content="software-engineering">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Bug 14 Tahun di Core PHP Mendadak Bikin 70% Web Kena RCE Pre-Auth", "description": "Celah di parser request PHP yang umurnya sejak 2012 bikin penyerang tanpa login bisa eksekusi kode di konfigurasi default. PHP sendiri jalan di sekitar 70% web dunia.", "datePublished": "2026-10-27T00:00:00+00:00", "dateModified": "2026-10-27T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/id/"}, "keywords": "security, php, devops, vulnerability, software-engineering", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1092, "image": ["https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>27 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Bug 14 Tahun di Core PHP Mendadak Bikin 70% Web Kena RCE Pre-Auth</h1>
+    <div class="post__tags"><span>security</span><span>php</span><span>devops</span><span>vulnerability</span><span>software-engineering</span></div>
+    <div class="post__content reveal is-visible">
+<p>Tanggal 21 Oktober 2026 PHP ngelepas perbaikan buat dua celah kritis, CVE-2026-109618 dan CVE-2026-109619.</p>
+<p>Dua-duanya dapat skor 9.2 di versi 4.0 Common Vulnerability Scoring System (CVSS).</p>
+<p>Orang nyebutnya PHP2Shell, dan CISA masukin keduanya ke katalog Known Exploited Vulnerabilities tanggal 26 Oktober.</p>
+<p>PHP jalan di 69,2% dari semua situs yang bahasa server-side-nya diketahui W3Techs. Itu angka di balik semua judul "sekitar 70% web".</p>
+<p>Yang bikin gue nggak tenang bukan skornya. Ini bukan soal plugin jelek atau framework yang lupa nge-filter parameter.</p>
+<p>Eksekusinya di dalam parser request milik engine-nya sendiri, tepat saat body multipart masih diterjemahin jadi <code>$_POST</code> sama <code>$_FILES</code>.</p>
+<p>Di titik itu router lo belum ada. Belum lahir.</p>
+<p>Makanya ini urusan patch sekarang juga, bukan hardening pelan-pelan. Semua pengecekan input gue duduknya di hilir kode yang udah korup.</p>
+<h2>Parser jalan duluan, modulnya belum aktif</h2>
+<p>PHP harus bikin <code>$_POST</code> sama <code>$_FILES</code> sebelum ada script yang bisa baca isinya, jadi parsing-nya masuk fase request startup.</p>
+<p>Urutannya di <code>main/main.c</code> seperti ini, dikutip dari disclosure Calif:</p>
+<pre><code class="language-c">PG(modules_activated) = 0;
+/* ... */
+php_hash_environment();   /* Parses request variables and multipart input. */
+zend_activate_modules();  /* Calls normal module RINIT functions. */
+PG(modules_activated) = 1;
+</code></pre>
+<p>Dari situ keluar dua akibat:</p>
+<ul>
+<li>request multipart tetap diparsing walau endpoint-nya nggak pernah nerima upload,</li>
+<li>fatal error di tengah parsing itu bukan error aplikasi, dan handler lo nggak pernah kepanggil.</li>
+</ul>
+<p>Di konfigurasi default jalur ini kebuka. <code>session.upload_progress.enabled</code> bawaannya <code>On</code>, yang bikin extension session buka dan update session selagi body dibaca.</p>
+<h2>Hitungan dinaikkan dulu, alokasi belakangan</h2>
+<p>Tim Calif nelusuri mekanismenya sampai ke rutin insert hash table <code>_zend_hash_str_add_or_update_i</code>. Hitungan elemen dinaikkan sebelum bucket selesai diinisialisasi:</p>
+<pre><code class="language-c">idx = ht-&gt;nNumUsed++;
+ht-&gt;nNumOfElements++;
+p = ht-&gt;arData + idx;
+p-&gt;key = zend_string_init(str, len, persistent); /* may zend_bailout() */
+</code></pre>
+<p>Pas alokasi key kena <code>memory_limit</code>, PHP nggak unwinding rapi. Dia loncat keluar lewat <code>longjmp()</code> level C dengan hitungan yang telanjur naik.</p>
+<p>Terus waktu teardown, PHP jalanin <code>ht-&gt;arData</code> sampai batas <code>nNumUsed</code> dan nganggep bucket setengah jadi itu data hidup.</p>
+<p>Nyampein limit-nya murah. Satu part upload RFC1867 boleh bawa filename kosong, jadi lolos dari <code>max_file_uploads</code>. Tapi PHP tetap bikin enam entri <code>$_FILES</code>.</p>
+<p>Kasih nama field bersarang kayak <code>files[a][b][c]</code>, hierarkinya dibangun enam kali. Ratusan record kayak gitu muat di <code>post_max_size</code> default 8 MiB, padahal heap yang kepakai lewat 128 MiB.</p>
+<p>Body chunked HTTP/1.1 atau HTTP/2 tanpa length lewat batas sama. PHP cuma bandingin <code>Content-Length</code> yang dideklarasi, bukan byte yang benar-benar dikonsumsi.</p>
+<h2>mod_php sama PHP-FPM bukan lawan yang sama</h2>
+<p>Dua-duanya memparsing body identik. Bedanya nasib worker setelah fatal saat startup.</p>
+<p>Di Apache pakai <code>mod_php</code>, startup yang gagal tetap nyampe ke <code>php_request_shutdown()</code>. Heap request dibebasin, child process Apache-nya selamat buat layani request berikutnya.</p>
+<p>Session globals yang masih nunjuk ke heap itu dimakan request multipart berikutnya. Hasilnya RCE ke script PHP apa pun, tanpa aplikasinya ikut main.</p>
+<p>PHP-FPM ambil cabang lain. Startup gagal berarti <code>php_module_shutdown()</code> dipanggil dan <code>FPM_EXIT_SOFTWARE</code> dikembalikan. Worker-nya mati, pointer basi ikut mati.</p>
+<p>Artinya di FPM fatal-nya harus mendarat setelah startup sukses, saat aplikasi udah mulai ngedecode sesuatu.</p>
+<p>Rantai kedua itu butuh pemicu dari sisi aplikasi:</p>
+<ul>
+<li>aplikasi ngedecode data terserialisasi di bawah tekanan memori penyerang,</li>
+<li>decode-nya lewat <code>session_start()</code>, <code>session_decode()</code>, <code>unserialize()</code> atau wrapper kayak <code>maybe_unserialize()</code> milik WordPress,</li>
+<li>fatal-nya bikin <code>php_var_unserialize_destroy()</code> keskip, jadi pointer <code>BG(unserialize).data</code> dan level nesting di extension Basic tetap hidup,</li>
+<li>heap request dibebasin sementara worker FPM-nya jalan,</li>
+<li>request multipart berikutnya nyampe ke session upload progress sebelum init Basic, pakai ulang bookkeeping decoder yang ditinggal, dan aritmetika destructor list-nya nulis <code>zval</code> yang dikendalikan ke memori yang sudah direbut ulang.</li>
+</ul>
+<p>Calif mendemokan rantai itu di nginx. Prasyaratnya nggak eksotis: session ID pilihan penyerang plus satu <code>session_start()</code> itu permukaan yang dibuka banyak aplikasi PHP.</p>
+<h2>Patch-nya ngubah mode kegagalan</h2>
+<p>Perbaikannya lebih menarik daripada sekadar nambah pengecekan batas.</p>
+<p>Out-of-memory sekarang nggak menghentikan operasi di tengah jalan. Dia jadi soft error di VM safe point berikutnya, jadi cleanup tetap jalan dan pointer dikosongin sebelum memori dilepas.</p>
+<p>Lewat dari ambang lebih tinggi, dia berubah jadi <code>_exit()</code> keras.</p>
+<p>Shutdown juga sekarang nge-reset semua state panjang umur yang dulunya selamat:</p>
+<ul>
+<li>session globals,</li>
+<li>error backtrace,</li>
+<li>shared memory OPcache.</li>
+</ul>
+<p>Objek yang didecode handler upload progress tetap <code>__PHP_IncompleteClass</code>, jadi nggak ada autoload maupun <code>__destruct()</code> di fase decode awal itu.</p>
+<p>Baca daftar itu sebagai pengakuan. Isolasi yang bergantung pada loncatan non-lokal mendarat di tempat yang masih bisa dicapai cleanup bukan isolasi.</p>
+<p>Itu taruhan untung-untungan, dan untungnya baru habis sekarang.</p>
+<h2>Kalau lo belum bisa patch hari ini</h2>
+<p>Upgrade kadang nunggu jadwal maintenance. Semua langkah di bawah parsial, nggak ada yang gantikan rilis yang dipatch.</p>
+<pre><code class="language-ini">; emergency only, revert after upgrading
+session.upload_progress.enabled = 0
+fatal_error_backtraces = 0        ; PHP 8.5.x
+memory_limit = -1
+</code></pre>
+<p>Lima detail yang nentuin baris itu beneran nolong atau nggak:</p>
+<ul>
+<li>restart semua worker setelah ngubah <code>php.ini</code>, karena child Apache dan worker FPM yang jalan pegang nilai lama,</li>
+<li>set <code>pm.max_requests = 1</code> selama masih kebuka, ini yang mecah syarat satu worker nanganin dua request berurutan,</li>
+<li>matiin <code>session.upload_progress</code> sambil sadar itu nggak nutup cabang OPcache maupun backtrace,</li>
+<li>jangan ganti <code>memory_limit</code> pakai <code>RLIMIT_AS</code> atau <code>RLIMIT_DATA</code> karena limit OS ngelewatin jalur cleanup PHP,</li>
+<li>terima kalau <code>memory_limit = -1</code> menukar eksekusi kode jadi denial of service karena kehabisan memori.</li>
+</ul>
+<p>Tukeran terakhir itu yang paling gue timbang di mesin sharing. Penyerang yang nggak bisa nulis bucket tetap bisa ngirim payload upload kosong bersarang dan ngabisin RAM.</p>
+<h2>Bagian tersusah itu justru inventarisasinya</h2>
+<p>Yang bawa perbaikan cuma empat rilis ini:</p>
+<ul>
+<li>PHP 8.5.12,</li>
+<li>8.4.27,</li>
+<li>8.3.36,</li>
+<li>8.2.35.</li>
+</ul>
+<p>Di bawah 8.2 nggak dapat apa-apa, padahal jalur paling tua yang kena balik ke PHP 5.4.0 dari Maret 2012.</p>
+<p>Saran CISA buat yang masih di 8.1 atau lebih lama: tarik offline.</p>
+<p>Masalahnya, mendata lebih berat daripada upgrade-nya. PHP sembunyi di tempat tanpa label:</p>
+<ul>
+<li>invokasi <code>php-cgi</code> dan LiteSpeed,</li>
+<li>build image FrankenPHP,</li>
+<li>base image container yang di-bake berbulan lalu,</li>
+<li>appliance vendor yang konsol adminnya nggak pernah nyebut runtime.</li>
+</ul>
+<p>Yang gue ubah di stack sendiri:</p>
+<ul>
+<li>tolak <code>multipart/form-data</code> di ingress buat route yang nggak pernah terima upload, biar body-nya nggak nyampe PHP,</li>
+<li>build ulang image pakai versi yang udah dipatch dan di-pin, bukan ngedit <code>php.ini</code> di host yang jalan,</li>
+<li>sandbox worker-nya biar proses yang udah dijebol nggak bisa exec shell atau download tool, aktivitas yang CISA minta dipantau,</li>
+<li>perlakuin <code>session_start()</code> dengan ID dari penyerang sebagai permukaan input, karena di FPM memang iya.</li>
+</ul>
+<p>Hampir semua saran hardening yang gue tulis buat stack web berasumsi aplikasi kita itu tempat input jadi bahaya.</p>
+<p>PHP2Shell mecahin asumsi itu di batas engine. Satu request hidup dua kali: sekali di parser, sekali di kode lo.</p>
+<p>Cuma yang kedua punya firewall lo di depannya.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

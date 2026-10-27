@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>A 14-Year-Old Bug in PHP Just Shattered Pre-Auth Security for 70% of the Web</title>
+      <link>https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/</guid>
+      <pubDate>Tue, 27 Oct 2026 00:00:00 +0000</pubDate>
+      <description>A flaw in PHP&#x27;s own request parser, present since 2012, hands unauthenticated attackers code execution on default configs. PHP runs roughly 70% of the web.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/id/"/>
+    </item>
+    <item>
       <title>Agent Skills Are Environment Notes, Not Prompt Tricks</title>
       <link>https://aditf.com/blog/agent-skills-environment-notes/</link>
       <guid isPermaLink="true">https://aditf.com/blog/agent-skills-environment-notes/</guid>
@@ -176,15 +185,6 @@
       <description>Frank Wiles got a fake project inquiry, a Dropbox folder of specs, and a hidden .git with a post-checkout hook. I reproduced both vectors on git 2.53.0, and the popular fix is overridable.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/reproducing-the-git-hook-attack/id/"/>
-    </item>
-    <item>
-      <title>My 17 Agents Remember With 1,069 Markdown Skills, Not Vectors</title>
-      <link>https://aditf.com/blog/agents-remember-with-markdown-skills-not-vectors/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/agents-remember-with-markdown-skills-not-vectors/</guid>
-      <pubDate>Sun, 04 Oct 2026 00:00:00 +0000</pubDate>
-      <description>A memory plugin attaches the five most similar snippets to every prompt. I run 17 agents, and their durable knowledge is 1,069 Markdown skill files plus a memory file I keep under a kilobyte.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/agents-remember-with-markdown-skills-not-vectors/id/"/>
     </item>
   </channel>
 </rss>

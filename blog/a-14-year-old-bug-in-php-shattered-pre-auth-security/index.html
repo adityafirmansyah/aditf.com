@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A 14-Year-Old Bug in PHP Just Shattered Pre-Auth Security for 70% of the Web — Field Notes</title>
+<meta name="description" content="A flaw in PHP&#x27;s own request parser, present since 2012, hands unauthenticated attackers code execution on default configs. PHP runs roughly 70% of the web.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="A 14-Year-Old Bug in PHP Just Shattered Pre-Auth Security for 70% of the Web — Field Notes">
+<meta property="og:description" content="A flaw in PHP&#x27;s own request parser, present since 2012, hands unauthenticated attackers code execution on default configs. PHP runs roughly 70% of the web.">
+<meta property="og:url" content="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A 14-Year-Old Bug in PHP Just Shattered Pre-Auth Security for 70% of the Web — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="A 14-Year-Old Bug in PHP Just Shattered Pre-Auth Security for 70% of the Web — Field Notes">
+<meta name="twitter:description" content="A flaw in PHP&#x27;s own request parser, present since 2012, hands unauthenticated attackers code execution on default configs. PHP runs roughly 70% of the web.">
+<meta name="twitter:image" content="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-27T00:00:00+00:00">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="php">
+<meta property="article:tag" content="devops">
+<meta property="article:tag" content="vulnerability">
+<meta property="article:tag" content="software-engineering">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "A 14-Year-Old Bug in PHP Just Shattered Pre-Auth Security for 70% of the Web", "description": "A flaw in PHP's own request parser, present since 2012, hands unauthenticated attackers code execution on default configs. PHP runs roughly 70% of the web.", "datePublished": "2026-10-27T00:00:00+00:00", "dateModified": "2026-10-27T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/"}, "keywords": "security, php, devops, vulnerability, software-engineering", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1147, "image": ["https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>27 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">A 14-Year-Old Bug in PHP Just Shattered Pre-Auth Security for 70% of the Web</h1>
+    <div class="post__tags"><span>security</span><span>php</span><span>devops</span><span>vulnerability</span><span>software-engineering</span></div>
+    <div class="post__content reveal is-visible">
+<p>On October 21, 2026, PHP shipped fixes for two critical vulnerabilities, CVE-2026-109618 and CVE-2026-109619. Both score 9.2 in version 4.0 of the Common Vulnerability Scoring System (CVSS). The pair is called PHP2Shell, and CISA added both to its Known Exploited Vulnerabilities catalog on October 26.</p>
+<p>W3Techs puts PHP at 69.2% of all sites whose server-side language it can identify. That is the measurement behind the "roughly 70% of the web" headlines.</p>
+<p>The exploit needs no bad plugin or sloppy filter. It executes inside the engine's own request parser, while the multipart body is still being turned into <code>$_POST</code> and <code>$_FILES</code>. Your router does not exist yet.</p>
+<p>That ordering makes PHP2Shell a patch-right-now problem, not a hardening exercise. Every input check I own sits downstream of corrupted code.</p>
+<h2>The parser runs before modules are activated</h2>
+<p>PHP builds <code>$_POST</code> and <code>$_FILES</code> before any script can read them, so the parse happens during request startup. The ordering in <code>main/main.c</code>, quoted from Calif's disclosure:</p>
+<pre><code class="language-c">PG(modules_activated) = 0;
+/* ... */
+php_hash_environment();   /* Parses request variables and multipart input. */
+zend_activate_modules();  /* Calls normal module RINIT functions. */
+PG(modules_activated) = 1;
+</code></pre>
+<p>Two consequences follow:</p>
+<ul>
+<li>a multipart request is parsed whether or not the endpoint accepts an upload,</li>
+<li>a fatal error during that parse is not an application error, and your handler never runs.</li>
+</ul>
+<p>The path is reachable under defaults. <code>session.upload_progress.enabled</code> ships <code>On</code>, letting the session extension open and update a session while the body is read.</p>
+<h2>Count first, allocate second</h2>
+<p>Calif's team traced it to a hash table insertion routine, <code>_zend_hash_str_add_or_update_i</code>. Element counts are bumped before the bucket is initialized:</p>
+<pre><code class="language-c">idx = ht-&gt;nNumUsed++;
+ht-&gt;nNumOfElements++;
+p = ht-&gt;arData + idx;
+p-&gt;key = zend_string_init(str, len, persistent); /* may zend_bailout() */
+</code></pre>
+<p>When the key allocation hits <code>memory_limit</code>, PHP does not unwind cleanly. It jumps out through C-level <code>longjmp()</code> with the count already incremented. Teardown later walks <code>ht-&gt;arData</code> up to <code>nNumUsed</code> and treats the half-written bucket as live data.</p>
+<p>Reaching that limit is cheap. A multipart part built to the RFC1867 upload format can carry an empty filename, escaping <code>max_file_uploads</code>, yet PHP still creates six <code>$_FILES</code> entries for it. A nested field name like <code>files[a][b][c]</code> builds that hierarchy six times over.</p>
+<p>Hundreds of such records fit inside the default 8 MiB <code>post_max_size</code> while occupying more than the default 128 MiB heap. Chunked HTTP/1.1 or lengthless HTTP/2 bodies clear the same cap, because PHP compares the declared <code>Content-Length</code> rather than consumed bytes.</p>
+<h2>mod_php and PHP-FPM are not the same fight</h2>
+<p>Both server application programming interfaces (SAPIs) parse the body identically. What differs is the worker's fate after a startup fatal.</p>
+<p>On Apache with <code>mod_php</code>, a startup failure still reaches <code>php_request_shutdown()</code>. The heap is freed and the Apache child survives to serve the next request. Session globals left pointing into that freed heap get consumed by the next multipart request, yielding remote code execution against arbitrary PHP scripts with no application involvement.</p>
+<p>PHP-FPM takes the other branch. A startup failure calls <code>php_module_shutdown()</code> and returns <code>FPM_EXIT_SOFTWARE</code>, so the worker exits and the stale pointers die with it. On FPM the fatal must land after a successful startup, once the application has started decoding something.</p>
+<p>That second chain needs an application-level trigger:</p>
+<ul>
+<li>the app decodes serialized data under attacker memory pressure,</li>
+<li>the decode runs through <code>session_start()</code>, <code>session_decode()</code>, <code>unserialize()</code> or a wrapper such as WordPress's <code>maybe_unserialize()</code>,</li>
+<li>the fatal skips <code>php_var_unserialize_destroy()</code>, so the Basic extension's <code>BG(unserialize).data</code> pointer and its nesting level survive,</li>
+<li>the request heap is freed while the FPM worker stays alive,</li>
+<li>the next multipart request reaches session upload progress before Basic's init, reuses the abandoned decoder bookkeeping, and writes a controlled <code>zval</code> into reclaimed memory via destructor-list arithmetic.</li>
+</ul>
+<p>Calif demonstrated that chain against nginx. The prerequisite is not exotic. A session ID chosen by the attacker plus one <code>session_start()</code> call is surface many PHP applications expose.</p>
+<h2>The patch fixes a failure mode</h2>
+<p>The fix runs deeper than a bounds check. Out-of-memory no longer aborts an operation mid-flight. It becomes a soft error at the next VM safe point, so cleanup runs and the pointer clears before the memory is released. Past a higher threshold it becomes a hard <code>_exit()</code>.</p>
+<p>Shutdown also resets long-lived state that used to survive:</p>
+<ul>
+<li>session globals,</li>
+<li>error backtraces,</li>
+<li>OPcache shared memory.</li>
+</ul>
+<p>Objects decoded by the upload-progress handler stay <code>__PHP_IncompleteClass</code>, so neither an autoload nor a <code>__destruct()</code> runs during that early decode.</p>
+<p>Read that list as an admission. Containment that depends on a non-local jump landing where cleanup can still reach is not containment. It is a coin flip, and this one took a long time to come up tails.</p>
+<h2>If you cannot patch this hour</h2>
+<p>Zero-day or not, upgrades wait for change windows. Every measure below is partial, none substitutes for the patched release.</p>
+<pre><code class="language-ini">; emergency only, revert after upgrading
+session.upload_progress.enabled = 0
+fatal_error_backtraces = 0        ; PHP 8.5.x
+memory_limit = -1
+</code></pre>
+<p>Five details decide whether they actually help:</p>
+<ul>
+<li>restart every worker after editing <code>php.ini</code>, because running Apache children and FPM workers hold old values,</li>
+<li>set <code>pm.max_requests = 1</code> while exposed, breaking the requirement that one worker handle both requests,</li>
+<li>switch off <code>session.upload_progress</code> knowing it covers neither the OPcache arm nor the backtrace arm,</li>
+<li>don't substitute <code>RLIMIT_AS</code> or <code>RLIMIT_DATA</code> for <code>memory_limit</code>, because OS limits bypass PHP's cleanup path,</li>
+<li>accept that <code>memory_limit = -1</code> trades code execution for a trivial memory-exhaustion denial of service.</li>
+</ul>
+<p>I would weigh that last trade hardest on a shared machine. An attacker who cannot write a bucket can still send the nested empty-upload payload and eat the box's RAM.</p>
+<h2>Inventory is the harder half</h2>
+<p>Only four releases carry fixes: PHP 8.5.12, 8.4.27, 8.3.36 and 8.2.35. Nothing below 8.2 gets one; the earliest affected path dates to PHP 5.4.0, March 2012. CISA's advice for 8.1 or older: take it offline.</p>
+<p>Listing that estate is heavier work than the upgrade. PHP hides where nobody labels it:</p>
+<ul>
+<li><code>php-cgi</code> and LiteSpeed invocations,</li>
+<li>FrankenPHP build images,</li>
+<li>container images baked months ago,</li>
+<li>vendor appliances whose admin console never mentions the runtime.</li>
+</ul>
+<p>What I would change in my own stack:</p>
+<ul>
+<li>reject <code>multipart/form-data</code> at ingress for routes that never accept uploads, so it never reaches PHP,</li>
+<li>rebuild images against a patched version, not edit <code>php.ini</code> on a live host,</li>
+<li>sandbox the worker so a popped process cannot exec a shell or fetch a tool, the activity CISA asks defenders to watch for,</li>
+<li>treat <code>session_start()</code> on an attacker-supplied ID as input surface, since on FPM it is one.</li>
+</ul>
+<p>Most hardening advice for a web stack assumes the application is where input becomes dangerous. PHP2Shell breaks that assumption at the engine boundary. A request lives twice, once inside the parser and once inside your code, and only the second life has your firewall in front of it.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
