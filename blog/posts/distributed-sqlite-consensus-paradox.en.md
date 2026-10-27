@@ -18,7 +18,9 @@ Every write goes through a leader, crosses the network, and waits for a quorum o
 
 His chronology is tidy.
 
-Consensus came first: rqlite in September 2014, Canonical's dqlite in 2017. Streaming came second, when Ben Johnson released Litestream in early 2021. Merge came third, with cr-sqlite adding CRDTs to the engine in 2022.
+Consensus came first: rqlite in September 2014, Canonical's dqlite in 2017.
+Streaming came second, when Ben Johnson released Litestream in early 2021.
+Merge came third, with cr-sqlite adding Conflict-free Replicated Data Types (CRDTs) to the engine in 2022.
 
 Each corner exists to answer one question.
 

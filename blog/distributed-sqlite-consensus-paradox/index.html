@@ -40,7 +40,7 @@
 <meta property="article:tag" content="databases">
 <meta property="article:tag" content="devops">
 <meta property="article:tag" content="architecture">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "The Distributed SQLite Paradox: You Pay for Consensus, Then Queue Behind One Writer", "description": "Raft-replicated SQLite buys you failover and charges you milliseconds per write. Most production apps need WAL streaming to S3, not a cluster.", "datePublished": "2026-10-25T00:00:00+00:00", "dateModified": "2026-10-25T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/distributed-sqlite-consensus-paradox/"}, "keywords": "sqlite, distributed-systems, databases, devops, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1014, "image": ["https://aditf.com/blog/distributed-sqlite-consensus-paradox/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/distributed-sqlite-consensus-paradox/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "The Distributed SQLite Paradox: You Pay for Consensus, Then Queue Behind One Writer", "description": "Raft-replicated SQLite buys you failover and charges you milliseconds per write. Most production apps need WAL streaming to S3, not a cluster.", "datePublished": "2026-10-25T00:00:00+00:00", "dateModified": "2026-10-25T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/distributed-sqlite-consensus-paradox/"}, "keywords": "sqlite, distributed-systems, databases, devops, architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1018, "image": ["https://aditf.com/blog/distributed-sqlite-consensus-paradox/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/distributed-sqlite-consensus-paradox/id/", "inLanguage": "id-ID"}}</script>
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/distributed-sqlite-consensus-paradox/id/">
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/distributed-sqlite-consensus-paradox/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/distributed-sqlite-consensus-paradox/">
@@ -82,7 +82,9 @@
 <p>Every write goes through a leader, crosses the network, and waits for a quorum of nodes to acknowledge it on disk. When that finishes, you still write through SQLite's single-writer lock. You traded microseconds for milliseconds and bought failover, which a backup file in object storage also gives you.</p>
 <h2>Three corners, one question each</h2>
 <p>His chronology is tidy.</p>
-<p>Consensus came first: rqlite in September 2014, Canonical's dqlite in 2017. Streaming came second, when Ben Johnson released Litestream in early 2021. Merge came third, with cr-sqlite adding CRDTs to the engine in 2022.</p>
+<p>Consensus came first: rqlite in September 2014, Canonical's dqlite in 2017.
+Streaming came second, when Ben Johnson released Litestream in early 2021.
+Merge came third, with cr-sqlite adding Conflict-free Replicated Data Types (CRDTs) to the engine in 2022.</p>
 <p>Each corner exists to answer one question.</p>
 <ul>
 <li><strong>Consensus (rqlite, dqlite):</strong> what if the machine dies and I cannot wait to restore?</li>

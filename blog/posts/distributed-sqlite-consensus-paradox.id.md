@@ -20,7 +20,7 @@ Selesai semua itu, lo masih nulis lewat lock single-writer punya SQLite. Yang lo
 
 Urutan kemunculannya rapi. Consensus dulu: rqlite September 2014, terus dqlite dari Canonical tahun 2017.
 
-Streaming belakangan, waktu Ben Johnson rilis Litestream awal 2021. Terakhir merge, saat cr-sqlite nambahin CRDT ke engine-nya tahun 2022.
+Streaming belakangan, waktu Ben Johnson rilis Litestream awal 2021. Terakhir merge, saat cr-sqlite nambahin Conflict-free Replicated Data Types (CRDT) ke engine-nya tahun 2022.
 
 Tiap sudut itu ada karena satu pertanyaan spesifik.
 
