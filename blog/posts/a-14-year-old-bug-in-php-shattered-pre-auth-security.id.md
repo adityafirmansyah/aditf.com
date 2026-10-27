@@ -18,9 +18,9 @@ Yang bikin gue nggak tenang bukan skornya. Ini bukan soal plugin jelek atau fram
 
 Eksekusinya di dalam parser request milik engine-nya sendiri, tepat saat body multipart masih diterjemahin jadi `$_POST` sama `$_FILES`.
 
-Di titik itu router lo belum ada. Belum lahir.
+Di titik itu router lo belum ada. Belum sempat jalan.
 
-Makanya ini urusan patch sekarang juga, bukan hardening pelan-pelan. Semua pengecekan input gue duduknya di hilir kode yang udah korup.
+Makanya ini urusan yang wajib dipatch sekarang juga, bukan sekadar hardening santai. Semua filter input dan middleware yang kita pasang posisinya baru jalan setelah kode C engine-nya telanjur jebol.
 
 ## Parser jalan duluan, modulnya belum aktif
 
@@ -58,15 +58,15 @@ Pas alokasi key kena `memory_limit`, PHP nggak unwinding rapi. Dia loncat keluar
 
 Terus waktu teardown, PHP jalanin `ht->arData` sampai batas `nNumUsed` dan nganggep bucket setengah jadi itu data hidup.
 
-Nyampein limit-nya murah. Satu part upload RFC1867 boleh bawa filename kosong, jadi lolos dari `max_file_uploads`. Tapi PHP tetap bikin enam entri `$_FILES`.
+Bikin PHP jebol batas memori ini gampang banget, bahkan tanpa kirim file raksasa. Penyerang cukup kirim form multipart berformat RFC 1867 dengan nama file kosong. Trik ini bikin payload lolos dari saringan `max_file_uploads`, tapi engine PHP tetap dipaksa bikin enam entri metadata `$_FILES`.
 
-Kasih nama field bersarang kayak `files[a][b][c]`, hierarkinya dibangun enam kali. Ratusan record kayak gitu muat di `post_max_size` default 8 MiB, padahal heap yang kepakai lewat 128 MiB.
+Kalau nama field-nya dibikin bersarang kayak `files[a][b][c]`, hierarki hash table tadi bakal dibangun ulang enam kali lipat. Ratusan entri kosong begini gampang banget ngabisin heap 128 MiB, padahal ukuran request HTTP-nya masih jauh di bawah batas 8 MiB `post_max_size`.
 
 Body chunked HTTP/1.1 atau HTTP/2 tanpa length lewat batas sama. PHP cuma bandingin `Content-Length` yang dideklarasi, bukan byte yang benar-benar dikonsumsi.
 
-## mod_php sama PHP-FPM bukan lawan yang sama
+## mod_php vs PHP-FPM: Dampak dan Alurnya Beda Jauh
 
-Dua-duanya memparsing body identik. Bedanya nasib worker setelah fatal saat startup.
+Dua-duanya memparsing body secara identik. Bedanya ada di nasib worker setelah kena fatal error pas startup.
 
 Di Apache pakai `mod_php`, startup yang gagal tetap nyampe ke `php_request_shutdown()`. Heap request dibebasin, child process Apache-nya selamat buat layani request berikutnya.
 
@@ -76,35 +76,35 @@ PHP-FPM ambil cabang lain. Startup gagal berarti `php_module_shutdown()` dipangg
 
 Artinya di FPM fatal-nya harus mendarat setelah startup sukses, saat aplikasi udah mulai ngedecode sesuatu.
 
-Rantai kedua itu butuh pemicu dari sisi aplikasi:
+Rantai kedua itu butuh pemicu dari alur aplikasi:
 
-- aplikasi ngedecode data terserialisasi di bawah tekanan memori penyerang,
-- decode-nya lewat `session_start()`, `session_decode()`, `unserialize()` atau wrapper kayak `maybe_unserialize()` milik WordPress,
-- fatal-nya bikin `php_var_unserialize_destroy()` keskip, jadi pointer `BG(unserialize).data` dan level nesting di extension Basic tetap hidup,
-- heap request dibebasin sementara worker FPM-nya jalan,
-- request multipart berikutnya nyampe ke session upload progress sebelum init Basic, pakai ulang bookkeeping decoder yang ditinggal, dan aritmetika destructor list-nya nulis `zval` yang dikendalikan ke memori yang sudah direbut ulang.
+- aplikasi memproses data serialisasi saat alokasi memori sengaja dimanipulasi penyerang sampai mepet limit,
+- proses decode berjalan lewat `session_start()`, `session_decode()`, `unserialize()`, atau fungsi wrapper kayak `maybe_unserialize()` di WordPress,
+- error fatal bikin fungsi `php_var_unserialize_destroy()` terlewat, sehingga pointer `BG(unserialize).data` dan status nesting di extension Basic tetap menggantung,
+- heap request langsung dibebaskan sementara worker PHP-FPM tetap dibiarkan hidup,
+- request multipart berikutnya masuk ke handler upload progress sebelum extension Basic diinisialisasi ulang, memanfaatkan sisa struktur decoder tadi buat nulis `zval` buatan penyerang ke blok memori yang dialokasikan ulang.
 
-Calif mendemokan rantai itu di nginx. Prasyaratnya nggak eksotis: session ID pilihan penyerang plus satu `session_start()` itu permukaan yang dibuka banyak aplikasi PHP.
+Calif sukses mendemokan skenario ini di server nginx. Syarat serangannya sama sekali nggak muluk-muluk: penyerang cukup kirim session ID custom ke endpoint yang manggil `session_start()`, sesuatu yang dibuka secara wajar oleh ribuan aplikasi PHP.
 
-## Patch-nya ngubah mode kegagalan
+## Cara Patch Ini Merombak Penanganan Error PHP
 
-Perbaikannya lebih menarik daripada sekadar nambah pengecekan batas.
+Perbaikannya jauh lebih cerdas ketimbang sekadar nambahin validasi batas array biasa.
 
-Out-of-memory sekarang nggak menghentikan operasi di tengah jalan. Dia jadi soft error di VM safe point berikutnya, jadi cleanup tetap jalan dan pointer dikosongin sebelum memori dilepas.
+Kondisi out-of-memory sekarang nggak langsung menghentikan eksekusi secara brutal di tengah jalan. Error OOM diubah jadi soft error yang baru dieksekusi di safe point VM berikutnya, sehingga proses cleanup tetap jalan dan pointer dibersihkan sebelum memori dilepas.
 
-Lewat dari ambang lebih tinggi, dia berubah jadi `_exit()` keras.
+Kalau konsumsi memori melewati batas ambang darurat yang lebih tinggi, barulah proses dimatikan langsung lewat pemanggilan `_exit()`.
 
-Shutdown juga sekarang nge-reset semua state panjang umur yang dulunya selamat:
+Fase shutdown engine sekarang juga membersihkan semua variabel global persisten yang sebelumnya sempat lolos:
 
 - session globals,
 - error backtrace,
 - shared memory OPcache.
 
-Objek yang didecode handler upload progress tetap `__PHP_IncompleteClass`, jadi nggak ada autoload maupun `__destruct()` di fase decode awal itu.
+Selain itu, objek yang diproses handler upload progress dikunci dalam status `__PHP_IncompleteClass`. Trik ini ampuh memastikan fungsi autoload maupun `__destruct()` nggak bisa dieksekusi diam-diam di fase parsing awal.
 
-Baca daftar itu sebagai pengakuan. Isolasi yang bergantung pada loncatan non-lokal mendarat di tempat yang masih bisa dicapai cleanup bukan isolasi.
+Daftar tambalan ini ngebuktiin satu hal penting: sistem isolasi yang cuma ngandelin mekanisme jump `longjmp()` dengan harapan cleanup-nya bakal mendarat mulus itu bukan isolasi sejati.
 
-Itu taruhan untung-untungan, dan untungnya baru habis sekarang.
+Itu murni taruhan untung-untungan, dan keberuntungannya baru jebol sekarang setelah belasan tahun.
 
 ## Kalau lo belum bisa patch hari ini
 
@@ -125,7 +125,7 @@ Lima detail yang nentuin baris itu beneran nolong atau nggak:
 - jangan ganti `memory_limit` pakai `RLIMIT_AS` atau `RLIMIT_DATA` karena limit OS ngelewatin jalur cleanup PHP,
 - terima kalau `memory_limit = -1` menukar eksekusi kode jadi denial of service karena kehabisan memori.
 
-Tukeran terakhir itu yang paling gue timbang di mesin sharing. Penyerang yang nggak bisa nulis bucket tetap bisa ngirim payload upload kosong bersarang dan ngabisin RAM.
+Kompromi terakhir ini yang paling berisiko kalau server lo dipakai barengan (shared hosting). Penyerang yang gagal mengeksekusi kode tetap bisa dengan mudah membombardir form kosong bersarang buat nguras habis sisa RAM server lo.
 
 ## Bagian tersusah itu justru inventarisasinya
 
@@ -140,22 +140,22 @@ Di bawah 8.2 nggak dapat apa-apa, padahal jalur paling tua yang kena balik ke PH
 
 Saran CISA buat yang masih di 8.1 atau lebih lama: tarik offline.
 
-Masalahnya, mendata lebih berat daripada upgrade-nya. PHP sembunyi di tempat tanpa label:
+Masalah terbesarnya justru bukan proses patch, melainkan melacak inventaris server lo. Runtime PHP sering kali nyelip di tempat-tempat yang nggak kelihatan secara kasat mata:
 
-- invokasi `php-cgi` dan LiteSpeed,
-- build image FrankenPHP,
-- base image container yang di-bake berbulan lalu,
-- appliance vendor yang konsol adminnya nggak pernah nyebut runtime.
+- proses `php-cgi` dan server LiteSpeed,
+- image build FrankenPHP,
+- base image container yang di-build berbulan-bulan lalu dan nggak pernah di-refresh,
+- appliance dari vendor pihak ketiga yang konsol adminnya sama sekali nggak nyebut kalau mereka pakai PHP di baliknya.
 
 Yang gue ubah di stack sendiri:
 
 - tolak `multipart/form-data` di ingress buat route yang nggak pernah terima upload, biar body-nya nggak nyampe PHP,
 - build ulang image pakai versi yang udah dipatch dan di-pin, bukan ngedit `php.ini` di host yang jalan,
 - sandbox worker-nya biar proses yang udah dijebol nggak bisa exec shell atau download tool, aktivitas yang CISA minta dipantau,
-- perlakuin `session_start()` dengan ID dari penyerang sebagai permukaan input, karena di FPM memang iya.
+- anggap pemanggilan `session_start()` dengan ID dari penyerang sebagai attack surface berbahaya, karena di arsitektur PHP-FPM alur inilah yang jadi celah masuk eksploitasi.
 
-Hampir semua saran hardening yang gue tulis buat stack web berasumsi aplikasi kita itu tempat input jadi bahaya.
+Hampir semua panduan hardening yang biasa kita buat berasumsi kalau celah keamanan selalu berasal dari kode aplikasi kita sendiri.
 
-PHP2Shell mecahin asumsi itu di batas engine. Satu request hidup dua kali: sekali di parser, sekali di kode lo.
+PHP2Shell membuyarkan asumsi itu tepat di jantung engine runtime. Setiap request HTTP sebenarnya diproses dua babak: pertama di parser C milik engine, baru kemudian di kode framework lo.
 
-Cuma yang kedua punya firewall lo di depannya.
+Masalahnya, semua firewall, filter WAF, dan middleware yang lo banggakan cuma berdiri menjaga babak yang kedua.
