@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Why Claude Code Burned 20% of API Requests on Status Lines — Field Notes</title>
+<meta name="description" content="An OpenTelemetry audit revealed Claude Code spent nearly 20% of its API requests generating three-word terminal status lines. Polling frontier models for UI progress is an architectural leak every agent harness must fix.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/claude-code-status-line-token-burn/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Why Claude Code Burned 20% of API Requests on Status Lines — Field Notes">
+<meta property="og:description" content="An OpenTelemetry audit revealed Claude Code spent nearly 20% of its API requests generating three-word terminal status lines. Polling frontier models for UI progress is an architectural leak every agent harness must fix.">
+<meta property="og:url" content="https://aditf.com/blog/claude-code-status-line-token-burn/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/claude-code-status-line-token-burn/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Why Claude Code Burned 20% of API Requests on Status Lines — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Why Claude Code Burned 20% of API Requests on Status Lines — Field Notes">
+<meta name="twitter:description" content="An OpenTelemetry audit revealed Claude Code spent nearly 20% of its API requests generating three-word terminal status lines. Polling frontier models for UI progress is an architectural leak every agent harness must fix.">
+<meta name="twitter:image" content="https://aditf.com/blog/claude-code-status-line-token-burn/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-29T00:00:00+00:00">
+<meta property="article:tag" content="ai agents">
+<meta property="article:tag" content="claude code">
+<meta property="article:tag" content="prompt engineering">
+<meta property="article:tag" content="developer tools">
+<meta property="article:tag" content="software architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Why Claude Code Burned 20% of API Requests on Status Lines", "description": "An OpenTelemetry audit revealed Claude Code spent nearly 20% of its API requests generating three-word terminal status lines. Polling frontier models for UI progress is an architectural leak every agent harness must fix.", "datePublished": "2026-10-29T00:00:00+00:00", "dateModified": "2026-10-29T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/claude-code-status-line-token-burn/"}, "keywords": "ai agents, claude code, prompt engineering, developer tools, software architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 941, "image": ["https://aditf.com/blog/claude-code-status-line-token-burn/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/claude-code-status-line-token-burn/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/claude-code-status-line-token-burn/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/claude-code-status-line-token-burn/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/claude-code-status-line-token-burn/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>29 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Why Claude Code Burned 20% of API Requests on Status Lines</h1>
+    <div class="post__tags"><span>ai agents</span><span>claude code</span><span>prompt engineering</span><span>developer tools</span><span>software architecture</span></div>
+    <div class="post__content reveal is-visible">
+<p>When an OpenTelemetry audit revealed that one in every five Application Programming Interface (API) calls in Claude Code was spent generating three-word status lines, it exposed an expensive flaw in agent telemetry.</p>
+<p>Flamerix AI analyzed request metrics from <code>claude_code.api_request</code> events grouped by <code>query_source</code>. The data was startling. A background polling routine named <code>agent_summary</code> accounted for 16.4% of total token spend and 19.7% of all requests.</p>
+<p>That background routine actually outspent the main interactive conversation, which consumed 15.7% of tokens. The telemetry audit highlighted several stark figures:</p>
+<ul>
+<li>96% of all status queries were dispatched to Claude 3 Opus.</li>
+<li>The input-to-output token ratio reached approximately 9,000 : 1.</li>
+<li>Every thirty seconds, the client fed 50,000 to 100,000 tokens into the model to produce three words of terminal feedback.</li>
+<li>Telemetry events confirmed that UI spinners were competing directly with actual engineering work for model throughput.</li>
+</ul>
+<h2>The OR Expression You Couldn't Turn Off</h2>
+<p>In Claude Code versions 2.1.257 through 2.1.312, background subagents ran with an aggressive polling loop. A hardcoded <code>setInterval</code> timer fired every thirty seconds. On every tick, the client packaged the entire conversation transcript of every active background agent and shipped it back to the frontier model.</p>
+<p>The goal was simple. The client wanted to update terminal status text like "analyzing repo" or "editing test suite".</p>
+<p>The trouble was that users could not disable it. While documentation referenced an <code>agentProgressSummaries</code> flag, the implementation wrapped it in a hardcoded OR expression. That flag remained glued to <code>true</code> in the bundled binary.</p>
+<p>If you launched three parallel background agents to refactor tests, your client sent three massive prompts every thirty seconds. The loop ran relentlessly regardless of whether the agent had produced new output:</p>
+<ul>
+<li>Transcripts were re-sent even when an agent was idle waiting on a shell command.</li>
+<li>Background subagents accumulated conversation history rapidly, making subsequent queries heavier.</li>
+<li>Network bandwidth on local developer machines was consumed uploading duplicate prompts continuously.</li>
+</ul>
+<p>Anthropic engineer Edwin Arbus confirmed the polling mechanism on Hacker News (thread #50284255). He noted that status queries accounted for roughly 6% of total terminal spend across users submitting telemetry. Arbus pointed to an upcoming prompt cache alignment fix in version 2.1.311+ and an in-progress short-notes mode for smaller models.</p>
+<h2>The Prompt Cache Mirage</h2>
+<p>The standard defense for frequent polling is prompt caching. If the conversation transcript is already cached, each read costs only 10% of the normal input token price. That discount sounds reassuring until you run the basic arithmetic of background fleets.</p>
+<p>Even with a 98% prompt cache hit rate, polling creates continuous financial drag:</p>
+<ul>
+<li>A 100,000-token transcript read at 10% cost still bills 10,000 token-equivalents every thirty seconds.</li>
+<li>Three active subagents generate 360 status queries per hour.</li>
+<li>At 10,000 discounted tokens per call, that background churn burns 3.6 million input tokens an hour just to refresh three terminal lines.</li>
+<li>Across a full workday, status polling alone can burn tens of millions of billable tokens.</li>
+</ul>
+<p>Then consider cache misses. When an agent writes code or receives a tool result, the prompt prefix shifts. Cache Time To Live (TTL) expirations also cause recurring cache evictions.</p>
+<p>Prompt cache entries expire after five minutes of inactivity. When a background subagent pauses to wait on slow builds or external network calls, that TTL window closes silently. The very next status query pays full price for 100,000 input tokens.</p>
+<p>Flamerix AI found that the remaining 2% cold cache misses accounted for more than a third of the feature's entire token cost. A single cold miss on Opus wipes out hours of cached savings in an instant.</p>
+<h2>Disarming Bun Bytecode at Runtime</h2>
+<p>Claude Code does not ship as plain JavaScript inside <code>node_modules</code>. It is distributed as precompiled Bun bytecode. Developers could not simply patch source files on disk to kill the timer.</p>
+<p>Flamerix AI engineered an ingenious workaround using Bun's preload hook (<code>BUN_OPTIONS=--preload</code>). Their <code>no-agent-summary.js</code> script intercepts timer registration at startup:</p>
+<pre><code class="language-javascript">// Hook setInterval to neutralize the agent_summary loop
+const originalSetInterval = globalThis.setInterval;
+
+globalThis.setInterval = function (callback, delay, ...args) {
+  const fnStr = Function.prototype.toString.call(callback);
+  if (fnStr.includes(&quot;agentProgressSummaries&quot;) || fnStr.includes(&quot;agent_summary&quot;)) {
+    // Delay timer to 2^31 - 1 milliseconds (~24.8 days)
+    return originalSetInterval.call(this, callback, 2147483647, ...args);
+  }
+  return originalSetInterval.call(this, callback, delay, ...args);
+};
+</code></pre>
+<p>By checking <code>Function.prototype.toString</code>, the preload hook traps the specific summary callback. It pushes the timer interval out to 2147483647 milliseconds—effectively disarming the loop without crashing the process.</p>
+<p>Anthropic subsequently shipped version 2.1.311+, adjusting cache breakpoints to reduce recurring miss penalties.</p>
+<h2>Telemetry Must Be Push-Based and Local</h2>
+<p>In my own setup, I manage an autonomous multi-agent Hermes fleet across Linux VPS nodes and an Intel Celeron J4105 homelab box. Our agents handle automated coding tasks, Quality Assurance (QA) runs, and Pull Request (PR) reviews. If our harness polled a frontier model like Opus every thirty seconds just to draw a CLI spinner, our API bills would spiral immediately.</p>
+<p>Agent User Experience (UX) should never depend on recurring frontier model inference. Instead, practical agent telemetry follows three design rules.</p>
+<ul>
+<li>Push on deterministic transitions. Emit status messages during tool execution, file edits, or step completions rather than on a wall-clock timer.</li>
+<li>Use local models for summaries. When an agent needs conversational compression, delegate to Small Language Models (SLMs) or fast deterministic heuristics.</li>
+<li>Never couple terminal rendering to billable tokens. The terminal interface should reflect known state machines, not speculative model generation.</li>
+</ul>
+<p>When model providers build developer harnesses, they face a subtle incentive trap. A loose timer loop silently inflates billed token consumption while giving users pretty terminal animations. As developers, we need transparent event-driven telemetry.</p>
+<p>Stop polling Opus for UI eye-candy.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/claude-code-status-line-token-burn/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

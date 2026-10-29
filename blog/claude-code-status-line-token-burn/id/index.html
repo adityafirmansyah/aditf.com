@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kenapa Claude Code Menghabiskan 20% Request API Cuma Buat Status Terminal — Field Notes</title>
+<meta name="description" content="Audit OpenTelemetry membongkar kalau Claude Code menghabiskan hampir 20% request API cuma buat tiga kata di status terminal. Polling frontier model buat urusan UI jelas jadi kebocoran arsitektur yang fatal.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/claude-code-status-line-token-burn/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Kenapa Claude Code Menghabiskan 20% Request API Cuma Buat Status Terminal — Field Notes">
+<meta property="og:description" content="Audit OpenTelemetry membongkar kalau Claude Code menghabiskan hampir 20% request API cuma buat tiga kata di status terminal. Polling frontier model buat urusan UI jelas jadi kebocoran arsitektur yang fatal.">
+<meta property="og:url" content="https://aditf.com/blog/claude-code-status-line-token-burn/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/claude-code-status-line-token-burn/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Kenapa Claude Code Menghabiskan 20% Request API Cuma Buat Status Terminal — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Kenapa Claude Code Menghabiskan 20% Request API Cuma Buat Status Terminal — Field Notes">
+<meta name="twitter:description" content="Audit OpenTelemetry membongkar kalau Claude Code menghabiskan hampir 20% request API cuma buat tiga kata di status terminal. Polling frontier model buat urusan UI jelas jadi kebocoran arsitektur yang fatal.">
+<meta name="twitter:image" content="https://aditf.com/blog/claude-code-status-line-token-burn/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-29T00:00:00+00:00">
+<meta property="article:tag" content="ai agents">
+<meta property="article:tag" content="claude code">
+<meta property="article:tag" content="prompt engineering">
+<meta property="article:tag" content="developer tools">
+<meta property="article:tag" content="software architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Kenapa Claude Code Menghabiskan 20% Request API Cuma Buat Status Terminal", "description": "Audit OpenTelemetry membongkar kalau Claude Code menghabiskan hampir 20% request API cuma buat tiga kata di status terminal. Polling frontier model buat urusan UI jelas jadi kebocoran arsitektur yang fatal.", "datePublished": "2026-10-29T00:00:00+00:00", "dateModified": "2026-10-29T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/claude-code-status-line-token-burn/id/"}, "keywords": "ai agents, claude code, prompt engineering, developer tools, software architecture", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 985, "image": ["https://aditf.com/blog/claude-code-status-line-token-burn/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/claude-code-status-line-token-burn/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/claude-code-status-line-token-burn/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/claude-code-status-line-token-burn/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/claude-code-status-line-token-burn/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>29 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Kenapa Claude Code Menghabiskan 20% Request API Cuma Buat Status Terminal</h1>
+    <div class="post__tags"><span>ai agents</span><span>claude code</span><span>prompt engineering</span><span>developer tools</span><span>software architecture</span></div>
+    <div class="post__content reveal is-visible">
+<p>Ketika audit OpenTelemetry membongkar bahwa satu dari lima panggilan Application Programming Interface (API) di Claude Code cuma dipakai buat bikin status terminal tiga kata, sebuah kebocoran biaya terungkap ke publik.</p>
+<p>Flamerix AI menganalisis metrik request dari event <code>claude_code.api_request</code> yang dikelompokkan berdasarkan <code>query_source</code>. Hasilnya bikin kaget. Rutinitas polling di background bernama <code>agent_summary</code> menyedot 16,4 persen konsumsi token dan 19,7 persen dari seluruh panggilan request.</p>
+<p>Beban rutin di background itu bahkan mengalahkan obrolan interaktif utama user, yang cuma menghabiskan 15,7% token. Audit telemetri ini menyoroti sejumlah angka gila:</p>
+<ul>
+<li>96% dari seluruh query status dikirim langsung ke Claude 3 Opus.</li>
+<li>Rasio token input banding output menyentuh angka sekitar 9.000 : 1.</li>
+<li>Setiap tiga puluh detik, client menyodorkan 50.000 sampai 100.000 token ke model hanya demi menghasilkan tiga kata di layar terminal.</li>
+<li>Animasi spinner di terminal ternyata bersaing langsung dengan pekerjaan coding utama untuk berebut kuota request model.</li>
+</ul>
+<h2>Loop Polling 30 Detik yang Terkunci Mati</h2>
+<p>Biang keroknya ada di implementasi Claude Code versi 2.1.257 sampai 2.1.312.</p>
+<p>Developer yang membongkar binary client menemukan timer <code>setInterval</code> yang dipatok kaku di angka tiga puluh detik.</p>
+<p>Cara kerjanya benar-benar boros. Client bakal menyapu bersih seluruh transkrip percakapan subagent aktif, lalu mengunggah tumpukan teks raksasa itu ke model frontier.</p>
+<p>Semua kerepotan jaringan itu cuma demi satu hal sepele. Client cuma ingin memperbarui teks status di pojok CLI, seperti "menganalisis repo" atau "menjalankan test".</p>
+<p>Yang bikin developer jengkel, jalur buat mematikan fitur ini dikunci mati.</p>
+<p>Di dokumentasi resmi memang tertulis opsi <code>agentProgressSummaries</code>. Tapi di baris kode aslinya, opsi itu dibungkus ekspresi OR yang memaksa nilainya selalu <code>true</code>.</p>
+<p>Akibatnya, kalau lo menyalakan tiga subagent sekaligus di terminal:</p>
+<ul>
+<li>Transkrip percakapan tetap dikirim meski agent lagi bengong menunggu proses shell.</li>
+<li>Riwayat obrolan makin panjang, sehingga payload prompt polling berikutnya otomatis makin membengkak.</li>
+<li>Koneksi internet lokal lo dipaksa mengunggah puluhan kilobyte teks duplikat tiap setengah menit.</li>
+</ul>
+<p>Engineer Anthropic, Edwin Arbus, akhirnya mengonfirmasi mekanisme ini di Hacker News pada thread #50284255.</p>
+<p>Dia menyebut kalau query status ini rata-rata memakan sekitar 6% dari seluruh pengeluaran terminal pengguna yang menyalakan telemetri. Arbus juga merinci rencana perbaikan prompt cache di versi 2.1.311+ serta mode ringkasan pendek memakai model yang lebih kecil.</p>
+<h2>Ilusi Murah dari Prompt Cache</h2>
+<p>Banyak orang awalnya mengira kebiasaan polling ini nggak bakal bikin dompet jebol karena ada diskon prompt cache.</p>
+<p>Secara teori, membaca transkrip yang sudah nangkring di cache memang cuma kena tarif 10% dari harga input normal.</p>
+<p>Tapi diskon 90% itu cuma manis di atas kertas.</p>
+<p>Begitu lo hitung beban armada agent secara riil, angkanya langsung bikin sesak napas:</p>
+<ul>
+<li>Transkrip sepanjang 100.000 token dengan diskon 10% tetap ditagih setara 10.000 token tiap tiga puluh detik.</li>
+<li>Tiga subagent aktif bakal menghasilkan 360 query status dalam kurun satu jam.</li>
+<li>Rutinitas latar belakang ini membakar 3,6 juta token input per jam cuma demi memoles tiga baris teks terminal.</li>
+<li>Kalau dikali jam kerja seharian, saldo API lo terkuras puluhan juta token tanpa menghasilkan baris kode baru.</li>
+</ul>
+<p>Itu baru hitungan kalau semua request dapat cache hit.</p>
+<p>Ceritanya langsung beda begitu ada cache miss.</p>
+<p>Masalahnya, entri prompt cache punya masa kedaluwarsa Time To Live (TTL) selama lima menit.</p>
+<p>Kalau subagent lo berhenti sejenak menunggu build yang berat atau respons jaringan yang lambat, jendela cache ini bakal hangus tanpa aba-aba. Belum lagi setiap kali agent menulis file baru, awalan prompt otomatis berubah dan memicu miss baru.</p>
+<p>Di sinilah letak jebakannya.</p>
+<p>Audit Flamerix AI membuktikan bahwa 2% kegagalan cache ternyata menyumbang lebih dari sepertiga total biaya fitur ringkasan status. Sekali saja Opus terkena cold miss, seluruh penghematan diskon yang dikumpulkan berjam-jam langsung lenyap seketika.</p>
+<h2>Menjinakkan Bytecode Bun Saat Runtime</h2>
+<p>Niat buat mematikan timer ini di lokal ternyata terhalang cara distribusi Claude Code.</p>
+<p>Paket CLI ini dikirim dalam format bytecode Bun yang sudah dikompilasi, bukan file JavaScript biasa di <code>node_modules</code> yang gampang dipotong pakai editor teks.</p>
+<p>Tim Flamerix AI mengakali batasan ini lewat preload hook milik Bun dengan memanfaatkan variabel environment <code>BUN_OPTIONS=--preload</code>.</p>
+<p>Script <code>no-agent-summary.js</code> buatan mereka mencegat pendaftaran timer saat startup:</p>
+<pre><code class="language-javascript">// Hook setInterval untuk melumpuhkan loop agent_summary
+const originalSetInterval = globalThis.setInterval;
+
+globalThis.setInterval = function (callback, delay, ...args) {
+  const fnStr = Function.prototype.toString.call(callback);
+  if (fnStr.includes(&quot;agentProgressSummaries&quot;) || fnStr.includes(&quot;agent_summary&quot;)) {
+    // Tunda timer ke 2^31 - 1 milidetik (~24,8 hari)
+    return originalSetInterval.call(this, callback, 2147483647, ...args);
+  }
+  return originalSetInterval.call(this, callback, delay, ...args);
+};
+</code></pre>
+<p>Trik ini memanfaatkan <code>Function.prototype.toString</code> buat mengintip isi callback milik <code>agent_summary</code>.</p>
+<p>Begitu fungsi target terdeteksi, interval timer langsung dilempar ke 2147483647 milidetik.</p>
+<p>Loop polling status pun praktis lumpuh selama 24 hari ke depan tanpa memicu error apa pun di CLI.</p>
+<p>Anthropic belakangan merilis versi 2.1.311+ buat membenahi breakpoint cache agar biaya cold miss nggak melonjak liar.</p>
+<h2>Telemetry Harus Push dan Lokal</h2>
+<p>Kasus ini menyodorkan pelajaran arsitektur yang sangat mahal bagi siapa pun yang membangun sistem agent.</p>
+<p>Di homelab pribadi gue, armada agent Hermes berjalan di atas server Celeron J4105 hemat daya dan beberapa VPS Linux. Agent kita mengurus penulisan kode, pengetesan Quality Assurance (QA), dan review Pull Request (PR).</p>
+<p>Kalau harness kita sampai polling Opus tiap tiga puluh detik cuma demi muter animasi spinner di CLI, saldo API kita bakal ludes sia-sia.</p>
+<p>Dan kita memang nggak boleh merancang pipeline yang gampang bocor seperti itu.</p>
+<p>Desain User Experience (UX) terminal seharusnya murni bekerja secara lokal dan digerakkan oleh event.</p>
+<ul>
+<li>Kirim status berbasis transisi deterministik. Terbitkan status saat tool selesai jalan atau langkah kerja berganti tanpa bergantung pada timer interval.</li>
+<li>Serahkan ringkasan ke model lokal. Kalau butuh merangkum riwayat obrolan, delegasikan ke Small Language Models (SLMs) lokal atau parser string yang gratis.</li>
+<li>Pisahkan tampilan terminal dari konsumsi token berbayar. Antarmuka cuma perlu memantau status mesin state lokal, bukan rutin memanggil cloud.</li>
+</ul>
+<p>Harness agent yang dibuat oleh penyedia model sering membawa insentif tersembunyi.</p>
+<p>Polling berkala yang dibiarkan longgar bakal diam-diam melipatgandakan konsumsi token pengguna, sambil menutupi kebocoran itu lewat animasi terminal yang kelihatan sibuk.</p>
+<p>Sebagai developer, kita butuh arsitektur yang transparan dan berbasis event.</p>
+<p>Berhenti memanggil Opus cuma demi pemanis tampilan terminal.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/claude-code-status-line-token-burn/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
