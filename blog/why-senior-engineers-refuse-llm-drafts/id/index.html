@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Martin Fowler Soal LLM Voice: Alasan Senior Engineer Menolak Draf AI — Field Notes</title>
+<meta name="description" content="Martin Fowler mengingatkan bahaya draf tulisan dari LLM yang merusak kredibilitas teknis. Solusinya bukan membuang AI, tapi memisahkan riset fakta dari penulisan kalimat.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Martin Fowler Soal LLM Voice: Alasan Senior Engineer Menolak Draf AI — Field Notes">
+<meta property="og:description" content="Martin Fowler mengingatkan bahaya draf tulisan dari LLM yang merusak kredibilitas teknis. Solusinya bukan membuang AI, tapi memisahkan riset fakta dari penulisan kalimat.">
+<meta property="og:url" content="https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Martin Fowler Soal LLM Voice: Alasan Senior Engineer Menolak Draf AI — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Martin Fowler Soal LLM Voice: Alasan Senior Engineer Menolak Draf AI — Field Notes">
+<meta name="twitter:description" content="Martin Fowler mengingatkan bahaya draf tulisan dari LLM yang merusak kredibilitas teknis. Solusinya bukan membuang AI, tapi memisahkan riset fakta dari penulisan kalimat.">
+<meta name="twitter:image" content="https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-30T00:00:00+00:00">
+<meta property="article:tag" content="ai tooling">
+<meta property="article:tag" content="software engineering">
+<meta property="article:tag" content="technical writing">
+<meta property="article:tag" content="llms">
+<meta property="article:tag" content="developer experience">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Martin Fowler Soal LLM Voice: Alasan Senior Engineer Menolak Draf AI", "description": "Martin Fowler mengingatkan bahaya draf tulisan dari LLM yang merusak kredibilitas teknis. Solusinya bukan membuang AI, tapi memisahkan riset fakta dari penulisan kalimat.", "datePublished": "2026-10-30T00:00:00+00:00", "dateModified": "2026-10-30T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/id/"}, "keywords": "ai tooling, software engineering, technical writing, llms, developer experience", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1016, "image": ["https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>30 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Martin Fowler Soal LLM Voice: Alasan Senior Engineer Menolak Draf AI</h1>
+    <div class="post__tags"><span>ai tooling</span><span>software engineering</span><span>technical writing</span><span>llms</span><span>developer experience</span></div>
+    <div class="post__content reveal is-visible">
+<p>Tanggal 29 Oktober 2026 kemarin, Martin Fowler nulis esai pendek berjudul "LLM Voice". Pesannya tegas: jangan pernah biarkan Large Language Model (LLM) nulis draf pertama tulisan lo.</p>
+<p>Alasannya masuk akal. Tulisan yang dihasilkan AI biasanya mendarat di <em>uncanny valley</em>. Kelihatan rapi, tapi hampa dan bikin pembaca cepat muak. Mau diedit sekeras apa pun, irama tulisan yang kaku dan sok sopan itu susah banget dihilangkan.</p>
+<p>Gue langsung paham rasa frustrasi itu. Setelah 13 tahun lebih nulis code dan bikin spek arsitektur di sistem produksi, kredibilitas teknis itu aset paling mahal. Dan paling gampang hilang.</p>
+<p>Sekali pembaca ngerasa lo cuma menyalin teks mesin tanpa bobot, mereka bakal langsung tutup tab. Tapi menurut gue, kesimpulan Fowler kurang pas. Solusinya bukan berarti kita harus anti sama AI.</p>
+<p>Masalah sebenarnya ada di arsitektur pipeline kita. Mesinnya nggak perlu lo buang. Batas kerjanya yang wajib lo tata ulang.</p>
+<h2>Akar Masalah Alignment Slop</h2>
+<p>Di Hacker News (HN) thread 50290177, banyak developer senior ngebahas kenapa tulisan buatan AI kerasa capek banget dibaca. Pembahasannya merujuk ke riset linguistik di arXiv:2410.16107 soal variasi gaya tata bahasa.</p>
+<p>Riset itu nemuin fakta menarik. Gaya bahasa AI yang seragam ini bukan bawaan dari fase pretraining web. Sumber masalahnya justru muncul di tahap post-training.</p>
+<p>Proses Supervised Fine-Tuning (SFT) dan algoritma alignment bikin variasi kalimat mendadak amblas. Teknik seperti Reinforcement Learning from Human Feedback (RLHF) dan Direct Preference Optimization (DPO) menghukum opini yang tajam demi ngejar skor aman.</p>
+<p>Akhirnya, model AI belajar serangkaian kebiasaan defensif:</p>
+<ul>
+<li>Selalu nambahin disclaimer panjang di setiap pernyataan.</li>
+<li>Memasukkan kata transisi yang kelewat sopan.</li>
+<li>Memaksa paragraf punya struktur poin yang simetris.</li>
+<li>Mengganti detail trade-off teknis dengan kalimat klise yang hambar.</li>
+</ul>
+<p>Modelnya nulis kayak jubir korporat yang ketakutan bikin salah. Pas lo minta draf teknis, friksi nyata yang bikin tulisan engineering dipercaya malah disapu bersih.</p>
+<h2>Aturan Ptacek Buat Review Tanpa Kompromi</h2>
+<p>Praktisi keamanan Thomas Ptacek punya aturan main yang sangat bersih soal pemakaian model bahasa buat tulisan teknis. Prinsipnya sederhana: pakai AI sebagai kritikus yang galak, jangan jadikan tukang tulis kalimat.</p>
+<p>Model bahasa itu jago banget nyari celah logika. Lo bisa tempel draf rancangan arsitektur lo ke dalam prompt, terus kasih instruksi tegas:</p>
+<ul>
+<li>Tunjukkan titik kegagalan sistem yang kelewat dari rancangan ini.</li>
+<li>Catat prasyarat operasional yang lupa gue jelaskan.</li>
+<li>Tunjuk bagian argumen teknis yang lompat ke kesimpulan tanpa bukti.</li>
+<li>Tandai skenario deployment yang berpotensi bikin migration database gagal.</li>
+</ul>
+<p>Kunci dari instruksi di atas ada di batasannya. Lo nggak minta dia nulis ulang kalimat lo. Lo bahkan wajib melarang model buat ngasih saran kata pengganti.</p>
+<p>Begitu lo izinkan LLM menulis ulang paragraf lo, irama kalimatnya yang simetris bakal langsung nular. Urusan bedah logika serahkan ke mesin. Tapi kata-katanya tetap milik lo sendiri.</p>
+<h2>Memisahkan Riset Fakta dari Penulisan di Produksi</h2>
+<p>Di pipeline multi-agent Field Notes yang jalan tiap hari, kita pakai armada agent Hermes buat otomasi publikasi. Pola arsitektur yang sama juga kita pakai di Dagango.com buat nulis dokumen teknis multi-tenant.</p>
+<p>Dulu kita sempat kena jebakan yang sama kayak omongan Fowler. Kalau lo cuma ngasih prompt bebas dan minta model nulis artikel, hasilnya cuma sampah korporat.</p>
+<p>Fix-nya adalah memisahkan tanggung jawab riset dari penulisan draf secara total. Kita bagi tugasnya ke tiga agent yang bekerja terisolasi:</p>
+<ul>
+<li><strong>Research Agent</strong>: Mengumpulkan data mentah dan memverifikasi kode status Hypertext Transfer Protocol (HTTP) 200 di semua link sumber rujukan. Agent ini dilarang keras merangkai kalimat artikel.</li>
+<li><strong>Drafting Agent</strong>: Mengambil data dari brief terstruktur, lalu menulis artikel dengan aturan batas panjang kalimat yang sangat ketat.</li>
+<li><strong>Auditor Agent</strong>: Menjalankan script deterministik buat ngukur panjang kalimat dan menghitung kepadatan koma.</li>
+</ul>
+<p>Begini gambaran alur kerja di pipeline kita:</p>
+<pre><code class="language-text">[Sumber Primer] ──&gt; (Researcher) ──&gt; [Brief Fakta Terstruktur]
+                                              │
+                                              ▼
+                                     (Typewriter Agent)
+                                              │
+                                              ▼
+[Audit Lolos]    &lt;── (Auditor Linter) &lt;── [Draf Mentah]
+       │                      │
+       ▼                      ▼
+  [Publish PR]         [Revisi Bernomor]
+</code></pre>
+<p>Tahap riset cuma menghasilkan fakta yang bisa diuji, seperti angka benchmark atau commit git. Karena researcher nggak bikin narasi apa pun, tahap drafting nggak punya irama AI yang bisa ditiru.</p>
+<h2>Negative Constraints dan Register Sebagai Benteng</h2>
+<p>Alat pembuat draf butuh batasan negatif yang tegas. Kalau lo cuma minta AI nulis dengan gaya santai, hasilnya malah sering kali lebay. Kredibilitas tulisan dijaga dengan melarang apa saja yang nggak boleh dilakukan model.</p>
+<p>Di pipeline kita, ada batasan mekanis yang langsung memutus irama bawaan AI:</p>
+<ul>
+<li>Batas maksimal 35 kata per kalimat.</li>
+<li>Maksimal tiga koma dalam satu kalimat supaya klausa nggak bertumpuk.</li>
+<li>Konversi otomatis buat poin yang terdiri dari dua hal menjadi bullet list.</li>
+<li>Larangan keras buat istilah klise dan kata transisi formal yang hampa.</li>
+</ul>
+<p>Proteksi ini makin penting di lingkungan teknis bilingual. Kalau lo prompt pakai bahasa Indonesia, model generik biasanya langsung balik ke gaya birokrasi yang kaku. Pilihan katanya bakal dipenuhi kata penghubung formal seperti <code>adalah</code> dan <code>merupakan</code>.</p>
+<p>Buat membabat kebiasaan itu, kita kunci sistem ke register santai ala obrolan developer lewat panggilan <em>gue</em> dan <em>lo</em>. Kita biarkan istilah teknis tetap natural seperti <em>deploy</em>, <em>runner</em>, dan <em>pipeline</em>.</p>
+<p>Kita juga nggak pernah menerjemahkan draf bahasa Inggris kalimat demi kalimat. Kita nulis ulang versi bahasa Indonesia langsung dari intisari teknisnya. Suara praktisi aslinya jadi tetap hidup di kedua bahasa.</p>
+<h2>Catatan Praktis Buat Senior Engineer</h2>
+<p>Kekhawatiran Martin Fowler memang beralasan. Kalau lo malas dan menyerahkan draf pertama ke model bahasa, tulisan lo bakal tenggelam bareng ribuan blog AI lainnya.</p>
+<p>Tapi lo nggak perlu mematikan tools AI lo. Anggap saja mereka sebagai third-party library yang belum tentu stabil. Terapkan tiga langkah ini di dokumen teknis lo berikutnya:</p>
+<ol>
+<li><strong>Kumpulkan fakta lebih dulu</strong>: Pakai otomasi buat ngecek link eksternal dan menarik metrik mentah sebelum lo mulai merangkai satu kalimat narasi pun.</li>
+<li><strong>Pakai review yang galak</strong>: Suruh model mencari celah logika atau kegagalan sistem di tulisan lo, sambil melarang keras dia memberi saran kalimat pengganti.</li>
+<li><strong>Kunci draf dengan aturan struktur</strong>: Tulis sendiri draf lo, atau pasang batasan negatif yang melarang kalimat panjang dan jargon korporat.</li>
+</ol>
+<p>Developer nggak butuh artikel yang sopan dan netral tanpa nyawa. Mereka baca tulisan lo buat ngeliat luka di lapangan dan angka riil di sistem produksi.</p>
+<p>Mereka nyari opini teknis lo yang berani. Jaga hal itu tetap ditulis manusia. 😅</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

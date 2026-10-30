@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Martin Fowler on LLM Voice: Why Senior Engineers Refuse AI Drafts</title>
+      <link>https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/</guid>
+      <pubDate>Fri, 30 Oct 2026 00:00:00 +0000</pubDate>
+      <description>Martin Fowler warned that LLM drafts trap writers in an uncanny valley you cannot edit out. Here is why the fix is architectural separation, not abandoning AI tools.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/id/"/>
+    </item>
+    <item>
       <title>Why Claude Code Burned 20% of API Requests on Status Lines</title>
       <link>https://aditf.com/blog/claude-code-status-line-token-burn/</link>
       <guid isPermaLink="true">https://aditf.com/blog/claude-code-status-line-token-burn/</guid>
@@ -176,15 +185,6 @@
       <description>Chrome 155 reverses its 2022 decision and ships JPEG XL decoding, built on a pure-Rust decoder. For a platform that got burned by AVIF&#x27;s encoding cost, this is the format worth re-evaluating.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/chrome-jpeg-xl-rust-ecommerce-image-pipeline/id/"/>
-    </item>
-    <item>
-      <title>Why next/font/google Broke Our CI: Self-Hosting 13 Font Subsets for Zero-Network Builds</title>
-      <link>https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/</guid>
-      <pubDate>Wed, 07 Oct 2026 00:00:00 +0000</pubDate>
-      <description>Our master CI died twice in twelve hours inside next/font/google, on commits that carried identical font code. Here is how Dagango.com vendors 13 font subsets on disk and makes next build fetch nothing.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/nextjs-self-host-font-subsets-zero-network-builds/id/"/>
     </item>
   </channel>
 </rss>
