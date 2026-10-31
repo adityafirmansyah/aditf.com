@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Backdooring Claude Code on Cursor: Why IDE Extensions Must Be Sandboxed — Field Notes</title>
+<meta name="description" content="An 11-hour breach of Cursor&#x27;s marketplace proxy injected a reverse SSH backdoor into Claude Code. Developer tools cannot safely share an unsandboxed runtime with workstation credentials.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Backdooring Claude Code on Cursor: Why IDE Extensions Must Be Sandboxed — Field Notes">
+<meta property="og:description" content="An 11-hour breach of Cursor&#x27;s marketplace proxy injected a reverse SSH backdoor into Claude Code. Developer tools cannot safely share an unsandboxed runtime with workstation credentials.">
+<meta property="og:url" content="https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Backdooring Claude Code on Cursor: Why IDE Extensions Must Be Sandboxed — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Backdooring Claude Code on Cursor: Why IDE Extensions Must Be Sandboxed — Field Notes">
+<meta name="twitter:description" content="An 11-hour breach of Cursor&#x27;s marketplace proxy injected a reverse SSH backdoor into Claude Code. Developer tools cannot safely share an unsandboxed runtime with workstation credentials.">
+<meta name="twitter:image" content="https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-10-31T00:00:00+00:00">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="developer-tooling">
+<meta property="article:tag" content="supply-chain">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Backdooring Claude Code on Cursor: Why IDE Extensions Must Be Sandboxed", "description": "An 11-hour breach of Cursor's marketplace proxy injected a reverse SSH backdoor into Claude Code. Developer tools cannot safely share an unsandboxed runtime with workstation credentials.", "datePublished": "2026-10-31T00:00:00+00:00", "dateModified": "2026-10-31T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/"}, "keywords": "security, ai-agents, developer-tooling, supply-chain", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1050, "image": ["https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>31 Oct 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Backdooring Claude Code on Cursor: Why IDE Extensions Must Be Sandboxed</h1>
+    <div class="post__tags"><span>security</span><span>ai-agents</span><span>developer-tooling</span><span>supply-chain</span></div>
+    <div class="post__content reveal is-visible">
+<p>When you install an Integrated Development Environment (IDE) extension, you are not granting scoped permissions to a sandbox. You are launching an unconfined Node.js process under your user account.</p>
+<p>That distinction matters.</p>
+<p>On October 29, 2026, developers installing or updating Anthropic's Claude Code extension inside Cursor received a malicious payload. For eleven hours, Cursor's proxy distributed compromised extension packages.</p>
+<p>The implant dropped an attacker key into authorized keys. Then it opened an outbound reverse Secure Shell (SSH) tunnel straight to an attacker server.</p>
+<p>Most teams treat extension registries like mobile app stores. We assume automated scanners keep our workstations safe.</p>
+<p>They do not.</p>
+<p>When an extension runtime shares full privileges with your local user, a proxy compromise becomes a total workstation breach.</p>
+<h2>The Eleven-Hour Injection Window</h2>
+<p>Between 2:27 AM PT and 1:35 PM PT on October 29, Cursor served backdoored builds of <code>Anthropic.claude-code</code>. The affected releases were versions 2.1.312 and 2.1.313.</p>
+<p>The upstream source was clean. Anthropic security engineers David Dworken and Felix Rieseberg confirmed that Anthropic infrastructure was untouched. The official Microsoft Visual Studio Marketplace and Open VSX registries remained clean.</p>
+<p>The breach hit Cursor's caching proxy (<code>marketplace.cursorapi.com</code>). This proxy caches Open VSX packages and serves editor-specific extensions.</p>
+<p>An attacker compromised that proxy pipeline. They swapped the extension bundle before Cursor's automated supply-chain scanners could catch the change.</p>
+<p>Endpoint security firm Phorion published the technical breakdown. The discussion quickly reached 857 points on Hacker News and 149 points on Lobste.rs.</p>
+<p>Cursor took the marketplace offline to rotate signing keys. They worked with the upstream hosting provider to terminate the attacker server. Anthropic quickly shipped clean version 2.1.314.</p>
+<h2>Anatomy of the Payload: From IIFE to Reverse SSH</h2>
+<p>The attack succeeded because it did not wait for user input. The attacker prepended an Immediately Invoked Function Expression (IIFE) to the minified <code>extension.js</code> bundle.</p>
+<pre><code class="language-javascript">// Malicious IIFE prepended to extension.js
+(function() {
+  const fs = require('fs');
+  const { exec } = require('child_process');
+  // Runs immediately when Node loads the module
+})();
+</code></pre>
+<p>Node executed the payload the instant the editor loaded the file. It ran before the extension reached its legitimate <code>activate()</code> lifecycle hook.</p>
+<p>No prompts appeared. No clicks were required.</p>
+<p>Once running, the implant carried out several targeted actions:</p>
+<ul>
+<li>It created <code>~/.ssh</code> if the folder did not exist.</li>
+<li>It wrote an Ed25519 public key with comment <code>svc-telemetry</code> to <code>~/.ssh/authorized_keys</code> with 0600 permissions.</li>
+<li>It started an outbound reverse SSH tunnel (<code>-R *:0:localhost:22</code>) to <code>134.209.82.225:22</code> using an embedded private key.</li>
+<li>It harvested up to 40 environment variables matching tokens like <code>AWS</code>, <code>GCP</code>, <code>KEY</code>, or <code>SECRET</code>.</li>
+<li>It beaconed host metadata to <code>134.209.82.225:8099/beacon</code> and <code>127.0.0.1:8099/beacon</code>.</li>
+</ul>
+<p>The attacker also established persistence across reboot:</p>
+<ul>
+<li>On macOS: a LaunchAgent plist at <code>~/Library/LaunchAgents/com.apple.sysmond.plist</code>.</li>
+<li>On Linux: a crontab entry running <code>@reboot ~/.config/.smt</code>.</li>
+<li>On Windows: a scheduled task named <code>SysMon</code> and a script in the Startup folder.</li>
+</ul>
+<p>A logic bug limited damage on non-root macOS setups. The script ran <code>systemsetup -getremotelogin</code> to check SSH status. That utility requires root privileges. Because the command returned an administrative error instead of string <code>Off</code>, the script skipped enabling remote login.</p>
+<p>Even with that blunder, the attacker still stole cloud credentials and developer identity data.</p>
+<h2>The Architectural Flaw: Zero-Isolation Runtimes</h2>
+<p>The problem is bigger than Cursor's proxy. The core issue lies in the execution model of modern IDEs.</p>
+<p>Web browsers spent twenty years isolating tabs behind capability models. Mobile operating systems run each app inside strict sandboxes.</p>
+<p>VS Code and its forks did not follow that design. An extension executes as plain Node.js with the developer's full User Identifier (UID) privileges:</p>
+<pre><code>+---------------------------------------------------------------+
+| Developer Workstation (UID 1000)                              |
+|                                                               |
+|   +-------------------+       +---------------------------+   |
+|   | Unsandboxed IDE   | ----&gt; | Reads ~/.ssh/id_ed25519   |   |
+|   | Extension Process | ----&gt; | Reads ~/.aws/credentials  |   |
+|   | (Node.js runtime) | ----&gt; | Harvests active shell env |   |
+|   +-------------------+       +---------------------------+   |
++---------------------------------------------------------------+
+</code></pre>
+<p>Your extensions can read private SSH keys without prompting. They can inspect your shell history, clone private git repositories, and exfiltrate cloud credentials.</p>
+<p>Cursor relied on automated scanners to spot malicious code on the proxy. That strategy will always lag behind determined attackers.</p>
+<p>You cannot secure an unconfined runtime with static scanners alone. If bad code lands on the machine, the game is already over.</p>
+<h2>How We Harden AI Agent Workflows in Production</h2>
+<p>In my own setup at GOSG Consulting and across Dagango.com, we run autonomous agent fleets every day. Our setups run coding agents and Command Line Interface (CLI) workflows through tools like Claude Code and Hermes.</p>
+<p>My baseline rule is simple: AI coding tools are untrusted third-party code. We do not run autonomous coding agents directly on primary workstations with production keys.</p>
+<p>We enforce four isolation practices across our fleet:</p>
+<ul>
+<li><strong>Isolated execution namespaces.</strong> Agents run inside unprivileged Linux containers or ephemeral Virtual Machines (VMs) without access to the host filesystem.</li>
+<li><strong>Ephemeral scoped credentials.</strong> We issue short-lived access tokens rather than static cloud keys.</li>
+<li><strong>Socket containment.</strong> We never mount or forward the host <code>SSH_AUTH_SOCK</code> into an agent runtime.</li>
+<li><strong>Strict egress filtering.</strong> Outbound network rules block unexpected ports, including outbound SSH traffic on port 22.</li>
+</ul>
+<p>Here is a baseline egress filter using <code>iptables</code> to block rogue tunnels from worker containers:</p>
+<pre><code class="language-bash"># Drop outbound SSH connections originating from container workers
+iptables -A OUTPUT -p tcp --dport 22 -m owner --uid-owner agent-worker -j DROP
+</code></pre>
+<p>If an extension tries to spawn a reverse tunnel, the network stack drops the packets immediately. The beacon dies before reaching the Command and Control (C2) server.</p>
+<h2>Sandboxing Is the Only Durable Boundary</h2>
+<p>The Cursor team handled the incident quickly. They took down the proxy, rotated keys, and patched the pipeline. Anthropic responded with clean builds within hours.</p>
+<p>Yet treating this incident as an isolated proxy breach misses the lesson.</p>
+<p>Tomorrow, an attacker might compromise an npm dependency or hijack a developer account. When they do, IDE extensions will still run with unrestricted user permissions.</p>
+<p>We need capability-based security in our development environments. Editors must require explicit permissions before an extension touches local storage, network sockets, or sub-processes.</p>
+<p>Until editor vendors build real sandboxes, developers must draw the boundary themselves. Run your AI tooling in containers, isolate your keys, and assume any extension can execute arbitrary code.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
