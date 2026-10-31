@@ -1,6 +1,6 @@
 # Aditya Firmansyah
 
-> Senior Software Engineer — Scalable Platforms & AI Workflows. 13+ years building scalable platforms, microservices, and autonomous multi-agent AI workflows. Practitioner notes, architecture war stories, and engineering benchmarks.
+> Senior Full-Stack Engineer — Customer-Facing Platforms & Scalable APIs. 13+ years delivering customer-facing platforms, multi-tenant commerce solutions, and scalable APIs with Next.js, TypeScript, Node.js, and FastAPI. Practitioner notes, architecture war stories, and engineering benchmarks.
 
 ## Overview
 - Website: https://aditf.com/
@@ -12,11 +12,11 @@
 - Location: Surakarta, Central Java, Indonesia
 
 ## Core Competencies & Technical Stack
-- AI & Autonomous Agents: Multi-agent orchestration, LLM tool-calling, Hermes Agent, Claude Code, evaluation harnesses, prompt workflows.
-- Backend & Microservices: Python (FastAPI), Node.js (NestJS, Express), TypeScript, Rust, PostgreSQL, SQLite (WAL mode), Redis.
-- Frontend & Web: Next.js, React, TypeScript, Tailwind CSS, static site generation, responsive UI/UX.
-- Systems & Infrastructure: Linux homelab self-hosting, Docker, Caddy, Nginx, Git post-receive deploy hooks, systemd services, Cloudflare.
-- E-Commerce & Domain Platforms: Multi-tenant SaaS, order orchestration, Indonesian QRIS payment flows.
+- Frontend: Next.js (App Router), React, TypeScript, JavaScript, Tailwind CSS, Web Performance.
+- Backend & APIs: Node.js, NestJS, REST, gRPC, FastAPI, SQLAlchemy, Microservices.
+- SaaS & Data: Multi-tenant Architecture, PostgreSQL, MySQL, Redis, Background Jobs, Payments & Idempotency, Database Indexing.
+- Platform & Delivery: Docker, Kubernetes, CI/CD, GitHub Actions, Linux, Nginx, Caddy, TDD.
+- Platform & AI: AI Agents, LLM Workflows, Website Builders, SEO Tooling.
 
 ## Flagship Projects
 - [Dagango.com](https://dagango.com): High-performance multi-tenant e-commerce storefront platform built with Next.js and FastAPI.
