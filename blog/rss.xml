@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Why Go 1.24&#x27;s Default MPTCP Exposed Linux Hosts to CVE-2026-98432</title>
+      <link>https://aditf.com/blog/go-mptcp-cve-2026-98432/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/go-mptcp-cve-2026-98432/</guid>
+      <pubDate>Sun, 01 Nov 2026 00:00:00 +0000</pubDate>
+      <description>Go 1.24 enabled Multipath TCP by default on Linux listeners, turning a subtle kernel Use-After-Free flaw into a remote root risk across unpatched servers.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/go-mptcp-cve-2026-98432/id/"/>
+    </item>
+    <item>
       <title>Backdooring Claude Code on Cursor: Why IDE Extensions Must Be Sandboxed</title>
       <link>https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/</link>
       <guid isPermaLink="true">https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/</guid>
@@ -176,15 +185,6 @@
       <description>Ryan Dahl is ending Deno runtime development in a year and sunsetting Deno Deploy in six months. The reason isn&#x27;t defeat: it&#x27;s a bet that Durable Objects are the right primitive for stateful distributed systems.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/id/"/>
-    </item>
-    <item>
-      <title>Someone Applied for .lan: Why OpenWrt and Homelab DNS May Leak</title>
-      <link>https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/</guid>
-      <pubDate>Fri, 09 Oct 2026 00:00:00 +0000</pubDate>
-      <description>ICANN&#x27;s 2026 gTLD round includes a live application for .lan, the domain OpenWrt has hardcoded as a router default for two decades. Here&#x27;s what that means for every homelab using it.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/dot-lan-gtld-openwrt-dns-leak-risk/id/"/>
     </item>
   </channel>
 </rss>

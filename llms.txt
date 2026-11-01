@@ -1,6 +1,6 @@
 # Aditya Firmansyah
 
-> Senior Full-Stack Engineer — Customer-Facing Platforms & Scalable APIs. 13+ years delivering customer-facing platforms, multi-tenant commerce solutions, and scalable APIs with Next.js, TypeScript, Node.js, and FastAPI. Practitioner notes, architecture war stories, and engineering benchmarks.
+> Senior Software Engineer — Scalable Platforms & AI Workflows. 13+ years building scalable platforms, microservices, and autonomous multi-agent AI workflows. Practitioner notes, architecture war stories, and engineering benchmarks.
 
 ## Overview
 - Website: https://aditf.com/
@@ -12,11 +12,11 @@
 - Location: Surakarta, Central Java, Indonesia
 
 ## Core Competencies & Technical Stack
-- Frontend: Next.js (App Router), React, TypeScript, JavaScript, Tailwind CSS, Web Performance.
-- Backend & APIs: Node.js, NestJS, REST, gRPC, FastAPI, SQLAlchemy, Microservices.
-- SaaS & Data: Multi-tenant Architecture, PostgreSQL, MySQL, Redis, Background Jobs, Payments & Idempotency, Database Indexing.
-- Platform & Delivery: Docker, Kubernetes, CI/CD, GitHub Actions, Linux, Nginx, Caddy, TDD.
-- Platform & AI: AI Agents, LLM Workflows, Website Builders, SEO Tooling.
+- AI & Autonomous Agents: Multi-agent orchestration, LLM tool-calling, Hermes Agent, Claude Code, evaluation harnesses, prompt workflows.
+- Backend & Microservices: Python (FastAPI), Node.js (NestJS, Express), TypeScript, Rust, PostgreSQL, SQLite (WAL mode), Redis.
+- Frontend & Web: Next.js, React, TypeScript, Tailwind CSS, static site generation, responsive UI/UX.
+- Systems & Infrastructure: Linux homelab self-hosting, Docker, Caddy, Nginx, Git post-receive deploy hooks, systemd services, Cloudflare.
+- E-Commerce & Domain Platforms: Multi-tenant SaaS, order orchestration, Indonesian QRIS payment flows.
 
 ## Flagship Projects
 - [Dagango.com](https://dagango.com): High-performance multi-tenant e-commerce storefront platform built with Next.js and FastAPI.
@@ -26,6 +26,7 @@
 ## Field Notes & Technical Articles
 Practitioner notes from production engineering, agent orchestration, and self-hosted infrastructure:
 
+- [Why Go 1.24's Default MPTCP Exposed Linux Hosts to CVE-2026-98432](https://aditf.com/blog/go-mptcp-cve-2026-98432/): Go 1.24 enabled Multipath TCP by default on Linux listeners, turning a subtle kernel Use-After-Free flaw into a remote root risk across unpatched servers. (Filed 01 Nov 2026, tags: linux, networking, security, golang, sysadmin) (also available in [Indonesian](https://aditf.com/blog/go-mptcp-cve-2026-98432/id/))
 - [Backdooring Claude Code on Cursor: Why IDE Extensions Must Be Sandboxed](https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/): An 11-hour breach of Cursor's marketplace proxy injected a reverse SSH backdoor into Claude Code. Developer tools cannot safely share an unsandboxed runtime with workstation credentials. (Filed 31 Oct 2026, tags: security, ai-agents, developer-tooling, supply-chain) (also available in [Indonesian](https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/id/))
 - [Martin Fowler on LLM Voice: Why Senior Engineers Refuse AI Drafts](https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/): Martin Fowler warned that LLM drafts trap writers in an uncanny valley you cannot edit out. Here is why the fix is architectural separation, not abandoning AI tools. (Filed 30 Oct 2026, tags: ai tooling, software engineering, technical writing, llms, developer experience) (also available in [Indonesian](https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/id/))
 - [Why Claude Code Burned 20% of API Requests on Status Lines](https://aditf.com/blog/claude-code-status-line-token-burn/): An OpenTelemetry audit revealed Claude Code spent nearly 20% of its API requests generating three-word terminal status lines. Polling frontier models for UI progress is an architectural leak every agent harness must fix. (Filed 29 Oct 2026, tags: ai agents, claude code, prompt engineering, developer tools, software architecture) (also available in [Indonesian](https://aditf.com/blog/claude-code-status-line-token-burn/id/))
