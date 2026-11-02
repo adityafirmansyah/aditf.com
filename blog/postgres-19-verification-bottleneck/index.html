@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PostgreSQL 19 Is Late Because Finding Bugs Got Cheap — Field Notes</title>
+<meta name="description" content="PostgreSQL 19 slid to November 19 and lost three features late in beta. The cause is not worse code. Naming a defect got cheap while verifying one stayed human work.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/postgres-19-verification-bottleneck/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="PostgreSQL 19 Is Late Because Finding Bugs Got Cheap — Field Notes">
+<meta property="og:description" content="PostgreSQL 19 slid to November 19 and lost three features late in beta. The cause is not worse code. Naming a defect got cheap while verifying one stayed human work.">
+<meta property="og:url" content="https://aditf.com/blog/postgres-19-verification-bottleneck/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/postgres-19-verification-bottleneck/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="PostgreSQL 19 Is Late Because Finding Bugs Got Cheap — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="PostgreSQL 19 Is Late Because Finding Bugs Got Cheap — Field Notes">
+<meta name="twitter:description" content="PostgreSQL 19 slid to November 19 and lost three features late in beta. The cause is not worse code. Naming a defect got cheap while verifying one stayed human work.">
+<meta name="twitter:image" content="https://aditf.com/blog/postgres-19-verification-bottleneck/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-11-02T00:00:00+00:00">
+<meta property="article:tag" content="postgresql">
+<meta property="article:tag" content="ai-engineering">
+<meta property="article:tag" content="software-reliability">
+<meta property="article:tag" content="open-source">
+<meta property="article:tag" content="database-internals">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "PostgreSQL 19 Is Late Because Finding Bugs Got Cheap", "description": "PostgreSQL 19 slid to November 19 and lost three features late in beta. The cause is not worse code. Naming a defect got cheap while verifying one stayed human work.", "datePublished": "2026-11-02T00:00:00+00:00", "dateModified": "2026-11-02T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/postgres-19-verification-bottleneck/"}, "keywords": "postgresql, ai-engineering, software-reliability, open-source, database-internals", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1374, "image": ["https://aditf.com/blog/postgres-19-verification-bottleneck/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/postgres-19-verification-bottleneck/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/postgres-19-verification-bottleneck/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/postgres-19-verification-bottleneck/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/postgres-19-verification-bottleneck/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>02 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">7 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">PostgreSQL 19 Is Late Because Finding Bugs Got Cheap</h1>
+    <div class="post__tags"><span>postgresql</span><span>ai-engineering</span><span>software-reliability</span><span>open-source</span><span>database-internals</span></div>
+    <div class="post__content reveal is-visible">
+<p>PostgreSQL 19 reaches general availability on November 19, 2026. For a project that has landed every major release between mid-September and mid-October for the past decade, that breaks the one piece of scheduling everyone had learned to trust.</p>
+<p>Robert Haas, a PostgreSQL major contributor and committer, wrote up why on October 30. His answer is not that the developers started writing worse code. It is that a lot of people got much better at finding the mistakes those developers were already making.</p>
+<h2>The window broke, and three features went with it</h2>
+<p>The pattern Haas describes is not folklore: no earlier than mid-September, no later than mid-October. PostgreSQL 19 RC 1 landed on October 15. RC 2 is due November 12, the same day as the quarterly update release, so that batch of fixes reaches the new major before it ships. General availability follows a week later.</p>
+<p>Feature freeze happened on April 8, the way it does every year. Between August 27 and September 15 the project reverted three merged capabilities:</p>
+<ul>
+<li>UPDATE/DELETE ... FOR PORTION OF, the temporal-table syntax for editing a slice of history.</li>
+<li>SQL Property Graph Queries (SQL/PGQ), the new graph-query layer.</li>
+<li>ALTER TABLE ... MERGE PARTITION and SPLIT PARTITION.</li>
+</ul>
+<p>Late reverts do happen in a beta cycle. Pulling three finished features a month before the first release candidate is a different kind of event.</p>
+<h2>The commit counts, and the number hiding inside them</h2>
+<p>Haas compared commits across the same calendar window in both years, from feature freeze through September 25:</p>
+<ul>
+<li>2025: 1,037 commits to master, 724 back-patched to REL_18_STABLE.</li>
+<li>2026: 1,443 commits to master, 1,169 back-patched to REL_19_STABLE.</li>
+<li>The branch one release older: 248 commits to REL_17_STABLE in 2025, 433 to REL_18_STABLE in 2026.</li>
+</ul>
+<p>Back-patching is what a project does when a defect turns out to affect versions already in production, not only the one under development. The stable-branch fix count rose 61.5%. The count for the older branch rose 74.6%.</p>
+<p>Subtract the back-patches from the master totals and the interesting number appears: 313 commits of other work in 2025, 274 in 2026. Less new work landed, and a much larger share of what did land was repair.</p>
+<p>Haas allows for the possibility that committers simply made more mistakes this year, then dismisses it. The people reviewing PostgreSQL patches were about as conservative in 2026 as in 2025. What changed is how quickly their mistakes got found.</p>
+<h2>The reports are not spam</h2>
+<p>The comfortable explanation is AI noise: too many low-quality reports, maintainers buried under plausible nonsense. That reading does not survive contact with the reports themselves, at least not the ones posted in public.</p>
+<p>HN user tibbar spent a summer on AI-assisted bug hunting in PostgreSQL. Most of what turned up never got reported:</p>
+<blockquote>
+<p>The list got so long that I had to triage what I even had time to report, and settled for a dozen or two out of hundreds of candidates.</p>
+</blockquote>
+<p>What sat in the pile:</p>
+<ul>
+<li>serialization anomalies under SERIALIZABLE, including write skew where both transactions commit.</li>
+<li>foreign key integrity violations, one traced to a lock lost during toasting.</li>
+<li>planner bugs, such as partition pruning that drops a RANGE default partition.</li>
+<li>several candidates in CVE territory.</li>
+</ul>
+<p>The write-skew report is the one I would hand to anyone who thinks this is noise. A Tid Range Scan, an access path added in PostgreSQL 14, lets two serializable transactions read the same range and both commit. The schedule is short:</p>
+<pre><code class="language-sql">-- both sessions: BEGIN ISOLATION LEVEL SERIALIZABLE;
+SET enable_seqscan = off;
+SELECT sum(v) FROM trs WHERE ctid &gt;= '(0,0)' AND ctid &lt;= '(0,100)';  -- 0
+-- each session updates a different row, both COMMIT, final sum = 2
+-- no serial order gives 2; both serial orders give 3
+</code></pre>
+<p>The control experiment on that reproducer is the interesting part. Set <code>enable_tidscan = off</code> in both sessions, which forces the same reads through a sequential scan, and the second commit fails with "could not serialize access due to read/write dependencies among transactions". Merely leaving <code>enable_seqscan</code> on is not enough, because the planner still prefers the Tid Range Scan for that qualifier. The reporter's own note is blunt: a control written that way is not a control.</p>
+<p>That is the shape of the whole problem. The bug is real and the reproducer is real. Confirming it still took someone who understood the planner well enough to build a valid control.</p>
+<p>Not everyone buys the framing. HN user ltbarcly3 reports finding a late-beta bug that crashed an entire cluster, back when LLMs did not exist. His read is that the project may be over-reacting to defects that could simply be patched.</p>
+<p>That is a fair objection. Patch-versus-revert is a real engineering judgment.</p>
+<h2>Naming a defect is cheap, verifying one is not</h2>
+<p>Haas puts the asymmetry dryly: those fixes still need review and commit by humans, and "those humans have not gotten any smarter between 2025 and 2026."</p>
+<p>An LLM can read forty years of C and propose thousands of candidate defects in the time a committer reviews one. Discovery moved by orders of magnitude. Verification moved by roughly nothing.</p>
+<p>The reason is what review actually checks. A PostgreSQL patch is not accepted because the tests pass. It is accepted because someone traced the lock ordering, walked the interaction with MVCC snapshots, and decided the fix is safe to apply to a stable branch that shipped years earlier.</p>
+<p>An LLM-drafted patch that ignores coding standards is a nuisance at review time. One that quietly changes lock acquisition order is an outage six months later.</p>
+<h2>The bill arrives as reverted features</h2>
+<p>Haas names the second-order effect. Review hours that would have gone into auditing the release went into back-branch fixes instead, so the project found its feature problems later and had less room to repair them. The revert is the symptom. The cause is a queue nobody staffed for.</p>
+<p>For a project with a fixed set of committers that trade is arithmetic. Every hour spent deciding whether a reported bug is real is an hour not spent on the release. When incoming volume rises faster than review capacity, something has to give. The thing that gives first is the newest code, because it has the fewest years of people staring at it.</p>
+<h2>What I would change</h2>
+<p>I run PostgreSQL for Dagango.com on bare-metal Linux, and I also run a fleet of agents that open changes and file QA findings against my own code. The lesson transferred in about a week. The expensive part was never generating the change. It was deciding whether to believe it.</p>
+<p>Four things I would put in place before pointing an agent fleet at a codebase where bugs matter:</p>
+<ul>
+<li><strong>Budget the review, not the generation.</strong> Track human hours per accepted fix as a headline metric. If that number climbs while agent pull requests climb faster, throughput did not improve.</li>
+<li><strong>Make "is this real?" cheap.</strong> A harness that spins the exact version in a container turns a reported defect into a verdict in minutes.</li>
+<li><strong>Tier by blast radius.</strong> Data loss and serialization violations jump the queue. Style findings wait for a batch.</li>
+<li><strong>Keep the confirmed regressions.</strong> Every verified bug becomes a test, and that corpus is the only asset that makes the next thousand reports cheaper to triage.</li>
+</ul>
+<h2>The narrowest stage sets the throughput</h2>
+<p>PostgreSQL will most likely answer this with process and tooling: more triage help, automated runs of every submitted reproducer, and probably a hard conversation about what a maintainer is expected to absorb per week. Whatever they land on will be verification infrastructure.</p>
+<p>The general form is worth carrying into any team running agents. An AI fleet multiplies the number of changes and findings that reach a human. It does not multiply the number of humans. Throughput is still set by the narrowest stage, and in most organisations that stage has a name and a calendar.</p>
+<p>Haas closes his post saying he and others are working hard on the answer. Anyone running an agent fleet should be working on the same question, because a found bug is now nearly free and a trusted fix is not.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/postgres-19-verification-bottleneck/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>PostgreSQL 19 Is Late Because Finding Bugs Got Cheap</title>
+      <link>https://aditf.com/blog/postgres-19-verification-bottleneck/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/postgres-19-verification-bottleneck/</guid>
+      <pubDate>Mon, 02 Nov 2026 00:00:00 +0000</pubDate>
+      <description>PostgreSQL 19 slid to November 19 and lost three features late in beta. The cause is not worse code. Naming a defect got cheap while verifying one stayed human work.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/postgres-19-verification-bottleneck/id/"/>
+    </item>
+    <item>
       <title>Why Go 1.24&#x27;s Default MPTCP Exposed Linux Hosts to CVE-2026-98432</title>
       <link>https://aditf.com/blog/go-mptcp-cve-2026-98432/</link>
       <guid isPermaLink="true">https://aditf.com/blog/go-mptcp-cve-2026-98432/</guid>
@@ -176,15 +185,6 @@
       <description>Passkeys promise phishing-resistant logins, but WebAuthn carries a remote attestation switch. If relying parties turn it on, user-controlled password managers like KeePassXC get locked out.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/id/"/>
-    </item>
-    <item>
-      <title>Cloudflare Acquires Deno: What the Sunset Actually Means</title>
-      <link>https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/</guid>
-      <pubDate>Sat, 10 Oct 2026 00:00:00 +0000</pubDate>
-      <description>Ryan Dahl is ending Deno runtime development in a year and sunsetting Deno Deploy in six months. The reason isn&#x27;t defeat: it&#x27;s a bet that Durable Objects are the right primitive for stateful distributed systems.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/cloudflare-acquires-deno-workerd-durable-objects/id/"/>
     </item>
   </channel>
 </rss>
