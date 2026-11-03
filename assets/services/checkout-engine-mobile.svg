@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 560" width="340" height="560" fill="none">
+  <defs>
+    <marker id="mA" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#2563EB"/>
+    </marker>
+    <marker id="mG" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#059669"/>
+    </marker>
+  </defs>
+  <rect width="340" height="560" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+
+  <text x="16" y="28" font-family="Geist Mono, monospace" font-size="13" letter-spacing="0.04em" fill="#94A3B8">CHECKOUT STATE MACHINE</text>
+  <line x1="16" y1="40" x2="324" y2="40" stroke="#E2E8F0"/>
+
+  <g transform="translate(16, 54)">
+    <rect width="308" height="66" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="24" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#0F172A">Cart priced · 12ms</text>
+    <text x="12" y="44" font-family="Geist Mono, monospace" font-size="12" fill="#475569">stock reserved for 10m</text>
+  </g>
+  <line x1="170" y1="122" x2="170" y2="140" stroke="#2563EB" stroke-width="1.4" marker-end="url(#mA)"/>
+
+  <g transform="translate(16, 144)">
+    <rect width="308" height="66" rx="8" fill="#EFF6FF" stroke="#BFDBFE"/>
+    <text x="12" y="24" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#1D4ED8">Payment intent · 41ms</text>
+    <text x="12" y="44" font-family="Geist Mono, monospace" font-size="12" fill="#475569">QRIS · Midtrans · Stripe</text>
+  </g>
+  <line x1="170" y1="212" x2="170" y2="230" stroke="#2563EB" stroke-width="1.4" marker-end="url(#mA)"/>
+
+  <g transform="translate(16, 234)">
+    <rect width="308" height="84" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="24" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#0F172A">Webhook handler</text>
+    <text x="12" y="44" font-family="Geist Mono, monospace" font-size="12" fill="#475569">idempotency key checked</text>
+    <text x="12" y="62" font-family="Geist Mono, monospace" font-size="12" fill="#475569">duplicate retries ignored</text>
+    <text x="12" y="80" font-family="Geist Mono, monospace" font-size="12" fill="#059669">0 double charges</text>
+  </g>
+  <line x1="170" y1="320" x2="170" y2="338" stroke="#059669" stroke-width="1.4" marker-end="url(#mG)"/>
+
+  <g transform="translate(16, 342)">
+    <rect width="308" height="84" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/>
+    <text x="12" y="24" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#065F46">Order confirmed</text>
+    <text x="12" y="44" font-family="Geist Mono, monospace" font-size="12" fill="#047857">stock decremented once</text>
+    <text x="12" y="62" font-family="Geist Mono, monospace" font-size="12" fill="#047857">receipt queued</text>
+    <text x="12" y="80" font-family="Geist Mono, monospace" font-size="12" fill="#047857">event replayable</text>
+  </g>
+
+  <g transform="translate(16, 440)">
+    <rect width="308" height="62" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="12" y="24" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Failure: stock released, cart kept</text>
+    <text x="12" y="44" font-family="Geist Mono, monospace" font-size="12" fill="#64748B">no orphaned reservation, no silent charge</text>
+  </g>
+
+  <g transform="translate(16, 512)">
+    <text x="0" y="14" font-family="Geist Mono, monospace" font-size="12" fill="#475569">20,000 SKU · 60ms p99 · 900 orders/day</text>
+    <text x="0" y="36" font-family="Geist Mono, monospace" font-size="12" fill="#94A3B8">ledger keyed on (order_id, event_id)</text>
+  </g>
+</svg>
