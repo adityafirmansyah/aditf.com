@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>The 46-vCPU Pod Trap: What PostHog Learned by Leaving DuckDB</title>
+      <link>https://aditf.com/blog/posthog-duckdb-46-vcpu-pod-trap/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/posthog-duckdb-46-vcpu-pod-trap/</guid>
+      <pubDate>Tue, 03 Nov 2026 00:00:00 +0000</pubDate>
+      <description>PostHog ran DuckDB as a multi-tenant warehouse for five months, then scrapped it. The lesson is about where a single-node engine stops being a bargain.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/posthog-duckdb-46-vcpu-pod-trap/id/"/>
+    </item>
+    <item>
       <title>PostgreSQL 19 Is Late Because Finding Bugs Got Cheap</title>
       <link>https://aditf.com/blog/postgres-19-verification-bottleneck/</link>
       <guid isPermaLink="true">https://aditf.com/blog/postgres-19-verification-bottleneck/</guid>
@@ -176,15 +185,6 @@
       <description>Since 0.157.0, Codex CLI starts a persistent, self-updating background daemon on qualifying interactive sessions. Here is what that breaks, and what a supervised service would have done instead.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/codex-daemon-vs-systemd-supervision/id/"/>
-    </item>
-    <item>
-      <title>The Remote Attestation Trap in Passkeys: Why WebAuthn Threatens User Sovereignty</title>
-      <link>https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/</guid>
-      <pubDate>Mon, 12 Oct 2026 00:00:00 +0000</pubDate>
-      <description>Passkeys promise phishing-resistant logins, but WebAuthn carries a remote attestation switch. If relying parties turn it on, user-controlled password managers like KeePassXC get locked out.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/passkeys-remote-attestation-webauthn-trap/id/"/>
     </item>
   </channel>
 </rss>
