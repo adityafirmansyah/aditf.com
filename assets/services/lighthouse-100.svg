@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" width="480" height="480" fill="none">
+  <defs>
+    <linearGradient id="ringGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2563EB"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="240" cy="240" r="200" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1"/>
+
+  <!-- Gauge track -->
+  <circle cx="240" cy="240" r="160" fill="none" stroke="#E2E8F0" stroke-width="20"/>
+
+  <!-- Ticks -->
+  <g stroke="#CBD5E1" stroke-width="1.5">
+    <line x1="240" y1="62" x2="240" y2="74"/>
+    <line x1="329" y1="88" x2="323" y2="99"/>
+    <line x1="392" y1="151" x2="381" y2="157"/>
+    <line x1="418" y1="240" x2="406" y2="240"/>
+    <line x1="392" y1="329" x2="381" y2="323"/>
+    <line x1="329" y1="392" x2="323" y2="381"/>
+    <line x1="240" y1="418" x2="240" y2="406"/>
+    <line x1="151" y1="392" x2="157" y2="381"/>
+    <line x1="88" y1="329" x2="99" y2="323"/>
+    <line x1="62" y1="240" x2="74" y2="240"/>
+    <line x1="88" y1="151" x2="99" y2="157"/>
+    <line x1="151" y1="88" x2="157" y2="99"/>
+  </g>
+
+  <!-- Full score arcs -->
+  <circle cx="240" cy="240" r="160" fill="none" stroke="url(#ringGrad)" stroke-width="20"
+          stroke-dasharray="1005.3" stroke-linecap="round" transform="rotate(-90 240 240)"/>
+
+  <!-- Inner disc -->
+  <circle cx="240" cy="240" r="132" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1"/>
+
+  <!-- Score -->
+  <text x="240" y="232" text-anchor="middle" font-family="Geist, sans-serif" font-size="72" font-weight="600" letter-spacing="-0.03em" fill="#0F172A">100</text>
+  <text x="240" y="262" text-anchor="middle" font-family="Geist, sans-serif" font-size="12" font-weight="600" letter-spacing="0.1em" fill="#059669">PERFORMANCE</text>
+  <line x1="186" y1="284" x2="294" y2="284" stroke="#E2E8F0"/>
+  <text x="240" y="306" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" fill="#64748B">mobile · throttled 4G</text>
+  <text x="240" y="324" text-anchor="middle" font-family="Geist Mono, monospace" font-size="11" fill="#64748B">LCP 1.24s · CLS 0.00</text>
+
+  <!-- Score chips around -->
+  <g font-family="Geist, sans-serif" font-size="11" font-weight="600">
+    <rect x="24" y="200" width="86" height="28" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="38" y="218" fill="#059669">A11Y 100</text>
+
+    <rect x="370" y="200" width="86" height="28" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="380" y="218" fill="#059669">SEO 100</text>
+
+    <rect x="24" y="252" width="86" height="28" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="34" y="270" fill="#2563EB">TTFB 41ms</text>
+
+    <rect x="370" y="252" width="86" height="28" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="381" y="270" fill="#2563EB">TBT 0ms</text>
+  </g>
+
+  <text x="240" y="424" text-anchor="middle" font-family="Geist Mono, monospace" font-size="10" fill="#94A3B8">audited on shipped production build</text>
+</svg>

@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 300" width="1040" height="300" fill="none">
+  <defs>
+    <marker id="wk" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#2563EB"/>
+    </marker>
+  </defs>
+
+  <rect x="0" y="0" width="1040" height="300" rx="16" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+
+  <text x="32" y="40" font-family="Geist Mono, monospace" font-size="11" letter-spacing="0.08em" fill="#94A3B8">DELIVERY WORKFLOW · FIXED MILESTONES</text>
+  <line x1="32" y1="58" x2="1008" y2="58" stroke="#E2E8F0"/>
+
+  <!-- Step cards -->
+  <g transform="translate(32, 82)">
+    <rect width="300" height="152" rx="12" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <circle cx="30" cy="30" r="14" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="24" y="35" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#2563EB">01</text>
+    <text x="56" y="35" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#0F172A">Spec and architecture lock</text>
+    <line x1="20" y1="56" x2="280" y2="56" stroke="#E2E8F0"/>
+    <text x="20" y="82" font-family="Geist, sans-serif" font-size="12" fill="#475569">Entity diagram, migrations, API contract</text>
+    <text x="20" y="102" font-family="Geist, sans-serif" font-size="12" fill="#475569">Milestone dates with acceptance checks</text>
+    <rect x="20" y="116" width="92" height="22" rx="5" fill="#EFF6FF"/>
+    <text x="30" y="131" font-family="Geist Mono, monospace" font-size="10" font-weight="600" fill="#1D4ED8">DELIVERED 24H</text>
+  </g>
+
+  <line x1="336" y1="158" x2="368" y2="158" stroke="#2563EB" stroke-width="1.5" marker-end="url(#wk)"/>
+
+  <g transform="translate(370, 82)">
+    <rect width="300" height="152" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <circle cx="30" cy="30" r="14" fill="#EFF6FF" stroke="#BFDBFE"/>
+    <text x="24" y="35" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#2563EB">02</text>
+    <text x="56" y="35" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#0F172A">Sprint staging and previews</text>
+    <line x1="20" y1="56" x2="280" y2="56" stroke="#E2E8F0"/>
+    <text x="20" y="82" font-family="Geist, sans-serif" font-size="12" fill="#475569">Working staging URL after each milestone</text>
+    <text x="20" y="102" font-family="Geist, sans-serif" font-size="12" fill="#475569">Weekly screen share, async notes in repo</text>
+    <rect x="20" y="116" width="104" height="22" rx="5" fill="#EFF6FF"/>
+    <text x="30" y="131" font-family="Geist Mono, monospace" font-size="10" font-weight="600" fill="#1D4ED8">SAME DAY MERGE</text>
+  </g>
+
+  <line x1="674" y1="158" x2="706" y2="158" stroke="#2563EB" stroke-width="1.5" marker-end="url(#wk)"/>
+
+  <g transform="translate(708, 82)">
+    <rect width="300" height="152" rx="12" fill="#FFFFFF" stroke="#2563EB"/>
+    <circle cx="30" cy="30" r="14" fill="#ECFDF5" stroke="#A7F3D0"/>
+    <text x="24" y="35" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#059669">03</text>
+    <text x="56" y="35" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#0F172A">Hardening and handover</text>
+    <line x1="20" y1="56" x2="280" y2="56" stroke="#E2E8F0"/>
+    <text x="20" y="82" font-family="Geist, sans-serif" font-size="12" fill="#475569">Load test, index audit, backup restore drill</text>
+    <text x="20" y="102" font-family="Geist, sans-serif" font-size="12" fill="#475569">Repo, keys and runbook to your account</text>
+    <rect x="20" y="116" width="112" height="22" rx="5" fill="#ECFDF5"/>
+    <text x="30" y="131" font-family="Geist Mono, monospace" font-size="10" font-weight="600" fill="#047857">100% OWNERSHIP</text>
+  </g>
+
+  <text x="32" y="266" font-family="Geist, sans-serif" font-size="11" fill="#94A3B8">Fixed price per milestone. No hourly drift, no change order surprise after signature.</text>
+</svg>
