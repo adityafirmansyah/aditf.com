@@ -1152,7 +1152,9 @@ body.is-locked {
 }
 
 .compare__card--agency {
-  background: var(--surface-2);
+  /* Recessed against the tinted section, so the white card beside it reads as elevated. */
+  background: var(--surface-3);
+  border-color: var(--line);
 }
 
 .compare__card--direct {
