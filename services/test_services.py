@@ -232,6 +232,44 @@ def test_static():
             check(f"asset: {name} is light theme (white card fill)",
                   "#FFFFFF" in path.read_text(encoding="utf-8"))
 
+    # Diagram spacing: text must sit inside an internal padding box, never on the
+    # canvas edge, and nothing may straddle a week gridline. Regression guard for
+    # the delivery-workflow "missing spacing" report.
+    for name, pad_x, pad_top in [("delivery-workflow.svg", 40, 24),
+                                 ("delivery-workflow-mobile.svg", 24, 24)]:
+        path = ASSETS / name
+        if not path.exists():
+            continue
+        root = ET.parse(path).getroot()
+        vb = [float(v) for v in root.get("viewBox", "").split()[2:]]
+        width = vb[0]
+        texts = root.findall("{http://www.w3.org/2000/svg}text")
+        xs = [float(t.get("x", 0)) for t in texts]
+        check(f"spacing: {name} keeps a {pad_x}px left inset",
+              min(xs) >= pad_x - 0.5, min(xs) if xs else None)
+        check(f"spacing: {name} leaves headroom above the first line",
+              min(float(t.get("y")) for t in texts) >= pad_top,
+              min(float(t.get("y")) for t in texts))
+        # right edge: no text may run past the mirrored inset
+        ends = []
+        for t in texts:
+            x = float(t.get("x", 0))
+            size = float(t.get("font-size", 11))
+            # conservative width estimate: widest glyph ~0.62em, monospace tracking
+            est = len(t.text or "") * size * 0.62
+            ends.append(width - (x + est) if t.get("text-anchor") != "end" else width - x)
+        check(f"spacing: {name} keeps a {pad_x}px right inset", min(ends) >= pad_x - 8,
+              round(min(ends), 1))
+        # the bottom note must clear the closing rule by at least 8px
+        lines = root.findall("{http://www.w3.org/2000/svg}line")
+        bottoms = [float(l.get("y1")) for l in lines
+                   if float(l.get("y1")) == float(l.get("y2"))
+                   and float(l.get("x2")) - float(l.get("x1")) > width * 0.9]
+        last_text_bottom = max(float(t.get("y")) for t in texts)
+        check(f"spacing: {name} footnote clears the closing rule",
+              bool(bottoms) and last_text_bottom <= max(bottoms) - 8,
+              (last_text_bottom, max(bottoms) if bottoms else None))
+
     # JSON-LD
     blocks = re.findall(r'<script type="application/ld\+json">(.*?)</script>', HTML, re.S)
     check("schema: one JSON-LD block", len(blocks) == 1, len(blocks))

@@ -1,49 +1,57 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 300" width="1040" height="300" fill="none" role="img" aria-label="Milestone schedule across three weeks, showing spec, staging and hardening as sequential bars on a calendar axis">
-  <rect x="0" y="0" width="1040" height="300" fill="#FFFFFF"/>
-  <line x1="0" y1="0" x2="1040" y2="0" stroke="#0F172A" stroke-width="2"/>
-  <line x1="0" y1="38" x2="1040" y2="38" stroke="#E2E8F0"/>
-  <text x="0" y="25" font-family="Geist Mono, monospace" font-size="11" font-weight="600" letter-spacing="0.08em" fill="#64748B">MILESTONE SCHEDULE · FIXED PRICE PER BAR</text>
-  <text x="1040" y="25" font-family="Geist Mono, monospace" font-size="11" letter-spacing="0.04em" fill="#94A3B8" text-anchor="end">SIGNATURE → OWNERSHIP</text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1040 410" width="1040" height="410" fill="none" role="img" aria-label="Milestone schedule across four weeks: spec lock at 24 hours, build and staging for 10 to 14 working days, then hardening and handover for 3 to 5 days, with a 30 day defect warranty tail">
+  <rect x="0" y="0" width="1040" height="410" fill="#FFFFFF"/>
 
-  <!-- calendar axis: week columns -->
-  <line x1="200" y1="64" x2="200" y2="262" stroke="#E2E8F0"/>
-  <line x1="404" y1="64" x2="404" y2="262" stroke="#E2E8F0"/>
-  <line x1="608" y1="64" x2="608" y2="262" stroke="#E2E8F0"/>
-  <line x1="812" y1="64" x2="812" y2="262" stroke="#E2E8F0"/>
-  <line x1="1016" y1="64" x2="1016" y2="262" stroke="#E2E8F0"/>
+  <!-- frame: heavy rules top and bottom, inset to the padding box -->
+  <line x1="0" y1="0.75" x2="1040" y2="0.75" stroke="#0F172A" stroke-width="1.5"/>
+  <line x1="0" y1="409.25" x2="1040" y2="409.25" stroke="#0F172A" stroke-width="1.5"/>
 
-  <text x="200" y="58" font-family="Geist Mono, monospace" font-size="10" letter-spacing="0.06em" fill="#94A3B8">WEEK 1</text>
-  <text x="404" y="58" font-family="Geist Mono, monospace" font-size="10" letter-spacing="0.06em" fill="#94A3B8">WEEK 2</text>
-  <text x="608" y="58" font-family="Geist Mono, monospace" font-size="10" letter-spacing="0.06em" fill="#94A3B8">WEEK 3</text>
-  <text x="812" y="58" font-family="Geist Mono, monospace" font-size="10" letter-spacing="0.06em" fill="#94A3B8">WEEK 4</text>
+  <!-- header band: 40px side padding, 44px top padding -->
+  <text x="40" y="44" font-family="Geist Mono, monospace" font-size="11" font-weight="600" letter-spacing="0.08em" fill="#64748B">MILESTONE SCHEDULE · FIXED PRICE PER BAR</text>
+  <text x="1000" y="44" font-family="Geist Mono, monospace" font-size="11" letter-spacing="0.04em" fill="#64748B" text-anchor="end">SIGNATURE → OWNERSHIP</text>
+  <line x1="40" y1="68" x2="1000" y2="68" stroke="#E2E8F0"/>
 
-  <!-- row 01: spec lock, day 1 -->
-  <text x="0" y="90" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#2563EB">01</text>
-  <text x="0" y="108" font-family="Geist, sans-serif" font-size="11" fill="#0F172A">Spec lock</text>
-  <rect x="200" y="80" width="44" height="18" fill="#2563EB"/>
-  <text x="256" y="93" font-family="Geist Mono, monospace" font-size="10" fill="#1D4ED8">24h, paid on acceptance</text>
-  <line x1="0" y1="122" x2="1040" y2="122" stroke="#E2E8F0"/>
+  <!-- calendar axis: four 175px week columns spanning x 300 to x 1000 -->
+  <line x1="300" y1="108" x2="300" y2="356" stroke="#E2E8F0"/>
+  <line x1="475" y1="108" x2="475" y2="356" stroke="#E2E8F0"/>
+  <line x1="650" y1="108" x2="650" y2="356" stroke="#E2E8F0"/>
+  <line x1="825" y1="108" x2="825" y2="356" stroke="#E2E8F0"/>
+  <line x1="1000" y1="108" x2="1000" y2="356" stroke="#E2E8F0"/>
 
-  <!-- row 02: build and staging -->
-  <text x="0" y="148" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#2563EB">02</text>
-  <text x="0" y="166" font-family="Geist, sans-serif" font-size="11" fill="#0F172A">Build and staging</text>
-  <rect x="244" y="138" width="360" height="18" fill="#BFDBFE"/>
-  <text x="616" y="151" font-family="Geist Mono, monospace" font-size="10" fill="#1D4ED8">10 to 14 working days, staging URL each merge</text>
-  <line x1="0" y1="180" x2="1040" y2="180" stroke="#E2E8F0"/>
+  <text x="387.5" y="96" font-family="Geist Mono, monospace" font-size="10" letter-spacing="0.08em" fill="#64748B" text-anchor="middle">WEEK 1</text>
+  <text x="562.5" y="96" font-family="Geist Mono, monospace" font-size="10" letter-spacing="0.08em" fill="#64748B" text-anchor="middle">WEEK 2</text>
+  <text x="737.5" y="96" font-family="Geist Mono, monospace" font-size="10" letter-spacing="0.08em" fill="#64748B" text-anchor="middle">WEEK 3</text>
+  <text x="912.5" y="96" font-family="Geist Mono, monospace" font-size="10" letter-spacing="0.08em" fill="#64748B" text-anchor="middle">WEEK 4</text>
+
+  <!-- row 01: spec lock, first 24 hours -->
+  <text x="40" y="136" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#2563EB">01</text>
+  <text x="76" y="136" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#0F172A">Spec lock</text>
+  <text x="76" y="154" font-family="Geist Mono, monospace" font-size="10" fill="#64748B">24h, paid on acceptance</text>
+  <rect x="300" y="122" width="25" height="18" fill="#2563EB"/>
+  <line x1="40" y1="170" x2="1000" y2="170" stroke="#E2E8F0"/>
+
+  <!-- row 02: build and staging eleven days -->
+  <text x="40" y="198" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#2563EB">02</text>
+  <text x="76" y="198" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#0F172A">Build and staging</text>
+  <text x="76" y="216" font-family="Geist Mono, monospace" font-size="10" fill="#64748B">10 to 14 days, staging per merge</text>
+  <rect x="325" y="184" width="350" height="18" fill="#BFDBFE"/>
+  <line x1="40" y1="232" x2="1000" y2="232" stroke="#E2E8F0"/>
 
   <!-- row 03: hardening and handover -->
-  <text x="0" y="206" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#059669">03</text>
-  <text x="0" y="224" font-family="Geist, sans-serif" font-size="11" fill="#0F172A">Hardening and handover</text>
-  <rect x="604" y="196" width="180" height="18" fill="#A7F3D0"/>
-  <text x="796" y="209" font-family="Geist Mono, monospace" font-size="10" fill="#047857">3 to 5 days, keys and runbook</text>
-  <line x1="0" y1="238" x2="1040" y2="238" stroke="#E2E8F0"/>
+  <text x="40" y="260" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#059669">03</text>
+  <text x="76" y="260" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#0F172A">Hardening and handover</text>
+  <text x="76" y="278" font-family="Geist Mono, monospace" font-size="10" fill="#64748B">3 to 5 days, keys and runbook</text>
+  <rect x="675" y="246" width="125" height="18" fill="#A7F3D0"/>
+  <line x1="40" y1="294" x2="1000" y2="294" stroke="#E2E8F0"/>
 
-  <!-- warranty tail -->
-  <text x="0" y="258" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#64748B">W</text>
-  <text x="0" y="276" font-family="Geist, sans-serif" font-size="11" fill="#475569">Defect warranty</text>
-  <rect x="784" y="248" width="256" height="18" fill="none" stroke="#A7F3D0" stroke-dasharray="3 2"/>
-  <text x="792" y="261" font-family="Geist Mono, monospace" font-size="10" fill="#047857">30 days, no extra cost</text>
+  <!-- row 04: warranty tail -->
+  <text x="40" y="322" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#64748B">W</text>
+  <text x="76" y="322" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#475569">Defect warranty</text>
+  <text x="76" y="340" font-family="Geist Mono, monospace" font-size="10" fill="#64748B">30 days, no extra cost</text>
+  <path d="M800 308 H1000 M800 308 V326 M800 326 H1000" stroke="#059669" stroke-dasharray="4 3"/>
 
-  <text x="0" y="292" font-family="Geist, sans-serif" font-size="10" fill="#64748B">Fixed price per milestone. No hourly drift, no change order surprise after signature.</text>
-  <line x1="0" y1="299" x2="1040" y2="299" stroke="#0F172A" stroke-width="2"/>
+  <!-- the axis closes here so the grid never dangles above the footnote -->
+  <line x1="40" y1="356" x2="1000" y2="356" stroke="#E2E8F0"/>
+
+  <!-- footnote: 22px below the axis, 20px clear of the bottom rule -->
+  <text x="40" y="388" font-family="Geist, sans-serif" font-size="11" fill="#64748B">Fixed price per milestone. No hourly drift, no change order surprise after signature.</text>
 </svg>
