@@ -176,9 +176,10 @@
 
 <header class="site-nav" id="siteNav">
   <div class="site-nav__inner">
-    <a class="brand" href="#top" aria-label="Aditya Firmansyah, back to top">
-      <span class="brand__mark" aria-hidden="true">&lt; AF /&gt;</span>
-      <span class="brand__name">Aditya Firmansyah</span>
+    <a class="nav-brand" href="#top" aria-label="Aditya Firmansyah, back to top">
+      <span class="nav-brand__mark" aria-hidden="true">AF</span>
+      <span class="nav-brand__name">Aditya Firmansyah</span>
+      <span class="nav-brand__role">Lead Architect</span>
     </a>
 
     <nav class="nav__links" aria-label="Section navigation">
@@ -192,7 +193,8 @@
     </nav>
 
     <div class="nav__actions">
-      <a class="btn btn--primary btn--sm" href="#builder">Build your scope spec</a>
+      <span class="nav-status"><span class="nav-status__dot" aria-hidden="true"></span>Available</span>
+      <a class="btn btn--primary btn--sm nav__cta" href="#builder">Configure scope spec <span class="btn__arrow" aria-hidden="true">→</span></a>
       <button class="nav__toggle" type="button" id="navToggle" aria-expanded="false" aria-controls="drawer" aria-label="Open menu">
         <span class="nav__toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
       </button>
@@ -202,9 +204,9 @@
 
 <div class="drawer" id="drawer" role="dialog" aria-modal="true" aria-label="Menu" hidden>
   <div class="drawer__top">
-    <a class="brand" href="#top">
-      <span class="brand__mark" aria-hidden="true">&lt; AF /&gt;</span>
-      <span class="brand__name">Aditya Firmansyah</span>
+    <a class="nav-brand" href="#top">
+      <span class="nav-brand__mark" aria-hidden="true">AF</span>
+      <span class="nav-brand__name">Aditya Firmansyah</span>
     </a>
     <button class="drawer__close" type="button" id="drawerClose" aria-label="Close menu">
       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
@@ -224,7 +226,7 @@
   </nav>
 
   <div class="drawer__foot">
-    <a class="btn btn--primary" href="#builder">Build your scope spec</a>
+    <a class="btn btn--primary" href="#builder">Configure scope spec</a>
     <p class="drawer__note">Reply window: under 24 hours, Monday to Saturday, UTC+7.</p>
   </div>
 </div>
@@ -1085,7 +1087,7 @@
   <div class="shell">
     <div class="foot__grid">
       <div class="foot__brand">
-        <span class="brand__name">Aditya Firmansyah</span>
+        <span class="foot__name">Aditya Firmansyah</span>
         <p class="foot__note">Senior full stack engineer in Surakarta, Indonesia. Building multi tenant commerce and SaaS platforms since 2012, directly with the people who own them.</p>
       </div>
 

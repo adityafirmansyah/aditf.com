@@ -103,11 +103,81 @@ def test_static():
     for label in ["Overview", "Why Direct", "Services", "Architecture", "Process", "Spec Builder", "FAQ"]:
         check(f"nav: '{label}' item present", f">{label}<" in HTML or f">{label} " in HTML)
 
-    check("nav: floating pill surface is translucent white",
-          "rgba(255, 255, 255, 0.85)" in CSS)
+    check("nav: header surface is translucent white at 92%",
+          "rgba(255, 255, 255, 0.92)" in CSS)
     check("nav: backdrop blur of 16px applied", "blur(16px)" in CSS)
     check("nav: mobile drawer exists", 'class="drawer"' in HTML)
     check("nav: drawer items stagger by 60ms", "* 60ms" in CSS)
+
+    # ---- full width enterprise bar contract ----
+    nav_rule = re.search(r"\.site-nav \{([^}]*)\}", CSS, re.S)
+    nav_body = nav_rule.group(1) if nav_rule else ""
+    check("nav: bar is pinned to the top edge", "top: 0;" in nav_body, nav_body[:80])
+    check("nav: bar spans the full viewport width", "width: 100%;" in nav_body)
+    check("nav: bar has no horizontal margin (edge to edge)",
+          "margin" not in nav_body)
+    check("nav: bar body is square, not a pill", "border-radius" not in nav_body)
+    check("nav: no floating offset token on the bar", "--s-200" not in nav_body)
+    check("nav: hairline bottom boundary spans the bar",
+          "border-bottom: 1px solid var(--line);" in nav_body)
+    check("nav: bar height is a fixed 64px token",
+          "--nav-h: 64px;" in CSS and "height: var(--nav-h);" in nav_body)
+    check("nav: bar is a flex row with vertical centring",
+          "display: flex;" in nav_body and "align-items: center;" in nav_body)
+    check("nav: backdrop filter boosts saturation to 180%",
+          "saturate(180%)" in nav_body)
+
+    inner_rule = re.search(r"\.site-nav__inner \{([^}]*)\}", CSS, re.S)
+    inner_body = inner_rule.group(1) if inner_rule else ""
+    check("nav: inner container caps at the 1440px shell",
+          "max-width: var(--shell);" in inner_body and "--shell: 1440px;" in CSS)
+    check("nav: inner container is fluid padded 20px to 56px",
+          "padding: 0 clamp(20px, 4vw, 56px);" in inner_body)
+    check("nav: inner container is square (no pill radius)",
+          "border-radius" not in inner_body)
+
+    # The floating pill pattern must be gone from the stylesheet entirely.
+    check("nav: retired 1120px floating wrapper is gone", "1120px" not in CSS)
+    check("nav: no pill radius anywhere on the header", not re.search(
+        r"\.site-nav[^{]*\{[^}]*border-radius", CSS, re.S))
+
+    # Identity block, status signal, primary action, active indicator.
+    check("nav: brand renders the name in sentence case",
+          'class="nav-brand__name">Aditya Firmansyah<' in HTML)
+    check("nav: role divider reads Lead Architect",
+          'class="nav-brand__role">Lead Architect<' in HTML)
+    check("nav: live status signal present with a dot",
+          'class="nav-status"' in HTML and 'class="nav-status__dot"' in HTML)
+    check("nav: status signal sits on emerald soft tokens",
+          "background: var(--green-soft);" in CSS
+          and "border: 1px solid var(--green-line);" in CSS)
+    check("nav: primary CTA reads Configure scope spec",
+          "Configure scope spec" in HTML)
+    check("nav: active link uses blue plus a hairline indicator",
+          '.nav__link[aria-current="true"]' in CSS
+          and "border-bottom-color: var(--blue);" in CSS)
+    check("nav: links are 14px medium in body ink", re.search(
+        r"\.nav__link \{[^}]*font-size: 14px;[^}]*font-weight: 500;", CSS, re.S)
+        is not None)
+    check("nav: links space at 24px", re.search(
+        r"\.nav__links \{[^}]*gap: var\(--s-300\);", CSS, re.S) is not None)
+    check("nav: identity mark is a square monogram, not a text glyph",
+          'class="nav-brand__mark" aria-hidden="true">AF<' in HTML)
+
+    # Page offset: hero clears the bar, anchors land with clearance.
+    hero_rule = re.search(r"\.hero \{([^}]*)\}", CSS, re.S)
+    hero_body = hero_rule.group(1) if hero_rule else ""
+    check("nav: hero clears the full width bar",
+          "padding-top: calc(var(--nav-h) + var(--s-400));" in hero_body, hero_body)
+    margin_block = re.search(
+        r"#top,\s*#difference,\s*#services,\s*#architecture,\s*#process,\s*#builder,"
+        r"\s*#faq\s*\{([^}]*)\}", CSS, re.S)
+    check("nav: every section id listed for anchor clearance",
+          margin_block is not None)
+    check("nav: anchors land 80px clear of the bar",
+          margin_block is not None and "scroll-margin-top: 80px;" in margin_block.group(1))
+    check("nav: document scroll padding matches the bar height",
+          "scroll-padding-top: var(--nav-h);" in CSS)
 
     # Heading max width 680px (B5)
     check("type: hero heading capped at 680px", "max-width: 680px" in CSS)
@@ -348,22 +418,46 @@ def run_browser(base):
               h1["fill"] in ("rgba(0, 0, 0, 0)", "transparent"), h1["fill"])
 
         metrics = page.evaluate("""() => {
-          const nav = document.querySelector('.site-nav__inner');
-          const cs = getComputedStyle(nav);
+          const header = document.querySelector('.site-nav');
+          const inner = document.querySelector('.site-nav__inner');
+          const hr = header.getBoundingClientRect();
+          const ir = inner.getBoundingClientRect();
+          const hcs = getComputedStyle(header);
+          const ics = getComputedStyle(inner);
           const body = getComputedStyle(document.body);
-          return {bg: cs.backgroundColor, blur: cs.backdropFilter,
-                  radius: cs.borderRadius, bodyBg: body.backgroundColor,
-                  bodyColor: body.color, bodyFamily: body.fontFamily};
+          const vw = document.documentElement.clientWidth;
+          return {
+            hBg: hcs.backgroundColor,
+            hBlur: hcs.backdropFilter,
+            hRadius: hcs.borderRadius,
+            hTop: Math.round(hr.top),
+            hLeft: Math.round(hr.left),
+            hRight: Math.round(hr.right),
+            hWidth: Math.round(hr.width),
+            hHeight: Math.round(hr.height),
+            iRadius: ics.borderRadius,
+            iWidth: Math.round(ir.width),
+            vw,
+            bodyBg: body.backgroundColor,
+            bodyColor: body.color,
+          };
         }""")
         check("render: page background is pure white",
               metrics["bodyBg"] == "rgb(255, 255, 255)", metrics["bodyBg"])
         check("render: body ink is slate 900",
               metrics["bodyColor"] == "rgb(15, 23, 42)", metrics["bodyColor"])
-        check("render: navbar background is translucent white",
-              "0.85" in metrics["bg"], metrics["bg"])
+        check("render: navbar background is translucent white at 92%",
+              "0.92" in metrics["hBg"], metrics["hBg"])
         check("render: navbar applies backdrop blur",
-              "blur(16px)" in (metrics["blur"] or ""), metrics["blur"])
-        check("render: navbar is a full pill", metrics["radius"].startswith("999"), metrics["radius"])
+              "blur(16px)" in (metrics["hBlur"] or ""), metrics["hBlur"])
+        check("render: navbar is pinned at top 0", metrics["hTop"] == 0, metrics["hTop"])
+        check("render: navbar spans full viewport edge to edge",
+              metrics["hLeft"] == 0 and metrics["hWidth"] == metrics["vw"], metrics)
+        check("render: navbar container is not pill shaped",
+              metrics["hRadius"] == "0px", metrics["hRadius"])
+        check("render: navbar inner container is not pill shaped",
+              metrics["iRadius"] == "0px", metrics["iRadius"])
+        check("render: navbar height is 64px", metrics["hHeight"] == 64, metrics["hHeight"])
 
         # Type scale conformance across rendered text
         off_scale = page.evaluate("""() => {
@@ -407,6 +501,37 @@ def run_browser(base):
         dead = page.evaluate("""() => [...document.querySelectorAll('a[href="#"], a[href=""]')]
             .map(a => a.textContent.trim())""")
         check("render: no dead anchor links", not dead, dead[:5])
+
+        # header interaction states: hover, active indicator, focus ring
+        page.hover(".nav__link:nth-child(3)")
+        page.wait_for_timeout(400)
+        hov = page.evaluate("""() => getComputedStyle(document.querySelectorAll('.nav__link')[2]).color""")
+        check("render: nav link hover shifts to ink", hov == "rgb(15, 23, 42)", hov)
+
+        act = page.evaluate("""() => {
+          const a = document.querySelector('.nav__link[aria-current="true"]');
+          if (!a) return null;
+          const cs = getComputedStyle(a);
+          return {color: cs.color, weight: cs.fontWeight, border: cs.borderBottomColor,
+                  width: cs.borderBottomWidth};
+        }""")
+        check("render: active nav link is blue and semibold",
+              act and act["color"] == "rgb(37, 99, 235)" and act["weight"] == "600", act)
+        check("render: active nav link carries a 2px bottom indicator",
+              act and act["border"] == "rgb(37, 99, 235)" and act["width"] == "2px", act)
+
+        page.evaluate("document.querySelectorAll('.nav__link')[0].focus()")
+        page.wait_for_timeout(200)
+        ring = page.evaluate("""() => { const s = getComputedStyle(document.activeElement);
+          return {w: s.outlineWidth, style: s.outlineStyle, color: s.outlineColor}; }""")
+        check("render: nav links show a visible focus ring",
+              ring["w"] == "2px" and ring["style"] != "none", ring)
+
+        page.hover(".nav-brand")
+        page.wait_for_timeout(400)
+        mark = page.evaluate(
+            """() => getComputedStyle(document.querySelector('.nav-brand__mark')).backgroundColor""")
+        check("render: brand monogram responds to hover", mark == "rgb(37, 99, 235)", mark)
 
         # Section alternation
         bgs = page.evaluate("""() => [...document.querySelectorAll('.section--tint')]
@@ -754,7 +879,8 @@ def run_browser(base):
         ctx2.close()
 
         # ---------- responsive ----------
-        for label, w, h in [("mobile", 390, 844), ("tablet", 768, 1024), ("desktop", 1280, 900)]:
+        for label, w, h in [("mobile", 390, 844), ("tablet", 768, 1024),
+                            ("desktop", 1280, 900), ("wide", 1440, 900)]:
             ctx3 = browser.new_context(viewport={"width": w, "height": h})
             page = ctx3.new_page()
             page.goto(base, wait_until="networkidle")
@@ -778,20 +904,58 @@ def run_browser(base):
                   not metrics["offenders"], metrics["offenders"])
 
             nav = page.evaluate("""() => {
+              const header = document.querySelector('.site-nav');
               const inner = document.querySelector('.site-nav__inner');
+              const hr = header.getBoundingClientRect();
               const r = inner.getBoundingClientRect();
+              const hero = document.querySelector('.hero__meta').getBoundingClientRect();
               return {left: Math.round(r.left), right: Math.round(r.right),
+                      hLeft: Math.round(hr.left), hTop: Math.round(hr.top),
+                      hWidth: Math.round(hr.width), hHeight: Math.round(hr.height),
+                      heroTop: Math.round(hero.top),
                       vw: document.documentElement.clientWidth,
                       toggle: getComputedStyle(document.getElementById('navToggle')).display,
+                      status: getComputedStyle(document.querySelector('.nav-status')).display,
+                      heroPad: parseFloat(getComputedStyle(document.querySelector('.hero')).paddingTop),
                       links: getComputedStyle(document.querySelector('.nav__links')).display};
             }""")
             check(f"{label}: navbar sits inside the viewport",
                   nav["left"] >= 0 and nav["right"] <= nav["vw"], nav)
+            check(f"{label}: header is flush to the left edge and full bleed",
+                  nav["hLeft"] == 0 and nav["hWidth"] == nav["vw"], nav)
+            check(f"{label}: header sits at the very top of the viewport",
+                  nav["hTop"] == 0, nav["hTop"])
+            check(f"{label}: header keeps a fixed 64px height",
+                  nav["hHeight"] == 64, nav["hHeight"])
+            check(f"{label}: hero is offset below the fixed header",
+                  nav["heroTop"] >= nav["hHeight"], nav)
+            check(f"{label}: hero padding accounts for the header height",
+                  nav["heroPad"] >= nav["hHeight"], nav["heroPad"])
+            if w < 1280:
+                check(f"{label}: status signal hidden when the bar is tight",
+                      nav["status"] == "none", nav["status"])
+            else:
+                check(f"{label}: status signal visible on a wide bar",
+                      nav["status"] != "none", nav["status"])
             if w < 1080:
                 check(f"{label}: hamburger shown under 1080px", nav["toggle"] != "none", nav["toggle"])
                 check(f"{label}: inline link row hidden under 1080px", nav["links"] == "none", nav["links"])
             else:
                 check(f"{label}: inline link row visible at 1080px+", nav["links"] == "flex", nav["links"])
+
+            # anchor jumps must clear the fixed bar
+            jump = page.evaluate("""() => {
+              document.getElementById('services').scrollIntoView();
+              const el = document.getElementById('services');
+              const r = el.getBoundingClientRect();
+              const bar = document.querySelector('.site-nav').getBoundingClientRect();
+              return {top: Math.round(r.top), bottom: Math.round(bar.bottom),
+                      clearance: Math.round(r.top - bar.bottom)};
+            }""")
+            check(f"{label}: anchor jump clears the fixed bar",
+                  jump["clearance"] >= 16, jump)
+            page.evaluate("window.scrollTo(0, 0)")
+            page.wait_for_timeout(200)
 
             # hero readability
             hero = page.evaluate("""() => {
@@ -835,6 +999,70 @@ def run_browser(base):
                 check("mobile: body scroll locks while the drawer is open", drawer["bodyLocked"] is True)
                 check("mobile: close button dismisses the drawer", drawer["closed"] is True)
 
+                # the drawer must replace the header in place, not shift the brand
+                align = page.evaluate("""async () => {
+                  const hBrand = document.querySelector('.site-nav .nav-brand').getBoundingClientRect();
+                  const hToggle = document.getElementById('navToggle').getBoundingClientRect();
+                  const hBar = document.querySelector('.site-nav').getBoundingClientRect();
+                  document.getElementById('navToggle').click();
+                  await new Promise(r => setTimeout(r, 500));
+                  const dBrand = document.querySelector('.drawer .nav-brand').getBoundingClientRect();
+                  const dClose = document.getElementById('drawerClose').getBoundingClientRect();
+                  const dTop = document.querySelector('.drawer__top').getBoundingClientRect();
+                  document.getElementById('drawerClose').click();
+                  await new Promise(r => setTimeout(r, 450));
+                  return {hBrandLeft: Math.round(hBrand.left), dBrandLeft: Math.round(dBrand.left),
+                          hBrandTop: Math.round(hBrand.top), dBrandTop: Math.round(dBrand.top),
+                          hToggleLeft: Math.round(hToggle.left), dCloseLeft: Math.round(dClose.left),
+                          hBarH: Math.round(hBar.height), dTopH: Math.round(dTop.height)};
+                }""")
+                check("mobile: drawer brand sits exactly where the header brand sat",
+                      align["hBrandLeft"] == align["dBrandLeft"]
+                      and align["hBrandTop"] == align["dBrandTop"], align)
+                check("mobile: drawer close sits exactly where the toggle sat",
+                      align["hToggleLeft"] == align["dCloseLeft"], align)
+                check("mobile: drawer top row matches the header height",
+                      align["dTopH"] == align["hBarH"], align)
+
+                # hairline rows, not a card list
+                rows = page.evaluate("""async () => {
+                  document.getElementById('navToggle').click();
+                  await new Promise(r => setTimeout(r, 400));
+                  const out = [...document.querySelectorAll('.drawer__item')].map(i => {
+                    const cs = getComputedStyle(i);
+                    return {border: cs.borderBottomWidth, radius: cs.borderRadius,
+                            h: Math.round(i.getBoundingClientRect().height)};
+                  });
+                  document.getElementById('drawerClose').click();
+                  await new Promise(r => setTimeout(r, 350));
+                  return out;
+                }""")
+                check("mobile: drawer rows are hairline separated",
+                      all(r["border"] == "1px" for r in rows), rows[:3])
+                check("mobile: drawer rows are square, not rounded cards",
+                      all(r["radius"] == "0px" for r in rows), rows[:3])
+                check("mobile: drawer rows are comfortable touch targets",
+                      all(r["h"] >= 44 for r in rows), [r["h"] for r in rows])
+
+                # a single hairline between the drawer top row and the first link
+                seam = page.evaluate("""async () => {
+                  document.getElementById('navToggle').click();
+                  await new Promise(r => setTimeout(r, 450));
+                  const top = document.querySelector('.drawer__top');
+                  const list = document.querySelector('.drawer__list');
+                  const out = {topBorder: getComputedStyle(top).borderBottomWidth,
+                               listBorder: getComputedStyle(list).borderTopWidth,
+                               gap: Math.round(list.getBoundingClientRect().top
+                                               - top.getBoundingClientRect().bottom)};
+                  document.getElementById('drawerClose').click();
+                  await new Promise(r => setTimeout(r, 350));
+                  return out;
+                }""")
+                check("mobile: exactly one hairline under the drawer top row",
+                      seam["topBorder"] == "1px" and seam["listBorder"] == "0px", seam)
+                check("mobile: the link list starts flush under the drawer top row",
+                      seam["gap"] == 0, seam)
+
                 # touch target sizing for pills
                 sizes = page.evaluate("""() => [...document.querySelectorAll('.pill-opt')]
                   .map(el => Math.round(el.getBoundingClientRect().height))""")
@@ -851,12 +1079,82 @@ def run_browser(base):
         browser.close()
 
 
+# --------------------------------------------------------------------------
+# 3. Width sweep: the bar must never crowd, wrap, or clip at any viewport.
+# --------------------------------------------------------------------------
+HEADER_WIDTHS = [1920, 1600, 1440, 1366, 1320, 1280, 1200, 1100, 1080, 1024,
+                 900, 834, 768, 640, 520, 480, 430, 414, 390, 360, 320]
+
+
+def test_header_widths(base):
+    """The header has three zones; at every width they must coexist without
+    overlap, wrapping, or negative slack. Guards the 414 to 479px crowding that
+    the first full width build shipped."""
+    with sync_playwright() as p:
+        browser = p.chromium.launch()
+        probe = """() => {
+          const vis = (s) => { const e = document.querySelector(s); if (!e) return null;
+            const cs = getComputedStyle(e);
+            if (cs.display === 'none' || cs.visibility === 'hidden') return null;
+            const b = e.getBoundingClientRect();
+            return {l: b.left, r: b.right, w: b.width}; };
+          const inner = document.querySelector('.site-nav__inner');
+          const ics = getComputedStyle(inner);
+          const content = inner.getBoundingClientRect().width
+                          - parseFloat(ics.paddingLeft) - parseFloat(ics.paddingRight);
+          const zones = [vis('.nav-brand'), vis('.nav__links'), vis('.nav__actions')]
+            .filter(Boolean).filter(z => z.w > 0);
+          const kids = [...inner.children]
+            .filter(k => getComputedStyle(k).display !== 'none')
+            .map(k => { const b = k.getBoundingClientRect();
+                        return {c: k.className, l: b.left, r: b.right}; })
+            .filter(k => k.r > k.l);
+          const collisions = [];
+          for (let i = 0; i < kids.length; i++)
+            for (let j = i + 1; j < kids.length; j++)
+              if (kids[i].r > kids[j].l + 0.5 && kids[j].r > kids[i].l + 0.5)
+                collisions.push(kids[i].c + ' x ' + kids[j].c);
+          const sum = ['brand', 'links', 'actions'].reduce((a, k) => a + (zones[k] ? zones[k].w : 0), 0);
+          const gap = parseFloat(ics.columnGap) || 0;
+          const aZone = document.querySelector('.nav__actions');
+          const aGap = aZone ? parseFloat(getComputedStyle(aZone).columnGap) : null;
+          return {
+            slack: Math.round(content - sum - gap * Math.max(0, zones.length - 1)),
+            collisions,
+            minZoneGap: zones.length > 1
+              ? Math.round(Math.min(...zones.slice(1).map((z, i) => z.l - zones[i].r)))
+              : 999,
+            actionsGap: aGap,
+            height: Math.round(document.querySelector('.site-nav').getBoundingClientRect().height),
+            overflow: document.documentElement.scrollWidth - document.documentElement.clientWidth,
+          };
+        }"""
+        for w in HEADER_WIDTHS:
+            page = browser.new_page(viewport={"width": w, "height": 900})
+            page.goto(base, wait_until="networkidle")
+            page.wait_for_timeout(180)
+            r = page.evaluate(probe)
+            check(f"header {w}px: zones do not overlap", not r["collisions"], r["collisions"])
+            check(f"header {w}px: zones keep at least 16px apart",
+                  r["minZoneGap"] >= 16, r["minZoneGap"])
+            check(f"header {w}px: the bar does not run out of room",
+                  r["slack"] >= 0, r["slack"])
+            check(f"header {w}px: the bar stays one 64px row", r["height"] == 64, r["height"])
+            check(f"header {w}px: the bar causes no overflow", r["overflow"] <= 0, r["overflow"])
+            check(f"header {w}px: action controls keep a distinct tap gap",
+                  r["actionsGap"] >= 16 if r["actionsGap"] is not None else True,
+                  r["actionsGap"])
+            page.close()
+        browser.close()
+
+
 def main():
     port = free_port()
     httpd = serve(port)
     base = f"http://127.0.0.1:{port}/services/"
     try:
         test_static()
+        test_header_widths(base)
         run_browser(base)
     except Exception as exc:  # keep partial results visible on a hard failure
         import traceback
