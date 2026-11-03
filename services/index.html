@@ -232,33 +232,59 @@
 <main id="main">
   <!-- ================= HERO ================= -->
   <section class="hero" id="top" aria-labelledby="heroTitle">
-    <div class="wrap">
-      <div class="hero__copy">
+    <div class="shell shell--grid">
+      <div class="hero__meta">
         <span class="pill"><span class="pill__dot" aria-hidden="true"></span>Direct architect access &middot; zero sales reps</span>
+        <span class="hero__stamp mono">Surakarta, ID &middot; UTC+7 &middot; Remote worldwide</span>
+      </div>
 
-        <h1 class="heading-1 hero__title" id="heroTitle">One senior engineer owns your platform, from schema to deploy.</h1>
+      <h1 class="heading-1 hero__title" id="heroTitle">One senior engineer owns your platform, from schema to deploy.</h1>
 
-        <p class="hero__lede">You brief the lead architect, not an account manager. The first call ends with a database schema, an API contract and a fixed milestone schedule in writing, before you are asked for a deposit.</p>
+      <div class="hero__specs">
+        <div class="hero__pitch">
+          <p class="hero__lede">You brief the lead architect, not an account manager. The first call ends with a database schema, an API contract and a fixed milestone schedule in writing, before you are asked for a deposit.</p>
 
-        <div class="hero__cta">
-          <a class="btn btn--primary btn--lg" href="#builder">Build your scope spec <span class="btn__arrow" aria-hidden="true">↓</span></a>
-          <a class="btn btn--ghost btn--lg" href="#services">View case deliveries <span class="btn__arrow" aria-hidden="true">→</span></a>
+          <div class="hero__cta">
+            <a class="btn btn--primary btn--lg" href="#builder">Build your scope spec <span class="btn__arrow" aria-hidden="true">↓</span></a>
+            <a class="btn btn--ghost btn--lg" href="#services">View case deliveries <span class="btn__arrow" aria-hidden="true">→</span></a>
+          </div>
+
+          <ul class="hero__fineprint">
+            <li>13 years in production systems</li>
+            <li>Reply within 24 hours</li>
+            <li>No agency retainer</li>
+          </ul>
         </div>
 
-        <ul class="hero__fineprint">
-          <li>13 years in production systems</li>
-          <li>Reply within 24 hours</li>
-          <li>No agency retainer</li>
-        </ul>
+        <dl class="hero__facts" aria-label="Engagement terms">
+          <div class="hero__fact">
+            <dt>Engagement</dt>
+            <dd>Direct, one architect</dd>
+          </div>
+          <div class="hero__fact">
+            <dt>Spec delivery</dt>
+            <dd>24 hours, written</dd>
+          </div>
+          <div class="hero__fact">
+            <dt>Billing</dt>
+            <dd>Fixed price per milestone</dd>
+          </div>
+          <div class="hero__fact">
+            <dt>Handover</dt>
+            <dd>Repository, keys, runbook</dd>
+          </div>
+        </dl>
       </div>
+    </div>
 
-      <div class="hero__frame">
-        <picture>
-          <source media="(max-width: 899px)" srcset="/assets/services/hero-platform-mockup-mobile.svg" width="390" height="560">
-          <img src="/assets/services/hero-platform-mockup.svg" width="1060" height="600" alt="Telemetry dashboard in light theme showing 34.2 millisecond edge response, 12,480 catalogue queries per second, 99.98 percent availability and a tenant routing function written in TypeScript">
-        </picture>
-      </div>
+    <figure class="hero__stage">
+      <picture>
+        <source media="(max-width: 899px)" srcset="/assets/services/hero-platform-mockup-mobile.svg" width="390" height="560">
+        <img src="/assets/services/hero-platform-mockup.svg" width="1100" height="640" alt="Telemetry dashboard in light theme showing 34.2 millisecond edge response, 12,480 catalogue queries per second, 99.98 percent availability and a tenant routing function written in TypeScript">
+      </picture>
+    </figure>
 
+    <div class="shell">
       <ul class="proof" aria-label="Measured delivery record">
         <li class="proof__item">
           <span class="proof__value">100</span>
@@ -282,7 +308,7 @@
 
   <!-- ================= STACK RIBBON ================= -->
   <section class="ribbon" aria-label="Technology stack">
-    <div class="wrap">
+    <div class="shell ribbon__inner">
       <p class="ribbon__label">Built on the stack you can hire for tomorrow</p>
       <ul class="ribbon__list">
         <li class="ribbon__item">Next.js</li>
@@ -297,273 +323,367 @@
     </div>
   </section>
 
-  <!-- ================= DIFFERENCE ================= -->
-  <section class="section section--tint" id="difference" aria-labelledby="diffTitle">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="eyebrow sec-head__eyebrow">Why direct</span>
-        <h2 class="heading-2" id="diffTitle">Agencies sell you a team. You need the person who designs the database.</h2>
+  <!-- ================= DIFFERENCE: FULL WIDTH LEDGER ================= -->
+  <section class="section" id="difference" aria-labelledby="diffTitle">
+    <div class="shell">
+      <header class="sec-head reveal">
+        <div class="sec-head__main">
+          <span class="eyebrow sec-head__eyebrow">Why direct</span>
+          <h2 class="heading-2" id="diffTitle">Agencies sell you a team. You need the person who designs the database.</h2>
+        </div>
         <p class="sec-head__lede">Most custom software is quoted by a seller, specified by a manager and written by someone who never spoke to you. That gap is where deadlines and budgets go. One direct line removes it.</p>
+      </header>
+
+      <div class="ledger reveal" role="table" aria-label="Agency model compared with a direct architect engagement">
+        <div class="ledger__head" role="row">
+          <span class="ledger__axis" role="columnheader">Dimension</span>
+          <span class="ledger__col" role="columnheader">Agency model</span>
+          <span class="ledger__col ledger__col--direct" role="columnheader">Direct architect</span>
+        </div>
+
+        <div class="ledger__row" role="row">
+          <span class="ledger__key" role="rowheader">Communication</span>
+          <div class="ledger__cell ledger__cell--agency" role="cell">
+            <span class="ledger__tag" aria-hidden="true">Lost in relay</span>
+            <p>Every technical question travels through a person who cannot answer it, then returns days later, already stale.</p>
+          </div>
+          <div class="ledger__cell ledger__cell--direct" role="cell">
+            <span class="ledger__tag ledger__tag--direct" aria-hidden="true">Same thread</span>
+            <p>You message the person holding the schema. Answers land in the same thread the same day, with the code attached.</p>
+          </div>
+        </div>
+
+        <div class="ledger__row" role="row">
+          <span class="ledger__key" role="rowheader">Architecture</span>
+          <div class="ledger__cell ledger__cell--agency" role="cell">
+            <span class="ledger__tag" aria-hidden="true">Template first</span>
+            <p>Decisions are made to fit the delivery template, not your traffic profile or the shape of your data model.</p>
+          </div>
+          <div class="ledger__cell ledger__cell--direct" role="cell">
+            <span class="ledger__tag ledger__tag--direct" aria-hidden="true">Measured first</span>
+            <p>Schema, indexes and cache boundaries are argued against your real query volume before a screen is built.</p>
+          </div>
+        </div>
+
+        <div class="ledger__row" role="row">
+          <span class="ledger__key" role="rowheader">Speed</span>
+          <div class="ledger__cell ledger__cell--agency" role="cell">
+            <span class="ledger__tag" aria-hidden="true">Demo dates</span>
+            <p>Staging appears at the agreed demo dates, rebuilt from a branch you are never given access to.</p>
+          </div>
+          <div class="ledger__cell ledger__cell--direct" role="cell">
+            <span class="ledger__tag ledger__tag--direct" aria-hidden="true">Daily staging</span>
+            <p>Every working day ends with a URL you can click, on the milestone you are paying for.</p>
+          </div>
+        </div>
+
+        <div class="ledger__row" role="row">
+          <span class="ledger__key" role="rowheader">Cost</span>
+          <div class="ledger__cell ledger__cell--agency" role="cell">
+            <span class="ledger__tag" aria-hidden="true">Coordination tax</span>
+            <p>Sales, account management and project coordination are billed into the same engineering rate you sign.</p>
+          </div>
+          <div class="ledger__cell ledger__cell--direct" role="cell">
+            <span class="ledger__tag ledger__tag--direct" aria-hidden="true">One rate</span>
+            <p>One senior rate, fixed per milestone. Added scope is quoted in writing before it is built.</p>
+          </div>
+        </div>
+
+        <div class="ledger__row" role="row">
+          <span class="ledger__key" role="rowheader">Code quality</span>
+          <div class="ledger__cell ledger__cell--agency" role="cell">
+            <span class="ledger__tag" aria-hidden="true">Shadow execution</span>
+            <p>The senior who pitched you is booked elsewhere. Your build lands with whoever is free, undocumented at handover.</p>
+          </div>
+          <div class="ledger__cell ledger__cell--direct" role="cell">
+            <span class="ledger__tag ledger__tag--direct" aria-hidden="true">One owner</span>
+            <p>One owner writes, reviews and merges. Full commit history, keys and runbook transfer with the repository.</p>
+          </div>
+        </div>
+
+        <div class="ledger__row ledger__row--total" role="row">
+          <span class="ledger__key" role="rowheader">Effective rate</span>
+          <div class="ledger__cell ledger__cell--agency" role="cell">
+            <p class="mono">Senior rate &times; 3.0 coordination tax</p>
+          </div>
+          <div class="ledger__cell ledger__cell--direct" role="cell">
+            <p class="mono ledger__total-value">One senior rate, zero coordination tax</p>
+          </div>
+        </div>
       </div>
 
-      <div class="compare">
-        <article class="compare__card compare__card--agency reveal">
-          <span class="compare__tag compare__tag--agency">Agency model</span>
-          <h3 class="compare__title">Four people between the brief and the code</h3>
-          <p class="compare__sub">Your budget funds coordination, not engineering capacity.</p>
-
-          <ul class="compare__list">
-            <li class="compare__row">
-              <span class="compare__icon" aria-hidden="true">×</span>
-              <span class="compare__row-text"><strong>Junior shadow execution.</strong> The senior who pitched you is booked elsewhere. Your build lands with whoever is free.</span>
-            </li>
-            <li class="compare__row">
-              <span class="compare__icon" aria-hidden="true">×</span>
-              <span class="compare__row-text"><strong>300% overhead multiplier.</strong> Sales, account management and project coordination are billed into the same engineering rate you sign.</span>
-            </li>
-            <li class="compare__row">
-              <span class="compare__icon" aria-hidden="true">×</span>
-              <span class="compare__row-text"><strong>Communication bottleneck.</strong> Every technical question travels through a person who cannot answer it, then returns days later, already stale.</span>
-            </li>
-            <li class="compare__row">
-              <span class="compare__icon" aria-hidden="true">×</span>
-              <span class="compare__row-text"><strong>Architecture by committee.</strong> Decisions are made to fit the delivery template, not your traffic profile or your data model.</span>
-            </li>
-            <li class="compare__row">
-              <span class="compare__icon" aria-hidden="true">×</span>
-              <span class="compare__row-text"><strong>Knowledge walks out.</strong> At handover you receive a repository nobody on your side understands and a support contract you cannot leave.</span>
-            </li>
-          </ul>
-
-          <p class="compare__foot">Effective engineering rate: billed senior rate × 3.0 coordination tax</p>
-        </article>
-
-        <article class="compare__card compare__card--direct reveal">
-          <span class="compare__tag compare__tag--direct">Direct architect</span>
-          <h3 class="compare__title">One owner, accountable for every decision</h3>
-          <p class="compare__sub">The person who scopes the work is the person who ships it.</p>
-
-          <ul class="compare__list">
-            <li class="compare__row">
-              <span class="compare__icon" aria-hidden="true">✓</span>
-              <span class="compare__row-text"><strong>1:1 code access.</strong> You read the same commits I push, ask questions in the same thread, and see staging rebuild minutes after a merge.</span>
-            </li>
-            <li class="compare__row">
-              <span class="compare__icon" aria-hidden="true">✓</span>
-              <span class="compare__row-text"><strong>Production grade architecture.</strong> Schema, indexes and cache boundaries are argued against your real query volume before a screen is built.</span>
-            </li>
-            <li class="compare__row">
-              <span class="compare__icon" aria-hidden="true">✓</span>
-              <span class="compare__row-text"><strong>Daily staging deploys.</strong> Every working day ends with a URL you can click, on the milestone you are paying for.</span>
-            </li>
-            <li class="compare__row">
-              <span class="compare__icon" aria-hidden="true">✓</span>
-              <span class="compare__row-text"><strong>Fixed milestone pricing.</strong> The number in the specification is the number on the invoice. Added scope is quoted before it is built.</span>
-            </li>
-            <li class="compare__row">
-              <span class="compare__icon" aria-hidden="true">✓</span>
-              <span class="compare__row-text"><strong>Full handover.</strong> Repository history, environment keys, deployment runbook and a 30 day defect warranty transfer with the code.</span>
-            </li>
-          </ul>
-
-          <p class="compare__foot">Effective engineering rate: one senior rate, zero coordination tax</p>
-        </article>
-      </div>
-
-      <figure class="compare__figure reveal">
+      <figure class="bleed-figure reveal">
         <picture>
           <source media="(max-width: 899px)" srcset="/assets/services/agency-vs-direct-mobile.svg" width="400" height="900">
           <img src="/assets/services/agency-vs-direct.svg" width="1000" height="460" loading="lazy" alt="Two column diagram comparing a four step agency chain with a four step direct architect engagement, showing day one against week twelve delivery timelines">
         </picture>
+        <figcaption class="bleed-figure__cap mono">Fig. 01 &middot; Brief to deploy, agency chain against direct line</figcaption>
       </figure>
     </div>
   </section>
 
   <!-- ================= TAGLINE REVEAL (B11) ================= -->
   <section class="tagline" aria-label="Delivery principle">
-    <div class="wrap">
+    <div class="shell">
       <div class="tagline__inner">
-        <div class="tagline__rule" aria-hidden="true"></div>
-        <span class="eyebrow tagline__eyebrow">The commitment</span>
+        <div class="tagline__top">
+          <span class="eyebrow tagline__eyebrow">The commitment</span>
+          <span class="tagline__stamp mono">Three clauses, no exceptions</span>
+        </div>
         <p class="tagline__text" id="taglineText"><span class="tagline__line">Written architecture in 24 hours.</span><span class="tagline__line">Working staging on day three.</span><span class="tagline__line">Your repository, your keys, your platform, at the end.</span></p>
       </div>
     </div>
   </section>
 
-  <!-- ================= SERVICES ================= -->
+  <!-- ================= SERVICES: ARCHITECTURAL STACK ROWS ================= -->
   <section class="section section--tint" id="services" aria-labelledby="svcTitle">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="eyebrow sec-head__eyebrow">Core capabilities</span>
-        <h2 class="heading-2" id="svcTitle">Three things I build better than a generalist team</h2>
+    <div class="shell">
+      <header class="sec-head reveal">
+        <div class="sec-head__main">
+          <span class="eyebrow sec-head__eyebrow">Core capabilities</span>
+          <h2 class="heading-2" id="svcTitle">Three things I build better than a generalist team</h2>
+        </div>
         <p class="sec-head__lede">Each tier below is a fixed engagement shape with its own deliverables. If your project does not fit one, the specification step will say so before you pay anything.</p>
-      </div>
+      </header>
+    </div>
 
-      <div class="svc-grid">
-        <!-- Tier 1 -->
-        <article class="svc reveal">
-          <div class="svc__body">
-            <span class="svc__tier">Tier 01 &middot; Product build</span>
-            <h3 class="svc__title">High speed web applications and SaaS MVPs</h3>
-            <p class="svc__desc">A complete product surface: tenant model, authentication, billing hooks and a server rendered front end. Built so the first hundred users do not require a rewrite for the first thousand.</p>
-            <ul class="svc__points">
-              <li class="svc__point">Normalised data models with migration history from commit one</li>
-              <li class="svc__point">Server side rendering and route level caching for sub second navigation</li>
-              <li class="svc__point">Session auth with role based access control and audit logging</li>
-              <li class="svc__point">Automated test suite that gates every deploy</li>
+    <ol class="stack">
+      <!-- Tier 1 -->
+      <li class="stack__row reveal">
+        <div class="shell stack__grid">
+          <span class="stack__index mono" aria-hidden="true">01</span>
+          <div class="stack__body">
+            <span class="stack__kicker mono">Product build</span>
+            <h3 class="heading-4 stack__title">High speed web applications and SaaS MVPs</h3>
+            <p class="stack__desc">A complete product surface: tenant model, authentication, billing hooks and a server rendered front end. Built so the first hundred users do not require a rewrite for the first thousand.</p>
+            <ul class="stack__points">
+              <li>Normalised data models with migration history from commit one</li>
+              <li>Server side rendering and route level caching for sub second navigation</li>
+              <li>Session auth with role based access control and audit logging</li>
+              <li>Automated test suite that gates every deploy</li>
             </ul>
-            <div class="svc__meta">
-              <span class="chip">3 to 4 weeks</span>
-              <span class="chip">Next.js + FastAPI</span>
-              <span class="chip chip--signal">Fixed milestone price</span>
-            </div>
+            <ul class="stack__tags" aria-label="Tier one specifications">
+              <li class="chip">3 to 4 weeks</li>
+              <li class="chip">Next.js + FastAPI</li>
+              <li class="chip chip--signal">Fixed milestone price</li>
+            </ul>
           </div>
-          <div class="svc__visual">
+          <figure class="stack__visual">
             <picture>
               <source media="(max-width: 767px)" srcset="/assets/services/saas-foundation-mobile.svg" width="340" height="560">
               <img src="/assets/services/saas-foundation.svg" width="520" height="420" loading="lazy" alt="Database schema illustration showing tenants, sessions, orders and a replayable migration log with a covering index note">
             </picture>
-          </div>
-        </article>
+            <figcaption class="stack__cap mono">Schema first</figcaption>
+          </figure>
+        </div>
+      </li>
 
-        <!-- Tier 2 -->
-        <article class="svc reveal">
-          <div class="svc__body">
-            <span class="svc__tier">Tier 02 &middot; Commerce</span>
-            <h3 class="svc__title">Custom ecommerce and checkout engines</h3>
-            <p class="svc__desc">Catalogue, cart and payment flow written as one system instead of glued plugins. The checkout survives retries, duplicate webhooks and abandoned carts without double charging anyone.</p>
-            <ul class="svc__points">
-              <li class="svc__point">Catalog queries under 60 ms across a 20,000 item inventory</li>
-              <li class="svc__point">QRIS, Midtrans and Stripe in one payment abstraction with idempotent callbacks</li>
-              <li class="svc__point">Stock reservation that survives concurrent checkout attempts</li>
-              <li class="svc__point">Receipt generation and order state machine with replayable events</li>
+      <!-- Tier 2 -->
+      <li class="stack__row reveal">
+        <div class="shell stack__grid">
+          <span class="stack__index mono" aria-hidden="true">02</span>
+          <div class="stack__body">
+            <span class="stack__kicker mono">Commerce</span>
+            <h3 class="heading-4 stack__title">Custom ecommerce and checkout engines</h3>
+            <p class="stack__desc">Catalogue, cart and payment flow written as one system instead of glued plugins. The checkout survives retries, duplicate webhooks and abandoned carts without double charging anyone.</p>
+            <ul class="stack__points">
+              <li>Catalog queries under 60 ms across a 20,000 item inventory</li>
+              <li>QRIS, Midtrans and Stripe in one payment abstraction with idempotent callbacks</li>
+              <li>Stock reservation that survives concurrent checkout attempts</li>
+              <li>Receipt generation and order state machine with replayable events</li>
             </ul>
-            <div class="svc__meta">
-              <span class="chip">4 to 6 weeks</span>
-              <span class="chip">Multi tenant ready</span>
-              <span class="chip chip--signal">Live payment testing</span>
-            </div>
+            <ul class="stack__tags" aria-label="Tier two specifications">
+              <li class="chip">4 to 6 weeks</li>
+              <li class="chip">Multi tenant ready</li>
+              <li class="chip chip--signal">Live payment testing</li>
+            </ul>
           </div>
-          <div class="svc__visual">
+          <figure class="stack__visual">
             <picture>
               <source media="(max-width: 767px)" srcset="/assets/services/checkout-engine-mobile.svg" width="340" height="560">
               <img src="/assets/services/checkout-engine.svg" width="520" height="420" loading="lazy" alt="Checkout state machine diagram from cart pricing through payment intent, idempotent webhook handling and order confirmation, with a failure branch that releases stock">
             </picture>
-          </div>
-        </article>
+            <figcaption class="stack__cap mono">Idempotent by design</figcaption>
+          </figure>
+        </div>
+      </li>
 
-        <!-- Tier 3 -->
-        <article class="svc reveal">
-          <div class="svc__body">
-            <span class="svc__tier">Tier 03 &middot; Rescue</span>
-            <h3 class="svc__title">Platform rearchitecture and performance overhauls</h3>
-            <p class="svc__desc">You have a system that works and a bill that keeps climbing. I measure first, then change the two or three things that actually cause the latency, rather than rewriting everything to look busy.</p>
-            <ul class="svc__points">
-              <li class="svc__point">Query plan audit with index changes measured before and after</li>
-              <li class="svc__point">Cache boundaries placed at the layer that removes the most work</li>
-              <li class="svc__point">Lighthouse 100 on mobile with a documented performance budget</li>
-              <li class="svc__point">Incremental migration path, no big bang cutover weekend</li>
+      <!-- Tier 3 -->
+      <li class="stack__row reveal">
+        <div class="shell stack__grid">
+          <span class="stack__index mono" aria-hidden="true">03</span>
+          <div class="stack__body">
+            <span class="stack__kicker mono">Rescue</span>
+            <h3 class="heading-4 stack__title">Platform rearchitecture and performance overhauls</h3>
+            <p class="stack__desc">You have a system that works and a bill that keeps climbing. I measure first, then change the two or three things that actually cause the latency, rather than rewriting everything to look busy.</p>
+            <ul class="stack__points">
+              <li>Query plan audit with index changes measured before and after</li>
+              <li>Cache boundaries placed at the layer that removes the most work</li>
+              <li>Lighthouse 100 on mobile with a documented performance budget</li>
+              <li>Incremental migration path, no big bang cutover weekend</li>
             </ul>
-            <div class="svc__meta">
-              <span class="chip">2 to 3 weeks</span>
-              <span class="chip">Audit first</span>
-              <span class="chip chip--signal">Measured baseline</span>
-            </div>
+            <ul class="stack__tags" aria-label="Tier three specifications">
+              <li class="chip">2 to 3 weeks</li>
+              <li class="chip">Audit first</li>
+              <li class="chip chip--signal">Measured baseline</li>
+            </ul>
           </div>
-          <div class="svc__visual">
+          <figure class="stack__visual">
             <img src="/assets/services/lighthouse-100.svg" width="480" height="480" loading="lazy"
                  alt="Lighthouse gauge reading 100 for performance, with accessibility 100, SEO 100, TTFB 41 milliseconds and cumulative layout shift of zero">
-          </div>
-        </article>
-      </div>
-    </div>
+            <figcaption class="stack__cap mono">Measured after, not claimed</figcaption>
+          </figure>
+        </div>
+      </li>
+    </ol>
   </section>
 
-  <!-- ================= ARCHITECTURE ================= -->
+  <!-- ================= ARCHITECTURE: PANORAMIC BLUEPRINT ================= -->
   <section class="section" id="architecture" aria-labelledby="archTitle">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="eyebrow sec-head__eyebrow">Architecture</span>
-        <h2 class="heading-2" id="archTitle">Every engagement starts with the diagram</h2>
+    <div class="shell">
+      <header class="sec-head reveal">
+        <div class="sec-head__main">
+          <span class="eyebrow sec-head__eyebrow">Architecture</span>
+          <h2 class="heading-2" id="archTitle">Every engagement starts with the diagram</h2>
+        </div>
         <p class="sec-head__lede">Nothing is built until the request path is drawn and the latency budget is written down. This is the reference topology I start from, adapted to your traffic and your team.</p>
-      </div>
+      </header>
 
-      <figure class="workflow__figure reveal">
+      <dl class="budget reveal" aria-label="Reference latency budget">
+        <div class="budget__item">
+          <dt class="mono">Edge handoff</dt>
+          <dd><span class="budget__value mono">34.2 ms</span><span class="budget__note">Cloudflare to origin, cached HTML</span></dd>
+        </div>
+        <div class="budget__item">
+          <dt class="mono">Service response</dt>
+          <dd><span class="budget__value mono">41 ms</span><span class="budget__note">FastAPI p50, read path</span></dd>
+        </div>
+        <div class="budget__item">
+          <dt class="mono">Catalogue read</dt>
+          <dd><span class="budget__value mono">12 ms</span><span class="budget__note">PostgreSQL with a covering index</span></dd>
+        </div>
+        <div class="budget__item">
+          <dt class="mono">Availability</dt>
+          <dd><span class="budget__value budget__value--signal mono">99.98%</span><span class="budget__note">Rolling 90 days</span></dd>
+        </div>
+      </dl>
+    </div>
+
+    <figure class="pano reveal">
+      <div class="pano__frame">
         <picture>
           <source media="(max-width: 899px)" srcset="/assets/services/architecture-blueprint-mobile.svg" width="380" height="760">
           <img src="/assets/services/architecture-blueprint.svg" width="1040" height="600" alt="Reference architecture: browser to Cloudflare edge, Next.js application, FastAPI services, and a data layer of PostgreSQL, Redis and object storage, with delivery observability notes">
         </picture>
-      </figure>
-    </div>
+      </div>
+      <figcaption class="pano__cap mono">Fig. 02 &middot; Reference topology, edge to storage, with the latency budget annotated per hop</figcaption>
+    </figure>
   </section>
 
-  <!-- ================= PROCESS ================= -->
+  <!-- ================= PROCESS: EDGE TO EDGE TIMELINE TRACK ================= -->
   <section class="section section--tint" id="process" aria-labelledby="procTitle">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="eyebrow sec-head__eyebrow">Process</span>
-        <h2 class="heading-2" id="procTitle">Three milestones, each one clickable</h2>
+    <div class="shell">
+      <header class="sec-head reveal">
+        <div class="sec-head__main">
+          <span class="eyebrow sec-head__eyebrow">Process</span>
+          <h2 class="heading-2" id="procTitle">Three milestones, each one clickable</h2>
+        </div>
         <p class="sec-head__lede">No phase ends with a slide deck. Each milestone ends with something you can open in a browser or read in a repository.</p>
-      </div>
-
-      <ol class="steps">
-        <li class="step reveal">
-          <span class="step__num" aria-hidden="true">01</span>
-          <h3 class="step__title">Spec and architecture lock</h3>
-          <p class="step__desc">One call, then a written specification. The data model, the API contract and the milestone dates are agreed before any code exists.</p>
-          <ul class="step__list">
-            <li>Entity diagram and table definitions</li>
-            <li>Endpoint list with request and response shapes</li>
-            <li>Fixed price per milestone</li>
-          </ul>
-          <span class="step__time">Delivered in 24h</span>
-        </li>
-
-        <li class="step reveal">
-          <span class="step__num" aria-hidden="true">02</span>
-          <h3 class="step__title">Sprint staging and live previews</h3>
-          <p class="step__desc">Each milestone closes with a deployed environment. You review the running product, not a screenshot, and comments land in the same repository.</p>
-          <ul class="step__list">
-            <li>Staging URL after every merged milestone</li>
-            <li>Weekly screen share plus async notes</li>
-            <li>Seeded demo data for realistic review</li>
-          </ul>
-          <span class="step__time">Same day merge</span>
-        </li>
-
-        <li class="step reveal">
-          <span class="step__num" aria-hidden="true">03</span>
-          <h3 class="step__title">Production hardening and full handover</h3>
-          <p class="step__desc">Load test, index review and a restore drill on the real backup. Then the repository, keys and runbook move to accounts you own.</p>
-          <ul class="step__list">
-            <li>Backup restore rehearsed once, on purpose</li>
-            <li>Deploy and rollback runbook</li>
-            <li>30 day defect warranty included</li>
-          </ul>
-          <span class="step__time">Full ownership transfer</span>
-        </li>
-      </ol>
-
-      <figure class="workflow__figure reveal">
-        <picture>
-          <source media="(max-width: 899px)" srcset="/assets/services/delivery-workflow-mobile.svg" width="380" height="560">
-          <img src="/assets/services/delivery-workflow.svg" width="1040" height="300" loading="lazy" alt="Three step delivery workflow diagram: architecture lock in 24 hours, sprint staging with same day merges, and production hardening with 100 percent ownership">
-        </picture>
-      </figure>
+      </header>
     </div>
+
+    <ol class="track">
+      <li class="track__stop reveal">
+        <div class="shell track__grid">
+          <div class="track__station">
+            <span class="track__node" aria-hidden="true"></span>
+            <span class="track__num mono">01</span>
+          </div>
+          <div class="track__body">
+            <div class="track__head">
+              <h3 class="heading-5 track__title">Spec and architecture lock</h3>
+              <span class="track__time mono">Delivered in 24h</span>
+            </div>
+            <p class="track__desc">One call, then a written specification. The data model, the API contract and the milestone dates are agreed before any code exists.</p>
+            <ul class="track__list">
+              <li>Entity diagram and table definitions</li>
+              <li>Endpoint list with request and response shapes</li>
+              <li>Fixed price per milestone</li>
+            </ul>
+          </div>
+        </div>
+      </li>
+
+      <li class="track__stop reveal">
+        <div class="shell track__grid">
+          <div class="track__station">
+            <span class="track__node" aria-hidden="true"></span>
+            <span class="track__num mono">02</span>
+          </div>
+          <div class="track__body">
+            <div class="track__head">
+              <h3 class="heading-5 track__title">Sprint staging and live previews</h3>
+              <span class="track__time mono">Same day merge</span>
+            </div>
+            <p class="track__desc">Each milestone closes with a deployed environment. You review the running product, not a screenshot, and comments land in the same repository.</p>
+            <ul class="track__list">
+              <li>Staging URL after every merged milestone</li>
+              <li>Weekly screen share plus async notes</li>
+              <li>Seeded demo data for realistic review</li>
+            </ul>
+          </div>
+        </div>
+      </li>
+
+      <li class="track__stop reveal">
+        <div class="shell track__grid">
+          <div class="track__station">
+            <span class="track__node" aria-hidden="true"></span>
+            <span class="track__num mono">03</span>
+          </div>
+          <div class="track__body">
+            <div class="track__head">
+              <h3 class="heading-5 track__title">Production hardening and full handover</h3>
+              <span class="track__time mono">Full ownership transfer</span>
+            </div>
+            <p class="track__desc">Load test, index review and a restore drill on the real backup. Then the repository, keys and runbook move to accounts you own.</p>
+            <ul class="track__list">
+              <li>Backup restore rehearsed once, on purpose</li>
+              <li>Deploy and rollback runbook</li>
+              <li>30 day defect warranty included</li>
+            </ul>
+          </div>
+        </div>
+      </li>
+    </ol>
+
+    <figure class="bleed-figure bleed-figure--flush reveal">
+      <picture>
+        <source media="(max-width: 899px)" srcset="/assets/services/delivery-workflow-mobile.svg" width="380" height="420">
+        <img src="/assets/services/delivery-workflow.svg" width="1040" height="300" loading="lazy" alt="Milestone schedule across four weeks: spec lock at 24 hours, build and staging for 10 to 14 working days, then hardening and handover for 3 to 5 days, with a 30 day defect warranty tail">
+      </picture>
+      <figcaption class="bleed-figure__cap mono">Fig. 03 &middot; The same three milestones on a calendar, so the schedule is inspectable before you commit</figcaption>
+    </figure>
   </section>
 
-  <!-- ================= SPEC BUILDER ================= -->
+  <!-- ================= SPEC BUILDER: STUDIO WORKBENCH ================= -->
   <section class="section" id="builder" aria-labelledby="builderTitle">
-    <div class="wrap">
-      <div class="sec-head reveal">
-        <span class="eyebrow sec-head__eyebrow">Spec builder</span>
-        <h2 class="heading-2" id="builderTitle">Build your scope spec in about 40 seconds</h2>
+    <div class="shell">
+      <header class="sec-head reveal">
+        <div class="sec-head__main">
+          <span class="eyebrow sec-head__eyebrow">Spec builder</span>
+          <h2 class="heading-2" id="builderTitle">Build your scope spec in about 40 seconds</h2>
+        </div>
         <p class="sec-head__lede">Select the shape of the work. The live summary assembles itself as you choose, and becomes the body of the reply I send you within 24 hours.</p>
-      </div>
+      </header>
 
-      <div class="builder">
-        <div class="builder__panel reveal" id="builderPanel">
+      <div class="bench">
+        <div class="bench__console reveal" id="builderPanel">
+          <div class="bench__bar">
+            <span class="bench__bar-label mono">Configuration console</span>
+            <span class="bench__bar-state mono"><span class="bench__dot" aria-hidden="true"></span>Draft</span>
+          </div>
+
           <form id="specForm" novalidate autocomplete="on">
             <input type="text" name="_waybill_trap" id="waybillTrap" class="hp-trap" tabindex="-1" autocomplete="off" aria-hidden="true">
 
@@ -769,11 +889,14 @@
           </div>
         </div>
 
-        <!-- Live summary -->
+        <!-- Live summary: the spec sheet -->
         <aside class="sheet reveal" aria-label="Live specification summary">
           <div class="sheet__head">
-            <span class="sheet__title">Spec summary</span>
-            <span class="sheet__live">Live</span>
+            <div>
+              <span class="sheet__title mono">Waybill spec sheet</span>
+              <span class="sheet__sub mono">Draft, unsubmitted</span>
+            </div>
+            <span class="sheet__live mono">Live</span>
           </div>
           <div class="sheet__body">
             <div class="sheet__row">
@@ -807,19 +930,22 @@
     </div>
   </section>
 
-  <!-- ================= FAQ ================= -->
+  <!-- ================= FAQ: HAIRLINE ROWS ================= -->
   <section class="section section--tint" id="faq" aria-labelledby="faqTitle">
-    <div class="wrap">
-      <div class="sec-head sec-head--center reveal">
-        <span class="eyebrow sec-head__eyebrow">Questions</span>
-        <h2 class="heading-2" id="faqTitle">The things clients ask before signing</h2>
+    <div class="shell">
+      <header class="sec-head sec-head--split reveal">
+        <div class="sec-head__main">
+          <span class="eyebrow sec-head__eyebrow">Questions</span>
+          <h2 class="heading-2" id="faqTitle">The things clients ask before signing</h2>
+        </div>
         <p class="sec-head__lede">Straight answers, including the parts that usually get buried in a proposal.</p>
-      </div>
+      </header>
 
       <div class="faq" id="faqList">
         <div class="faq__item">
           <button class="faq__q" type="button" aria-expanded="false" aria-controls="faqA1" id="faqQ1">
-            <span>Who actually writes the code?</span>
+            <span class="faq__idx mono" aria-hidden="true">01</span>
+            <span class="faq__label">Who actually writes the code?</span>
             <span class="faq__icon" aria-hidden="true"></span>
           </button>
           <div class="faq__a" id="faqA1" role="region" aria-labelledby="faqQ1">
@@ -831,7 +957,8 @@
 
         <div class="faq__item">
           <button class="faq__q" type="button" aria-expanded="false" aria-controls="faqA2" id="faqQ2">
-            <span>What do I receive after the first call?</span>
+            <span class="faq__idx mono" aria-hidden="true">02</span>
+            <span class="faq__label">What do I receive after the first call?</span>
             <span class="faq__icon" aria-hidden="true"></span>
           </button>
           <div class="faq__a" id="faqA2" role="region" aria-labelledby="faqQ2">
@@ -843,7 +970,8 @@
 
         <div class="faq__item">
           <button class="faq__q" type="button" aria-expanded="false" aria-controls="faqA3" id="faqQ3">
-            <span>How is the work priced and billed?</span>
+            <span class="faq__idx mono" aria-hidden="true">03</span>
+            <span class="faq__label">How is the work priced and billed?</span>
             <span class="faq__icon" aria-hidden="true"></span>
           </button>
           <div class="faq__a" id="faqA3" role="region" aria-labelledby="faqQ3">
@@ -855,7 +983,8 @@
 
         <div class="faq__item">
           <button class="faq__q" type="button" aria-expanded="false" aria-controls="faqA4" id="faqQ4">
-            <span>Do I own the code and the infrastructure?</span>
+            <span class="faq__idx mono" aria-hidden="true">04</span>
+            <span class="faq__label">Do I own the code and the infrastructure?</span>
             <span class="faq__icon" aria-hidden="true"></span>
           </button>
           <div class="faq__a" id="faqA4" role="region" aria-labelledby="faqQ4">
@@ -867,7 +996,8 @@
 
         <div class="faq__item">
           <button class="faq__q" type="button" aria-expanded="false" aria-controls="faqA5" id="faqQ5">
-            <span>What happens when the scope changes mid build?</span>
+            <span class="faq__idx mono" aria-hidden="true">05</span>
+            <span class="faq__label">What happens when the scope changes mid build?</span>
             <span class="faq__icon" aria-hidden="true"></span>
           </button>
           <div class="faq__a" id="faqA5" role="region" aria-labelledby="faqQ5">
@@ -879,7 +1009,8 @@
 
         <div class="faq__item">
           <button class="faq__q" type="button" aria-expanded="false" aria-controls="faqA6" id="faqQ6">
-            <span>Which stack do you build on?</span>
+            <span class="faq__idx mono" aria-hidden="true">06</span>
+            <span class="faq__label">Which stack do you build on?</span>
             <span class="faq__icon" aria-hidden="true"></span>
           </button>
           <div class="faq__a" id="faqA6" role="region" aria-labelledby="faqQ6">
@@ -891,7 +1022,8 @@
 
         <div class="faq__item">
           <button class="faq__q" type="button" aria-expanded="false" aria-controls="faqA7" id="faqQ7">
-            <span>Can you take over an existing codebase?</span>
+            <span class="faq__idx mono" aria-hidden="true">07</span>
+            <span class="faq__label">Can you take over an existing codebase?</span>
             <span class="faq__icon" aria-hidden="true"></span>
           </button>
           <div class="faq__a" id="faqA7" role="region" aria-labelledby="faqQ7">
@@ -903,7 +1035,8 @@
 
         <div class="faq__item">
           <button class="faq__q" type="button" aria-expanded="false" aria-controls="faqA8" id="faqQ8">
-            <span>What happens after launch?</span>
+            <span class="faq__idx mono" aria-hidden="true">08</span>
+            <span class="faq__label">What happens after launch?</span>
             <span class="faq__icon" aria-hidden="true"></span>
           </button>
           <div class="faq__a" id="faqA8" role="region" aria-labelledby="faqQ8">
@@ -916,42 +1049,40 @@
     </div>
   </section>
 
-  <!-- ================= FINAL CTA ================= -->
+  <!-- ================= FINAL: FULL BLEED BAND ================= -->
   <section class="final" aria-labelledby="finalTitle">
-    <div class="wrap">
-      <div class="final__card reveal">
-        <div class="final__inner">
-          <span class="final__eyebrow">Risk reversal</span>
-          <h2 class="final__title" id="finalTitle">If the first milestone misses, you keep the specification and pay nothing further.</h2>
-          <p class="final__lede">The terms are short on purpose: fixed price per milestone, code in your account from day one, and no retainer to escape.</p>
+    <div class="shell final__grid">
+      <div class="final__copy reveal">
+        <span class="final__eyebrow mono">Risk reversal</span>
+        <h2 class="final__title" id="finalTitle">If the first milestone misses, you keep the specification and pay nothing further.</h2>
+        <p class="final__lede">The terms are short on purpose: fixed price per milestone, code in your account from day one, and no retainer to escape.</p>
 
-          <div class="final__guarantees">
-            <div class="final__guarantee">
-              <strong>100% IP ownership</strong>
-              <span>Repository, commit history and keys transfer at handover.</span>
-            </div>
-            <div class="final__guarantee">
-              <strong>Fixed milestone price</strong>
-              <span>The quoted number is the invoiced number, per milestone.</span>
-            </div>
-            <div class="final__guarantee">
-              <strong>Zero vendor lock in</strong>
-              <span>Standard stack, standard containers, your hosting accounts.</span>
-            </div>
-          </div>
-
-          <div class="final__cta">
-            <a class="btn btn--primary btn--lg" href="#builder">Build your scope spec <span class="btn__arrow" aria-hidden="true">→</span></a>
-            <p class="final__alt">Prefer email? <a href="mailto:aditf.work@gmail.com?subject=Platform%20delivery%20enquiry">aditf.work@gmail.com</a></p>
-          </div>
+        <div class="final__cta">
+          <a class="btn btn--primary btn--lg" href="#builder">Build your scope spec <span class="btn__arrow" aria-hidden="true">→</span></a>
+          <p class="final__alt">Prefer email? <a href="mailto:aditf.work@gmail.com?subject=Platform%20delivery%20enquiry">aditf.work@gmail.com</a></p>
         </div>
       </div>
+
+      <dl class="final__terms reveal" aria-label="Engagement guarantees">
+        <div class="final__term">
+          <dt class="mono">01 &middot; Ownership</dt>
+          <dd><strong>100% IP ownership</strong><span>Repository, commit history and keys transfer at handover.</span></dd>
+        </div>
+        <div class="final__term">
+          <dt class="mono">02 &middot; Price</dt>
+          <dd><strong>Fixed milestone price</strong><span>The quoted number is the invoiced number, per milestone.</span></dd>
+        </div>
+        <div class="final__term">
+          <dt class="mono">03 &middot; Exit</dt>
+          <dd><strong>Zero vendor lock in</strong><span>Standard stack, standard containers, your hosting accounts.</span></dd>
+        </div>
+      </dl>
     </div>
   </section>
 </main>
 
 <footer class="site-foot">
-  <div class="wrap">
+  <div class="shell">
     <div class="foot__grid">
       <div class="foot__brand">
         <span class="brand__name">Aditya Firmansyah</span>
@@ -1108,9 +1239,9 @@
   /* ---------------- tagline word reveal (B11) ---------------- */
   var tagline = document.getElementById('taglineText');
   if (tagline) {
-    var lines = tagline.querySelectorAll('.tagline__line');
+    var tlines = tagline.querySelectorAll('.tagline__line');
     var spans = [];
-    lines.forEach(function (line) {
+    tlines.forEach(function (line) {
       var words = line.textContent.trim().split(/\s+/);
       line.textContent = '';
       words.forEach(function (word, i) {
@@ -1200,7 +1331,7 @@
       });
   }
 
-  function renderModules(target, emptyText, chips) {
+  function renderModules(target, emptyText) {
     target.textContent = '';
     var values = pickedModules();
     if (!values.length) {
@@ -1211,7 +1342,7 @@
     target.classList.remove('sheet__val--empty');
     values.forEach(function (v) {
       var tag = document.createElement('span');
-      tag.className = chips ? 'sheet__module' : 'sheet__module';
+      tag.className = 'sheet__module';
       tag.textContent = v;
       target.appendChild(tag);
     });
@@ -1226,7 +1357,7 @@
     sTimeline.textContent = LABELS.timeline[timeline] || 'Not selected';
     sBudget.textContent = LABELS.budget[budget] || 'Not selected';
 
-    renderModules(sModules, 'None selected yet', true);
+    renderModules(sModules, 'None selected yet');
 
     var name = nameInput.value.trim();
     var email = emailInput.value.trim();

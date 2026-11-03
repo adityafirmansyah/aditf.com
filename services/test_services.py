@@ -166,16 +166,55 @@ def test_static():
     check("spacing: button padding is 8px / 12px",
           "padding: var(--s-75) var(--s-100);" in CSS)
 
-    # No single-sided card borders: cards either have a full border or none.
-    card_rules = re.findall(r"\.(?:compare__card|svc|step|faq__item|sheet|voucher)\b[^{]*\{([^}]*)\}", CSS, re.S)
-    single_sided = []
-    for rule in card_rules:
-        for side in ("top", "right", "bottom", "left"):
-            if re.search(rf"border-{side}:\s*(?!0)", rule):
-                single_sided.append(f"border-{side}: {rule.strip()[:40]}")
-    check("borders: cards never use a single sided border", not single_sided, single_sided[:4])
-    check("borders: card borders are all one hairline around",
-          ".compare__card--direct" in CSS and "border: 1px solid var(--line)" in CSS)
+    # Anti card system: the architecture is full width bands, ledger rows and
+    # hairline accordions. No floating rounded rectangles with elevation.
+    retired = ["compare__card", "compare__list", "svc-grid", "svc__body", "svc__visual",
+               "class=\"svc\"", "class=\"step\"", "final__card", "final__inner",
+               "wrap--narrow"]
+    for name in retired:
+        check(f"layout: retired card primitive '{name.strip()}' is gone",
+              name not in HTML and name not in CSS)
+
+    # Only the copy surface tokens remain outside the sanctioned radius set.
+    check("layout: no 16px or larger card radius in use",
+          "border-radius: var(--r-16)" not in CSS
+          and "border-radius: var(--r-24)" not in CSS)
+
+    # Sections own their full width; there is one shell, not a per-section card.
+    check("layout: shell is a single fluid container",
+          CSS.count(".shell {") == 1 and "--gutter: clamp(24px, 5vw, 80px);" in CSS)
+    check("layout: shell max width is 1440px", "--shell: 1440px;" in CSS)
+
+    # Ledger structure: vertical hairline split with row dividers, in CSS.
+    ledger_rules = re.findall(r"\.ledger__[a-z-]+[^{]*\{([^}]*)\}", CSS, re.S)
+    check("layout: comparative ledger exists", ".ledger__row" in CSS and ".ledger__cell" in CSS)
+    check("layout: ledger splits columns with a vertical hairline",
+          any("border-left: 1px solid var(--line)" in r for r in ledger_rules))
+    check("layout: ledger rows are separated by a hairline divider",
+          any("border-bottom: 1px solid var(--line)" in r for r in ledger_rules))
+
+    # Stack rows and timeline track: full width rows, not a 3 card grid.
+    check("layout: services use architectural stack rows",
+          'class="stack__row' in HTML and ".stack__row {" in CSS
+          and ".stack__index {" in CSS)
+    check("layout: process uses a timeline track station",
+          'class="track__stop' in HTML and ".track__stop {" in CSS
+          and ".track__station {" in CSS)
+    faq_item_rule = re.search(r"\.faq__item \{[^}]*\}", CSS, re.S)
+    check("layout: FAQ rows are hairline separated, not cards",
+          faq_item_rule is not None and "border: 1px solid" not in faq_item_rule.group(0))
+
+    # Elevation is reserved for the floating nav pill and the buttons that sit
+    # inside it. No content surface combines a card radius with a shadow.
+    elevated = []
+    for sel, body in re.findall(r"([^{}]+)\{([^}]*)\}", CSS, re.S):
+        if "box-shadow:" not in body or "var(--shadow" in body:
+            continue
+        radii = [float(v) for v in re.findall(r"border-radius:\s*(\d+)px", body)]
+        if any(r >= 12 for r in radii):
+            elevated.append(sel.strip())
+    check("layout: no content surface pairs a card radius with a shadow",
+          not elevated, elevated[:5])
 
     # Assets
     for name in ["hero-platform-mockup.svg", "agency-vs-direct.svg",
@@ -337,6 +376,116 @@ def run_browser(base):
         check("render: tinted sections use #F8FAFC",
               all(b == "rgb(248, 250, 252)" for b in bgs), bgs)
         check("render: at least three tinted sections for rhythm", len(bgs) >= 3, len(bgs))
+
+        # ---- architectural layout, measured in the browser ----
+        layout = page.evaluate("""() => {
+          const vw = document.documentElement.clientWidth;
+          const box = (sel) => {
+            const el = document.querySelector(sel);
+            if (!el) return null;
+            const r = el.getBoundingClientRect();
+            const cs = getComputedStyle(el);
+            const pad = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight);
+            return {left: Math.round(r.left), right: Math.round(r.right),
+                    width: Math.round(r.width),
+                    content: Math.round(r.width - pad),
+                    pad: Math.round(pad / 2),
+                    radius: cs.borderTopLeftRadius, shadow: cs.boxShadow};
+          };
+          return {
+            vw,
+            shell: box('.shell'),
+            heroStage: box('.hero__stage'),
+            ledger: box('.ledger'),
+            stackRow: box('.stack__row'),
+            trackStop: box('.track__stop'),
+            faq: box('.faq'),
+            bench: box('.bench'),
+            panoFrame: box('.pano__frame'),
+            // how many blocks look like floating rounded cards
+            cards: [...document.querySelectorAll('main *')].filter(el => {
+              const cs = getComputedStyle(el);
+              const r = el.getBoundingClientRect();
+              if (r.width < 120 || r.height < 60) return false;
+              const radius = parseFloat(cs.borderTopLeftRadius) || 0;
+              const shadow = cs.boxShadow && cs.boxShadow !== 'none';
+              return radius >= 12 && shadow;
+            }).map(el => el.tagName + '.' + el.className).slice(0, 5)
+          };
+        }""")
+        vw = layout["vw"]
+        content_w = layout["shell"]["content"]
+        check("layout: shell spans the whole viewport at 1280",
+              layout["shell"]["width"] >= vw - 1, layout["shell"])
+        check("layout: container measures wider than the retired 1160px wrapper",
+              content_w > 1112, content_w)
+        check("layout: hero product stage bleeds edge to edge",
+              layout["heroStage"]["left"] <= 1 and layout["heroStage"]["right"] >= vw - 1,
+              layout["heroStage"])
+        check("layout: comparative ledger spans the container",
+              layout["ledger"]["width"] >= content_w - 2, layout["ledger"])
+        check("layout: ledger has square corners",
+              layout["ledger"]["radius"] == "0px", layout["ledger"]["radius"])
+        check("layout: service stack rows span the container",
+              layout["stackRow"]["width"] >= vw - 1, layout["stackRow"])
+        check("layout: timeline stops span the container",
+              layout["trackStop"]["width"] >= vw - 1, layout["trackStop"])
+        check("layout: FAQ list uses the full container width",
+              layout["faq"]["width"] >= content_w - 2, layout["faq"])
+        check("layout: spec workbench is one wide console, not nested cards",
+              layout["bench"]["width"] >= content_w - 2, layout["bench"])
+        check("layout: blueprint panorama bleeds edge to edge",
+              layout["panoFrame"]["left"] <= 1 and layout["panoFrame"]["right"] >= vw - 1,
+              layout["panoFrame"])
+        check("layout: no floating rounded cards left in the page",
+              not layout["cards"], layout["cards"])
+
+        # ---- WCAG AA contrast on every rendered text run ----
+        contrast_bad = page.evaluate("""() => {
+          const lum = (c) => {
+            const [r, g, b] = c.map(v => { v /= 255;
+              return v <= 0.03928 ? v / 12.92 : Math.pow((v + 0.055) / 1.055, 2.4); });
+            return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+          };
+          const parse = (s) => { const m = s.match(/[\\d.]+/g); return m ? m.slice(0, 3).map(Number) : null; };
+          const bgOf = (el) => {
+            let n = el;
+            while (n && n !== document.documentElement) {
+              const cs = getComputedStyle(n);
+              const c = parse(cs.backgroundColor);
+              const a = cs.backgroundColor.match(/rgba?\\([^)]*\\)/);
+              const alpha = a && a[0].includes('rgba') ? parseFloat(a[0].split(',')[3]) : 1;
+              if (c && alpha > 0.85) return c;
+              n = n.parentElement;
+            }
+            return [255, 255, 255];
+          };
+          const bad = [];
+          const sel = 'h1,h2,h3,h4,p,li,span,a,button,label,dt,dd,strong,pre,figcaption,legend';
+          document.querySelectorAll(sel).forEach(el => {
+            const text = el.textContent.trim();
+            if (!text || el.children.length > 0) return;
+            const cs = getComputedStyle(el);
+            if (cs.display === 'none' || cs.visibility === 'hidden') return;
+            if (parseFloat(cs.opacity) < 0.5) return;
+            if (el.closest('.hp-trap')) return;
+            if (cs.webkitTextFillColor === 'rgba(0, 0, 0, 0)') return;
+            const fg = parse(cs.color);
+            if (!fg) return;
+            const bg = bgOf(el);
+            const L1 = lum(fg), L2 = lum(bg);
+            const ratio = (Math.max(L1, L2) + 0.05) / (Math.min(L1, L2) + 0.05);
+            const size = parseFloat(cs.fontSize), weight = parseInt(cs.fontWeight);
+            const need = (size >= 24 || (size >= 18.66 && weight >= 700)) ? 3 : 4.5;
+            if (ratio < need) {
+              bad.push((el.className || el.tagName) + ' @' + size + 'px =' +
+                       ratio.toFixed(2) + ' <' + need);
+            }
+          });
+          return bad;
+        }""")
+        check("a11y: every rendered text run clears WCAG AA contrast",
+              not contrast_bad, contrast_bad[:6])
 
         # Reveals are armed but not applied at load, and fire on scroll
         armed = page.evaluate("() => document.querySelectorAll('.reveal').length")

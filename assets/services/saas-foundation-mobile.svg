@@ -1,5 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 560" width="340" height="560" fill="none">
-  <rect width="340" height="560" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="0" y="0" width="340" height="560" fill="#FFFFFF"/>
+  <line x1="0.75" y1="0" x2="0.75" y2="560" stroke="#CBD5E1"/>
+  <line x1="339.25" y1="0" x2="339.25" y2="560" stroke="#CBD5E1"/>
+  <line x1="0" y1="0.75" x2="340" y2="0.75" stroke="#0F172A" stroke-width="1.5"/>
+  <line x1="0" y1="559" x2="340" y2="559" stroke="#0F172A" stroke-width="1.5"/>
 
   <text x="16" y="28" font-family="Geist Mono, monospace" font-size="13" letter-spacing="0.04em" fill="#94A3B8">SCHEMA · MULTI TENANT</text>
   <line x1="16" y1="40" x2="324" y2="40" stroke="#E2E8F0"/>

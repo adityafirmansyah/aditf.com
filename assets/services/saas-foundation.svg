@@ -4,7 +4,11 @@
       <path d="M 0 1 L 9 5 L 0 9 z" fill="#94A3B8"/>
     </marker>
   </defs>
-  <rect width="520" height="420" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <rect x="0" y="0" width="520" height="420" fill="#FFFFFF"/>
+  <line x1="0.75" y1="0" x2="0.75" y2="420" stroke="#CBD5E1"/>
+  <line x1="519.25" y1="0" x2="519.25" y2="420" stroke="#CBD5E1"/>
+  <line x1="0" y1="0" x2="520" y2="0" stroke="#0F172A" stroke-width="1.5"/>
+  <line x1="0" y1="420" x2="520" y2="420" stroke="#0F172A" stroke-width="1.5"/>
 
   <text x="20" y="30" font-family="Geist Mono, monospace" font-size="12" letter-spacing="0.05em" fill="#94A3B8">SCHEMA · MULTI TENANT</text>
   <line x1="20" y1="42" x2="500" y2="42" stroke="#E2E8F0"/>
