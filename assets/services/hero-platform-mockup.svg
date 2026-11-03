@@ -1,0 +1,170 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 640" width="1060" height="600" fill="none">
+  <defs>
+    <filter id="shadow" x="-5%" y="-5%" width="110%" height="115%" filterUnits="objectBoundingBox">
+      <feDropShadow dx="0" dy="16" stdDeviation="24" flood-color="#0F172A" flood-opacity="0.08"/>
+      <feDropShadow dx="0" dy="4" stdDeviation="8" flood-color="#0F172A" flood-opacity="0.04"/>
+    </filter>
+    <clipPath id="frameClip">
+      <rect x="0" y="0" width="1060" height="600" rx="16"/>
+    </clipPath>
+  </defs>
+
+  <g transform="translate(20, 16)" filter="url(#shadow)">
+    <!-- Main Frame Background -->
+    <rect width="1060" height="600" rx="16" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+
+    <!-- Window Header / Chrome -->
+    <rect width="1060" height="48" rx="16" fill="#F8FAFC"/>
+    <rect y="32" width="1060" height="16" fill="#F8FAFC"/>
+    <line x1="0" y1="48" x2="1060" y2="48" stroke="#E2E8F0" stroke-width="1"/>
+
+    <!-- Window Dots -->
+    <circle cx="28" cy="24" r="5" fill="#EF4444"/>
+    <circle cx="44" cy="24" r="5" fill="#F59E0B"/>
+    <circle cx="60" cy="24" r="5" fill="#10B981"/>
+
+    <!-- URL Bar Pill -->
+    <rect x="96" y="10" width="480" height="28" rx="6" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <circle cx="112" cy="24" r="3" fill="#10B981"/>
+    <text x="124" y="28" font-family="Geist Mono, monospace" font-size="12" fill="#475569">https://core.dagango.internal/telemetry/production</text>
+
+    <!-- Branch & Status -->
+    <rect x="880" y="10" width="156" height="28" rx="6" fill="#ECFDF5" stroke="#A7F3D0"/>
+    <circle cx="896" cy="24" r="3.5" fill="#059669"/>
+    <text x="908" y="28" font-family="Geist, sans-serif" font-weight="600" font-size="12" fill="#065F46">STATUS HEALTHY</text>
+
+    <!-- Workspace Grid -->
+    <!-- Left Sidebar: Services & Routes -->
+    <g transform="translate(0, 48)">
+      <rect width="240" height="552" fill="#F8FAFC"/>
+      <line x1="240" y1="0" x2="240" y2="552" stroke="#E2E8F0" stroke-width="1"/>
+
+      <!-- Sidebar Section 1 -->
+      <text x="24" y="32" font-family="Geist, sans-serif" font-size="11" font-weight="600" letter-spacing="0.05em" fill="#94A3B8">CLUSTER SERVICES</text>
+
+      <!-- Active Service Row -->
+      <rect x="16" y="44" width="208" height="40" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <rect x="16" y="44" width="3" height="40" rx="1.5" fill="#2563EB"/>
+      <text x="32" y="68" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#0F172A">api-edge-gateway</text>
+      <rect x="176" y="56" width="36" height="18" rx="4" fill="#EFF6FF"/>
+      <text x="183" y="69" font-family="Geist Mono, monospace" font-size="10" font-weight="600" fill="#2563EB">200</text>
+
+      <rect x="16" y="92" width="208" height="36" rx="8" fill="transparent"/>
+      <text x="32" y="115" font-family="Geist, sans-serif" font-size="13" font-weight="500" fill="#475569">db-primary-pg16</text>
+      <text x="176" y="115" font-family="Geist Mono, monospace" font-size="11" fill="#059669">0.8ms</text>
+
+      <rect x="16" y="132" width="208" height="36" rx="8" fill="transparent"/>
+      <text x="32" y="155" font-family="Geist, sans-serif" font-size="13" font-weight="500" fill="#475569">cache-redis-shard1</text>
+      <text x="176" y="155" font-family="Geist Mono, monospace" font-size="11" fill="#059669">0.3ms</text>
+
+      <rect x="16" y="172" width="208" height="36" rx="8" fill="transparent"/>
+      <text x="32" y="195" font-family="Geist, sans-serif" font-size="13" font-weight="500" fill="#475569">worker-queue-runner</text>
+      <text x="176" y="195" font-family="Geist Mono, monospace" font-size="11" fill="#2563EB">IDLE</text>
+
+      <!-- Sidebar Section 2 -->
+      <text x="24" y="246" font-family="Geist, sans-serif" font-size="11" font-weight="600" letter-spacing="0.05em" fill="#94A3B8">BUILD VERIFICATION</text>
+
+      <g transform="translate(24, 260)">
+        <text x="0" y="16" font-family="Geist, sans-serif" font-size="12" fill="#475569">TypeScript Compile</text>
+        <text x="160" y="16" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#059669">PASS</text>
+
+        <text x="0" y="44" font-family="Geist, sans-serif" font-size="12" fill="#475569">Vitest Suite (188/188)</text>
+        <text x="160" y="44" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#059669">PASS</text>
+
+        <text x="0" y="72" font-family="Geist, sans-serif" font-size="12" fill="#475569">Lighthouse Audit</text>
+        <text x="160" y="72" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#059669">100/100</text>
+
+        <text x="0" y="100" font-family="Geist, sans-serif" font-size="12" fill="#475569">Docker Image Size</text>
+        <text x="160" y="100" font-family="Geist Mono, monospace" font-size="11" font-weight="600" fill="#2563EB">48.2 MB</text>
+      </g>
+
+      <!-- Lead Architect Signature Badge -->
+      <g transform="translate(16, 440)">
+        <rect width="208" height="68" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+        <circle cx="36" cy="34" r="14" fill="#EFF6FF"/>
+        <text x="31" y="38" font-family="Geist, sans-serif" font-size="11" font-weight="700" fill="#2563EB">AF</text>
+        <text x="58" y="28" font-family="Geist, sans-serif" font-size="11" font-weight="600" fill="#0F172A">Aditya Firmansyah</text>
+        <text x="58" y="44" font-family="Geist, sans-serif" font-size="10" fill="#64748B">Lead Systems Architect</text>
+      </g>
+    </g>
+
+    <!-- Center Content: Live Production Metrics Dashboard -->
+    <g transform="translate(264, 68)">
+      <!-- Metric Cards Row -->
+      <!-- Card 1 -->
+      <g transform="translate(0, 0)">
+        <rect width="244" height="96" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+        <text x="20" y="32" font-family="Geist, sans-serif" font-size="12" font-weight="500" fill="#64748B">Edge Response (p99)</text>
+        <text x="20" y="66" font-family="Geist, sans-serif" font-size="28" font-weight="700" fill="#0F172A">34.2 ms</text>
+        <rect x="180" y="20" width="44" height="20" rx="4" fill="#ECFDF5"/>
+        <text x="188" y="34" font-family="Geist Mono, monospace" font-size="10" font-weight="600" fill="#059669">-18%</text>
+      </g>
+
+      <!-- Card 2 -->
+      <g transform="translate(260, 0)">
+        <rect width="244" height="96" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+        <text x="20" y="32" font-family="Geist, sans-serif" font-size="12" font-weight="500" fill="#64748B">Catalog Query Throughput</text>
+        <text x="20" y="66" font-family="Geist, sans-serif" font-size="28" font-weight="700" fill="#0F172A">12,480</text>
+        <text x="136" y="64" font-family="Geist, sans-serif" font-size="12" font-weight="500" fill="#64748B">req/sec</text>
+        <rect x="180" y="20" width="44" height="20" rx="4" fill="#EFF6FF"/>
+        <text x="189" y="34" font-family="Geist Mono, monospace" font-size="10" font-weight="600" fill="#2563EB">LIVE</text>
+      </g>
+
+      <!-- Card 3 -->
+      <g transform="translate(520, 0)">
+        <rect width="244" height="96" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+        <text x="20" y="32" font-family="Geist, sans-serif" font-size="12" font-weight="500" fill="#64748B">Availability SLA</text>
+        <text x="20" y="66" font-family="Geist, sans-serif" font-size="28" font-weight="700" fill="#059669">99.98%</text>
+        <rect x="176" y="20" width="48" height="20" rx="4" fill="#ECFDF5"/>
+        <text x="184" y="34" font-family="Geist Mono, monospace" font-size="10" font-weight="600" fill="#059669">30D</text>
+      </g>
+
+      <!-- Main Latency & Request Chart -->
+      <g transform="translate(0, 116)">
+        <rect width="764" height="220" rx="12" fill="#FFFFFF" stroke="#E2E8F0"/>
+        <text x="24" y="36" font-family="Geist, sans-serif" font-size="14" font-weight="600" fill="#0F172A">Real-Time Request Latency Profile</text>
+        <text x="24" y="54" font-family="Geist, sans-serif" font-size="12" fill="#64748B">Multi-tenant edge routing across 20,000 active catalog SKUs</text>
+
+        <!-- Chart Grid Lines -->
+        <line x1="24" y1="90" x2="740" y2="90" stroke="#F1F5F9" stroke-width="1"/>
+        <line x1="24" y1="130" x2="740" y2="130" stroke="#F1F5F9" stroke-width="1"/>
+        <line x1="24" y1="170" x2="740" y2="170" stroke="#F1F5F9" stroke-width="1"/>
+        <line x1="24" y1="210" x2="740" y2="210" stroke="#F1F5F9" stroke-width="1"/>
+
+        <!-- Y Axis Labels -->
+        <text x="710" y="86" font-family="Geist Mono, monospace" font-size="10" fill="#94A3B8">60ms</text>
+        <text x="710" y="126" font-family="Geist Mono, monospace" font-size="10" fill="#94A3B8">40ms</text>
+        <text x="710" y="166" font-family="Geist Mono, monospace" font-size="10" fill="#94A3B8">20ms</text>
+        <text x="710" y="206" font-family="Geist Mono, monospace" font-size="10" fill="#94A3B8">0ms</text>
+
+        <!-- Smooth Area / Sparkline -->
+        <path d="M 40 180 Q 90 160 140 170 T 240 150 T 340 165 T 440 135 T 540 145 T 640 120 T 700 130 L 700 210 L 40 210 Z" fill="#EFF6FF" opacity="0.6"/>
+        <path d="M 40 180 Q 90 160 140 170 T 240 150 T 340 165 T 440 135 T 540 145 T 640 120 T 700 130" stroke="#2563EB" stroke-width="2.5" fill="none"/>
+
+        <!-- Target Threshold Line -->
+        <line x1="40" y1="148" x2="700" y2="148" stroke="#059669" stroke-width="1.5" stroke-dasharray="4 4"/>
+        <rect x="580" y="70" width="120" height="22" rx="4" fill="#ECFDF5" stroke="#A7F3D0"/>
+        <text x="590" y="85" font-family="Geist Mono, monospace" font-size="10" font-weight="600" fill="#065F46">SLO: &lt; 50ms (99.4%)</text>
+      </g>
+
+      <!-- Code & Architecture Terminal Snippet -->
+      <g transform="translate(0, 352)">
+        <rect width="764" height="152" rx="12" fill="#F8FAFC" stroke="#E2E8F0"/>
+        <rect width="764" height="32" rx="12" fill="#F1F5F9"/>
+        <rect y="20" width="764" height="12" fill="#F1F5F9"/>
+        <line x1="0" y1="32" x2="764" y2="32" stroke="#E2E8F0" stroke-width="1"/>
+
+        <circle cx="20" cy="16" r="4" fill="#CBD5E1"/>
+        <circle cx="34" cy="16" r="4" fill="#CBD5E1"/>
+        <circle cx="48" cy="16" r="4" fill="#CBD5E1"/>
+        <text x="68" y="20" font-family="Geist Mono, monospace" font-size="11" fill="#475569">services/tenant_router.ts — Clean Architecture</text>
+
+        <text x="24" y="60" font-family="Geist Mono, monospace" font-size="12" fill="#2563EB">export async function <tspan fill="#0F172A">resolveTenantContext</tspan>(<tspan fill="#475569">host: string</tspan>): Promise&lt;TenantPayload&gt; {</text>
+        <text x="44" y="82" font-family="Geist Mono, monospace" font-size="12" fill="#475569">const cached = await redis.get(`tenant:${host}`);</text>
+        <text x="44" y="104" font-family="Geist Mono, monospace" font-size="12" fill="#475569">if (cached) return JSON.parse(cached); // sub-millisecond edge resolution</text>
+        <text x="44" y="126" font-family="Geist Mono, monospace" font-size="12" fill="#475569">return await db.tenants.findUnique({ where: { domain: host } });</text>
+        <text x="24" y="144" font-family="Geist Mono, monospace" font-size="12" fill="#2563EB">}</text>
+      </g>
+    </g>
+  </g>
+</svg>

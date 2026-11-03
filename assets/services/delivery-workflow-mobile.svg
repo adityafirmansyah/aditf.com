@@ -1,0 +1,44 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 380 560" width="380" height="560" fill="none">
+  <rect width="380" height="560" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+  <text x="20" y="30" font-family="Geist Mono, monospace" font-size="10" letter-spacing="0.06em" fill="#94A3B8">FIXED MILESTONES</text>
+  <line x1="20" y1="42" x2="360" y2="42" stroke="#E2E8F0"/>
+
+  <g transform="translate(20, 58)">
+    <rect width="340" height="132" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <circle cx="26" cy="26" r="13" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="21" y="30" font-family="Geist Mono, monospace" font-size="10" font-weight="600" fill="#2563EB">01</text>
+    <text x="48" y="31" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Spec and architecture lock</text>
+    <line x1="16" y1="48" x2="324" y2="48" stroke="#E2E8F0"/>
+    <text x="16" y="70" font-family="Geist, sans-serif" font-size="10" fill="#475569">Entity diagram, migrations, API contract</text>
+    <text x="16" y="88" font-family="Geist, sans-serif" font-size="10" fill="#475569">Milestone dates with acceptance checks</text>
+    <rect x="16" y="100" width="88" height="20" rx="4" fill="#EFF6FF"/>
+    <text x="24" y="114" font-family="Geist Mono, monospace" font-size="9" font-weight="600" fill="#1D4ED8">DELIVERED 24H</text>
+  </g>
+
+  <g transform="translate(20, 204)">
+    <rect width="340" height="132" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <circle cx="26" cy="26" r="13" fill="#EFF6FF" stroke="#BFDBFE"/>
+    <text x="21" y="30" font-family="Geist Mono, monospace" font-size="10" font-weight="600" fill="#2563EB">02</text>
+    <text x="48" y="31" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Sprint staging and previews</text>
+    <line x1="16" y1="48" x2="324" y2="48" stroke="#E2E8F0"/>
+    <text x="16" y="70" font-family="Geist, sans-serif" font-size="10" fill="#475569">Working staging URL per milestone</text>
+    <text x="16" y="88" font-family="Geist, sans-serif" font-size="10" fill="#475569">Weekly screen share, async repo notes</text>
+    <rect x="16" y="100" width="98" height="20" rx="4" fill="#EFF6FF"/>
+    <text x="24" y="114" font-family="Geist Mono, monospace" font-size="9" font-weight="600" fill="#1D4ED8">SAME DAY MERGE</text>
+  </g>
+
+  <g transform="translate(20, 350)">
+    <rect width="340" height="132" rx="10" fill="#FFFFFF" stroke="#2563EB"/>
+    <circle cx="26" cy="26" r="13" fill="#ECFDF5" stroke="#A7F3D0"/>
+    <text x="21" y="30" font-family="Geist Mono, monospace" font-size="10" font-weight="600" fill="#059669">03</text>
+    <text x="48" y="31" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Hardening and handover</text>
+    <line x1="16" y1="48" x2="324" y2="48" stroke="#E2E8F0"/>
+    <text x="16" y="70" font-family="Geist, sans-serif" font-size="10" fill="#475569">Load test, index audit, restore drill</text>
+    <text x="16" y="88" font-family="Geist, sans-serif" font-size="10" fill="#475569">Repo, keys and runbook to your account</text>
+    <rect x="16" y="100" width="104" height="20" rx="4" fill="#ECFDF5"/>
+    <text x="24" y="114" font-family="Geist Mono, monospace" font-size="9" font-weight="600" fill="#047857">100% OWNERSHIP</text>
+  </g>
+
+  <text x="20" y="510" font-family="Geist, sans-serif" font-size="10" fill="#94A3B8">Fixed price per milestone. No hourly drift,</text>
+  <text x="20" y="526" font-family="Geist, sans-serif" font-size="10" fill="#94A3B8">no change order surprise after signature.</text>
+</svg>

@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 420" width="520" height="420" fill="none">
+  <defs>
+    <marker id="rel" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#94A3B8"/>
+    </marker>
+  </defs>
+  <rect width="520" height="420" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+
+  <text x="20" y="30" font-family="Geist Mono, monospace" font-size="12" letter-spacing="0.05em" fill="#94A3B8">SCHEMA · MULTI TENANT</text>
+  <line x1="20" y1="42" x2="500" y2="42" stroke="#E2E8F0"/>
+
+  <!-- tenants table -->
+  <g transform="translate(20, 58)">
+    <rect width="216" height="112" rx="8" fill="#F8FAFC" stroke="#CBD5E1"/>
+    <rect width="216" height="26" rx="8" fill="#EFF6FF"/>
+    <rect y="18" width="216" height="8" fill="#EFF6FF"/>
+    <text x="12" y="19" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#1D4ED8">tenants</text>
+    <g font-family="Geist Mono, monospace" font-size="12" fill="#475569">
+      <text x="12" y="46">id uuid pk</text>
+      <text x="12" y="66">domain text unique</text>
+      <text x="12" y="86">plan enum</text>
+      <text x="12" y="104">created_at timestamptz</text>
+    </g>
+  </g>
+
+  <!-- sessions table -->
+  <g transform="translate(286, 58)">
+    <rect width="214" height="112" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <rect width="214" height="26" rx="8" fill="#F8FAFC"/>
+    <rect y="18" width="214" height="8" fill="#F8FAFC"/>
+    <text x="12" y="19" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#0F172A">sessions</text>
+    <g font-family="Geist Mono, monospace" font-size="12" fill="#475569">
+      <text x="12" y="46">id uuid pk</text>
+      <text x="12" y="66">tenant_id fk</text>
+      <text x="12" y="86">role enum</text>
+      <text x="12" y="104">expires_at timestamptz</text>
+    </g>
+  </g>
+
+  <line x1="236" y1="114" x2="284" y2="114" stroke="#94A3B8" stroke-width="1.2" marker-end="url(#rel)"/>
+
+  <!-- orders table -->
+  <g transform="translate(20, 190)">
+    <rect width="216" height="132" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <rect width="216" height="26" rx="8" fill="#F8FAFC"/>
+    <rect y="18" width="216" height="8" fill="#F8FAFC"/>
+    <text x="12" y="19" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#0F172A">orders</text>
+    <g font-family="Geist Mono, monospace" font-size="12" fill="#475569">
+      <text x="12" y="46">id uuid pk</text>
+      <text x="12" y="66">tenant_id fk index</text>
+      <text x="12" y="86">state enum</text>
+      <text x="12" y="104">total_cents bigint</text>
+      <text x="12" y="122">idempotency_key uniq</text>
+    </g>
+  </g>
+
+  <!-- migration log -->
+  <g transform="translate(286, 190)">
+    <rect width="214" height="132" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/>
+    <rect width="214" height="26" rx="8" fill="#ECFDF5"/>
+    <text x="12" y="19" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#065F46">migrations</text>
+    <g font-family="Geist Mono, monospace" font-size="12" fill="#047857">
+      <text x="12" y="48">001_init         applied</text>
+      <text x="12" y="68">002_tenants      applied</text>
+      <text x="12" y="88">003_orders       applied</text>
+      <text x="12" y="108">004_rls          applied</text>
+      <text x="12" y="126">005_indexes      applied</text>
+    </g>
+  </g>
+
+  <!-- index callout -->
+  <g transform="translate(20, 338)">
+    <rect width="480" height="62" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="14" y="24" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Covering index on (tenant_id, state, created_at)</text>
+    <text x="14" y="44" font-family="Geist Mono, monospace" font-size="12" fill="#475569">catalog read 0.8ms · 188 migrations replayable from zero</text>
+  </g>
+</svg>
