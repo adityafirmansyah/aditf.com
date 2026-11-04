@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>What a Failed C++26 Ballot Says About Shipping to an Ecosystem — Field Notes</title>
+<meta name="description" content="C++26&#x27;s draft standard was reported disapproved in its ISO ballot over contracts. The useful question is what separates a feature that passes every internal gate from one an ecosystem can safely depend on.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="What a Failed C++26 Ballot Says About Shipping to an Ecosystem — Field Notes">
+<meta property="og:description" content="C++26&#x27;s draft standard was reported disapproved in its ISO ballot over contracts. The useful question is what separates a feature that passes every internal gate from one an ecosystem can safely depend on.">
+<meta property="og:url" content="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="What a Failed C++26 Ballot Says About Shipping to an Ecosystem — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="What a Failed C++26 Ballot Says About Shipping to an Ecosystem — Field Notes">
+<meta name="twitter:description" content="C++26&#x27;s draft standard was reported disapproved in its ISO ballot over contracts. The useful question is what separates a feature that passes every internal gate from one an ecosystem can safely depend on.">
+<meta name="twitter:image" content="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-11-04T00:00:00+00:00">
+<meta property="article:tag" content="cpp">
+<meta property="article:tag" content="software-engineering">
+<meta property="article:tag" content="standards">
+<meta property="article:tag" content="systems-design">
+<meta property="article:tag" content="release-engineering">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "What a Failed C++26 Ballot Says About Shipping to an Ecosystem", "description": "C++26's draft standard was reported disapproved in its ISO ballot over contracts. The useful question is what separates a feature that passes every internal gate from one an ecosystem can safely depend on.", "datePublished": "2026-11-04T00:00:00+00:00", "dateModified": "2026-11-04T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/"}, "keywords": "cpp, software-engineering, standards, systems-design, release-engineering", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1031, "image": ["https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>04 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">What a Failed C++26 Ballot Says About Shipping to an Ecosystem</h1>
+    <div class="post__tags"><span>cpp</span><span>software-engineering</span><span>standards</span><span>systems-design</span><span>release-engineering</span></div>
+    <div class="post__content reveal is-visible">
+<p>The C++26 draft standard was reported disapproved in its ISO ballot in late October 2026, after a twelve-week vote. By the account of one committee member, that outcome is close to unprecedented.</p>
+<p>I do not sit in WG21, the ISO working group that develops the C++ standard. Whether contract assertions belong in the language is not my argument.</p>
+<p>What interests me is the shape of the failure. A feature cleared every gate its own community controls, then failed at the one gate where outsiders hold votes.</p>
+<p>That is a shipping problem before it is a language problem, and it is one platform teams meet constantly without the luxury of a twelve-week comment period.</p>
+<h2>What the record actually says</h2>
+<p>The arithmetic matters here, so take it slowly. Approval needed two thirds of the participating-member (P-member) votes in favour and at most a quarter against. The draft got neither:</p>
+<ul>
+<li>12 of 20 P-member votes in favour, against the 14 that two thirds requires.</li>
+<li>9 of 22 votes negative, against the 5 that a quarter allows.</li>
+</ul>
+<p>Either shortfall fails the draft on its own. The denominators differ because the 22 counts observer-member votes too. Mateusz Pusz counts eight of those nine negatives as coming from P-members. The rest includes Iran, an observer member.</p>
+<p>No official ISO record is public. The tally comes from a LinkedIn post by Robert Seacord and a 25 October article by Pusz, and the wro.cpp writeup collecting both marks every number as reported rather than confirmed. The disapproval itself is solid. The arithmetic behind it is second-hand.</p>
+<p>That gap deserves a second look. A process that decides the fate of a language ended up with its own vote count circulating as hearsay, and the national bodies' comments stay unpublished.</p>
+<p>The argument traveled anyway. By 4 November the story sat on the Hacker News front page at 174 points and 74 comments.</p>
+<p>The thread could not agree on what the objection really was. Some read it as technical. Others called it procedural or political.</p>
+<p>Andreas Fertig, who represents Germany's vote on the committee, says he searched the ISO system and found one other disapproved DIS, or Draft International Standard: the C++/CLI language specification from 2006. That project was halted.</p>
+<h2>The gate nobody in the room can vote at</h2>
+<p>The committee voted the draft forward in March 2026 with contracts included, by more than the majority it needed. Months later the national bodies voted no on the same text.</p>
+<p>Same artifact, different electorate. The people who spent years on the design had no vote at the gate that decided it.</p>
+<p>Fertig's reading is that a number of national bodies believe the feature is not ready for release. He also argues the objecting papers restate old arguments rather than adding information.</p>
+<p>That distinction carries real weight. If you have already heard an objection and rejected it, hearing it again should not reset the decision. If you have not heard it, it should.</p>
+<p>The technical file is harder to wave away. WG21 papers are numbered proposals, and P4334R0 carries Stroustrup among its signatories. It indicts the contracts design on three counts:</p>
+<ul>
+<li>unimplemented,</li>
+<li>incomplete,</li>
+<li>untried at scale.</li>
+</ul>
+<p>Pusz adds that contract assertions on GCC 16 rest on an experimental implementation of the disputed part.</p>
+<p>Read those two together and you get the exact state the ballot rejected. Shipped far enough to try. Not settled enough to depend on.</p>
+<h2>Every recovery path costs a cycle</h2>
+<p>The ISO directives quoted in P4388R0 leave four routes:</p>
+<ul>
+<li>another eight-week ballot on a revised draft,</li>
+<li>a revised committee draft for comments,</li>
+<li>a draft Technical Specification,</li>
+<li>cancellation of the project.</li>
+</ul>
+<p>All four need a recommendation from WG21 and a decision by the SC22 chair. SC22 is the ISO subcommittee that covers programming languages. So there is no fast compromise on demand. WG21 next meets in Búzios from 16 to 21 November.</p>
+<p>Then there is the clock. The project was registered on 2 January 2025, and an ISO project that has not reached approval after 36 months is cancelled automatically. P4388R0 reads the single permitted extension as leaving until the end of 2027.</p>
+<p>None of the four routes is a rollback. Each one spends time the project does not get back.</p>
+<h2>The same wall inside a commerce platform</h2>
+<p>On Dagango.com the dangerous change is rarely the hard one to write. It is the easy one that lands on a shared surface tenant integrations already consume.</p>
+<p>A pricing invariant is a decent example of the shape. The code is a few lines. The meaning is a contract with every tenant whose invoices read from it.</p>
+<p>Three questions decide whether that change is ready:</p>
+<ul>
+<li>Who is allowed to rule on what happens when the invariant breaks for a tenant we have never met?</li>
+<li>Which consumers read this output, including the ones outside our repositories?</li>
+<li>What is the fallback path, and does rolling back require a data migration?</li>
+</ul>
+<p>If any of those has no written answer, the change is available. It is not committed.</p>
+<p>For that kind of change I want a flag file that is deliberately boring:</p>
+<pre><code class="language-yaml">pricing.invariants.enforce:
+  default: off              # available to tenants, not committed to them
+  enabled_for: [internal-smoke]
+  on_violation: reject      # decided once, not left to each caller
+  fallback: legacy_pricing_v2
+</code></pre>
+<p>Every line answers one of the three questions. The enforcement behaviour is written down instead of inherited from whoever wrote the caller.</p>
+<p>If you already ship C++26 features, Pusz's practical note is worth repeating. Nothing needs undoing yet, and the ballot does not change what compilers already ship.</p>
+<h2>What maturity actually looks like</h2>
+<p>An approval rule that needs two thirds and caps opposition at a quarter is deliberate. It exists so a minority with a real objection can stop a release that everyone would otherwise have to live with.</p>
+<p>That is an expensive rule, and the C++ community just paid for it. Fertig's own conclusion is that trust is what got shaken, and consensus runs on trust. I would broaden it. A gate that only holds while everyone already agrees was never doing work, in a language committee or in a commerce platform.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

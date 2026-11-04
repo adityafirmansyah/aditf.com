@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yang Bikin C++26 Gagal Bukan Fiturnya, Tapi Gate yang Nggak Bisa Lo Kontrol — Field Notes</title>
+<meta name="description" content="Draft standar C++26 dilaporkan ditolak di ballot ISO gara-gara contracts. Pertanyaan yang lebih berguna: apa bedanya fitur yang lolos semua gate internal dengan fitur yang aman dijadikan sandaran oleh ekosistem?">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Yang Bikin C++26 Gagal Bukan Fiturnya, Tapi Gate yang Nggak Bisa Lo Kontrol — Field Notes">
+<meta property="og:description" content="Draft standar C++26 dilaporkan ditolak di ballot ISO gara-gara contracts. Pertanyaan yang lebih berguna: apa bedanya fitur yang lolos semua gate internal dengan fitur yang aman dijadikan sandaran oleh ekosistem?">
+<meta property="og:url" content="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Yang Bikin C++26 Gagal Bukan Fiturnya, Tapi Gate yang Nggak Bisa Lo Kontrol — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Yang Bikin C++26 Gagal Bukan Fiturnya, Tapi Gate yang Nggak Bisa Lo Kontrol — Field Notes">
+<meta name="twitter:description" content="Draft standar C++26 dilaporkan ditolak di ballot ISO gara-gara contracts. Pertanyaan yang lebih berguna: apa bedanya fitur yang lolos semua gate internal dengan fitur yang aman dijadikan sandaran oleh ekosistem?">
+<meta name="twitter:image" content="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-11-04T00:00:00+00:00">
+<meta property="article:tag" content="cpp">
+<meta property="article:tag" content="software-engineering">
+<meta property="article:tag" content="standards">
+<meta property="article:tag" content="systems-design">
+<meta property="article:tag" content="release-engineering">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Yang Bikin C++26 Gagal Bukan Fiturnya, Tapi Gate yang Nggak Bisa Lo Kontrol", "description": "Draft standar C++26 dilaporkan ditolak di ballot ISO gara-gara contracts. Pertanyaan yang lebih berguna: apa bedanya fitur yang lolos semua gate internal dengan fitur yang aman dijadikan sandaran oleh ekosistem?", "datePublished": "2026-11-04T00:00:00+00:00", "dateModified": "2026-11-04T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/id/"}, "keywords": "cpp, software-engineering, standards, systems-design, release-engineering", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 975, "image": ["https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>04 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Yang Bikin C++26 Gagal Bukan Fiturnya, Tapi Gate yang Nggak Bisa Lo Kontrol</h1>
+    <div class="post__tags"><span>cpp</span><span>software-engineering</span><span>standards</span><span>systems-design</span><span>release-engineering</span></div>
+    <div class="post__content reveal is-visible">
+<p>Draft standar C++26 dilaporkan ditolak di ballot ISO akhir Oktober 2026. Prosesnya makan dua belas minggu. Menurut salah satu anggota komite, hasil kayak gini nyaris belum pernah kejadian.</p>
+<p>Gue nggak duduk di WG21, working group ISO yang ngembangin standar C++. Soal apakah contract assertion pantas masuk ke bahasa itu, gue nggak punya pendapat kuat.</p>
+<p>Yang bikin gue tertarik justru bentuk kegagalannya.</p>
+<p>Sebuah fitur udah lewat semua gate yang dipegang komunitasnya sendiri, terus mentok di gate terakhir: gate yang di dalamnya orang luar ikut punya suara.</p>
+<p>Nah, itu masalah shipping sebelum jadi masalah bahasa. Tim platform di mana-mana ketemu tembok yang sama, cuma tanpa kemewahan dua belas minggu buat berdebat.</p>
+<h2>Isi catatannya sebenarnya apa</h2>
+<p>Angkanya penting, jadi pelan-pelan aja.</p>
+<p>Buat lolos, draft butuh dua pertiga suara participating member alias P-member, dan maksimal seperempat menolak. Draft ini gagal di dua-duanya sekaligus:</p>
+<ul>
+<li>12 dari 20 suara P-member setuju, padahal dua pertiga dari 20 itu berarti 14.</li>
+<li>9 dari 22 suara menolak, padahal batasnya cuma 5.</li>
+</ul>
+<p>Salah satu kekurangan itu aja cukup buat menggagalkan draft. Penyebutnya beda karena 22 ikut menghitung observer member. Mateusz Pusz menghitung delapan dari sembilan suara negatif itu datang dari P-member, dan Iran yang statusnya observer member ada di sisanya.</p>
+<p>Catatan resmi ISO-nya nggak dibuka ke publik.</p>
+<p>Angkanya sendiri berasal dari post LinkedIn Robert Seacord dan artikel Pusz tanggal 25 Oktober. Tulisan wro.cpp yang merangkum keduanya menandai semua angka itu sebagai laporan yang belum dikonfirmasi.</p>
+<p>Penolakannya solid. Angkanya sendiri masih sebatas klaim yang belum dikonfirmasi.</p>
+<p>Jeda itu patut dicermati. Proses yang menentukan nasib sebuah bahasa, tapi hitungan suaranya cuma beredar sebagai kabar. Komentar national body juga tetap nggak dibuka.</p>
+<p>Perdebatannya tetap jalan. Sampai 4 November, ceritanya muncul di front page Hacker News dengan 174 poin dan 74 komentar.</p>
+<p>Komentarnya mayoritas memperdebatkan sifat keberatan itu. Ada yang melihatnya murni teknis. Ada yang bilang itu soal prosedur atau politik.</p>
+<p>Andreas Fertig mewakili suara Jerman di komite. Dia bilang udah nyari di sistem ISO dan cuma nemu satu DIS lain yang pernah ditolak. DIS itu kepanjangan dari Draft International Standard.</p>
+<p>Yang dia temukan: spesifikasi C++/CLI tahun 2006. Proyeknya dihentikan.</p>
+<h2>Gate yang nggak bisa dipilih orang di ruangan itu</h2>
+<p>Komitenya sendiri sudah meloloskan draft ini ke tahap berikutnya pada Maret 2026 dengan contracts di dalamnya. Suaranya bahkan lebih dari mayoritas yang dibutuhkan.</p>
+<p>Beberapa bulan kemudian, national body bilang no ke teks yang sama.</p>
+<p>Artefak yang sama, pemilih yang beda. Yang berubah bukan teksnya, tapi siapa yang pegang suara. Orang yang menghabiskan bertahun-tahun di desainnya nggak punya suara di gate yang akhirnya menentukan.</p>
+<p>Menurut Fertig, sejumlah national body menilai fitur ini belum siap rilis. Dia juga berpendapat paper-paper yang menolak cuma mengulang argumen lama tanpa menambah informasi baru.</p>
+<p>Bedanya nyata. Kalau sebuah keberatan udah lo dengar dan lo tolak, dengar lagi nggak seharusnya me-reset keputusan. Kalau belum pernah, ya seharusnya dianggap baru.</p>
+<p>Yang lebih susah dibantah justru berkas teknisnya. Paper WG21 itu pakai nomor, dan P4334R0 salah satu yang ditandatangani Stroustrup. Isinya menilai desain contracts bermasalah di tiga hal:</p>
+<ul>
+<li>belum diimplementasi,</li>
+<li>belum lengkap,</li>
+<li>belum dicoba dalam skala besar.</li>
+</ul>
+<p>Pusz menambahkan satu detail: contract assertion di GCC 16 masih bergantung pada implementasi eksperimental dari bagian yang lagi disengketakan itu.</p>
+<p>Baca dua hal itu bareng-bareng, dan lo dapat kondisi persis yang ditolak ballot. Sudah cukup jalan buat dicoba. Belum cukup mapan buat dijadikan sandaran.</p>
+<h2>Semua jalan keluarnya tetap makan satu putaran</h2>
+<p>Direktif ISO yang dikutip di P4388R0 ninggalin empat rute:</p>
+<ul>
+<li>ballot ulang delapan minggu dengan draft revisi,</li>
+<li>committee draft revisi buat dikomentari,</li>
+<li>draft Technical Specification,</li>
+<li>atau proyeknya dibatalkan.</li>
+</ul>
+<p>Keempatnya butuh rekomendasi dari WG21 dan keputusan dari ketua SC22. SC22 itu subkomite ISO yang menaungi bahasa pemrograman. Jadi nggak ada kompromi cepat yang bisa langsung diambil. Rapat WG21 berikutnya di Búzios, 16 sampai 21 November.</p>
+<p>Terus ada batas waktunya. Proyek ini diregistrasi 2 Januari 2025, dan proyek ISO yang belum sampai tahap approval dalam 36 bulan otomatis dibatalkan. P4388R0 membaca satu perpanjangan yang diizinkan sebagai ruang sampai akhir 2027.</p>
+<p>Nggak ada satu pun dari empat rute itu yang jadi rollback. Semuanya cuma menambah waktu.</p>
+<h2>Tembok yang sama di dalam platform commerce</h2>
+<p>Di Dagango.com, perubahan berbahaya biasanya bukan yang susah ditulis. Yang berbahaya justru yang gampang ditulis, tapi nyentuh bagian sistem yang udah dipakai integrasi tenant.</p>
+<p>Invariant harga contohnya bagus. Kodenya cuma beberapa baris. Yang susah bukan nulisnya, tapi menjaga artinya buat semua tenant yang invoice-nya membaca dari situ.</p>
+<p>Buat nentuin siap atau nggaknya, gue selalu balik ke tiga pertanyaan ini:</p>
+<ul>
+<li>Siapa yang berwenang memutuskan apa yang terjadi ketika invariant-nya jebol buat tenant yang belum pernah kita temui?</li>
+<li>Siapa saja yang membaca output ini, termasuk yang di luar repo kita?</li>
+<li>Apa jalur fallback-nya, dan apakah rollback-nya butuh migrasi data?</li>
+</ul>
+<p>Kalau satu pertanyaan belum ada jawaban tertulisnya, perubahan itu cuma tersedia. Belum jadi komitmen.</p>
+<p>Buat perubahan kayak gini, gue mau flag file yang sengaja dibikin membosankan:</p>
+<pre><code class="language-yaml">pricing.invariants.enforce:
+  default: off              # available to tenants, not committed to them
+  enabled_for: [internal-smoke]
+  on_violation: reject      # decided once, not left to each caller
+  fallback: legacy_pricing_v2
+</code></pre>
+<p>Tiap baris menjawab satu pertanyaan tadi. Perilaku enforcement-nya ditulis eksplisit, nggak diwarisi dari yang kebetulan nulis caller-nya.</p>
+<p>Kalau lo sudah sempat pakai fitur C++26, catatan Pusz masih berlaku. Belum ada yang perlu dibongkar, dan ballot ini nggak mengubah apa pun yang sudah dikirim compiler sekarang.</p>
+<h2>Matang itu kelihatan dari mana</h2>
+<p>Aturan approval yang menuntut dua pertiga setuju dan membatasi penolakan di seperempat itu memang disengaja.</p>
+<p>Logikanya biar minoritas yang punya keberatan serius bisa menghentikan rilis yang harus dijalani semua orang.</p>
+<p>Aturan kayak begini mahal, dan C++ baru saja merasakan akibatnya. Kesimpulan Fertig sendiri: yang goyang itu kepercayaannya, sementara konsensus jalan di atas kepercayaan.</p>
+<p>Gue mau memperluas sedikit. Gate yang cuma bertahan selama semua orang udah setuju dari awal itu sebenarnya nggak pernah kerja. Baik di komite bahasa, maupun di platform commerce yang lo kelola sekarang.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
