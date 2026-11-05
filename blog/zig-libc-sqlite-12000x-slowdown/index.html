@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zig&#x27;s libc Rewrite Made SQLite 12,000x Slower. Your Tests Wouldn&#x27;t Catch It — Field Notes</title>
+<meta name="description" content="A cross-compiled Rust service lost 12,000x on SQLite inserts because Zig&#x27;s libc rewrite walked the whole string inside every strchr call. Local tests passed on macOS.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Zig&#x27;s libc Rewrite Made SQLite 12,000x Slower. Your Tests Wouldn&#x27;t Catch It — Field Notes">
+<meta property="og:description" content="A cross-compiled Rust service lost 12,000x on SQLite inserts because Zig&#x27;s libc rewrite walked the whole string inside every strchr call. Local tests passed on macOS.">
+<meta property="og:url" content="https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Zig&#x27;s libc Rewrite Made SQLite 12,000x Slower. Your Tests Wouldn&#x27;t Catch It — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Zig&#x27;s libc Rewrite Made SQLite 12,000x Slower. Your Tests Wouldn&#x27;t Catch It — Field Notes">
+<meta name="twitter:description" content="A cross-compiled Rust service lost 12,000x on SQLite inserts because Zig&#x27;s libc rewrite walked the whole string inside every strchr call. Local tests passed on macOS.">
+<meta name="twitter:image" content="https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-11-05T00:00:00+00:00">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="zig">
+<meta property="article:tag" content="sqlite">
+<meta property="article:tag" content="performance">
+<meta property="article:tag" content="compilers">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Zig's libc Rewrite Made SQLite 12,000x Slower. Your Tests Wouldn't Catch It", "description": "A cross-compiled Rust service lost 12,000x on SQLite inserts because Zig's libc rewrite walked the whole string inside every strchr call. Local tests passed on macOS.", "datePublished": "2026-11-05T00:00:00+00:00", "dateModified": "2026-11-05T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/"}, "keywords": "rust, zig, sqlite, performance, compilers", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1084, "image": ["https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>05 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Zig&#x27;s libc Rewrite Made SQLite 12,000x Slower. Your Tests Wouldn&#x27;t Catch It</h1>
+    <div class="post__tags"><span>rust</span><span>zig</span><span>sqlite</span><span>performance</span><span>compilers</span></div>
+    <div class="post__content reveal is-visible">
+<p>Inserting 40,000 JSON records into SQLite should take milliseconds. For Dennis Forbes it pinned a full CPU core for minutes, and his write-up landed on a number that reads like a typo: 12,000x slower.</p>
+<p>Lock contention was not the problem. Neither was fsync, disk I/O, or a missing index. The binary had been cross-compiled for Linux through <code>zig cc</code>, and the C standard library (libc) sitting underneath it had quietly turned SQLite's parser quadratic.</p>
+<p>That is the part worth your attention. Not the Zig bug itself, which upstream is fixing. The fact that an entire class of regression is invisible to the test suite most of us actually run.</p>
+<h2>The libc your tests never touched</h2>
+<p>Forbes benchmarked a 1.2 MB JSON payload fed to SQLite as a batch of 40,000 records. On macOS, where his integration tests ran, the same workload finished in sub-millisecond time.</p>
+<p>The difference was not the hardware. It was the linker.</p>
+<p><code>cargo-zigbuild</code> hands linking to <code>zig cc</code>, which ships its own C library implementations. That is the whole reason the tool exists: emit Linux binaries from a Mac or a CI runner without booting a Docker build container. The convenience is real. So is the cost.</p>
+<p>A native build on your laptop links Apple's libc. Your production artifact links Zig's <code>libzigc</code>. That is Zig's own version of <code>strchr</code>, <code>strspn</code>, <code>strstr</code> and the rest of that family.</p>
+<p>Your tests exercised Apple's copies. You shipped Zig's.</p>
+<h2>Shlemiel the Painter, again</h2>
+<p>C strings are not strings. They are a pointer and a promise that a zero byte exists somewhere ahead of it. A Zig slice is a pointer and a length. Every bridge between those two representations needs the length, and the only way to get it from a bare <code>char*</code> is to walk forward until you hit the terminator.</p>
+<p>Go read Joel Spolsky's 2001 essay "Back to Basics" if you have not. His Shlemiel paints one meter per stroke, then walks back to the can for every stroke, so painting a longer fence takes quadratic time. The essay is twenty-five years old and it still predicts production incidents.</p>
+<p>Here is the shape of what <code>libzigc</code> did, roughly:</p>
+<pre><code class="language-zig">// illustrative sketch, not the literal patch
+const n = std.mem.len(ptr);           // scan to the NUL byte first: O(remaining)
+const s = ptr[0..n];                  // now we have a slice
+const idx = std.mem.indexOfScalar(u8, s, ':');  // then search: another O(remaining)
+</code></pre>
+<p>A call that should stop at the first colon now reads to the end of the buffer first. Do that once and nobody notices. Do it in a loop over a 1.2 MB document and the loop becomes quadratic.</p>
+<p>The tell is that <code>strchrnul</code> exists at all. That function returns a pointer to the terminator instead of the length, precisely because C callers often do not need to know how long the rest of the string is. A rewrite that computes the length up front has discarded the reason the API was shaped that way.</p>
+<p>PR #37417 corrects <code>strchr</code>, <code>strchrnul</code> and the neighbouring functions. The fix is unglamorous, which is what you want in a libc: search with a bounded scan, skip the length when the caller never asked for it.</p>
+<h2>Tokenizers live on the worst-case path</h2>
+<p>The mechanism matters more than the specific functions. SQLite's lexer tokenizes JSON and SQL by advancing a pointer through the buffer, calling <code>strchr</code> and <code>strspn</code> to skip whitespace and find the next delimiter.</p>
+<p>That loop was always linear. Each call advanced the cursor by a few bytes, and the total work stayed proportional to the input. Now every call walks to the end of the buffer regardless of where it finds its match, so N tokenization steps each cost O(N).</p>
+<p>Total: O(N²). At 1.2 MB that is roughly a trillion byte comparisons where the old build did about a million. The 12,000x figure stops looking mysterious.</p>
+<h2>The reproduction is a straight line</h2>
+<p>Zig issue #37402 carries a synthetic <code>strchr</code> loop, compiled with <code>zig cc -target x86_64-linux-musl</code>:</p>
+<ul>
+<li>1 MB: 2.8 seconds</li>
+<li>2 MB: 11 seconds</li>
+<li>4 MB: 46 seconds</li>
+</ul>
+<p>Double the input, quadruple the time. That ratio is the fingerprint of quadratic growth, and it is far more useful than any absolute number.</p>
+<p>The same loop built with <code>musl-gcc</code> finished under 5 milliseconds at every one of those sizes. Not a little faster. Four orders of magnitude faster, on the same machine, doing the same thing.</p>
+<h2>What I changed in my own build</h2>
+<p>I cross-compile Rust backend services and Dagango.com worker pipelines for Linux VPS and bare metal with <code>cargo-zigbuild</code>, for exactly the container-free reason above. Four changes came out of reading this:</p>
+<ol>
+<li><strong>Benchmark on the target libc, not the host.</strong> The perf test runs inside the same toolchain that produces the artifact, against the musl binary, not a native debug build.</li>
+<li><strong>Assert growth, not latency.</strong> Parse 1 MB and 4 MB in CI and check that the time ratio stays near 4x. Absolute timings flake on shared runners; a 16x ratio does not lie.</li>
+<li><strong>Treat a Zig version bump as a dependency change.</strong> Pin it, then require a bench run before the bump merges. <code>zig cc</code> is now a production dependency of the build, and it deserves the same scrutiny as a crate.</li>
+<li><strong>Keep one <code>musl-gcc</code> build around as a control.</strong> When a number moves, you need a second implementation to tell you whether the code changed or the toolchain did.</li>
+</ol>
+<p>None of that is exotic. It is the ordinary discipline you already apply to database drivers and allocators, applied to something we all quietly assumed was a boring linker flag.</p>
+<h2>An ABI is a performance contract too</h2>
+<p>Zig is rewriting libc, and Rust is rewriting coreutils, and both efforts are worth doing. But functional equivalence and a passing test suite are the easy half of the job.</p>
+<p>The hard half is that a C library is forty years of undocumented asymptotics. Callers wrote loops that depend on <code>strchr</code> stopping at the first hit. Nobody wrote that requirement down, because everybody already knew it, so it never made it into a test.</p>
+<p>If you are replacing a thirty-year-old primitive, "does it return the right value?" is the easy question. The one that matters is whether it still costs what callers assumed it costs. That second question has no compiler warning and no unit test. It only has a benchmark, and only if you remember to run it against the binary you actually ship.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

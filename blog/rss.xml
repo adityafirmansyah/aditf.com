@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Zig&#x27;s libc Rewrite Made SQLite 12,000x Slower. Your Tests Wouldn&#x27;t Catch It</title>
+      <link>https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/</guid>
+      <pubDate>Thu, 05 Nov 2026 00:00:00 +0000</pubDate>
+      <description>A cross-compiled Rust service lost 12,000x on SQLite inserts because Zig&#x27;s libc rewrite walked the whole string inside every strchr call. Local tests passed on macOS.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/zig-libc-sqlite-12000x-slowdown/id/"/>
+    </item>
+    <item>
       <title>What a Failed C++26 Ballot Says About Shipping to an Ecosystem</title>
       <link>https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/</link>
       <guid isPermaLink="true">https://aditf.com/blog/cpp26-ballot-failure-ecosystem-readiness/</guid>
@@ -176,15 +185,6 @@
       <description>Configure ProtectHome=yes, ProtectSystem=strict and IPAddressDeny=any on a systemd --user unit and systemctl show reports them all as active. On modern Ubuntu they fail open and enforce nothing.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/systemd-user-sandbox-fails-open/id/"/>
-    </item>
-    <item>
-      <title>The Multi-Agent Concurrency Bottleneck: Why Your Coding Fleet Locks Up</title>
-      <link>https://aditf.com/blog/multi-agent-concurrency-bottleneck/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/multi-agent-concurrency-bottleneck/</guid>
-      <pubDate>Wed, 14 Oct 2026 00:00:00 +0000</pubDate>
-      <description>Three coding agents on one repository stop failing on model quality. The failures become file locks, bound ports, and database races. Here is the isolation that fixes it.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/multi-agent-concurrency-bottleneck/id/"/>
     </item>
   </channel>
 </rss>
