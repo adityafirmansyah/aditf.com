@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Empat Dekade Workaround Defensif, Satu Bypass OpenSSH — Field Notes</title>
+<meta name="description" content="Di host Alpine tanpa PAM, password sepanjang 257 sampai 1024 karakter bisa membuka akun yang seharusnya terkunci. Enam perbaikan wajar selama 46 tahun yang membangun lubang itu.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Empat Dekade Workaround Defensif, Satu Bypass OpenSSH — Field Notes">
+<meta property="og:description" content="Di host Alpine tanpa PAM, password sepanjang 257 sampai 1024 karakter bisa membuka akun yang seharusnya terkunci. Enam perbaikan wajar selama 46 tahun yang membangun lubang itu.">
+<meta property="og:url" content="https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/openssh-musl-password-bypass-sshole/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Empat Dekade Workaround Defensif, Satu Bypass OpenSSH — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Empat Dekade Workaround Defensif, Satu Bypass OpenSSH — Field Notes">
+<meta name="twitter:description" content="Di host Alpine tanpa PAM, password sepanjang 257 sampai 1024 karakter bisa membuka akun yang seharusnya terkunci. Enam perbaikan wajar selama 46 tahun yang membangun lubang itu.">
+<meta name="twitter:image" content="https://aditf.com/blog/openssh-musl-password-bypass-sshole/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-11-06T00:00:00+00:00">
+<meta property="article:tag" content="openssh">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="musl">
+<meta property="article:tag" content="alpine">
+<meta property="article:tag" content="ai-agents">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Empat Dekade Workaround Defensif, Satu Bypass OpenSSH", "description": "Di host Alpine tanpa PAM, password sepanjang 257 sampai 1024 karakter bisa membuka akun yang seharusnya terkunci. Enam perbaikan wajar selama 46 tahun yang membangun lubang itu.", "datePublished": "2026-11-06T00:00:00+00:00", "dateModified": "2026-11-06T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/"}, "keywords": "openssh, security, musl, alpine, ai-agents", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1153, "image": ["https://aditf.com/blog/openssh-musl-password-bypass-sshole/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>06 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Empat Dekade Workaround Defensif, Satu Bypass OpenSSH</h1>
+    <div class="post__tags"><span>openssh</span><span>security</span><span>musl</span><span>alpine</span><span>ai-agents</span></div>
+    <div class="post__content reveal is-visible">
+<p>Di host Alpine yang gue pegang, password 300 karakter itu sama dengan bypass autentikasi. Bukan buffer overflow, bukan juga race condition.</p>
+<p>Yang dikirim cuma string <code>a</code> panjang ke akun yang field <code>/etc/shadow</code>-nya isinya <code>*</code>. Itu sudah cukup.</p>
+<p>Özgün Kültekin menamai bug ini *sshole, lalu menulis seluruh timeline-nya di sshhole.com dalam bentuk pelajaran sejarah. Menurut gue framing itu memang pas.</p>
+<p>Alasannya sederhana: nggak ada satu orang pun yang salah di sini.</p>
+<p>Enam keputusan defensif terpisah disambung selama puluhan tahun, dan tiap potongan jalan persis sesuai tujuan awalnya.</p>
+<p>Setiap lapisan itu benar kalau dilihat sendiri. Yang salah justru hasil akhirnya. Ini bukan cerita soal satu bug yang lolos review, tapi soal susunan yang nggak pernah dites bareng.</p>
+<h2>Enam keputusan, satu lubang</h2>
+<p>Urutannya begini, mengikuti kapan tiap potongan disambung:</p>
+<ul>
+<li>Tahun <strong>1980</strong>, Bill Joy nulis <code>*</code> di <code>/etc/passwd</code> buat akun <code>daemon</code>, supaya nggak ada password yang bisa cocok. Konvensi itu masih kepakai di <code>/etc/shadow</code> sampai sekarang.</li>
+<li>Tahun <strong>1997</strong>, Single Unix Specification mewajibkan <code>crypt()</code> membalikin NULL kalau gagal nge-hash. Banyak program nggak pernah ngecek, jadi ujungnya segfault, bukan login gagal.</li>
+<li><strong>Agustus 2012</strong>, commit musl <code>b3c4cc12</code> berhenti membalikin NULL. Kalau hashing gagal, hasilnya <code>"*"</code>, jadi pemanggil ceroboh tetap ditolak tanpa crash.</li>
+<li><strong>Dua puluh hari kemudian</strong>, commit <code>88bf5a8a</code> memasukkan SHA-512 crypt dengan batas keras 256 byte (<code>KEY_MAX</code>), supaya password kepanjangan nggak bikin CPU tetap sibuk.</li>
+<li>Tahun <strong>2016</strong>, <code>pick_salt()</code> masuk buat CVE-2016-6210. OpenSSH membocorkan keberadaan akun lewat selisih waktu <code>crypt()</code>, dan fix-nya nge-hash pakai salt pinjaman kalau akunnya nggak punya hash asli.</li>
+<li>Tahun <strong>2022</strong>, commit Alpine 3.16 <code>fbe926af</code> mengembalikan field root yang terkunci dari <code>!</code> ke <code>*</code>, karena tanpa pluggable authentication modules (PAM) tanda <code>!</code> juga mematikan login public key.</li>
+</ul>
+<p>Taruh keenamnya di satu garis waktu, tabrakannya kelihatan jelas. Nilai kegagalan musl itu <code>"*"</code>. Penanda akun terkunci di shadow juga <code>*</code>. Dan fix timing 2016 justru ada supaya <code>crypt()</code> tetap dijalankan buat akun yang nggak punya hash.</p>
+<h2>Perbandingan yang menentukan</h2>
+<p>Pengecekan password normal itu cuma tiga langkah:</p>
+<ul>
+<li>sshd ambil salt dari field yang tersimpan,</li>
+<li>password yang lo ketik di-hash pakai salt itu,</li>
+<li>hasilnya dibandingkan dengan isi field.</li>
+</ul>
+<p>Akun yang dikunci pakai <code>*</code> nggak punya salt sendiri. Jadi <code>pick_salt()</code> minjam salt dari user lain yang punya password asli.</p>
+<p>Bypass ini butuh ada akun lain yang punya password asli di mesin yang sama. Tanpa user ber-password asli, nggak ada salt yang bisa dipinjam.</p>
+<pre><code class="language-c">/* bentuk alurnya, bukan source literal */
+hash  = crypt(password, borrowed_salt);   /* musl: &quot;*&quot; kalau input &gt; 256 byte */
+match = strcmp(hash, shadow_field) == 0;  /* &quot;*&quot; vs &quot;*&quot; -&gt; 0, diterima */
+</code></pre>
+<p>Dua syarat harus ketemu bareng. Password yang dikirim harus lewat dari batas 256 byte musl, dan field shadow-nya harus persis <code>*</code>.</p>
+<p>Di demo browser Kültekin, rentang yang bisa dipakai 257 sampai 1024 karakter.</p>
+<h2>Separuh lainnya dari Alpine</h2>
+<p>Alpine bukan yang menciptakan field <code>*</code>, tapi mereka punya alasan bagus buat memakainya.</p>
+<p>Tahun 2019, CVE-2019-5021 membongkar image Docker yang ternyata nggak punya password root sama sekali. Alpine mengunci root pakai <code>!</code>, yang di sistem ber-PAM itu keputusan benar.</p>
+<p>Tanpa PAM, <code>!</code> juga menolak login public key buat akun itu. Image cloud masuk pakai key, jadi fix-nya malah merusak user sendiri.</p>
+<p>Alpine 3.16 mengganti field-nya ke <code>*</code>, dan key jalan lagi.</p>
+<p>Di image resmi Alpine untuk AWS dan Azure, user default <code>alpine</code> dapat <code>*</code> plus <code>doas</code> tanpa password. Jadi bypass ini nggak berhenti di shell user biasa. Berhentinya di root.</p>
+<h2>Sepuluh tahun nyaris</h2>
+<p>Kenapa lubang ini diam dari 2016 sampai 2026? Sebagian besar jawabannya soal siapa yang menguji apa.</p>
+<p>Test login OpenSSH jalan di OpenBSD dan glibc. Hampir semua distro melewatkan autentikasi password lewat PAM, yang sudah menolak <code>*</code> sebelum <code>crypt()</code> sempat dipanggil. musl nggak menguji sshd. sshd juga nggak menguji musl.</p>
+<p>Ada tiga orang yang sudah sangat dekat:</p>
+<ul>
+<li>Bug Debian #714219 tahun 2013 minta glibc meniru <code>"*"</code> punya musl. Enam tahun kemudian Debian pindah ke libxcrypt yang membalikin <code>"*0"</code>, dan laporannya ditutup. Selisih satu karakter.</li>
+<li>Thread di mailing list musl Desember 2024 melaporkan BusyBox <code>passwd</code> rusak kalau dikasih password 257 karakter. Sentinel-nya sama, batas 256 byte-nya sama, dan nggak ada yang menyebut sshd.</li>
+<li>Tanggal 30 Oktober 2026, sebuah security review menyentuh <code>pick_salt()</code> di OpenSSH. Bug-nya cuma empat baris di bawah perubahan itu, empat hari sebelum Kültekin menemukannya.</li>
+</ul>
+<h2>Embargo ikut mati di situ</h2>
+<p>Damien Miller mengumumkan 10.6p2 pada 5 November 2026, sehari setelah laporan masuk ke dia. Alasan yang dia tulis sendiri ternyata lebih panjang umurnya dari CVE-nya:</p>
+<blockquote>
+<p>We have recently observed multiple cases of rapid bug rediscovery by AI agents, sometimes within hours, and so now consider long embargo periods to be a dangerous practice that primarily benefits attackers.</p>
+</blockquote>
+<p>Di release notes, pesannya sama, cuma dengan suara proyek. Kalau bug temuan AI bisa ditemukan ulang secara independen oleh peneliti kedua, penyerang yang nggak pernah melapor pun kemungkinan besar bisa menemukannya juga.</p>
+<p>Soal penemuannya, ada satu detail menarik. Kültekin mem-build sshd dalam matriks libc, PAM, dan layout shadow, lalu menembakkan 17.600 percobaan login ke semua build itu. Hash rusak, akun cacat, password kepanjangan.</p>
+<p>Di situsnya dia bilang jelas: bagian repetitif itu dikerjakan agent swarm.</p>
+<p>Gue menjalankan fleet serupa buat runbook dan code review di Dagango.com. Jadi bagian itu bukan hal baru buat gue.</p>
+<h2>Yang gue ubah di host sendiri</h2>
+<p>Cakupan terdampak lebih sempit dari yang terdengar di judul berita. Distro glibc aman, dan apa pun yang lewat PAM juga aman. Tapi host musl tetap harus di-patch:</p>
+<pre><code class="language-bash"># Host Alpine dan musl lain: upgrade, lalu pastikan build-nya
+apk upgrade openssh
+apk list -I openssh   # harusnya openssh-10.6p2-*
+
+# Belum bisa patch sekarang? Matikan password auth sekalian.
+printf 'PasswordAuthentication no\n' &gt; /etc/ssh/sshd_config.d/00-no-passwords.conf
+rc-service sshd restart
+</code></pre>
+<p>Host yang dari awal pakai <code>PasswordAuthentication no</code> nggak pernah punya pintu buat dibuka. Baris itu kerja lebih keras dari yang kita kira.</p>
+<p>Buat triage, proyeknya menyediakan pengecek log di github.com/oz9un/sshole. Yang dicari tanda password diterima untuk akun yang seharusnya nggak punya password sama sekali.</p>
+<p>Satu hal yang gampang terlewat: <code>apk upgrade openssh</code> cuma berguna kalau repo image-nya hidup. Container yang di-build setahun lalu nggak akan pernah menyentuh paket ini. Buat itu, matikan password auth di image lalu rebuild.</p>
+<h2>Yang sebenarnya berubah</h2>
+<p>Gue nggak menaruh kasus ini di rak "masalah Alpine". Kegagalan yang menarik justru di antarmuka antara komponen.</p>
+<p>Konvensi penguncian di file teks dan sentinel error di libc sama-sama ide bagus. Cuma nggak ada satu pun yang dirancang sebagai batas autentikasi. Dan nggak ada bagian mana pun di stack yang dibangun buat menyadari dua nilai itu sudah jadi sama.</p>
+<p>Pelajaran operasionalnya lebih membosankan, tapi lebih berguna. Kalau upstream sekarang merilis emergency release dalam hitungan jam karena agent menemukan ulang bug secepat itu, ritme patch kita harus tahan.</p>
+<p>Jendela maintenance bulanan itu taruhan bahwa jarak antara disclosure dan eksploitasi masih diukur dalam bulan.</p>
+<p>Di host yang gue pegang, taruhan itu berhenti murah minggu ini.</p>
+<p>Jadi catat daftar host terdampak sebelum lo butuh daftarnya. Punya gue masih berupa shell history, dan itu bukan inventaris.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
