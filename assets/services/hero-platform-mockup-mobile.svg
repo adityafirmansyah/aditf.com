@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 390 560" width="390" height="560" fill="none">
+  <defs>
+    <clipPath id="mClip"><rect x="0" y="0" width="390" height="560" rx="14"/></clipPath>
+  </defs>
+  <g clip-path="url(#mClip)">
+    <rect width="390" height="560" rx="14" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+
+    <!-- header -->
+    <rect width="390" height="44" fill="#F8FAFC"/>
+    <line x1="0" y1="44" x2="390" y2="44" stroke="#E2E8F0"/>
+    <circle cx="20" cy="22" r="4" fill="#EF4444"/>
+    <circle cx="34" cy="22" r="4" fill="#F59E0B"/>
+    <circle cx="48" cy="22" r="4" fill="#10B981"/>
+    <rect x="66" y="11" width="204" height="22" rx="5" fill="#FFFFFF" stroke="#E2E8F0"/>
+    <text x="78" y="26" font-family="Geist Mono, monospace" font-size="10" fill="#475569">core/telemetry</text>
+    <rect x="280" y="11" width="94" height="22" rx="5" fill="#ECFDF5" stroke="#A7F3D0"/>
+    <circle cx="292" cy="22" r="3" fill="#059669"/>
+    <text x="301" y="26" font-family="Geist, sans-serif" font-size="9" font-weight="600" fill="#065F46">HEALTHY</text>
+
+    <!-- metric cards -->
+    <g transform="translate(16, 60)">
+      <rect width="172" height="72" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="14" y="24" font-family="Geist, sans-serif" font-size="10" font-weight="500" fill="#64748B">Edge response p99</text>
+      <text x="14" y="52" font-family="Geist, sans-serif" font-size="22" font-weight="600" fill="#0F172A">34.2 ms</text>
+      <rect x="120" y="14" width="38" height="16" rx="4" fill="#ECFDF5"/>
+      <text x="126" y="26" font-family="Geist Mono, monospace" font-size="9" font-weight="600" fill="#059669">-18%</text>
+    </g>
+
+    <g transform="translate(202, 60)">
+      <rect width="172" height="72" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="14" y="24" font-family="Geist, sans-serif" font-size="10" font-weight="500" fill="#64748B">Availability SLA</text>
+      <text x="14" y="52" font-family="Geist, sans-serif" font-size="22" font-weight="600" fill="#059669">99.98%</text>
+      <rect x="126" y="14" width="32" height="16" rx="4" fill="#EFF6FF"/>
+      <text x="133" y="26" font-family="Geist Mono, monospace" font-size="9" font-weight="600" fill="#2563EB">30D</text>
+    </g>
+
+    <!-- chart card -->
+    <g transform="translate(16, 144)">
+      <rect width="358" height="176" rx="10" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="16" y="26" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Request latency</text>
+      <text x="16" y="42" font-family="Geist, sans-serif" font-size="10" fill="#64748B">20,000 SKU catalogue, edge routed</text>
+
+      <line x1="16" y1="62" x2="342" y2="62" stroke="#F1F5F9"/>
+      <line x1="16" y1="96" x2="342" y2="96" stroke="#F1F5F9"/>
+      <line x1="16" y1="130" x2="342" y2="130" stroke="#F1F5F9"/>
+      <line x1="16" y1="150" x2="342" y2="150" stroke="#F1F5F9"/>
+
+      <path d="M 20 138 Q 60 118 100 127 T 180 108 T 260 118 T 330 96 L 330 150 L 20 150 Z" fill="#EFF6FF" opacity="0.7"/>
+      <path d="M 20 138 Q 60 118 100 127 T 180 108 T 260 118 T 330 96" stroke="#2563EB" stroke-width="2.4" fill="none"/>
+      <line x1="20" y1="112" x2="330" y2="112" stroke="#059669" stroke-width="1.2" stroke-dasharray="4 4"/>
+      <rect x="232" y="70" width="106" height="18" rx="4" fill="#ECFDF5" stroke="#A7F3D0"/>
+      <text x="240" y="83" font-family="Geist Mono, monospace" font-size="9" font-weight="600" fill="#065F46">SLO under 50 ms</text>
+    </g>
+
+    <!-- services list -->
+    <g transform="translate(16, 336)">
+      <rect width="358" height="96" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="16" y="24" font-family="Geist, sans-serif" font-size="10" font-weight="600" letter-spacing="0.06em" fill="#94A3B8">CLUSTER SERVICES</text>
+      <circle cx="22" cy="42" r="3" fill="#2563EB"/>
+      <text x="34" y="46" font-family="Geist, sans-serif" font-size="12" font-weight="500" fill="#0F172A">api-edge-gateway</text>
+      <text x="300" y="46" font-family="Geist Mono, monospace" font-size="10" fill="#2563EB">200</text>
+      <circle cx="22" cy="62" r="3" fill="#10B981"/>
+      <text x="34" y="66" font-family="Geist, sans-serif" font-size="12" fill="#475569">db-primary-pg16</text>
+      <text x="300" y="66" font-family="Geist Mono, monospace" font-size="10" fill="#059669">0.8ms</text>
+      <circle cx="22" cy="82" r="3" fill="#10B981"/>
+      <text x="34" y="86" font-family="Geist, sans-serif" font-size="12" fill="#475569">cache-redis-shard1</text>
+      <text x="300" y="86" font-family="Geist Mono, monospace" font-size="10" fill="#059669">0.3ms</text>
+    </g>
+
+    <!-- code block -->
+    <g transform="translate(16, 448)">
+      <rect width="358" height="96" rx="10" fill="#F8FAFC" stroke="#E2E8F0"/>
+      <text x="14" y="22" font-family="Geist Mono, monospace" font-size="10" fill="#64748B">tenant_router.ts</text>
+      <line x1="0" y1="32" x2="358" y2="32" stroke="#E2E8F0"/>
+      <text x="14" y="50" font-family="Geist Mono, monospace" font-size="10" fill="#2563EB">export async function</text>
+      <text x="14" y="66" font-family="Geist Mono, monospace" font-size="10" fill="#0F172A">resolveTenant(host) {</text>
+      <text x="24" y="82" font-family="Geist Mono, monospace" font-size="10" fill="#475569">return redis.get(host) ?? db.tenants</text>
+    </g>
+  </g>
+</svg>

@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 900" width="400" height="900" fill="none">
+  <g transform="translate(0, 0)">
+    <rect width="400" height="440" rx="14" fill="#F8FAFC" stroke="#E2E8F0" stroke-width="1.5"/>
+    <rect x="18" y="18" width="150" height="22" rx="5" fill="#FEE2E2"/>
+    <text x="28" y="34" font-family="Geist, sans-serif" font-size="10" font-weight="600" letter-spacing="0.05em" fill="#B91C1C">TRADITIONAL AGENCY</text>
+    <text x="18" y="66" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#0F172A">Four layers to the code</text>
+
+    <g font-family="Geist, sans-serif">
+      <rect x="18" y="82" width="364" height="66" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="30" y="104" font-size="11" font-weight="600" fill="#0F172A">Client brief</text>
+      <text x="30" y="122" font-size="10" fill="#64748B">Requirements re explained three times</text>
+      <text x="30" y="138" font-size="10" fill="#94A3B8">Day 1</text>
+
+      <rect x="18" y="158" width="364" height="66" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="30" y="180" font-size="11" font-weight="600" fill="#0F172A">Account manager translates</text>
+      <text x="30" y="198" font-size="10" fill="#64748B">Scope drifts, no technical review</text>
+      <text x="30" y="214" font-size="10" fill="#94A3B8">Day 4</text>
+
+      <rect x="18" y="234" width="364" height="66" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="30" y="256" font-size="11" font-weight="600" fill="#0F172A">Junior builds from the ticket</text>
+      <text x="30" y="274" font-size="10" fill="#64748B">No architecture owner in the room</text>
+      <text x="30" y="290" font-size="10" fill="#94A3B8">Week 3</text>
+
+      <rect x="18" y="310" width="364" height="66" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="30" y="332" font-size="11" font-weight="600" fill="#0F172A">Offshore QA signs the handoff</text>
+      <text x="30" y="350" font-size="10" fill="#64748B">Knowledge leaves with the contract</text>
+      <text x="30" y="366" font-size="10" fill="#94A3B8">Week 12</text>
+    </g>
+
+    <rect x="18" y="390" width="364" height="34" rx="8" fill="#FEF2F2" stroke="#FECACA"/>
+    <text x="30" y="411" font-family="Geist Mono, monospace" font-size="10" fill="#7F1D1D">Senior rate × 3.0 overhead</text>
+  </g>
+
+  <g transform="translate(0, 460)">
+    <rect width="400" height="440" rx="14" fill="#FFFFFF" stroke="#2563EB" stroke-width="1.5"/>
+    <rect x="18" y="18" width="160" height="22" rx="5" fill="#EFF6FF"/>
+    <text x="28" y="34" font-family="Geist, sans-serif" font-size="10" font-weight="600" letter-spacing="0.05em" fill="#1D4ED8">DIRECT ARCHITECT</text>
+    <text x="18" y="66" font-family="Geist, sans-serif" font-size="13" font-weight="600" fill="#0F172A">One line, one owner</text>
+
+    <g font-family="Geist, sans-serif">
+      <rect x="18" y="82" width="364" height="66" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="30" y="104" font-size="11" font-weight="600" fill="#0F172A">You brief the architect</text>
+      <text x="30" y="122" font-size="10" fill="#64748B">Constraints, traffic profile, deadline</text>
+      <text x="30" y="138" font-size="10" fill="#2563EB">Day 0</text>
+
+      <rect x="18" y="158" width="364" height="66" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="30" y="180" font-size="11" font-weight="600" fill="#0F172A">Schema and milestones in writing</text>
+      <text x="30" y="198" font-size="10" fill="#64748B">Database DDL, API contract, sprint dates</text>
+      <text x="30" y="214" font-size="10" fill="#2563EB">Day 1</text>
+
+      <rect x="18" y="234" width="364" height="66" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="30" y="256" font-size="11" font-weight="600" fill="#0F172A">Architect builds and reviews</text>
+      <text x="30" y="274" font-size="10" fill="#64748B">Staging deployed as milestones close</text>
+      <text x="30" y="290" font-size="10" fill="#2563EB">Day 14</text>
+
+      <rect x="18" y="310" width="364" height="66" rx="8" fill="#FFFFFF" stroke="#E2E8F0"/>
+      <text x="30" y="332" font-size="11" font-weight="600" fill="#0F172A">Repository and keys transfer</text>
+      <text x="30" y="350" font-size="10" fill="#64748B">Full history, no proprietary lock in</text>
+      <text x="30" y="366" font-size="10" fill="#2563EB">Day 21</text>
+    </g>
+
+    <rect x="18" y="390" width="364" height="34" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/>
+    <text x="30" y="411" font-family="Geist Mono, monospace" font-size="10" fill="#047857">One senior rate, zero tax</text>
+  </g>
+</svg>

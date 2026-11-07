@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 520 420" width="520" height="420" fill="none">
+  <defs>
+    <marker id="flowA" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#2563EB"/>
+    </marker>
+    <marker id="flowG" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1 L 9 5 L 0 9 z" fill="#059669"/>
+    </marker>
+  </defs>
+  <rect width="520" height="420" rx="12" fill="#FFFFFF" stroke="#E2E8F0" stroke-width="1.5"/>
+
+  <text x="20" y="30" font-family="Geist Mono, monospace" font-size="12" letter-spacing="0.05em" fill="#94A3B8">CHECKOUT STATE MACHINE</text>
+  <line x1="20" y1="42" x2="500" y2="42" stroke="#E2E8F0"/>
+
+  <!-- line items -->
+  <g transform="translate(20, 58)">
+    <rect width="230" height="70" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="24" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Cart priced</text>
+    <text x="12" y="42" font-family="Geist Mono, monospace" font-size="12" fill="#475569">stock reserved for 10m</text>
+    <text x="12" y="60" font-family="Geist Mono, monospace" font-size="12" fill="#2563EB">12ms</text>
+  </g>
+
+  <line x1="252" y1="94" x2="286" y2="94" stroke="#2563EB" stroke-width="1.4" marker-end="url(#flowA)"/>
+
+  <g transform="translate(290, 58)">
+    <rect width="210" height="70" rx="8" fill="#EFF6FF" stroke="#BFDBFE"/>
+    <text x="12" y="24" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#1D4ED8">Payment intent</text>
+    <text x="12" y="42" font-family="Geist Mono, monospace" font-size="12" fill="#475569">QRIS · Midtrans · Stripe</text>
+    <text x="12" y="60" font-family="Geist Mono, monospace" font-size="12" fill="#2563EB">41ms</text>
+  </g>
+
+  <line x1="395" y1="130" x2="395" y2="160" stroke="#2563EB" stroke-width="1.4" marker-end="url(#flowA)"/>
+
+  <!-- webhook + ledger -->
+  <g transform="translate(290, 164)">
+    <rect width="210" height="82" rx="8" fill="#FFFFFF" stroke="#CBD5E1"/>
+    <text x="12" y="24" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Webhook handler</text>
+    <text x="12" y="42" font-family="Geist Mono, monospace" font-size="12" fill="#475569">idempotency key checked</text>
+    <text x="12" y="60" font-family="Geist Mono, monospace" font-size="12" fill="#475569">duplicate retries ignored</text>
+    <text x="12" y="78" font-family="Geist Mono, monospace" font-size="12" fill="#059669">0 double charges</text>
+  </g>
+
+  <line x1="290" y1="205" x2="256" y2="205" stroke="#059669" stroke-width="1.4" marker-end="url(#flowG)"/>
+
+  <g transform="translate(20, 164)">
+    <rect width="230" height="82" rx="8" fill="#ECFDF5" stroke="#A7F3D0"/>
+    <text x="12" y="24" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#065F46">Order confirmed</text>
+    <text x="12" y="42" font-family="Geist Mono, monospace" font-size="12" fill="#047857">stock decremented once</text>
+    <text x="12" y="60" font-family="Geist Mono, monospace" font-size="12" fill="#047857">receipt queued</text>
+    <text x="12" y="78" font-family="Geist Mono, monospace" font-size="12" fill="#047857">event replayable</text>
+  </g>
+
+  <line x1="135" y1="246" x2="135" y2="278" stroke="#94A3B8" stroke-width="1.2" stroke-dasharray="4 4"/>
+
+  <!-- failure branch -->
+  <g transform="translate(20, 282)">
+    <rect width="480" height="52" rx="8" fill="#F8FAFC" stroke="#E2E8F0"/>
+    <text x="14" y="22" font-family="Geist, sans-serif" font-size="12" font-weight="600" fill="#0F172A">Failure branch: stock released, cart preserved, buyer retried once</text>
+    <text x="14" y="40" font-family="Geist Mono, monospace" font-size="12" fill="#64748B">no orphaned reservations, no silent charge</text>
+  </g>
+
+  <!-- results -->
+  <g transform="translate(20, 346)">
+    <text x="0" y="18" font-family="Geist Mono, monospace" font-size="12" fill="#475569">20,000 SKU catalog · 60ms p99 read · 900 orders/day verified</text>
+    <text x="0" y="40" font-family="Geist Mono, monospace" font-size="12" fill="#94A3B8">replay ledger keyed on (order_id, event_id)</text>
+  </g>
+</svg>
