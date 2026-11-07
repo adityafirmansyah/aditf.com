@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Claude Code Leaked Your Email Because a Website Asked Politely</title>
+      <link>https://aditf.com/blog/claude-code-user-agent-email-leak/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/claude-code-user-agent-email-leak/</guid>
+      <pubDate>Sat, 07 Nov 2026 00:00:00 +0000</pubDate>
+      <description>A site asked for a contact address, and the agent handed over a real Gmail from its context window. The fix shows why a regex hook is not a security boundary.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/claude-code-user-agent-email-leak/id/"/>
+    </item>
+    <item>
       <title>Four Decades of Defensive Workarounds, One OpenSSH Bypass</title>
       <link>https://aditf.com/blog/openssh-musl-password-bypass-sshole/</link>
       <guid isPermaLink="true">https://aditf.com/blog/openssh-musl-password-bypass-sshole/</guid>
@@ -176,15 +185,6 @@
       <description>Anthropic merges 30,000 changes daily by having AI review AI with zero human sign-off. But machine-only reviews turn immediate architectural alignment into delayed production regressions.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/the-30000-pr-illusion/id/"/>
-    </item>
-    <item>
-      <title>Why I Built mycv.ai.id: How AI Resume Tools Silently Strip Technical Depth and Hallucinate Dates</title>
-      <link>https://aditf.com/blog/why-i-built-mycv-ai-id/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/why-i-built-mycv-ai-id/</guid>
-      <pubDate>Fri, 16 Oct 2026 00:00:00 +0000</pubDate>
-      <description>Standard AI resume builders quietly strip concrete tech stacks into corporate fluff and hallucinate that 2026 dates are from the future. Here is how I engineered mycv.ai.id to stop them.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/why-i-built-mycv-ai-id/id/"/>
     </item>
   </channel>
 </rss>
