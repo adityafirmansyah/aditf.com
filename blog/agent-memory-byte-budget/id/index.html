@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Memori Agent Nggak Butuh Skema, Butuh Plafon Byte — Field Notes</title>
+<meta name="description" content="Standarisasi format memori agent menyelesaikan lapisan yang salah. Yang bikin model bodoh itu store yang nggak pernah membuang apa pun, dan plafon byte plus skills on-demand lebih ampuh daripada skema bersama.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/agent-memory-byte-budget/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Memori Agent Nggak Butuh Skema, Butuh Plafon Byte — Field Notes">
+<meta property="og:description" content="Standarisasi format memori agent menyelesaikan lapisan yang salah. Yang bikin model bodoh itu store yang nggak pernah membuang apa pun, dan plafon byte plus skills on-demand lebih ampuh daripada skema bersama.">
+<meta property="og:url" content="https://aditf.com/blog/agent-memory-byte-budget/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/agent-memory-byte-budget/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Memori Agent Nggak Butuh Skema, Butuh Plafon Byte — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Memori Agent Nggak Butuh Skema, Butuh Plafon Byte — Field Notes">
+<meta name="twitter:description" content="Standarisasi format memori agent menyelesaikan lapisan yang salah. Yang bikin model bodoh itu store yang nggak pernah membuang apa pun, dan plafon byte plus skills on-demand lebih ampuh daripada skema bersama.">
+<meta name="twitter:image" content="https://aditf.com/blog/agent-memory-byte-budget/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-11-09T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="llm-tooling">
+<meta property="article:tag" content="system-architecture">
+<meta property="article:tag" content="devops">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Memori Agent Nggak Butuh Skema, Butuh Plafon Byte", "description": "Standarisasi format memori agent menyelesaikan lapisan yang salah. Yang bikin model bodoh itu store yang nggak pernah membuang apa pun, dan plafon byte plus skills on-demand lebih ampuh daripada skema bersama.", "datePublished": "2026-11-09T00:00:00+00:00", "dateModified": "2026-11-09T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/agent-memory-byte-budget/id/"}, "keywords": "ai-agents, llm-tooling, system-architecture, devops", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1125, "image": ["https://aditf.com/blog/agent-memory-byte-budget/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/agent-memory-byte-budget/", "inLanguage": "en-US"}}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/agent-memory-byte-budget/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/agent-memory-byte-budget/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/agent-memory-byte-budget/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>09 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Memori Agent Nggak Butuh Skema, Butuh Plafon Byte</h1>
+    <div class="post__tags"><span>ai-agents</span><span>llm-tooling</span><span>system-architecture</span><span>devops</span></div>
+    <div class="post__content reveal is-visible">
+<p>Memori agent itu butuh momen OpenTelemetry-nya. Itu argumen Mads Thines di tulisan yang terbit 7 November 2026.</p>
+<p>Dia memetakan sembilan format yang nggak bisa saling baca, lalu menarik paralel ke observability pra-2019.</p>
+<p>Diagnosisnya benar.</p>
+<p>Resepnya nyasar ke lapisan yang salah. Yang bikin orang ngamuk soal memori agent itu sebagian besar soal eviction, bukan soal serialisasi.</p>
+<p>Agent nulis satu keputusan debugging yang cuma berlaku seminggu, store-nya nggak pernah lupa, terus sesi berikutnya baca balik sebagai aturan tetap. Itu bisa lo hentikan malam ini juga pakai plafon byte. Skema bersama cuma menyeragamkan bentuk kekacauannya.</p>
+<h2>Yang sebenarnya disepakati OpenTelemetry</h2>
+<p>Bagian paling berguna dari tulisan itu justru tabelnya. Sembilan keluarga memori diurutkan, dari file Markdown di path tetap sampai graph dengan dua timeline. Baca kolom Forgetting:</p>
+<pre><code>format                        unit memori                   lupa kapan
+AGENTS.md / CLAUDE.md         satu file Markdown utuh       nggak pernah, diedit manusia
+memory tool Anthropic         file di bawah /memories       hanya kalau model menghapusnya
+Copilot Memory                fakta plus sitasi kode        28 hari nggak dipakai
+Letta core memory             block berlabel, ada batas     nggak pernah
+Mem0                          fakta hasil ekstraksi         tanggal kedaluwarsa opsional
+LangGraph BaseStore           nilai JSON di namespace+key   TTL opsional
+MCP reference memory server   entitas dan relasi            nggak pernah
+Graphiti / Zep                fakta di edge graph           di-invalidate, bukan dihapus
+LoreKit                       record dengan scope dan key   hanya kalau TTL dipasang
+</code></pre>
+<p>Empat dari sembilan punya mekanisme kedaluwarsa, permanen atau opsional. Yang kelima, Graphiti, membatalkan fakta tanpa menghapusnya. Sisanya empat lagi nggak pernah lupa, kecuali ada manusia atau model yang balik dan mencabut entrinya satu per satu.</p>
+<p>OpenTelemetry dulu menyepakati empat lapisan: data model, semantic conventions, protokol wire, dan SDK referensi. Vendor tetap bersaing di storage dan query. Data model-nya yang berhasil, dan alasannya nggak keren sama sekali.</p>
+<p>Span dibaca mesin yang mengindeksnya, sementara catatan memori dibaca oleh atensi model. Jadi setiap token metadata tambahan itu langsung memakan jatah buat bernalar.</p>
+<h2>Keluhannya sebenarnya soal eviction</h2>
+<p>Thread Hacker News-nya sampai 105 komentar, dan isinya soal operasional semua. Nggak ada yang berdebat soal estetika.</p>
+<p><code>slopinthebag</code> yang buka suara: "at this point i'm pretty convinced agent memory is strictly harmful. it remembers the wrong things, and then turns them into an inane focus for each task."</p>
+<p><code>SwellJoe</code> setuju: "Everybody builds one, and then eventually realizes it makes the model stupid and confused."</p>
+<p><code>Kwpolska</code> yang paling jelas menyebut mekanismenya. Claude Code sering nulis keputusan sekali pakai dan masalah sesaat ke memori, terus sesi berikutnya bertindak berdasarkan konteks yang sebenarnya nggak pernah berlaku umum.</p>
+<p><code>nonethewiser</code> nyebut efeknya confirmation bias, dan menaksir catatan yang nggak pernah ditinjau itu paling banter 90% benar.</p>
+<p>Nggak ada satu pun dari mereka yang minta wire format. Semuanya lagi mendeskripsikan satu entri yang seharusnya sudah dibuang tapi masih hidup.</p>
+<h2>Anthropic kasih angkanya</h2>
+<p>Tulisan riset Anthropic soal komponen memori agent cukup blak-blakan: "Injected memories use up valuable tokens, and an incorrect note can be carried into every session."</p>
+<p>Di bagian yang sama mereka nambahin satu hal yang sering dilewatkan. Catatan yang berhasil dimuat belum tentu dipatuhi, karena file instruksi yang makin panjang justru menurunkan tingkat kepatuhan model.</p>
+<p>Mitigasinya ada di dalam produk. Claude Code cuma memuat 200 baris pertama atau 25 KB dari MEMORY.md. <code>troupo</code> mengutip batas itu di thread buat nunjukin bahwa file-file ini lebih sering diabaikan daripada dipatuhi.</p>
+<p>Dua mode kegagalan, satu obat: jaga lapisan yang di-inject tetap kecil.</p>
+<h2>Tiga tingkat di satu mesin</h2>
+<p>Fleet gue jalan di sembilan belas profil agent di mesin ini, dengan 1.392 file SKILL.md, antara 58 sampai 166 per profil. Tiga belas dari sembilan belas juga punya <code>memories/MEMORY.md</code>. Ukurannya dari 594 byte di viral-researcher sampai 8.985 byte di cto, dan store profil root ada di 9.040 byte.</p>
+<p>Konteksnya dibagi tiga tingkat:</p>
+<pre><code>SOUL.md              identitas dan aturan keras, dimuat tiap sesi
+skills/**/SKILL.md   runbook prosedural, dimuat saat trigger cocok
+memories/MEMORY.md   fakta, dibatasi dan dikonsolidasi saat ditulis
+</code></pre>
+<p>Yang menahan semuanya ya plafonnya. Bukan skemanya dan bukan nama field-nya.</p>
+<p>Kalau store penuh, penulisan gagal. Agent jadi harus mengonsolidasi atau menghapus dulu sebelum bisa menambah apa pun. Tiga profil di sini pasang batas eksplisit 6.000 atau 9.000 karakter. Sisanya jalan di default 2.200 karakter.</p>
+<p>Di 2.200 karakter, kosakata satu sesi cepat habis. Itu justru intinya. Model dipaksa memutuskan apa yang layak bertahan, dan keputusan itu diambil selagi tugasnya masih ada di depan mata.</p>
+<p>Satu efek samping yang nggak kelihatan dari luar: penuh itu nggak terasa sampai ada penambahan yang ditolak. Di titik itu isi store-nya dikirim balik utuh ke agent. Pilihannya cuma dua, dan dua-duanya nggak nyaman: rapikan sekarang atau nggak menyimpan apa pun sama sekali.</p>
+<p>Menurut gue justru momen dipaksa itu yang bikin kualitasnya naik. Selama store masih longgar, agent bakal hafal semua hal sepele karena nggak ada biaya untuk itu.</p>
+<h2>Plafon byte lebih penting daripada metadata</h2>
+<p>Record LoreKit menambahkan persis field yang dibutuhkan format bersama: address, key, lifecycle, dan written_by.</p>
+<p>written_by ide paling tajam di proposal itu. Pembaca jadi bisa menimbang sebuah catatan dari siapa yang menulisnya, dan fakta hasil ekstraksi service jelas lebih lemah daripada direktif yang diketik manusia.</p>
+<p>Masalahnya, metadata nggak bisa mengeksekusi apa pun. Record yang mendeklarasikan tanggal kedaluwarsa tetap butuh sesuatu yang menegakkan tanggal itu. Nggak ada format yang bisa memutuskan sendiri bahwa shortcut debugging bulan lalu sudah nggak berlaku.</p>
+<p>Plafon byte memaksa penilaian itu terjadi di saat penulisan. Itu satu-satunya momen ketika konteksnya masih utuh di depan model.</p>
+<p>Tapi plafon juga bukan pengganti kurasi manual. Sesekali file-file ini tetap harus dibuka dan dibaca dari atas ke bawah oleh manusia, bukan cuma dipercaya ke agent yang menulisnya.</p>
+<p>Kalau nggak pernah dibuka, agent cuma mengonsolidasi isi yang sudah salah sejak awal, dan hasilnya sampah yang lebih rapi. Rapi tapi tetap salah.</p>
+<p>Bagian ini yang paling susah dijual sebagai fitur, karena nggak bisa diotomatiskan penuh.</p>
+<h2>Yang gue ambil sekarang, standar atau belum</h2>
+<p>Ada tiga bagian proposal yang layak dibangun dari sekarang:</p>
+<ul>
+<li>Konvensi untuk level address dan namespace atribut, supaya dua tool bisa mendeskripsikan repo yang sama tanpa lapisan penerjemah.</li>
+<li>Conformance test sebagai pengganti implementasi referensi, karena test suite tetap hidup walau lapisan storage-nya ditulis ulang.</li>
+<li>Live addressing antar tool yang jalan bersamaan, bagian yang lebih sulit dan yang paling sering dilewatkan proposal yang sudah ada.</li>
+</ul>
+<p>Soal poin ketiga, karya yang ada sekarang jujur soal cakupannya. Bundle <code>.mem</code> dari MacPaw, draft Open Memory Protocol, dan COGX dari Cognee semuanya fokus di export: memindahkan memori satu orang dari vendor A ke vendor B. CI job, editor agent, dan review bot yang baca record yang sama di waktu bersamaan masih belum ada jawabannya.</p>
+<p>Jadi seragamkan kosakatanya, jangan storage-nya. Pasang plafon byte untuk apa pun yang di-inject ke tiap sesi, dan pindahkan prosedur ke file yang baru dimuat saat trigger-nya kena.</p>
+<p>Format memori yang nggak punya jalur lupa itu ya format yang mengirim context rot sebagai bawaan. Menurut gue itu yang perlu distandarkan lebih dulu, sebelum kita sibuk sepakat soal nama field. 😅</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/agent-memory-byte-budget/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

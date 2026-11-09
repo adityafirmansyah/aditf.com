@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agent Memory Doesn&#x27;t Need a Schema, It Needs a Byte Budget — Field Notes</title>
+<meta name="description" content="The push to standardize agent memory fixes the wrong layer. What actually degrades models is a store that never evicts, and a byte ceiling plus on-demand skills fixes it.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/agent-memory-byte-budget/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Agent Memory Doesn&#x27;t Need a Schema, It Needs a Byte Budget — Field Notes">
+<meta property="og:description" content="The push to standardize agent memory fixes the wrong layer. What actually degrades models is a store that never evicts, and a byte ceiling plus on-demand skills fixes it.">
+<meta property="og:url" content="https://aditf.com/blog/agent-memory-byte-budget/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/agent-memory-byte-budget/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Agent Memory Doesn&#x27;t Need a Schema, It Needs a Byte Budget — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Agent Memory Doesn&#x27;t Need a Schema, It Needs a Byte Budget — Field Notes">
+<meta name="twitter:description" content="The push to standardize agent memory fixes the wrong layer. What actually degrades models is a store that never evicts, and a byte ceiling plus on-demand skills fixes it.">
+<meta name="twitter:image" content="https://aditf.com/blog/agent-memory-byte-budget/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta property="article:published_time" content="2026-11-09T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="llm-tooling">
+<meta property="article:tag" content="system-architecture">
+<meta property="article:tag" content="devops">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Agent Memory Doesn't Need a Schema, It Needs a Byte Budget", "description": "The push to standardize agent memory fixes the wrong layer. What actually degrades models is a store that never evicts, and a byte ceiling plus on-demand skills fixes it.", "datePublished": "2026-11-09T00:00:00+00:00", "dateModified": "2026-11-09T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/agent-memory-byte-budget/"}, "keywords": "ai-agents, llm-tooling, system-architecture, devops", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1076, "image": ["https://aditf.com/blog/agent-memory-byte-budget/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/agent-memory-byte-budget/id/", "inLanguage": "id-ID"}}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/agent-memory-byte-budget/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/agent-memory-byte-budget/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/agent-memory-byte-budget/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>09 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Agent Memory Doesn&#x27;t Need a Schema, It Needs a Byte Budget</h1>
+    <div class="post__tags"><span>ai-agents</span><span>llm-tooling</span><span>system-architecture</span><span>devops</span></div>
+    <div class="post__content reveal is-visible">
+<p>On November 7, 2026, Mads Thines published the case for giving agent memory its OpenTelemetry moment. Nine memory formats, none of them readable by the others, and a 2019 precedent that fixed exactly this kind of fragmentation. The diagnosis lands.</p>
+<p>The prescription aims one layer too high. What developers complain about is mostly eviction, not serialization.</p>
+<p>An agent writes a transient debugging decision into a store that never forgets, then reads it back in every later session as a standing rule. You can stop that tonight with a byte ceiling. A shared schema only standardizes the shape of the mess.</p>
+<h2>What OpenTelemetry actually agreed on</h2>
+<p>The comparison table is the most useful part of the post. It sorts nine families of memory, from a Markdown file at a known path to a graph with two timelines. Read the Forget column:</p>
+<pre><code>format                        unit of memory                forgetting
+AGENTS.md / CLAUDE.md         whole Markdown file           never, a person edits it
+Anthropic memory tool         file under /memories          only if the model deletes it
+Copilot Memory                fact plus code citations      28 days unused
+Letta core memory             labelled block, char limit    never
+Mem0                          extracted fact                optional expiry date
+LangGraph BaseStore           JSON value at namespace+key   optional TTL
+MCP reference memory server   entities and relations        never
+Graphiti / Zep                fact on a graph edge          invalidated, not deleted
+LoreKit                       record with scope and key     only if a TTL is set
+</code></pre>
+<p>Four of the nine carry a built-in or optional expiry, and a fifth, Graphiti, invalidates facts instead of deleting them. The remaining four never forget unless a person or the model goes back and removes an entry one at a time.</p>
+<p>OpenTelemetry's shared layers were a data model, semantic conventions, a wire protocol, and reference SDKs. Vendors kept competing on storage and query.</p>
+<p>The data model was the part that worked, and the reason is unglamorous. A span gets consumed by a machine that indexes it. A memory note gets consumed by attention, so every token of envelope competes with reasoning.</p>
+<h2>The complainers are describing eviction</h2>
+<p>The Hacker News thread ran 105 comments, and the objections were operational rather than aesthetic. The comment from <code>slopinthebag</code> states the charge plainly: "at this point i'm pretty convinced agent memory is strictly harmful. it remembers the wrong things, and then turns them into an inane focus for each task."</p>
+<p><code>SwellJoe</code> said the same thing: "Everybody builds one, and then eventually realizes it makes the model stupid and confused."</p>
+<p><code>Kwpolska</code> named the mechanism. Claude Code writes one-off decisions and transient problems into memory, and later sessions then act on context that never held in general. <code>nonethewiser</code> called the effect confirmation bias, and estimated that an unvetted note is at most 90% correct.</p>
+<p>Not one of those comments asks for a wire format. Each one describes an entry that should have been deleted and survived.</p>
+<h2>Anthropic put a number on it</h2>
+<p>Anthropic's research writeup on agent memory components is blunt about injection: "Injected memories use up valuable tokens, and an incorrect note can be carried into every session."</p>
+<p>The same section adds that loading a note does not guarantee the model acts on it, because longer instruction files reduce adherence.</p>
+<p>Claude Code's mitigation lives inside the product. It loads only the first 200 lines or 25 KB of MEMORY.md. <code>troupo</code> quoted that cap in the thread to argue that these files are often ignored rather than obeyed.</p>
+<p>Two failure modes, one fix: keep the injected layer small.</p>
+<h2>Three tiers on one box</h2>
+<p>My fleet runs nineteen agent profiles on this machine, with 1,392 SKILL.md files between them, 58 to 166 per profile. Thirteen of the nineteen also carry a <code>memories/MEMORY.md</code>. Those files run from 594 bytes on viral-researcher to 8,985 bytes on cto. The root profile's store sits at 9,040 bytes.</p>
+<p>Context splits into three tiers:</p>
+<pre><code>SOUL.md              identity and hard rules, loaded every session
+skills/**/SKILL.md   procedural runbooks, loaded on a trigger match
+memories/MEMORY.md   facts, capped and consolidated on write
+</code></pre>
+<p>The cap is the load-bearing part. Writes fail when the store is full, so the agent has to consolidate or delete before it can add anything. Three profiles here set an explicit ceiling of 6,000 or 9,000 characters. The rest run at the 2,200-character default.</p>
+<p>At 2,200 characters, a session's vocabulary runs out fast. That is the feature. It forces a decision about what deserves to survive, made while the current task is still in front of the model.</p>
+<h2>A byte ceiling beats an envelope</h2>
+<p>LoreKit's record adds exactly the fields a shared format needs: address, key, lifecycle, and written_by. The last one is the sharpest idea in the proposal. It lets a reader weight a note by who wrote it, and a fact extracted by a service is weaker evidence than a directive a human typed.</p>
+<p>Metadata cannot evict anything, though. A record that declares its own expiry still needs something to enforce that expiry. No format can decide that last month's debugging shortcut stopped being true. A budget forces the judgement at write time, which is the only moment the context is loaded.</p>
+<p>A ceiling does not replace curation either. Someone still has to open the file now and then and read it top to bottom. Consolidation of a wrong premise only produces a tidier wrong premise, and that failure is invisible to every metric except a human read.</p>
+<h2>What I would copy before there is a standard</h2>
+<p>Three parts of the proposal are worth building now, standard or not:</p>
+<ul>
+<li>Conventions for address levels and attribute namespaces, so two tools can describe the same repo without a translation layer.</li>
+<li>Conformance tests in place of a reference implementation, because a test suite survives a rewrite of the storage layer.</li>
+<li>Live addressing between concurrent tools, the harder half of the problem and the half the current proposals mostly skip.</li>
+</ul>
+<p>On that third point, the existing work is honest about its own scope. MacPaw's <code>.mem</code> bundle, the Open Memory Protocol draft, and Cognee's COGX all concentrate on export: moving one person's memory between vendors. A CI job, an editor agent, and a review bot reading the same record at the same time is still unsolved.</p>
+<p>Standardize the vocabulary, not the storage. Put a byte ceiling on anything that gets injected into every session, and move procedure into files that load when a trigger fires. A memory format with no forgetting path is a format that ships context rot by default.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/agent-memory-byte-budget/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
