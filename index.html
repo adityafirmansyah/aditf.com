@@ -234,6 +234,83 @@
   opacity: 0.8;
 }
 
+/* 6. Multi-Operator Terminal Cursor Layer */
+.hero {
+  position: relative;
+  overflow: visible;
+}
+.cursor-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 5;
+  overflow: hidden;
+}
+.live-cursor {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.cursor-pointer {
+  width: 14px;
+  height: 14px;
+  filter: drop-shadow(0 2px 4px rgba(0,0,0,0.6));
+}
+.cursor-badge {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 3px;
+  white-space: nowrap;
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+}
+.cursor--ops .cursor-pointer { fill: #E8871E; }
+.cursor--ops .cursor-badge { background: #E8871E; color: #14181B; }
+
+.cursor--qa .cursor-pointer { fill: #38BDF8; }
+.cursor--qa .cursor-badge { background: #38BDF8; color: #0F172A; }
+
+.cursor--lead .cursor-pointer { fill: #10B981; }
+.cursor--lead .cursor-badge { background: #10B981; color: #064E3B; }
+
+/* Lenis Scroll Smooth Rules */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* GSAP Reveal Base Rules */
+.gsap-reveal-header {
+  will-change: transform, opacity;
+}
+.section__head .eyebrow {
+  display: inline-block;
+  transform-origin: left center;
+}
+.section__head h2 {
+  display: block;
+  transform-origin: left center;
+}
+
 @media (max-width: 900px) {
   .proj-terminal {
     flex-direction: column;
@@ -245,6 +322,9 @@
     border-bottom: 1px solid var(--ink-line);
     padding-right: 0;
     padding-bottom: 16px;
+  }
+  .cursor-layer {
+    display: none; /* Disable multi-cursor on small mobile screens for clean touch */
   }
 }
 </style>
@@ -276,6 +356,22 @@
 
   <!-- HERO -->
   <section class="hero">
+    <!-- Live Multi-Operator Cursor Simulation Layer -->
+    <div class="cursor-layer" id="heroCursorLayer" aria-hidden="true">
+      <div class="live-cursor cursor--lead" id="cursorLead">
+        <svg class="cursor-pointer" viewBox="0 0 16 16"><path d="M0 0 L16 6 L9 9 L6 16 Z"/></svg>
+        <span class="cursor-badge">Adit (Staff)</span>
+      </div>
+      <div class="live-cursor cursor--qa" id="cursorQA">
+        <svg class="cursor-pointer" viewBox="0 0 16 16"><path d="M0 0 L16 6 L9 9 L6 16 Z"/></svg>
+        <span class="cursor-badge">QA-Audit · 100%</span>
+      </div>
+      <div class="live-cursor cursor--ops" id="cursorOps">
+        <svg class="cursor-pointer" viewBox="0 0 16 16"><path d="M0 0 L16 6 L9 9 L6 16 Z"/></svg>
+        <span class="cursor-badge">Ops · 99.9% Up</span>
+      </div>
+    </div>
+
     <div class="hero__inner">
       <div class="waybill">
         <span class="waybill__field">TRACKING NO. <b>AF-2011&ndash;2026</b></span>
@@ -819,7 +915,9 @@
 </footer>
 
 <script src="script.js"></script>
-
+<script src="assets/lenis.min.js"></script>
+<script src="assets/gsap.min.js"></script>
+<script src="assets/ScrollTrigger.min.js"></script>
 <script src="assets/anime.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -962,6 +1060,146 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }, { threshold: 0.2 });
       contactObs.observe(contactSec);
+    }
+  }
+
+  // 6. Lenis Smooth Scrolling + GSAP ScrollTrigger Integration
+  const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!prefersReduced && window.Lenis && window.gsap) {
+    const lenis = new Lenis({
+      lerp: 0.09,
+      smoothWheel: true,
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.2
+    });
+    window.__lenis = lenis;
+
+    if (window.ScrollTrigger) {
+      gsap.registerPlugin(ScrollTrigger);
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add((time) => {
+        lenis.raf(time * 1000);
+      });
+      gsap.ticker.lagSmoothing(0);
+    } else {
+      function raf(time) {
+        lenis.raf(time);
+        requestAnimationFrame(raf);
+      }
+      requestAnimationFrame(raf);
+    }
+
+    // GSAP ScrollTrigger Reveals for Sections & Eyebrows
+    if (window.ScrollTrigger) {
+      const sectionHeads = document.querySelectorAll('.section__head');
+      sectionHeads.forEach(head => {
+        const eyebrow = head.querySelector('.eyebrow');
+        const h2 = head.querySelector('h2');
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: head,
+            start: 'top 85%',
+            toggleActions: 'play none none reverse'
+          }
+        });
+
+        if (eyebrow) {
+          tl.from(eyebrow, {
+            y: 16,
+            opacity: 0,
+            duration: 0.6,
+            ease: 'power3.out'
+          }, 0);
+        }
+
+        if (h2) {
+          tl.from(h2, {
+            y: 28,
+            opacity: 0,
+            duration: 0.7,
+            ease: 'power3.out'
+          }, 0.08);
+        }
+      });
+
+      // Subtle Parallax on Selected Projects Cards
+      gsap.utils.toArray('.terminal-ticket').forEach((ticket, i) => {
+        gsap.from(ticket, {
+          scrollTrigger: {
+            trigger: ticket,
+            start: 'top 92%',
+            toggleActions: 'play none none reverse'
+          },
+          x: -16,
+          opacity: 0,
+          duration: 0.5,
+          delay: i * 0.08,
+          ease: 'power2.out'
+        });
+      });
+    }
+
+    // 7. Multi-Operator Terminal Cursor Simulation in Hero
+    const cursorLayer = document.getElementById('heroCursorLayer');
+    const heroSec = document.querySelector('.hero');
+    const cLead = document.getElementById('cursorLead');
+    const cQA = document.getElementById('cursorQA');
+    const cOps = document.getElementById('cursorOps');
+
+    if (cursorLayer && heroSec && cLead && cQA && cOps && window.gsap && window.innerWidth > 900) {
+      const heroRect = heroSec.getBoundingClientRect();
+      const heroW = heroSec.offsetWidth;
+      const heroH = heroSec.offsetHeight;
+
+      // Realistic Operator Patrol Loop
+      const cursorTl = gsap.timeline({ repeat: -1, repeatDelay: 1 });
+
+      // Initial positions
+      gsap.set(cLead, { x: heroW * 0.25, y: heroH * 0.45, opacity: 0 });
+      gsap.set(cQA, { x: heroW * 0.75, y: heroH * 0.35, opacity: 0 });
+      gsap.set(cOps, { x: heroW * 0.55, y: heroH * 0.70, opacity: 0 });
+
+      cursorTl
+        // 1. Reset posisi awal sebelum fade-in tiap loop
+        .set(cLead, { x: heroW * 0.25, y: heroH * 0.45 })
+        .set(cQA, { x: heroW * 0.75, y: heroH * 0.35 })
+        .set(cOps, { x: heroW * 0.55, y: heroH * 0.70 })
+        // 2. Operators appear
+        .to([cLead, cQA, cOps], { opacity: 1, duration: 0.8, stagger: 0.2, ease: 'power2.out' })
+        
+        // 3. Adit moves to verify Waybill Status
+        .to(cLead, { x: 120, y: 135, duration: 2.2, ease: 'power3.inOut' }, '+=0.2')
+        .to(cLead, { scale: 0.85, duration: 0.12, yoyo: true, repeat: 1 }, '+=0.1') // Click pulse
+
+        // 4. QA inspects Role / Heading
+        .to(cQA, { x: heroW * 0.65, y: heroH * 0.38, duration: 2.4, ease: 'power2.inOut' }, '-=1.4')
+        .to(cQA, { scale: 0.85, duration: 0.12, yoyo: true, repeat: 1 })
+
+        // 5. Ops reviews Route Destination
+        .to(cOps, { x: heroW * 0.42, y: heroH * 0.48, duration: 2.5, ease: 'power2.inOut' }, '-=1.6')
+        .to(cOps, { scale: 0.85, duration: 0.12, yoyo: true, repeat: 1 })
+
+        // 6. Coordinated move towards CTA buttons
+        .to(cLead, { x: 140, y: heroH * 0.82, duration: 2.0, ease: 'power3.inOut' }, '+=0.4')
+        .to(cQA, { x: 260, y: heroH * 0.82, duration: 2.2, ease: 'power3.inOut' }, '-=1.6')
+        .to(cOps, { x: 390, y: heroH * 0.82, duration: 2.0, ease: 'power3.inOut' }, '-=1.7')
+
+        // 7. Click CTA together
+        .to([cLead, cQA, cOps], { scale: 0.88, duration: 0.14, yoyo: true, repeat: 1 }, '+=0.2')
+
+        // 8. Subtle idle drift
+        .to([cLead, cQA, cOps], {
+          x: '+=12',
+          y: '-=8',
+          duration: 1.8,
+          yoyo: true,
+          repeat: 1,
+          ease: 'sine.inOut'
+        })
+        
+        // 9. Fade out sebelum restart cycle
+        .to([cLead, cQA, cOps], { opacity: 0, duration: 0.8, ease: 'power2.in' }, '+=1.2');
     }
   }
 });
