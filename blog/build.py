@@ -264,6 +264,7 @@ NAV = """<div class="route-progress" aria-hidden="true"><span id="routeFill"></s
     <a href="/#contact"><span class="idx">06</span>Contact</a>
     <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
     <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
   </nav>
 </header>
 """
@@ -521,6 +522,7 @@ def build_sitemap(posts):
     entries = [
         (SITE_URL + "/", now, "weekly", "1.0", []),
         (SITE_URL + "/consult/", now, "weekly", "0.9", []),
+        (SITE_URL + "/services/", now, "weekly", "0.9", []),
         (BLOG_URL, now, "daily", "0.9", []),
     ]
     for e in posts:
@@ -603,6 +605,7 @@ def build_llms_txt(posts):
         f"- Website: {SITE_URL}/",
         f"- Blog: {BLOG_URL}",
         f"- Consultation & Advisory: {SITE_URL}/consult/",
+        f"- Services & Spec Builder: {SITE_URL}/services/",
         f"- RSS Feed: {BLOG_URL}rss.xml",
         f"- GitHub: https://github.com/adityafirmansyah",
         f"- LinkedIn: https://linkedin.com/in/aditya-firmansyah-21940845",

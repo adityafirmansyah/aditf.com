@@ -6,6 +6,7 @@
 - Website: https://aditf.com/
 - Blog: https://aditf.com/blog/
 - Consultation & Advisory: https://aditf.com/consult/
+- Services & Spec Builder: https://aditf.com/services/
 - RSS Feed: https://aditf.com/blog/rss.xml
 - GitHub: https://github.com/adityafirmansyah
 - LinkedIn: https://linkedin.com/in/aditya-firmansyah-21940845
