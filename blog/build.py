@@ -88,6 +88,8 @@ def parse_frontmatter(text):
                 meta[k.strip().lower()] = val
     tags = [t.strip() for t in meta.get("tags", "").split(",") if t.strip()]
     meta["tags"] = tags
+    keywords = [k.strip() for k in meta.get("keywords", "").split(",") if k.strip()]
+    meta["keywords"] = keywords or tags
     return meta, strip_owner_markers(body)
 
 
@@ -139,7 +141,7 @@ def iso_date(iso):
 
 def og_block(title, description, url, image=None, locale="en_US",
              og_type="website", site_name=None, published=None, author=None,
-             tags=None, jsonld=None):
+             tags=None, keywords=None, jsonld=None):
     """Open Graph + twitter:card + JSON-LD for one page."""
     out = []
     sn = site_name or f"{BLOG_NAME} — {SITE_NAME}"
@@ -162,6 +164,8 @@ def og_block(title, description, url, image=None, locale="en_US",
         out.append(f'<meta name="twitter:image" content="{esc(image)}">')
     out.append(f'<meta name="author" content="{esc(author or AUTHOR)}">')
     out.append('<meta name="theme-color" content="#14181B">')
+    if keywords:
+        out.append(f'<meta name="keywords" content="{esc(", ".join(keywords))}">')
     if published:
         out.append(f'<meta property="article:published_time" content="{esc(published)}">')
     for t in (tags or []):
@@ -186,7 +190,7 @@ def person_jsonld():
 
 
 def head(title, description, extra="", url=None, image=None, locale="en_US",
-         og_type="website", published=None, tags=None, jsonld=None,
+         og_type="website", published=None, tags=None, keywords=None, jsonld=None,
          site_name=None):
     """Build <head>. SEO tags are emitted only when `url` is supplied, so legacy
     callers that omit it still produce valid pages."""
@@ -194,7 +198,7 @@ def head(title, description, extra="", url=None, image=None, locale="en_US",
     if url:
         seo = og_block(title, description, url, image=image, locale=locale,
                        og_type=og_type, site_name=site_name, published=published,
-                       tags=tags, jsonld=jsonld)
+                       tags=tags, keywords=keywords, jsonld=jsonld)
         seo = "\n<link rel=\"canonical\" href=\"" + esc(url) + "\">\n" + seo
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -388,7 +392,7 @@ def build_post(e, lang):
         "dateModified": published,
         "inLanguage": "id-ID" if lang == "id" else "en-US",
         "mainEntityOfPage": {"@type": "WebPage", "@id": url},
-        "keywords": ", ".join(meta["tags"]),
+        "keywords": ", ".join(meta["keywords"]),
         "author": {"@type": "Person", "name": AUTHOR, "url": AUTHOR_URL,
                    "jobTitle": AUTHOR_JOB},
         "publisher": {"@type": "Person", "name": AUTHOR, "url": AUTHOR_URL},
@@ -405,7 +409,7 @@ def build_post(e, lang):
 
     page = head(title, description, "\n".join(extra), url=url, image=og_image,
                 locale="id_ID" if lang == "id" else "en_US", og_type="article",
-                published=published, tags=meta["tags"], jsonld=jsonld,
+                published=published, tags=meta["tags"], keywords=meta["keywords"], jsonld=jsonld,
                 site_name=f"{BLOG_NAME} — {SITE_NAME}")
     # set the lang attribute correctly on the real <html> element (the previous
     # implementation appended a stray '<html lang="id"' fragment into <body>)

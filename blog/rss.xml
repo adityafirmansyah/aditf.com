@@ -25,11 +25,11 @@
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/claude-code-user-agent-email-leak/id/"/>
     </item>
     <item>
-      <title>Four Decades of Defensive Workarounds, One OpenSSH Bypass</title>
+      <title>Four Decades of Defensive Workarounds, One OpenSSH musl Password Bypass</title>
       <link>https://aditf.com/blog/openssh-musl-password-bypass-sshole/</link>
       <guid isPermaLink="true">https://aditf.com/blog/openssh-musl-password-bypass-sshole/</guid>
       <pubDate>Fri, 06 Nov 2026 00:00:00 +0000</pubDate>
-      <description>On Alpine hosts without PAM, any password of 257 to 1024 characters opens accounts that were supposed to be locked. Six reasonable fixes across 46 years built that hole.</description>
+      <description>How layered workarounds created the OpenSSH musl password bypass (*sshole) on Alpine Linux hosts, allowing long passwords to unlock accounts marked with an asterisk.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/"/>
     </item>

@@ -1,9 +1,10 @@
 ---
-title: Four Decades of Defensive Workarounds, One OpenSSH Bypass
+title: Four Decades of Defensive Workarounds, One OpenSSH musl Password Bypass
 slug: openssh-musl-password-bypass-sshole
 date: 2026-11-06
-excerpt: On Alpine hosts without PAM, any password of 257 to 1024 characters opens accounts that were supposed to be locked. Six reasonable fixes across 46 years built that hole.
+excerpt: How layered workarounds created the OpenSSH musl password bypass (*sshole) on Alpine Linux hosts, allowing long passwords to unlock accounts marked with an asterisk.
 tags: openssh, security, musl, alpine, ai-agents
+keywords: openssh musl password bypass, sshhole vulnerability, openssh 10.6p2 release, alpine linux ssh vulnerability, ai agents security embargo
 ---
 
 On the Alpine hosts I run, a 300-character password is an authentication bypass. Not a buffer overflow. Not a race condition. Just a long string of `a` presented to an account whose `/etc/shadow` field is `*`.

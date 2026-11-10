@@ -1,9 +1,10 @@
 ---
-title: Empat Dekade Workaround Defensif, Satu Bypass OpenSSH
+title: Empat Dekade Workaround Defensif Berujung Bypass Otentikasi OpenSSH di musl
 slug: openssh-musl-password-bypass-sshole
 date: 2026-11-06
-excerpt: Di host Alpine tanpa PAM, password sepanjang 257 sampai 1024 karakter bisa membuka akun yang seharusnya terkunci. Enam perbaikan wajar selama 46 tahun yang membangun lubang itu.
+excerpt: Di host Alpine Linux tanpa PAM, password 300 karakter memicu bypass otentikasi OpenSSH musl (*sshole) pada akun yang dikunci dengan tanda asterisk.
 tags: openssh, security, musl, alpine, ai-agents
+keywords: openssh musl password bypass, sshhole vulnerability, openssh 10.6p2 release, alpine linux ssh vulnerability, ai agents security embargo
 ---
 
 Di host Alpine yang gue pegang, password 300 karakter itu sama dengan bypass autentikasi. Bukan buffer overflow, bukan juga race condition.

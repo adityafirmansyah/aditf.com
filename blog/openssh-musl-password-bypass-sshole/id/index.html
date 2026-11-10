@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Empat Dekade Workaround Defensif, Satu Bypass OpenSSH — Field Notes</title>
-<meta name="description" content="Di host Alpine tanpa PAM, password sepanjang 257 sampai 1024 karakter bisa membuka akun yang seharusnya terkunci. Enam perbaikan wajar selama 46 tahun yang membangun lubang itu.">
+<title>Empat Dekade Workaround Defensif Berujung Bypass Otentikasi OpenSSH di musl — Field Notes</title>
+<meta name="description" content="Di host Alpine Linux tanpa PAM, password 300 karakter memicu bypass otentikasi OpenSSH musl (*sshole) pada akun yang dikunci dengan tanda asterisk.">
 <link rel="icon" href="/favicon.ico" sizes="48x48">
 <link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -20,27 +20,28 @@
 <link rel="canonical" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/">
 <meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Empat Dekade Workaround Defensif, Satu Bypass OpenSSH — Field Notes">
-<meta property="og:description" content="Di host Alpine tanpa PAM, password sepanjang 257 sampai 1024 karakter bisa membuka akun yang seharusnya terkunci. Enam perbaikan wajar selama 46 tahun yang membangun lubang itu.">
+<meta property="og:title" content="Empat Dekade Workaround Defensif Berujung Bypass Otentikasi OpenSSH di musl — Field Notes">
+<meta property="og:description" content="Di host Alpine Linux tanpa PAM, password 300 karakter memicu bypass otentikasi OpenSSH musl (*sshole) pada akun yang dikunci dengan tanda asterisk.">
 <meta property="og:url" content="https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/">
 <meta property="og:locale" content="id_ID">
 <meta property="og:image" content="https://aditf.com/blog/openssh-musl-password-bypass-sshole/og.id.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Empat Dekade Workaround Defensif, Satu Bypass OpenSSH — Field Notes">
+<meta property="og:image:alt" content="Empat Dekade Workaround Defensif Berujung Bypass Otentikasi OpenSSH di musl — Field Notes">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Empat Dekade Workaround Defensif, Satu Bypass OpenSSH — Field Notes">
-<meta name="twitter:description" content="Di host Alpine tanpa PAM, password sepanjang 257 sampai 1024 karakter bisa membuka akun yang seharusnya terkunci. Enam perbaikan wajar selama 46 tahun yang membangun lubang itu.">
+<meta name="twitter:title" content="Empat Dekade Workaround Defensif Berujung Bypass Otentikasi OpenSSH di musl — Field Notes">
+<meta name="twitter:description" content="Di host Alpine Linux tanpa PAM, password 300 karakter memicu bypass otentikasi OpenSSH musl (*sshole) pada akun yang dikunci dengan tanda asterisk.">
 <meta name="twitter:image" content="https://aditf.com/blog/openssh-musl-password-bypass-sshole/og.id.png">
 <meta name="author" content="Aditya Firmansyah">
 <meta name="theme-color" content="#14181B">
+<meta name="keywords" content="openssh musl password bypass, sshhole vulnerability, openssh 10.6p2 release, alpine linux ssh vulnerability, ai agents security embargo">
 <meta property="article:published_time" content="2026-11-06T00:00:00+00:00">
 <meta property="article:tag" content="openssh">
 <meta property="article:tag" content="security">
 <meta property="article:tag" content="musl">
 <meta property="article:tag" content="alpine">
 <meta property="article:tag" content="ai-agents">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Empat Dekade Workaround Defensif, Satu Bypass OpenSSH", "description": "Di host Alpine tanpa PAM, password sepanjang 257 sampai 1024 karakter bisa membuka akun yang seharusnya terkunci. Enam perbaikan wajar selama 46 tahun yang membangun lubang itu.", "datePublished": "2026-11-06T00:00:00+00:00", "dateModified": "2026-11-06T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/"}, "keywords": "openssh, security, musl, alpine, ai-agents", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1153, "image": ["https://aditf.com/blog/openssh-musl-password-bypass-sshole/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Empat Dekade Workaround Defensif Berujung Bypass Otentikasi OpenSSH di musl", "description": "Di host Alpine Linux tanpa PAM, password 300 karakter memicu bypass otentikasi OpenSSH musl (*sshole) pada akun yang dikunci dengan tanda asterisk.", "datePublished": "2026-11-06T00:00:00+00:00", "dateModified": "2026-11-06T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/"}, "keywords": "openssh musl password bypass, sshhole vulnerability, openssh 10.6p2 release, alpine linux ssh vulnerability, ai agents security embargo", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1153, "image": ["https://aditf.com/blog/openssh-musl-password-bypass-sshole/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/", "inLanguage": "en-US"}}</script>
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/">
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/">
@@ -73,7 +74,7 @@
       <span class="waybill__divider" aria-hidden="true">&middot;</span>
       <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
     </div>
-    <h1 class="post__title">Empat Dekade Workaround Defensif, Satu Bypass OpenSSH</h1>
+    <h1 class="post__title">Empat Dekade Workaround Defensif Berujung Bypass Otentikasi OpenSSH di musl</h1>
     <div class="post__tags"><span>openssh</span><span>security</span><span>musl</span><span>alpine</span><span>ai-agents</span></div>
     <div class="post__content reveal is-visible">
 <p>Di host Alpine yang gue pegang, password 300 karakter itu sama dengan bypass autentikasi. Bukan buffer overflow, bukan juga race condition.</p>
