@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Expo Exact Framework: Native Apps With No React, No JSX</title>
+      <link>https://aditf.com/blog/expo-exact-framework-no-react-jsx/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/expo-exact-framework-no-react-jsx/</guid>
+      <pubDate>Tue, 10 Nov 2026 00:00:00 +0000</pubDate>
+      <description>The Expo Exact framework drops React, JSX, and the JavaScript bridge, betting that a virtual clock and a ten-verb driver make native apps buildable by AI agents.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/expo-exact-framework-no-react-jsx/id/"/>
+    </item>
+    <item>
       <title>Agent Memory Doesn&#x27;t Need a Schema, It Needs a Byte Budget</title>
       <link>https://aditf.com/blog/agent-memory-byte-budget/</link>
       <guid isPermaLink="true">https://aditf.com/blog/agent-memory-byte-budget/</guid>
@@ -176,15 +185,6 @@
       <description>Eight eMudhra intermediates were revoked for key compromise on October 18. A day later Go shipped the only enforcement most backend services will ever receive.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/go-distrusts-eight-intermediate-cas/id/"/>
-    </item>
-    <item>
-      <title>Why Our Multi-Agent Tooling Hallucinated Kubernetes (And How We Fix Context Poisoning)</title>
-      <link>https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/</guid>
-      <pubDate>Mon, 19 Oct 2026 00:00:00 +0000</pubDate>
-      <description>Our internal developer tooling for docs and runbooks cleanly approved a specification claiming Dagango.com runs on Kubernetes. Here is how context poisoning broke verification.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/why-our-tooling-hallucinated-kubernetes/id/"/>
     </item>
   </channel>
 </rss>

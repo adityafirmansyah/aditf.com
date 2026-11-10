@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expo Exact Framework: Bikin App Native Tanpa React dan JSX — Field Notes</title>
+<meta name="description" content="Expo Exact framework membuang React, JSX, dan bridge JavaScript, lalu bertaruh bahwa jam virtual plus driver sepuluh perintah bikin app native bisa dibangun AI agent.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/expo-exact-framework-no-react-jsx/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Expo Exact Framework: Bikin App Native Tanpa React dan JSX — Field Notes">
+<meta property="og:description" content="Expo Exact framework membuang React, JSX, dan bridge JavaScript, lalu bertaruh bahwa jam virtual plus driver sepuluh perintah bikin app native bisa dibangun AI agent.">
+<meta property="og:url" content="https://aditf.com/blog/expo-exact-framework-no-react-jsx/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/expo-exact-framework-no-react-jsx/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Expo Exact Framework: Bikin App Native Tanpa React dan JSX — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Expo Exact Framework: Bikin App Native Tanpa React dan JSX — Field Notes">
+<meta name="twitter:description" content="Expo Exact framework membuang React, JSX, dan bridge JavaScript, lalu bertaruh bahwa jam virtual plus driver sepuluh perintah bikin app native bisa dibangun AI agent.">
+<meta name="twitter:image" content="https://aditf.com/blog/expo-exact-framework-no-react-jsx/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="expo exact framework, agent native ui architecture, expo ditching react, contract dsl rust, ai coding agent frontend testing, deterministic ui testing agents">
+<meta property="article:published_time" content="2026-11-10T00:00:00+00:00">
+<meta property="article:tag" content="react">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="frontend-engineering">
+<meta property="article:tag" content="architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Expo Exact Framework: Bikin App Native Tanpa React dan JSX", "description": "Expo Exact framework membuang React, JSX, dan bridge JavaScript, lalu bertaruh bahwa jam virtual plus driver sepuluh perintah bikin app native bisa dibangun AI agent.", "datePublished": "2026-11-10T00:00:00+00:00", "dateModified": "2026-11-10T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/expo-exact-framework-no-react-jsx/id/"}, "keywords": "expo exact framework, agent native ui architecture, expo ditching react, contract dsl rust, ai coding agent frontend testing, deterministic ui testing agents", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1380, "image": ["https://aditf.com/blog/expo-exact-framework-no-react-jsx/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/expo-exact-framework-no-react-jsx/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Apakah Exact menggantikan React Native buat app Expo?", "acceptedAnswer": {"@type": "Answer", "text": "Nggak. Exact nggak punya React tier sama sekali, dan React Native tetap yang disupport Expo. Anggap ini eksperimen arsitektur UI yang dirancang buat mesin. Jangan dibaca sebagai jalur migrasi produk yang udah jalan."}}, {"@type": "Question", "name": "Bisa nggak satu app dibangun dan diverifikasi agent tanpa bantuan manusia?", "acceptedAnswer": {"@type": "Answer", "text": "README nyatet satu percobaan. Agent baru di clone bersih, dikasih prompt quick-start, selesai bikin app todo dalam sekitar 57 menit. Test-nya lolos di web, macOS, dan iOS Simulator. Sekitar 25 menit dari waktu itu habis buat build macOS dan iOS pertama, masing-masing kira-kira 13 menit."}}, {"@type": "Question", "name": "Kenapa JavaScript dibuang dari boot path, bukan cuma dioptimasi?", "acceptedAnswer": {"@type": "Answer", "text": "Karena startup itu sifatnya emergent dan nggak bisa ditempel belakangan. `RULES.md` bilang boot graph dianggarkan dari commit pertama dan dihitung sebagai angka. Jadi nggak diukur pakai timer, dan regresinya gagal di check. Bukan muncul sebagai benchmark yang melambat pelan-pelan."}}]}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/expo-exact-framework-no-react-jsx/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/expo-exact-framework-no-react-jsx/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/expo-exact-framework-no-react-jsx/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>10 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">7 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Expo Exact Framework: Bikin App Native Tanpa React dan JSX</h1>
+    <div class="post__tags"><span>react</span><span>ai-agents</span><span>rust</span><span>frontend-engineering</span><span>architecture</span></div>
+    <div class="post__content reveal is-visible">
+<p>Tanggal 9 November, tim Expo membuka <code>expo/exact</code> ke publik. Isinya runtime UI lintas platform buat web, macOS, iOS, dan Linux. React nggak dipakai sama sekali di layer view, dan JSX juga nggak ada.</p>
+<p>Frame pertama udah tampil sebelum satu baris pun JavaScript aplikasi jalan. Bukan hasil polesan di akhir, karena seluruh urutan boot-nya memang dirancang begitu dari awal.</p>
+<p>Dua hal soal Expo Exact framework ini sama-sama benar. Ini infrastruktur frontend paling jujur yang gue baca tahun ini. Tapi ini juga taruhan yang melawan hal yang bikin model sekarang jago nulis frontend.</p>
+<p>Kalau lo ngirim software pakai agent, dua-duanya penting.</p>
+<h2>Apa aja yang dibuang sama Expo Exact framework ini</h2>
+<p>Exact bukan React Native. Bukan juga renderer React. Repo-nya bilang langsung di README: "No JSX or React tier." Terus, dengan kejujuran yang jarang ada di postingan launching, mereka nambahin satu kalimat lagi. Pintunya masih terbuka, tapi nggak ada yang lagi ngebangun.</p>
+<p>Yang tersisa dari arsitektur ini justru intinya. Ini agent native UI architecture: runtime yang dirancang supaya program bisa langsung periksa dan kendalikan, sementara manusianya cuma ikut lihat hasilnya.</p>
+<p>Yang gantiin pohon komponen itu empat lapis.</p>
+<ul>
+<li><strong>Contract</strong>, bahasa domain-specific (DSL) kecil buat nyusun view. Record type-nya tertutup, list-nya wajib punya key, semua value bertipe, dan nggak ada celah buat nyelipin kode sembarangan.</li>
+<li><strong>Plan yang di-bake.</strong> Compile-nya lewat empat fase: syntax, types, analysis, lowering. Data konstanta dievaluasi masuk ke plan waktu build, jadi paint pertama nggak butuh apa-apa lagi.</li>
+<li><strong>Kernel Rust.</strong> <code>exact-kernel</code> ngitung layout pakai aturan CSS lewat Taffy yang di-patch, di atas node arena berbentuk kolumnar. Ukur teks pakai CoreText di Apple, cosmic-text di Linux.</li>
+<li><strong>Painter per host.</strong> AppKit di macOS, UIKit di iOS. Di Linux pakai DRM/KMS (Direct Rendering Manager plus Kernel Mode Setting) dengan input evdev. Di web, runtime sekitar 20 KB yang nulis langsung ke Document Object Model (DOM) asli.</li>
+</ul>
+<p>Logika data duduk di balik satu seam. TypeScript di-compile jadi bytecode Hermes waktu build dan baru dimuat setelah pixel pertama. Kalau mau, ganti aja pakai crate Rust.</p>
+<p>Tiap jawaban dari sumber data dicek dulu terhadap shape yang dideklarasikan Contract. Nggak ada webview, nggak ada bridge JavaScript.</p>
+<p>Intinya begini: hydration mismatch itu bukan bug yang lo perbaiki di arsitektur ini. Itu masalah yang nggak pernah lo kirim.</p>
+<h2>Kenapa jam virtual lebih bisa dipercaya daripada <code>await sleep(500)</code>?</h2>
+<p>Hampir semua test UI tulisan agent mati di bagian nunggu. Agent tap tombol, tidur 500 ms, terus screenshot. Animasi masih di 40%. Run berikutnya jadi 60%.</p>
+<p>Test kayak gitu nggak flaky karena app-nya rusak. Flaky karena wall-clock bukan hal yang bisa lo observasi dengan stabil.</p>
+<p>Exact kasih jam itu ke agent. Di antara dua operasi driver, nggak ada yang bergerak. Jadi daripada tidur, agent bilang <code>clock +60000</code> atau <code>clock settle</code>, terus baca hasilnya.</p>
+<p>Hasilnya deterministic UI testing yang beneran bisa dipegang. Input sama, frame sama, di run mana pun dan host mana pun.</p>
+<pre><code class="language-sh">bun scripts/agent.mjs web tree &quot;tap change-station&quot; &quot;type station-search Palo&quot; \
+  &quot;clock +60000&quot; state &quot;screenshot out.png&quot;
+</code></pre>
+<p>Total ada sepuluh operasi, dan jumlahnya sendiri keputusan desain: <code>tree · screenshot · tap · type · state · layout · logs · clock · prefer · perf</code>. Alasannya ada di README. API agent itu nambah satu perbaikan masuk akal demi satu perbaikan masuk akal, sampai akhirnya nggak ada yang sanggup hafal isinya.</p>
+<p>Test-nya jalan pakai primitif yang sama. File <code>app.test.contract</code> isinya rangkaian operasi tadi. File yang sama jalan tanpa diubah di web, macOS, iOS Simulator, dan Linux headless. Tiga test Caltrain selesai sekitar dua detik di host web.</p>
+<h2>Biaya sebenarnya ada di data latihan</h2>
+<p>Sampai sini gue berhenti tepuk tangan.</p>
+<p>Contract sengaja dibikin kecil supaya satu app muat di dalam context window. Itu kemenangan beneran buat urusan correctness. Semua penulisan state dideklarasikan, semua list punya key, semua value bertipe.</p>
+<p>Salah pun dibalas dengan penolakan yang jelasin harus ngapain. Sekali jalan, compiler bisa lapor sampai dua puluh error sekaligus.</p>
+<p>Kelemahan itu datang dari tempat yang nggak ada hubungannya dengan Rust. Zero-shot fluency di TSX dan Tailwind CSS itu bukan sifat TSX. Itu hasil triliunan token pengetahuan awal, dan Contract belum punya apa-apa di sana.</p>
+<p>Di thread Hacker News, poin ini muncul dari beberapa arah. <code>doodlesdev</code> nebak framework-nya bakal jalan bagus sama model frontier dan jauh lebih jelek sama model murah. <code>btown</code> nanya dasar lain: DSL yang punya ekspresi matematis bebas itu butuh spec bahasa formal, lexer dan parser hasil generate, plus stdlib yang perilakunya identik di semua target build.</p>
+<p>Perbandingan arsitektur juga masuk. <code>ogoffart</code>, yang ngerjain Slint, bilang desainnya mirip banget sama framework-nya. Sama-sama Rust, sama-sama DSL deklaratif dengan compiler sendiri, sama-sama naruh logika di bahasa host, sama-sama nyediain tooling yang bisa didrive agent.</p>
+<p>Bedanya cuma satu, dan itu yang paling tajam: Slint udah stabil di 1.x sejak 2023. Exact masih pre-1.0 dan berubah tiap hari. <code>zoom6628</code> malah mundur lebih jauh, nyebut QML dan Qt.</p>
+<p>Terus ada <code>mrbombastic</code>, yang nulis bahwa kecenderungan ngutamain agent di atas manusia dalam developer tooling bikin dia "sympathize with the Butlerian jihad". Gue ketawa bacanya, agak kebanyakan. Tapi rasa nggak nyaman di balik komentar itu pantas dijawab serius, dan nggak ada satu pun di thread yang jawab.</p>
+<h2>Enam check, 65 detik, lima belas dokumen</h2>
+<p>Bagian yang beneran mau gue tiru cuma ada di satu file markdown. <code>rules/RULES.md</code> nyebut tiap budget itu trade-off. Bukan limit yang sakral.</p>
+<p>Konkretnya:</p>
+<ul>
+<li><strong>Enam blocking check, total 65 detik.</strong> Kalau mau nambah yang ketujuh, satu yang lama harus dihapus di pull request yang sama.</li>
+<li><strong>Maksimum 1.500 baris per file source.</strong> File hasil generate bebas, karena itu dibangun dan nggak pernah di-commit.</li>
+<li><strong>Lima belas dokumen di working set.</strong> Dokumen keenam belas artinya lo harus mengarsipkan satu.</li>
+<li><strong>File rules-nya sendiri dibatasi 700 kata.</strong> Kalau tumbuh, berarti ada yang harus jadi check atau berhenti jadi aturan.</li>
+</ul>
+<p>Satu kalimat yang nanggung beban paling besar justru pendek. "A limit gets exceptions. A trade doesn't."</p>
+<p>Ini cocok banget sama yang gue lihat tiap hari waktu jalanin fleet agent. Agent perform-nya bagus kalau sistemnya punya permukaan kecil, latency rendah, dan batas yang ketat.</p>
+<p>Taruh agent yang sama di repo yang scaffolding build-nya lebih gede dari fitur-nya, dan angka gagalnya berhenti lucu. 😅</p>
+<p>Yang sering kelewat justru ini: biaya review kita ikut membengkak bareng permukaan sistemnya. Di stack web lama, gue nggak bisa percaya hasil agent sebelum jalanin sendiri. Di permukaan deklaratif yang sempit, gue bisa baca dan langsung nolak kalau bentuknya salah.</p>
+<h2>Yang beneran gue curi minggu ini</h2>
+<p>Gue nggak bakal mindahin produk ke Exact hari ini. Tiga idenya yang gue ambil minggu ini.</p>
+<ul>
+<li><strong>Curi jam-nya.</strong> Ganti satu <code>sleep</code> di harness lo dengan langkah settle eksplisit, terus ukur. Dari satu test itu lo langsung tahu app lo punya state "selesai" yang bisa diobservasi atau nggak.</li>
+<li><strong>Hitung verb lo.</strong> Tulisin operasi yang benar-benar dipakai agent lo. Lewat sepuluh, hampir pasti ada beberapa yang sebenarnya satu operasi pakai dua nama.</li>
+<li><strong>Tiru cara nulis trade-off-nya.</strong> Kalimat "check ketujuh wajib hapus satu yang lama" itu governance yang nggak bisa dibantah reviewer.</li>
+</ul>
+<p>Bagian README yang judulnya "What works today, and what doesn't yet" itu yang paling jujur. Parity kontrol di Windows, delivery Android, akses kamera, dan update TypeScript bertanda tangan semuanya masih ada di daftar belum selesai.</p>
+<p>Baca bagian itu dulu sebelum lo pertaruhin satu sprint ke sini.</p>
+<p>Dan satu hal lagi yang gue syukuri dari proyek ini. Daftar yang belum jalan itu ditulis di halaman depan repo. Jadi lo nggak perlu nemu sendiri lewat error yang muncul tengah malam.</p>
+<h2>FAQ Teknis</h2>
+<h3>Apakah Exact menggantikan React Native buat app Expo?</h3>
+<p>Nggak. Exact nggak punya React tier sama sekali, dan React Native tetap yang disupport Expo. Anggap ini eksperimen arsitektur UI yang dirancang buat mesin. Jangan dibaca sebagai jalur migrasi produk yang udah jalan.</p>
+<h3>Bisa nggak satu app dibangun dan diverifikasi agent tanpa bantuan manusia?</h3>
+<p>README nyatet satu percobaan. Agent baru di clone bersih, dikasih prompt quick-start, selesai bikin app todo dalam sekitar 57 menit. Test-nya lolos di web, macOS, dan iOS Simulator. Sekitar 25 menit dari waktu itu habis buat build macOS dan iOS pertama, masing-masing kira-kira 13 menit.</p>
+<h3>Kenapa JavaScript dibuang dari boot path, bukan cuma dioptimasi?</h3>
+<p>Karena startup itu sifatnya emergent dan nggak bisa ditempel belakangan. <code>RULES.md</code> bilang boot graph dianggarkan dari commit pertama dan dihitung sebagai angka. Jadi nggak diukur pakai timer, dan regresinya gagal di check. Bukan muncul sebagai benchmark yang melambat pelan-pelan.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/expo-exact-framework-no-react-jsx/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

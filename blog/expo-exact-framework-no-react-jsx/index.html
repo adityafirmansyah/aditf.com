@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Expo Exact Framework: Native Apps With No React, No JSX — Field Notes</title>
+<meta name="description" content="The Expo Exact framework drops React, JSX, and the JavaScript bridge, betting that a virtual clock and a ten-verb driver make native apps buildable by AI agents.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/expo-exact-framework-no-react-jsx/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Expo Exact Framework: Native Apps With No React, No JSX — Field Notes">
+<meta property="og:description" content="The Expo Exact framework drops React, JSX, and the JavaScript bridge, betting that a virtual clock and a ten-verb driver make native apps buildable by AI agents.">
+<meta property="og:url" content="https://aditf.com/blog/expo-exact-framework-no-react-jsx/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/expo-exact-framework-no-react-jsx/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Expo Exact Framework: Native Apps With No React, No JSX — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Expo Exact Framework: Native Apps With No React, No JSX — Field Notes">
+<meta name="twitter:description" content="The Expo Exact framework drops React, JSX, and the JavaScript bridge, betting that a virtual clock and a ten-verb driver make native apps buildable by AI agents.">
+<meta name="twitter:image" content="https://aditf.com/blog/expo-exact-framework-no-react-jsx/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="expo exact framework, agent native ui architecture, expo ditching react, contract dsl rust, ai coding agent frontend testing, deterministic ui testing agents">
+<meta property="article:published_time" content="2026-11-10T00:00:00+00:00">
+<meta property="article:tag" content="react">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="frontend-engineering">
+<meta property="article:tag" content="architecture">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Expo Exact Framework: Native Apps With No React, No JSX", "description": "The Expo Exact framework drops React, JSX, and the JavaScript bridge, betting that a virtual clock and a ten-verb driver make native apps buildable by AI agents.", "datePublished": "2026-11-10T00:00:00+00:00", "dateModified": "2026-11-10T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/expo-exact-framework-no-react-jsx/"}, "keywords": "expo exact framework, agent native ui architecture, expo ditching react, contract dsl rust, ai coding agent frontend testing, deterministic ui testing agents", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1294, "image": ["https://aditf.com/blog/expo-exact-framework-no-react-jsx/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/expo-exact-framework-no-react-jsx/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does Exact replace React Native for Expo apps?", "acceptedAnswer": {"@type": "Answer", "text": "No. Exact has no React tier at all, and React Native remains what Expo supports. Treat this as an experiment in machine-first UI architecture, with no migration path for a live product."}}, {"@type": "Question", "name": "Can an agent build and verify a whole app unaided?", "acceptedAnswer": {"@type": "Answer", "text": "The README documents one run: a fresh agent on a clean clone, given the quick-start prompt, finished a todo app in about 57 minutes. Its tests passed on web, macOS, and the iOS Simulator. About 25 of those minutes were the first macOS and iOS builds, roughly 13 each."}}, {"@type": "Question", "name": "Why delete JavaScript from the boot path instead of optimizing it?", "acceptedAnswer": {"@type": "Answer", "text": "Because startup is emergent and cannot be retrofitted later. `RULES.md` says the boot graph is budgeted from commit one and counted, not timed, so a regression fails a check instead of showing up as a slow benchmark."}}]}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/expo-exact-framework-no-react-jsx/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/expo-exact-framework-no-react-jsx/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/expo-exact-framework-no-react-jsx/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>10 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Expo Exact Framework: Native Apps With No React, No JSX</h1>
+    <div class="post__tags"><span>react</span><span>ai-agents</span><span>rust</span><span>frontend-engineering</span><span>architecture</span></div>
+    <div class="post__content reveal is-visible">
+<p>On November 9, the Expo team pushed <code>expo/exact</code> public. It is a cross-platform UI runtime targeting web, macOS, iOS, and Linux. No React anywhere in the view. No JSX either.</p>
+<p>Your first frame arrives before a single line of application JavaScript runs.</p>
+<p>Two claims about the Expo Exact framework are true at once. It is the most honest piece of frontend infrastructure I have read this year, and it is a bet against the thing that currently makes models good at frontend.</p>
+<p>Both halves matter if you ship software with agents.</p>
+<h2>What the Expo Exact framework removes from the stack</h2>
+<p>Exact is not React Native, and it is not a React renderer. The repo states it plainly: "No JSX or React tier." Then, with unusual honesty for a launch, it adds: "The door stays open, but no one is building it."</p>
+<p>What is left is an agent-native UI architecture. The runtime is built so a program can inspect and drive it directly.</p>
+<p>What replaces the component tree:</p>
+<ul>
+<li><strong>Contract</strong>, a small domain-specific language (DSL) for views. Closed record types, keyed lists, typed values, no escape hatch into arbitrary code.</li>
+<li><strong>A baked plan.</strong> Contract compiles in four passes: syntax, types, analysis, lowering. Constant data is evaluated into the plan at build time, so first paint needs nothing else.</li>
+<li><strong>A Rust kernel.</strong> <code>exact-kernel</code> lays out a columnar node arena using CSS rules through a patched Taffy. Text measurement is CoreText on Apple hosts and cosmic-text on Linux.</li>
+<li><strong>Host painters.</strong> AppKit on macOS, UIKit on iOS, DRM/KMS (Direct Rendering Manager with Kernel Mode Setting) plus evdev input on Linux, and a ~20 KB runtime driving the real Document Object Model (DOM) on web.</li>
+</ul>
+<p>Data logic sits behind one seam. TypeScript compiles to Hermes bytecode at build time and loads after the first pixel, or you write a Rust crate instead. Every answer from a data source gets checked against the shape Contract declared.</p>
+<p>No webview. No JavaScript bridge. Hydration is not a bug you fix on this architecture. It is a design you never ship.</p>
+<h2>Why is a virtual clock better than <code>await sleep(500)</code>?</h2>
+<p>Most agent-written UI tests die inside a wait. The agent taps a button, sleeps 500 ms, and screenshots. The animation is at 40% instead of finished. The next run it is at 60%.</p>
+<p>That test is not flaky because the app is broken. It is flaky because wall-clock time is not an observable.</p>
+<p>Exact hands the clock to the agent. Between two driver operations, nothing moves. Instead of sleeping, the agent sends <code>clock +60000</code> or <code>clock settle</code> and then reads the result.</p>
+<p>That is what deterministic UI testing looks like when the runtime cooperates. Same input, same frame, every run, on every host.</p>
+<pre><code class="language-sh">bun scripts/agent.mjs web tree &quot;tap change-station&quot; &quot;type station-search Palo&quot; \
+  &quot;clock +60000&quot; state &quot;screenshot out.png&quot;
+</code></pre>
+<p>Ten operations in total, and the count is a design decision: <code>tree · screenshot · tap · type · state · layout · logs · clock · prefer · perf</code>. The README explains why there are not more. An agent API grows one reasonable addition at a time "until no one can hold it in mind".</p>
+<p>Tests work the same way. An <code>app.test.contract</code> file is a script of those operations. The same file runs unchanged on web, macOS, the iOS Simulator, and Linux headless. Caltrain's three tests take about two seconds on the web host.</p>
+<h2>Where the real cost lands: training distribution</h2>
+<p>This is where I stop applauding.</p>
+<p>Contract is small on purpose, so a whole app fits inside a context window. That is a real correctness win. Every write is declared, every list is keyed, every value is typed. Mistakes come back as refusals that say what to do.</p>
+<p>The compiler reports up to twenty independent errors in one run.</p>
+<p>But zero-shot fluency on TSX (TypeScript XML) and Tailwind CSS is not a property of TSX. It is a property of trillions of tokens of prior knowledge. Contract has almost none of that yet.</p>
+<p>The Hacker News thread made the same point from a few directions. <code>doodlesdev</code> predicted the framework would work well with a frontier model and much worse with a cheaper one. <code>btown</code> argued that a DSL carrying arbitrary expressions needs a formal language spec, a generated lexer and parser, and a stdlib that behaves identically on every target.</p>
+<p>The architectural comparisons landed too. <code>ogoffart</code>, who works on Slint, noted that the design is close to his framework. Both are Rust with a declarative DSL and their own compiler, both keep logic in a host language, and both expose tooling an agent can drive.</p>
+<p>His sharpest difference: Slint has held a stable API since 2023, while Exact is pre-1.0 and changes daily. <code>zoom6628</code> reached further back, to QML and Qt.</p>
+<p>Then there is <code>mrbombastic</code>, who wrote that prioritizing agents over humans in developer tooling makes him "sympathize with the Butlerian jihad". I laughed at that line more than I should have. The discomfort underneath it deserves a real answer, and nobody in the thread gave one.</p>
+<h2>Six checks, sixty-five seconds, fifteen documents</h2>
+<p>The part I will actually copy lives in a single markdown file. <code>rules/RULES.md</code> treats every budget as a trade rather than a limit:</p>
+<ul>
+<li><strong>Six blocking checks, 65 seconds total.</strong> A seventh requires deleting one in the same pull request.</li>
+<li><strong>1,500 lines per source file.</strong> Generated files are exempt, since they are built and never committed.</li>
+<li><strong>15 documents in the working set.</strong> A sixteenth requires archiving one.</li>
+<li><strong>700 words for the rules file itself.</strong> If it grows, something becomes a check or stops being a rule.</li>
+</ul>
+<p>The line doing the real work is short: "A limit gets exceptions. A trade doesn't."</p>
+<p>This matches what I see running an agent fleet all day. Agents perform well inside a system with a small, low-latency, strictly bounded surface. Put the same agent in a repo where build scaffolding outweighs the feature, and the failure rate stops being funny.</p>
+<h2>What I would actually steal this week</h2>
+<p>I would not migrate a product to Exact today. I would take three ideas from it this week.</p>
+<ul>
+<li><strong>Steal the clock.</strong> Replace one <code>sleep</code> in your harness with an explicit settle step and measure. A single test tells you whether your app has an observable settled state at all.</li>
+<li><strong>Count your verbs.</strong> Write down the operations your agent really uses. Above ten, and a few of them are one operation wearing two names.</li>
+<li><strong>Copy the trade wording.</strong> "A seventh check requires deleting one" is governance a reviewer cannot argue with.</li>
+</ul>
+<p>The README's "What works today, and what doesn't yet" section is the honest one. Windows control parity, Android delivery, camera access and signed TypeScript updates all sit on the unfinished list. Read it before you bet a sprint on this.</p>
+<h2>FAQ</h2>
+<h3>Does Exact replace React Native for Expo apps?</h3>
+<p>No. Exact has no React tier at all, and React Native remains what Expo supports. Treat this as an experiment in machine-first UI architecture, with no migration path for a live product.</p>
+<h3>Can an agent build and verify a whole app unaided?</h3>
+<p>The README documents one run: a fresh agent on a clean clone, given the quick-start prompt, finished a todo app in about 57 minutes. Its tests passed on web, macOS, and the iOS Simulator. About 25 of those minutes were the first macOS and iOS builds, roughly 13 each.</p>
+<h3>Why delete JavaScript from the boot path instead of optimizing it?</h3>
+<p>Because startup is emergent and cannot be retrofitted later. <code>RULES.md</code> says the boot graph is budgeted from commit one and counted, not timed, so a regression fails a check instead of showing up as a slow benchmark.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/expo-exact-framework-no-react-jsx/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
