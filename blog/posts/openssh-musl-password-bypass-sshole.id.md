@@ -32,7 +32,7 @@ Urutannya begini, mengikuti kapan tiap potongan disambung:
 
 Taruh keenamnya di satu garis waktu, tabrakannya kelihatan jelas. Nilai kegagalan musl itu `"*"`. Penanda akun terkunci di shadow juga `*`. Dan fix timing 2016 justru ada supaya `crypt()` tetap dijalankan buat akun yang nggak punya hash.
 
-## Perbandingan yang menentukan
+## Kenapa OpenSSH tetap menjalankan crypt() saat akun terkunci?
 
 Pengecekan password normal itu cuma tiga langkah:
 
@@ -125,3 +125,14 @@ Jendela maintenance bulanan itu taruhan bahwa jarak antara disclosure dan eksplo
 Di host yang gue pegang, taruhan itu berhenti murah minggu ini.
 
 Jadi catat daftar host terdampak sebelum lo butuh daftarnya. Punya gue masih berupa shell history, dan itu bukan inventaris.
+
+## FAQ
+
+### Apakah bypass ini bisa nembus kalau Alpine Linux pakai PAM?
+Nggak bisa. Host yang proses autentikasinya dilewatkan ke Linux-PAM aman karena PAM langsung memeriksa status kunci akun sebelum memanggil `crypt()`.
+
+### Apakah host yang mematikan PasswordAuthentication tetap rawan?
+Nggak rawan sama sekali. Kalau di `sshd_config` lo udah pasang `PasswordAuthentication no`, alur pengecekan password nggak bakal pernah dieksekusi sejak awal.
+
+### Apakah upgrade OpenSSH atau musl langsung menyelesaikan masalah?
+Iya, tuntas. Rilis OpenSSH 10.6p2 langsung menolak input password di atas 256 byte dan membatalkan login kalau `crypt()` mengembalikan karakter sentinel `"*"`. Tim musl juga udah menambal penanganan error sentinel tersebut.

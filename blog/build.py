@@ -139,9 +139,27 @@ def iso_date(iso):
         return datetime.now(timezone.utc).isoformat()
 
 
+def extract_faq(body):
+    """Extract Q&A pairs from a markdown body under an ## FAQ section."""
+    m = re.search(r'(?i)^##\s+(?:FAQ|Frequently Asked Questions|FAQ Teknis)\b(.*?)(?=^##\s+|\Z)', body, re.M | re.S)
+    if not m:
+        return []
+    faq_text = m.group(1)
+    # Split by ### headers
+    items = []
+    q_blocks = re.findall(r'(?i)^###\s+(.+?)\n+(.*?)(?=^###\s+|\Z)', faq_text, re.M | re.S)
+    for q, a in q_blocks:
+        question = q.strip()
+        # Clean answer text of markdown links or formatting if necessary
+        answer = a.strip()
+        if question and answer:
+            items.append((question, answer))
+    return items
+
+
 def og_block(title, description, url, image=None, locale="en_US",
              og_type="website", site_name=None, published=None, author=None,
-             tags=None, keywords=None, jsonld=None):
+             tags=None, keywords=None, jsonld=None, extra_jsonld=None):
     """Open Graph + twitter:card + JSON-LD for one page."""
     out = []
     sn = site_name or f"{BLOG_NAME} — {SITE_NAME}"
@@ -173,6 +191,10 @@ def og_block(title, description, url, image=None, locale="en_US",
     if jsonld:
         out.append('<script type="application/ld+json">'
                    + json.dumps(jsonld, ensure_ascii=False) + '</script>')
+    if extra_jsonld:
+        for ej in extra_jsonld:
+            out.append('<script type="application/ld+json">'
+                       + json.dumps(ej, ensure_ascii=False) + '</script>')
     return "\n".join(out)
 
 
@@ -191,14 +213,14 @@ def person_jsonld():
 
 def head(title, description, extra="", url=None, image=None, locale="en_US",
          og_type="website", published=None, tags=None, keywords=None, jsonld=None,
-         site_name=None):
+         extra_jsonld=None, site_name=None):
     """Build <head>. SEO tags are emitted only when `url` is supplied, so legacy
     callers that omit it still produce valid pages."""
     seo = ""
     if url:
         seo = og_block(title, description, url, image=image, locale=locale,
                        og_type=og_type, site_name=site_name, published=published,
-                       tags=tags, keywords=keywords, jsonld=jsonld)
+                       tags=tags, keywords=keywords, jsonld=jsonld, extra_jsonld=extra_jsonld)
         seo = "\n<link rel=\"canonical\" href=\"" + esc(url) + "\">\n" + seo
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -407,9 +429,30 @@ def build_post(e, lang):
             "@type": "BlogPosting", "url": alt_url,
             "inLanguage": "id-ID" if lang == "en" else "en-US"}
 
+    extra_jsonld = []
+    faq_items = extract_faq(body)
+    if faq_items:
+        faq_schema = {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": q,
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": a
+                    }
+                }
+                for q, a in faq_items
+            ]
+        }
+        extra_jsonld.append(faq_schema)
+
     page = head(title, description, "\n".join(extra), url=url, image=og_image,
                 locale="id_ID" if lang == "id" else "en_US", og_type="article",
                 published=published, tags=meta["tags"], keywords=meta["keywords"], jsonld=jsonld,
+                extra_jsonld=extra_jsonld,
                 site_name=f"{BLOG_NAME} — {SITE_NAME}")
     # set the lang attribute correctly on the real <html> element (the previous
     # implementation appended a stray '<html lang="id"' fragment into <body>)

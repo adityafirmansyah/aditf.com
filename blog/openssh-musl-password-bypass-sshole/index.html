@@ -41,7 +41,8 @@
 <meta property="article:tag" content="musl">
 <meta property="article:tag" content="alpine">
 <meta property="article:tag" content="ai-agents">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Four Decades of Defensive Workarounds, One OpenSSH musl Password Bypass", "description": "How layered workarounds created the OpenSSH musl password bypass (*sshole) on Alpine Linux hosts, allowing long passwords to unlock accounts marked with an asterisk.", "datePublished": "2026-11-06T00:00:00+00:00", "dateModified": "2026-11-06T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/"}, "keywords": "openssh musl password bypass, sshhole vulnerability, openssh 10.6p2 release, alpine linux ssh vulnerability, ai agents security embargo", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1098, "image": ["https://aditf.com/blog/openssh-musl-password-bypass-sshole/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Four Decades of Defensive Workarounds, One OpenSSH musl Password Bypass", "description": "How layered workarounds created the OpenSSH musl password bypass (*sshole) on Alpine Linux hosts, allowing long passwords to unlock accounts marked with an asterisk.", "datePublished": "2026-11-06T00:00:00+00:00", "dateModified": "2026-11-06T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/"}, "keywords": "openssh musl password bypass, sshhole vulnerability, openssh 10.6p2 release, alpine linux ssh vulnerability, ai agents security embargo", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1202, "image": ["https://aditf.com/blog/openssh-musl-password-bypass-sshole/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does this bypass work if PAM is enabled on Alpine Linux?", "acceptedAnswer": {"@type": "Answer", "text": "No. Hosts that route authentication through Linux-PAM are unaffected because PAM verifies account lock flags before delegating to `crypt()`."}}, {"@type": "Question", "name": "Can attackers exploit this on hosts with PasswordAuthentication disabled?", "acceptedAnswer": {"@type": "Answer", "text": "No. If your `sshd_config` enforces `PasswordAuthentication no`, the password verification flow is never invoked."}}, {"@type": "Question", "name": "Does upgrading OpenSSH or musl completely remediate the issue?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Upgrading to OpenSSH 10.6p2 adds explicit checks that reject passwords longer than 256 bytes and refuses authentication if `crypt()` returns an error sentinel like `\"*\"`. musl has also patched its failure sentinel handling."}}]}</script>
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/">
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/">
@@ -70,7 +71,7 @@
     <div class="post__waybill">
       <span class="waybill__field">FILED <b>06 Nov 2026</b></span>
       <span class="waybill__divider" aria-hidden="true">&middot;</span>
-      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__field">6 MIN READ</span>
       <span class="waybill__divider" aria-hidden="true">&middot;</span>
       <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
     </div>
@@ -91,7 +92,7 @@
 <li>In <strong>2022</strong>, Alpine 3.16 commit <code>fbe926af</code> moves root's locked field from <code>!</code> back to <code>*</code>, because without pluggable authentication modules (PAM) the <code>!</code> also killed public-key logins.</li>
 </ul>
 <p>Plot those six on one timeline and the collision is obvious. musl's failure value is <code>"*"</code>. The shadow convention for a locked account is <code>*</code>. And the 2016 timing fix exists specifically to run <code>crypt()</code> for accounts that have no hash.</p>
-<h2>The comparison that decides it</h2>
+<h2>Why did OpenSSH invoke crypt() on locked accounts?</h2>
 <p>A normal password check has three steps:</p>
 <ul>
 <li>sshd takes the salt out of the stored field,</li>
@@ -141,6 +142,13 @@ rc-service sshd restart
 <p>I am not filing this under "Alpine problem". The interesting failure is the interface. A locking convention in a text file and an error sentinel in libc are both useful conventions. Neither is an authentication boundary, and nothing in the stack was built to notice that they had become the same value.</p>
 <p>The operational lesson is duller and more useful. If upstream ships emergency releases within a day because agents rediscover bugs in hours, my patch cadence has to survive that rhythm. A monthly maintenance window bets that the gap between disclosure and exploitation is still measured in months.</p>
 <p>On the hosts I run, that bet stopped being cheap this week. Write your affected-host inventory down before you need it. Mine was a shell history, which is not an inventory.</p>
+<h2>FAQ</h2>
+<h3>Does this bypass work if PAM is enabled on Alpine Linux?</h3>
+<p>No. Hosts that route authentication through Linux-PAM are unaffected because PAM verifies account lock flags before delegating to <code>crypt()</code>.</p>
+<h3>Can attackers exploit this on hosts with PasswordAuthentication disabled?</h3>
+<p>No. If your <code>sshd_config</code> enforces <code>PasswordAuthentication no</code>, the password verification flow is never invoked.</p>
+<h3>Does upgrading OpenSSH or musl completely remediate the issue?</h3>
+<p>Yes. Upgrading to OpenSSH 10.6p2 adds explicit checks that reject passwords longer than 256 bytes and refuses authentication if <code>crypt()</code> returns an error sentinel like <code>"*"</code>. musl has also patched its failure sentinel handling.</p>
     </div>
     <div class="hero__actions post__footer-actions">
       <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>

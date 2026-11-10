@@ -41,7 +41,8 @@
 <meta property="article:tag" content="musl">
 <meta property="article:tag" content="alpine">
 <meta property="article:tag" content="ai-agents">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Empat Dekade Workaround Defensif Berujung Bypass Otentikasi OpenSSH di musl", "description": "Di host Alpine Linux tanpa PAM, password 300 karakter memicu bypass otentikasi OpenSSH musl (*sshole) pada akun yang dikunci dengan tanda asterisk.", "datePublished": "2026-11-06T00:00:00+00:00", "dateModified": "2026-11-06T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/"}, "keywords": "openssh musl password bypass, sshhole vulnerability, openssh 10.6p2 release, alpine linux ssh vulnerability, ai agents security embargo", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1153, "image": ["https://aditf.com/blog/openssh-musl-password-bypass-sshole/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Empat Dekade Workaround Defensif Berujung Bypass Otentikasi OpenSSH di musl", "description": "Di host Alpine Linux tanpa PAM, password 300 karakter memicu bypass otentikasi OpenSSH musl (*sshole) pada akun yang dikunci dengan tanda asterisk.", "datePublished": "2026-11-06T00:00:00+00:00", "dateModified": "2026-11-06T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/"}, "keywords": "openssh musl password bypass, sshhole vulnerability, openssh 10.6p2 release, alpine linux ssh vulnerability, ai agents security embargo", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1260, "image": ["https://aditf.com/blog/openssh-musl-password-bypass-sshole/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/openssh-musl-password-bypass-sshole/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Apakah bypass ini bisa nembus kalau Alpine Linux pakai PAM?", "acceptedAnswer": {"@type": "Answer", "text": "Nggak bisa. Host yang proses autentikasinya dilewatkan ke Linux-PAM aman karena PAM langsung memeriksa status kunci akun sebelum memanggil `crypt()`."}}, {"@type": "Question", "name": "Apakah host yang mematikan PasswordAuthentication tetap rawan?", "acceptedAnswer": {"@type": "Answer", "text": "Nggak rawan sama sekali. Kalau di `sshd_config` lo udah pasang `PasswordAuthentication no`, alur pengecekan password nggak bakal pernah dieksekusi sejak awal."}}, {"@type": "Question", "name": "Apakah upgrade OpenSSH atau musl langsung menyelesaikan masalah?", "acceptedAnswer": {"@type": "Answer", "text": "Iya, tuntas. Rilis OpenSSH 10.6p2 langsung menolak input password di atas 256 byte dan membatalkan login kalau `crypt()` mengembalikan karakter sentinel `\"*\"`. Tim musl juga udah menambal penanganan error sentinel tersebut."}}]}</script>
 <link rel="alternate" hreflang="en" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/">
 <link rel="alternate" hreflang="id" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/id/">
 <link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/openssh-musl-password-bypass-sshole/">
@@ -94,7 +95,7 @@
 <li>Tahun <strong>2022</strong>, commit Alpine 3.16 <code>fbe926af</code> mengembalikan field root yang terkunci dari <code>!</code> ke <code>*</code>, karena tanpa pluggable authentication modules (PAM) tanda <code>!</code> juga mematikan login public key.</li>
 </ul>
 <p>Taruh keenamnya di satu garis waktu, tabrakannya kelihatan jelas. Nilai kegagalan musl itu <code>"*"</code>. Penanda akun terkunci di shadow juga <code>*</code>. Dan fix timing 2016 justru ada supaya <code>crypt()</code> tetap dijalankan buat akun yang nggak punya hash.</p>
-<h2>Perbandingan yang menentukan</h2>
+<h2>Kenapa OpenSSH tetap menjalankan crypt() saat akun terkunci?</h2>
 <p>Pengecekan password normal itu cuma tiga langkah:</p>
 <ul>
 <li>sshd ambil salt dari field yang tersimpan,</li>
@@ -153,6 +154,13 @@ rc-service sshd restart
 <p>Jendela maintenance bulanan itu taruhan bahwa jarak antara disclosure dan eksploitasi masih diukur dalam bulan.</p>
 <p>Di host yang gue pegang, taruhan itu berhenti murah minggu ini.</p>
 <p>Jadi catat daftar host terdampak sebelum lo butuh daftarnya. Punya gue masih berupa shell history, dan itu bukan inventaris.</p>
+<h2>FAQ</h2>
+<h3>Apakah bypass ini bisa nembus kalau Alpine Linux pakai PAM?</h3>
+<p>Nggak bisa. Host yang proses autentikasinya dilewatkan ke Linux-PAM aman karena PAM langsung memeriksa status kunci akun sebelum memanggil <code>crypt()</code>.</p>
+<h3>Apakah host yang mematikan PasswordAuthentication tetap rawan?</h3>
+<p>Nggak rawan sama sekali. Kalau di <code>sshd_config</code> lo udah pasang <code>PasswordAuthentication no</code>, alur pengecekan password nggak bakal pernah dieksekusi sejak awal.</p>
+<h3>Apakah upgrade OpenSSH atau musl langsung menyelesaikan masalah?</h3>
+<p>Iya, tuntas. Rilis OpenSSH 10.6p2 langsung menolak input password di atas 256 byte dan membatalkan login kalau <code>crypt()</code> mengembalikan karakter sentinel <code>"*"</code>. Tim musl juga udah menambal penanganan error sentinel tersebut.</p>
     </div>
     <div class="hero__actions post__footer-actions">
       <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>

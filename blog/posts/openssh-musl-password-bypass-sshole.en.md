@@ -26,7 +26,7 @@ The chain, welded in this order:
 
 Plot those six on one timeline and the collision is obvious. musl's failure value is `"*"`. The shadow convention for a locked account is `*`. And the 2016 timing fix exists specifically to run `crypt()` for accounts that have no hash.
 
-## The comparison that decides it
+## Why did OpenSSH invoke crypt() on locked accounts?
 
 A normal password check has three steps:
 
@@ -101,3 +101,14 @@ I am not filing this under "Alpine problem". The interesting failure is the inte
 The operational lesson is duller and more useful. If upstream ships emergency releases within a day because agents rediscover bugs in hours, my patch cadence has to survive that rhythm. A monthly maintenance window bets that the gap between disclosure and exploitation is still measured in months.
 
 On the hosts I run, that bet stopped being cheap this week. Write your affected-host inventory down before you need it. Mine was a shell history, which is not an inventory.
+
+## FAQ
+
+### Does this bypass work if PAM is enabled on Alpine Linux?
+No. Hosts that route authentication through Linux-PAM are unaffected because PAM verifies account lock flags before delegating to `crypt()`.
+
+### Can attackers exploit this on hosts with PasswordAuthentication disabled?
+No. If your `sshd_config` enforces `PasswordAuthentication no`, the password verification flow is never invoked.
+
+### Does upgrading OpenSSH or musl completely remediate the issue?
+Yes. Upgrading to OpenSSH 10.6p2 adds explicit checks that reject passwords longer than 256 bytes and refuses authentication if `crypt()` returns an error sentinel like `"*"`. musl has also patched its failure sentinel handling.
