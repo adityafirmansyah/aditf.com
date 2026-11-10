@@ -427,10 +427,10 @@ html.lenis, html.lenis body {
 
       <p class="hero__lede" data-b="lede">Thirteen-plus years architecting resilient web platforms, distributed microservices, and autonomous AI workflows&nbsp;&mdash; building scalable systems from zero to production.</p>
 
-      <div class="hero__actions" data-b="actions">
-        <a class="btn btn--stamp" href="/consult/">Work with me</a>
-        <a class="btn btn--ghost" href="assets/Aditya_Firmansyah_CV.pdf" download>Download CV</a>
-        <a class="btn btn--ghost" href="#contact">Get in touch</a>
+      <div class="hero__actions">
+        <a class="btn btn--stamp" href="/consult/" data-b="action-1">Work with me</a>
+        <a class="btn btn--ghost" href="assets/Aditya_Firmansyah_CV.pdf" download data-b="action-2">Download CV</a>
+        <a class="btn btn--ghost" href="#contact" data-b="action-3">Get in touch</a>
       </div>
     </div>
   </section>
@@ -1238,7 +1238,14 @@ document.addEventListener('DOMContentLoaded', () => {
       const role = document.querySelector('[data-b="role"]');
       const route = document.querySelector('[data-b="route"]');
       const lede = document.querySelector('[data-b="lede"]');
-      const actions = document.querySelector('[data-b="actions"]');
+      // Each CTA button is its own build target: no shared wireframe across three
+      // controls (a single 952px stamp makes the buttons look like one block and
+      // hides which control is being constructed).
+      const actions = [
+        document.querySelector('[data-b="action-1"]'),
+        document.querySelector('[data-b="action-2"]'),
+        document.querySelector('[data-b="action-3"]')
+      ];
 
       // Wave 1: Waybill (Adit) & Heading Name (QA)
       buildElement(waybill, cursorDoms[0], 0.1);
@@ -1248,9 +1255,15 @@ document.addEventListener('DOMContentLoaded', () => {
       buildElement(role, cursorDoms[2], 0.05);
       await buildElement(route, cursorDoms[3], 0.15);
 
-      // Wave 3: Lede (Adit) & CTA Buttons (QA)
+      // Wave 3: Lede (Adit), then each CTA button on its own cursor. The three
+      // buttons are separate build targets (one wireframe each) but run in
+      // parallel with a small stagger, so the row doesn't serialize the build.
       buildElement(lede, cursorDoms[0], 0.1);
-      await buildElement(actions, cursorDoms[1], 0.2);
+      await Promise.all(
+        actions.map((btn, i) =>
+          buildElement(btn, cursorDoms[(i + 1) % cursorDoms.length], 0.2 + i * 0.12)
+        )
+      );
 
       // Wave 4: Fade cursors to subtle floating patrol
       cursorDoms.forEach((c, idx) => {
