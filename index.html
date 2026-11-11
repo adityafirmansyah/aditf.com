@@ -1157,26 +1157,24 @@ document.addEventListener('DOMContentLoaded', () => {
     swarmLayer.id = 'swarmOverlay';
     document.body.appendChild(swarmLayer);
 
-    // Operator Cursor Pool
-    const AGENTS = [
-      { name: "Adit", color: "#E8871E", textColor: "#000" },
-      { name: "QA-Bot", color: "#38BDF8", textColor: "#000" },
-      { name: "Ops-Lead", color: "#10B981", textColor: "#000" },
-      { name: "Motion", color: "#A855F7", textColor: "#FFF" }
+    // Dynamic Cursor Swarm Pool (No name labels, pure fast cursors)
+    const CURSOR_COLORS = [
+      "#E8871E", "#38BDF8", "#10B981", "#A855F7", 
+      "#F59E0B", "#EC4899", "#6366F1", "#14B8A6",
+      "#EF4444", "#8B5CF6", "#06B6D4", "#84CC16"
     ];
 
-    const cursorDoms = AGENTS.map((agent, i) => {
+    const cursorDoms = CURSOR_COLORS.map((color, i) => {
       const el = document.createElement('div');
       el.className = 'swarm-cursor';
       el.innerHTML = `
         <svg viewBox="0 0 16 18">
-          <path d="M0 0 L15 6 L8 9 L5 16 Z" fill="${agent.color}"/>
+          <path d="M0 0 L15 6 L8 9 L5 16 Z" fill="${color}"/>
         </svg>
-        <span class="tag" style="background:${agent.color}; color:${agent.textColor}">${agent.name}</span>
       `;
       swarmLayer.appendChild(el);
-      gsap.set(el, { x: (i % 2 === 0 ? -150 : window.innerWidth + 150), y: 150 + i * 60, opacity: 0 });
-      return { el, agent, busy: false };
+      gsap.set(el, { x: (i % 2 === 0 ? -180 : window.innerWidth + 180), y: 120 + i * 45, opacity: 0 });
+      return { el, color, busy: false };
     });
 
     // Helper: Build a DOM Element using a Cursor with Box Draw + Snapping
@@ -1203,7 +1201,7 @@ document.addEventListener('DOMContentLoaded', () => {
         wireframe.style.top = `${pageTop}px`;
         wireframe.style.width = '0px';
         wireframe.style.height = '0px';
-        wireframe.style.borderColor = agentObj.agent.color;
+        wireframe.style.borderColor = agentObj.color || '#E8871E';
         swarmLayer.appendChild(wireframe);
 
         const tl = gsap.timeline({ delay });
@@ -1214,14 +1212,14 @@ document.addEventListener('DOMContentLoaded', () => {
             x: pageLeft,
             y: pageTop,
             opacity: 1,
-            duration: 0.5,
+            duration: 0.32,
             ease: 'power3.out'
           })
           // Draw bounding box diagonal down-right
           .to(cursor, {
             x: pageLeft + w,
             y: pageTop + h,
-            duration: 0.45,
+            duration: 0.28,
             ease: 'power2.inOut',
             onUpdate: function () {
               const curX = gsap.getProperty(cursor, "x");
@@ -1236,11 +1234,11 @@ document.addEventListener('DOMContentLoaded', () => {
             gsap.set(targetEl, { visibility: 'visible' });
             gsap.fromTo(targetEl, 
               { scale: 0.98, opacity: 0.7 },
-              { scale: 1, opacity: 1, duration: 0.25, ease: 'back.out(2)' }
+              { scale: 1, opacity: 1, duration: 0.2, ease: 'back.out(2)' }
             );
           })
           // Remove wireframe box
-          .to(wireframe, { opacity: 0, duration: 0.15, onComplete: () => wireframe.remove() })
+          .to(wireframe, { opacity: 0, duration: 0.1, onComplete: () => wireframe.remove() })
           .call(resolve);
       });
     }
@@ -1266,8 +1264,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const pageTop = r.top + scrollY;
 
         const cursor = agentObj.el;
-        const tag = cursor.querySelector('.tag');
-        const origTagText = tag ? tag.textContent : '';
 
         // Clear content for typing, create blinking caret
         targetEl.innerHTML = '';
@@ -1276,7 +1272,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const textSpan = document.createElement('span');
         const caret = document.createElement('span');
         caret.className = 'swarm-caret';
-        caret.style.backgroundColor = agentObj.agent.color;
+        caret.style.backgroundColor = agentObj.color || '#E8871E';
         targetEl.appendChild(textSpan);
         targetEl.appendChild(caret);
 
@@ -1285,12 +1281,10 @@ document.addEventListener('DOMContentLoaded', () => {
           x: pageLeft,
           y: pageTop + 4,
           opacity: 1,
-          duration: 0.4,
+          duration: 0.25,
           delay: delay,
           ease: 'power3.out',
           onComplete: () => {
-            if (tag) tag.textContent = 'typing...';
-
             let charIdx = 0;
             const timer = setInterval(() => {
               if (charIdx < rawText.length) {
@@ -1311,9 +1305,8 @@ document.addEventListener('DOMContentLoaded', () => {
                   // Restore original HTML structure (links, accents, inner tags)
                   targetEl.classList.add('built');
                   targetEl.innerHTML = originalHTML;
-                  if (tag) tag.textContent = origTagText;
                   resolve();
-                }, 100);
+                }, 80);
               }
             }, charSpeed);
           }
@@ -1360,21 +1353,20 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('[data-b="action-3"]')
       ];
 
-      // Wave 1: Draw Waybill Stamp (Adit) while Typing Headline Name (QA-Bot)
-      buildElement(waybill, cursorDoms[0], 0.05);
-      await typeTextElement(name, cursorDoms[1], 0.15, 28);
+      // Wave 1: Draw Waybill & Route while typing Name
+      buildElement(waybill, cursorDoms[0], 0);
+      buildElement(route, cursorDoms[2], 0.05);
+      await typeTextElement(name, cursorDoms[1], 0.05, 18);
 
-      // Wave 2: Type Role (Ops-Lead) & Draw Route Line (Motion)
-      buildElement(route, cursorDoms[3], 0.05);
-      await typeTextElement(role, cursorDoms[2], 0.1, 14);
+      // Wave 2: Type Role & build Action CTA buttons in parallel
+      const rolePromise = typeTextElement(role, cursorDoms[3], 0.02, 10);
+      const actionPromises = actions.map((btn, i) =>
+        buildElement(btn, cursorDoms[4 + i], 0.05 + i * 0.06)
+      );
+      await Promise.all([rolePromise, ...actionPromises]);
 
-      // Wave 3: Type Lede paragraph & Build interactive Action buttons
-      await Promise.all([
-        typeTextElement(lede, cursorDoms[0], 0.05, 8),
-        ...actions.map((btn, i) =>
-          buildElement(btn, cursorDoms[(i + 1) % cursorDoms.length], 0.2 + i * 0.12)
-        )
-      ]);
+      // Wave 3: Type Lede paragraph fast
+      await typeTextElement(lede, cursorDoms[0], 0.02, 5);
 
       // Remove any lingering carets
       document.querySelectorAll('.swarm-caret').forEach(c => c.remove());
@@ -1418,15 +1410,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 2. Type out the ABOUT paragraph with live caret (fast natural cadence)
             if (aboutText) {
-              await typeTextElement(aboutText, cursorDoms[0], 0.05, 5);
+              await typeTextElement(aboutText, cursorDoms[0], 0.02, 4);
             }
 
-            // 3. Build each stat chip strictly ONE AT A TIME with animated counter
+            // 3. Build each stat chip with animated counter (fast handoff)
             for (let i = 0; i < statChips.length; i++) {
               const chip = statChips[i];
               if (!chip) continue;
               const agent = cursorDoms[i % cursorDoms.length];
-              await buildElement(chip, agent, 0.05);
+              await buildElement(chip, agent, 0.02);
 
               // Trigger odometer counter for this chip immediately upon build
               const odo = chip.querySelector('.odometer');
@@ -1439,7 +1431,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   targets: obj,
                   val: target,
                   round: isFloat ? 10 : 1,
-                  duration: 800,
+                  duration: 600,
                   easing: 'easeOutExpo',
                   update: () => {
                     odo.innerText = (isFloat ? obj.val.toFixed(1) : obj.val) + suffix;
@@ -1475,14 +1467,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 1. Header
             if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
-            if (heading) await typeTextElement(heading, cursorDoms[1], 0.05, 20);
+            if (heading) await typeTextElement(heading, cursorDoms[1], 0.02, 14);
 
-            // 2. Build crate-grid cards ONE AT A TIME
+            // 2. Build crate-grid cards with dedicated cursors (snappy handoff)
             for (let i = 0; i < crates.length; i++) {
               const crate = crates[i];
               if (!crate) continue;
               const agent = cursorDoms[i % cursorDoms.length];
-              await buildElement(crate, agent, 0.04);
+              await buildElement(crate, agent, 0.02);
             }
 
             // Standby: park cursors hidden outside the frame
