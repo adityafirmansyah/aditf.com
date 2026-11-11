@@ -14,6 +14,12 @@
 <script>
   // Progressive enhancement: start blank for swarm builder if motion is allowed
   (function () {
+    // Disable browser scroll restoration so reload ALWAYS starts at top
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+    window.scrollTo(0, 0);
+
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     document.documentElement.classList.add('anim');
     // Safety watchdog: restore visibility if scripts fail or take > 3s
@@ -1123,6 +1129,7 @@ document.addEventListener('DOMContentLoaded', () => {
       touchMultiplier: 1.2
     });
     window.__lenis = lenis;
+    lenis.scrollTo(0, { immediate: true });
 
     if (window.ScrollTrigger) {
       gsap.registerPlugin(ScrollTrigger);
