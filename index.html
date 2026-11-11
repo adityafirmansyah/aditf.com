@@ -250,8 +250,13 @@
    ============================================================ */
 
 /* 1. Blank state until builders construct the element */
-html.anim [data-b] {
+html.anim [data-b],
+[data-b]:not(.built) {
   visibility: hidden;
+}
+
+[data-b].built {
+  visibility: visible !important;
 }
 
 /* 2. Global Swarm Canvas & Multi-Cursor Overlay */
@@ -463,11 +468,11 @@ html.lenis, html.lenis body {
       <p data-b="about-text">Senior full-stack engineer with 13+ years delivering customer-facing platforms, multi-tenant commerce solutions, and scalable APIs. Specializes in Next.js, TypeScript, Node.js and production system architecture, with additional FastAPI expertise. Built software supporting cross-border logistics across APAC, optimized catalog queries by 11.6&times;, and helped reduce reported regression defects by over 40% through engineering quality improvements. Combines hands-on delivery with platform reliability, payment integrations, and technical leadership.</p>
     </div>
 
-    <div class="stat-row reveal" id="statRow" data-b="stat-row">
-      <div class="stat-chip"><span class="stat-chip__num odometer" data-target="13" data-suffix="+">13+</span><span class="stat-chip__label">Years Delivering Platforms</span></div>
-      <div class="stat-chip"><span class="stat-chip__num odometer" data-target="11.6" data-suffix="x">11.6x</span><span class="stat-chip__label">Peak Query Optimization</span></div>
-      <div class="stat-chip"><span class="stat-chip__num odometer" data-target="40" data-suffix="%+">40%+</span><span class="stat-chip__label">Defect Reduction (CI/TDD)</span></div>
-      <div class="stat-chip"><span class="stat-chip__num odometer" data-target="99.9" data-suffix="%+">99.9%+</span><span class="stat-chip__label">Reported Platform Uptime</span></div>
+    <div class="stat-row reveal" id="statRow">
+      <div class="stat-chip" data-b="stat-1"><span class="stat-chip__num odometer" data-target="13" data-suffix="+">13+</span><span class="stat-chip__label">Years Delivering Platforms</span></div>
+      <div class="stat-chip" data-b="stat-2"><span class="stat-chip__num odometer" data-target="11.6" data-suffix="x">11.6x</span><span class="stat-chip__label">Peak Query Optimization</span></div>
+      <div class="stat-chip" data-b="stat-3"><span class="stat-chip__num odometer" data-target="40" data-suffix="%+">40%+</span><span class="stat-chip__label">Defect Reduction (CI/TDD)</span></div>
+      <div class="stat-chip" data-b="stat-4"><span class="stat-chip__num odometer" data-target="99.9" data-suffix="%+">99.9%+</span><span class="stat-chip__label">Reported Platform Uptime</span></div>
     </div>
   </section>
 
@@ -1170,7 +1175,7 @@ document.addEventListener('DOMContentLoaded', () => {
         <span class="tag" style="background:${agent.color}; color:${agent.textColor}">${agent.name}</span>
       `;
       swarmLayer.appendChild(el);
-      gsap.set(el, { x: window.innerWidth * (0.2 + i * 0.18), y: 150 + i * 60, opacity: 0 });
+      gsap.set(el, { x: (i % 2 === 0 ? -150 : window.innerWidth + 150), y: 150 + i * 60, opacity: 0 });
       return { el, agent, busy: false };
     });
 
@@ -1227,6 +1232,7 @@ document.addEventListener('DOMContentLoaded', () => {
           })
           // Stamp / Reveal: The real DOM element becomes visible!
           .call(() => {
+            targetEl.classList.add('built');
             gsap.set(targetEl, { visibility: 'visible' });
             gsap.fromTo(targetEl, 
               { scale: 0.98, opacity: 0.7 },
@@ -1303,6 +1309,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearInterval(timer);
                 setTimeout(() => {
                   // Restore original HTML structure (links, accents, inner tags)
+                  targetEl.classList.add('built');
                   targetEl.innerHTML = originalHTML;
                   if (tag) tag.textContent = origTagText;
                   resolve();
@@ -1314,11 +1321,29 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
+    // Hide all cursors outside viewport (standby mode)
+    function parkCursors() {
+      cursorDoms.forEach((c, idx) => {
+        gsap.killTweensOf(c.el);
+        const offX = idx % 2 === 0 ? -250 : window.innerWidth + 250;
+        const curScrollY = window.scrollY || window.pageYOffset;
+        gsap.to(c.el, {
+          x: offX,
+          y: curScrollY + 200 + idx * 80,
+          opacity: 0,
+          duration: 0.5,
+          ease: 'power2.in',
+          overwrite: 'auto'
+        });
+      });
+    }
+
     // Hero Sequence Builder
     async function runHeroBuild() {
       // 1. Reveal Nav first
       const navEl = document.querySelector('[data-b="nav"]');
       if (navEl) {
+        navEl.classList.add('built');
         gsap.set(navEl, { visibility: 'visible', opacity: 0, y: -20 });
         gsap.to(navEl, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' });
       }
@@ -1354,20 +1379,11 @@ document.addEventListener('DOMContentLoaded', () => {
       // Remove any lingering carets
       document.querySelectorAll('.swarm-caret').forEach(c => c.remove());
 
-      // Wave 4: Fade cursors to subtle floating patrol
-      cursorDoms.forEach((c, idx) => {
-        gsap.to(c.el, {
-          x: `+=${(idx % 2 === 0 ? 30 : -30)}`,
-          y: `+=${(idx < 2 ? -20 : 20)}`,
-          duration: 3,
-          repeat: -1,
-          yoyo: true,
-          ease: 'sine.inOut'
-        });
-      });
-
       // Cleanup initial anim class once hero is fully rendered
       document.documentElement.classList.remove('anim');
+
+      // Standby: park cursors hidden outside the frame
+      parkCursors();
     }
 
     // Scroll-triggered Builder for Sections (About, Skills, Projects)
@@ -1386,22 +1402,54 @@ document.addEventListener('DOMContentLoaded', () => {
             const heading = aboutSec.querySelector('[data-b="heading"]');
             const aboutCard = aboutSec.querySelector('[data-b="about-card"]');
             const aboutText = aboutSec.querySelector('[data-b="about-text"]');
-            const statRow = aboutSec.querySelector('[data-b="stat-row"]');
+            const statChips = [
+              aboutSec.querySelector('[data-b="stat-1"]'),
+              aboutSec.querySelector('[data-b="stat-2"]'),
+              aboutSec.querySelector('[data-b="stat-3"]'),
+              aboutSec.querySelector('[data-b="stat-4"]')
+            ];
 
             // 1. Draw card boundary & header
-            if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
-            if (heading) typeTextElement(heading, cursorDoms[1], 0.1, 24);
-            if (aboutCard) await buildElement(aboutCard, cursorDoms[2], 0.2);
+            await Promise.all([
+              eyebrow ? buildElement(eyebrow, cursorDoms[0], 0) : Promise.resolve(),
+              heading ? typeTextElement(heading, cursorDoms[1], 0.05, 20) : Promise.resolve()
+            ]);
+            if (aboutCard) await buildElement(aboutCard, cursorDoms[2], 0.05);
 
-            // 2. Type out the ABOUT paragraph with live caret
+            // 2. Type out the ABOUT paragraph with live caret (fast natural cadence)
             if (aboutText) {
-              await typeTextElement(aboutText, cursorDoms[0], 0.1, 7);
+              await typeTextElement(aboutText, cursorDoms[0], 0.05, 5);
             }
 
-            // 3. Reveal stat chips row
-            if (statRow) {
-              buildElement(statRow, cursorDoms[3], 0.1);
+            // 3. Build each stat chip strictly ONE AT A TIME with animated counter
+            for (let i = 0; i < statChips.length; i++) {
+              const chip = statChips[i];
+              if (!chip) continue;
+              const agent = cursorDoms[i % cursorDoms.length];
+              await buildElement(chip, agent, 0.05);
+
+              // Trigger odometer counter for this chip immediately upon build
+              const odo = chip.querySelector('.odometer');
+              if (odo && window.anime) {
+                const target = parseFloat(odo.dataset.target);
+                const suffix = odo.dataset.suffix || '';
+                const isFloat = String(odo.dataset.target).includes('.');
+                const obj = { val: 0 };
+                anime({
+                  targets: obj,
+                  val: target,
+                  round: isFloat ? 10 : 1,
+                  duration: 800,
+                  easing: 'easeOutExpo',
+                  update: () => {
+                    odo.innerText = (isFloat ? obj.val.toFixed(1) : obj.val) + suffix;
+                  }
+                });
+              }
             }
+
+            // Standby: park cursors hidden outside the frame
+            parkCursors();
           }
         });
       }
@@ -1415,16 +1463,19 @@ document.addEventListener('DOMContentLoaded', () => {
           trigger: sec,
           start: 'top 75%',
           once: true,
-          onEnter: () => {
+          onEnter: async () => {
             const targets = Array.from(sec.querySelectorAll('[data-b]'));
-            targets.forEach((el, i) => {
+            for (let i = 0; i < targets.length; i++) {
+              const el = targets[i];
               const agent = cursorDoms[i % cursorDoms.length];
               if (el.dataset.b === 'heading' || el.tagName === 'P') {
-                typeTextElement(el, agent, i * 0.15, 18);
+                await typeTextElement(el, agent, 0.05, 18);
               } else {
-                buildElement(el, agent, i * 0.12);
+                await buildElement(el, agent, 0.05);
               }
-            });
+            }
+            // Standby: park cursors hidden outside frame after section build
+            parkCursors();
           }
         });
       });
