@@ -484,37 +484,37 @@ html.lenis, html.lenis body {
     </div>
 
     <div class="crate-grid">
-      <div class="crate reveal">
+      <div class="crate reveal" data-b="crate-1">
         <p class="crate__label">Frontend</p>
         <div class="crate__items">
           <span>Next.js (App Router)</span><span>React</span><span>TypeScript</span><span>JavaScript</span><span>Tailwind CSS</span><span>Web Performance</span>
         </div>
       </div>
-      <div class="crate reveal">
+      <div class="crate reveal" data-b="crate-2">
         <p class="crate__label">Backend &amp; APIs</p>
         <div class="crate__items">
           <span>Node.js</span><span>NestJS</span><span>REST</span><span>gRPC</span><span>FastAPI</span><span>SQLAlchemy</span><span>Microservices</span>
         </div>
       </div>
-      <div class="crate reveal">
+      <div class="crate reveal" data-b="crate-3">
         <p class="crate__label">SaaS &amp; Data</p>
         <div class="crate__items">
           <span>Multi-tenant Architecture</span><span>PostgreSQL</span><span>MySQL</span><span>Redis</span><span>Background Jobs</span><span>Payments &amp; Idempotency</span><span>Database Indexing</span>
         </div>
       </div>
-      <div class="crate reveal">
+      <div class="crate reveal" data-b="crate-4">
         <p class="crate__label">Platform &amp; Delivery</p>
         <div class="crate__items">
           <span>Docker</span><span>Kubernetes</span><span>CI/CD</span><span>GitHub Actions</span><span>Linux</span><span>Nginx</span><span>Caddy</span><span>TDD</span>
         </div>
       </div>
-      <div class="crate reveal">
+      <div class="crate reveal" data-b="crate-5">
         <p class="crate__label">Platform &amp; AI</p>
         <div class="crate__items">
           <span>AI Agents</span><span>LLM Workflows</span><span>Website Builders</span><span>SEO Tooling</span>
         </div>
       </div>
-      <div class="crate reveal">
+      <div class="crate reveal" data-b="crate-6">
         <p class="crate__label">Practices</p>
         <div class="crate__items">
           <span>System Architecture</span><span>Code Review</span><span>Integration APIs</span><span>Automated Testing</span>
@@ -1454,10 +1454,47 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
+      // Special Sequence for SKILLS (crate-grid) section
+      const skillsSec = document.getElementById('skills');
+      if (skillsSec) {
+        ScrollTrigger.create({
+          trigger: skillsSec,
+          start: 'top 75%',
+          once: true,
+          onEnter: async () => {
+            const eyebrow = skillsSec.querySelector('[data-b="eyebrow"]');
+            const heading = skillsSec.querySelector('[data-b="heading"]');
+            const crates = [
+              skillsSec.querySelector('[data-b="crate-1"]'),
+              skillsSec.querySelector('[data-b="crate-2"]'),
+              skillsSec.querySelector('[data-b="crate-3"]'),
+              skillsSec.querySelector('[data-b="crate-4"]'),
+              skillsSec.querySelector('[data-b="crate-5"]'),
+              skillsSec.querySelector('[data-b="crate-6"]')
+            ];
+
+            // 1. Header
+            if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
+            if (heading) await typeTextElement(heading, cursorDoms[1], 0.05, 20);
+
+            // 2. Build crate-grid cards ONE AT A TIME
+            for (let i = 0; i < crates.length; i++) {
+              const crate = crates[i];
+              if (!crate) continue;
+              const agent = cursorDoms[i % cursorDoms.length];
+              await buildElement(crate, agent, 0.04);
+            }
+
+            // Standby: park cursors hidden outside the frame
+            parkCursors();
+          }
+        });
+      }
+
       // Generic trigger for remaining sections
       const sections = document.querySelectorAll('[data-seq]');
       sections.forEach(sec => {
-        if (sec.dataset.seq === 'hero' || sec.id === 'about') return;
+        if (sec.dataset.seq === 'hero' || sec.id === 'about' || sec.id === 'skills') return;
 
         ScrollTrigger.create({
           trigger: sec,
