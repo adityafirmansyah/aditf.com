@@ -294,6 +294,22 @@ html.anim [data-b] {
   letter-spacing: .04em;
   box-shadow: 0 4px 12px rgba(0,0,0,0.5);
   color: #070A0D;
+  transition: opacity 0.2s ease;
+}
+
+.swarm-caret {
+  display: inline-block;
+  width: 2px;
+  height: 1.1em;
+  vertical-align: -0.15em;
+  background-color: var(--amber);
+  animation: blinkCaret 0.8s infinite;
+  margin-left: 2px;
+}
+
+@keyframes blinkCaret {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
 }
 
 /* 3. Ghost Builder Frame & Snapping Ruler Guides */
@@ -1193,14 +1209,14 @@ document.addEventListener('DOMContentLoaded', () => {
             x: pageLeft,
             y: pageTop,
             opacity: 1,
-            duration: 0.6,
+            duration: 0.5,
             ease: 'power3.out'
           })
           // Draw bounding box diagonal down-right
           .to(cursor, {
             x: pageLeft + w,
             y: pageTop + h,
-            duration: 0.5,
+            duration: 0.45,
             ease: 'power2.inOut',
             onUpdate: function () {
               const curX = gsap.getProperty(cursor, "x");
@@ -1218,8 +1234,83 @@ document.addEventListener('DOMContentLoaded', () => {
             );
           })
           // Remove wireframe box
-          .to(wireframe, { opacity: 0, duration: 0.2, onComplete: () => wireframe.remove() })
+          .to(wireframe, { opacity: 0, duration: 0.15, onComplete: () => wireframe.remove() })
           .call(resolve);
+      });
+    }
+
+    // Helper: Build Text Element with realistic Cursor Typing Effect
+    function typeTextElement(targetEl, agentObj, delay = 0, charSpeed = 22) {
+      return new Promise((resolve) => {
+        if (!targetEl) return resolve();
+
+        // Preserve raw text/HTML structure
+        const originalHTML = targetEl.innerHTML;
+        const rawText = targetEl.textContent.trim();
+        if (!rawText) {
+          gsap.set(targetEl, { visibility: 'visible' });
+          return resolve();
+        }
+
+        // Measure layout space so nothing shifts
+        const r = targetEl.getBoundingClientRect();
+        const scrollX = window.scrollX || window.pageXOffset;
+        const scrollY = window.scrollY || window.pageYOffset;
+        const pageLeft = r.left + scrollX;
+        const pageTop = r.top + scrollY;
+
+        const cursor = agentObj.el;
+        const tag = cursor.querySelector('.tag');
+        const origTagText = tag ? tag.textContent : '';
+
+        // Clear content for typing, create blinking caret
+        targetEl.innerHTML = '';
+        gsap.set(targetEl, { visibility: 'visible', opacity: 1 });
+
+        const textSpan = document.createElement('span');
+        const caret = document.createElement('span');
+        caret.className = 'swarm-caret';
+        caret.style.backgroundColor = agentObj.agent.color;
+        targetEl.appendChild(textSpan);
+        targetEl.appendChild(caret);
+
+        // Move cursor directly to typing origin
+        gsap.to(cursor, {
+          x: pageLeft,
+          y: pageTop + 4,
+          opacity: 1,
+          duration: 0.4,
+          delay: delay,
+          ease: 'power3.out',
+          onComplete: () => {
+            if (tag) tag.textContent = 'typing...';
+
+            let charIdx = 0;
+            const timer = setInterval(() => {
+              if (charIdx < rawText.length) {
+                textSpan.textContent += rawText[charIdx];
+                charIdx++;
+
+                // Track cursor position slightly trailing active caret
+                const caretRect = caret.getBoundingClientRect();
+                const curScrollX = window.scrollX || window.pageXOffset;
+                const curScrollY = window.scrollY || window.pageYOffset;
+                gsap.set(cursor, {
+                  x: caretRect.right + curScrollX + 4,
+                  y: caretRect.top + curScrollY - 6
+                });
+              } else {
+                clearInterval(timer);
+                setTimeout(() => {
+                  // Restore original HTML structure (links, accents, inner tags)
+                  targetEl.innerHTML = originalHTML;
+                  if (tag) tag.textContent = origTagText;
+                  resolve();
+                }, 100);
+              }
+            }, charSpeed);
+          }
+        });
       });
     }
 
@@ -1229,7 +1320,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const navEl = document.querySelector('[data-b="nav"]');
       if (navEl) {
         gsap.set(navEl, { visibility: 'visible', opacity: 0, y: -20 });
-        gsap.to(navEl, { opacity: 1, y: 0, duration: 0.7, ease: 'power3.out' });
+        gsap.to(navEl, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' });
       }
 
       // 2. Swarm cursor build elements in parallel
@@ -1238,32 +1329,30 @@ document.addEventListener('DOMContentLoaded', () => {
       const role = document.querySelector('[data-b="role"]');
       const route = document.querySelector('[data-b="route"]');
       const lede = document.querySelector('[data-b="lede"]');
-      // Each CTA button is its own build target: no shared wireframe across three
-      // controls (a single 952px stamp makes the buttons look like one block and
-      // hides which control is being constructed).
       const actions = [
         document.querySelector('[data-b="action-1"]'),
         document.querySelector('[data-b="action-2"]'),
         document.querySelector('[data-b="action-3"]')
       ];
 
-      // Wave 1: Waybill (Adit) & Heading Name (QA)
-      buildElement(waybill, cursorDoms[0], 0.1);
-      await buildElement(name, cursorDoms[1], 0.2);
+      // Wave 1: Draw Waybill Stamp (Adit) while Typing Headline Name (QA-Bot)
+      buildElement(waybill, cursorDoms[0], 0.05);
+      await typeTextElement(name, cursorDoms[1], 0.15, 28);
 
-      // Wave 2: Role (Ops) & Route (Motion)
-      buildElement(role, cursorDoms[2], 0.05);
-      await buildElement(route, cursorDoms[3], 0.15);
+      // Wave 2: Type Role (Ops-Lead) & Draw Route Line (Motion)
+      buildElement(route, cursorDoms[3], 0.05);
+      await typeTextElement(role, cursorDoms[2], 0.1, 14);
 
-      // Wave 3: Lede (Adit), then each CTA button on its own cursor. The three
-      // buttons are separate build targets (one wireframe each) but run in
-      // parallel with a small stagger, so the row doesn't serialize the build.
-      buildElement(lede, cursorDoms[0], 0.1);
-      await Promise.all(
-        actions.map((btn, i) =>
+      // Wave 3: Type Lede paragraph & Build interactive Action buttons
+      await Promise.all([
+        typeTextElement(lede, cursorDoms[0], 0.05, 8),
+        ...actions.map((btn, i) =>
           buildElement(btn, cursorDoms[(i + 1) % cursorDoms.length], 0.2 + i * 0.12)
         )
-      );
+      ]);
+
+      // Remove any lingering carets
+      document.querySelectorAll('.swarm-caret').forEach(c => c.remove());
 
       // Wave 4: Fade cursors to subtle floating patrol
       cursorDoms.forEach((c, idx) => {
