@@ -772,14 +772,14 @@ html.lenis, html.lenis body {
               <span class="accordion-chevron">&darr;</span>
             </div>
           </div>
-          <div class="timeline__drawer">
+          <div class="timeline__drawer" data-b="drawer-1">
             <ul>
               <li>Delivered a multi-tenant e-commerce platform using Next.js, TypeScript, FastAPI and PostgreSQL, enabling separate storefront experiences on shared infrastructure through host-based tenant isolation.</li>
               <li>Improved the responsiveness of a 20,000+-item product catalog by optimizing PostgreSQL indexes and queries; reduced a measured lookup from 4.52 ms to 0.39 ms (11.6&times; faster).</li>
               <li>Built reliable bulk-import and payment-reconciliation workflows with Redis-backed jobs, transaction safeguards and idempotency controls, reducing the risk of partial catalog updates and duplicate payment processing.</li>
               <li>Owned deployment, backup, and monitoring-oriented operations on self-hosted Linux infrastructure, supporting reported availability of 99.9%+ for the platform.</li>
             </ul>
-            <div class="timeline__stack">
+            <div class="timeline__stack" data-b="stack-1">
               <span>Next.js</span><span>TypeScript</span><span>FastAPI</span><span>PostgreSQL</span><span>Redis</span><span>Multi-tenant</span><span>Linux</span>
             </div>
           </div>
@@ -801,14 +801,14 @@ html.lenis, html.lenis body {
               <span class="accordion-chevron">&darr;</span>
             </div>
           </div>
-          <div class="timeline__drawer">
+          <div class="timeline__drawer" data-b="drawer-2">
             <ul>
               <li>Delivered commercial e-commerce and client platforms end-to-end with Next.js, TypeScript, Node.js and Medusa, connecting business requirements to production-ready storefront and backend functionality.</li>
               <li>Reduced reported regression defects by over 40% by introducing test-driven development, structured code reviews and automated CI quality checks, improving release confidence for client projects.</li>
               <li>Implemented application integrations and AI-assisted operational workflows to automate data enrichment and structured customer interactions; mentored developers and aligned technical delivery with client requirements.</li>
               <li>Maintained production deployments and reliability through automated releases, Linux administration and reverse-proxy configuration, supporting reported 99.9%+ availability.</li>
             </ul>
-            <div class="timeline__stack">
+            <div class="timeline__stack" data-b="stack-2">
               <span>Medusa</span><span>Next.js</span><span>Node.js</span><span>TypeScript</span><span>CI/CD</span><span>TDD</span><span>AI Workflows</span><span>PostgreSQL</span>
             </div>
           </div>
@@ -830,14 +830,14 @@ html.lenis, html.lenis body {
               <span class="accordion-chevron">&darr;</span>
             </div>
           </div>
-          <div class="timeline__drawer">
+          <div class="timeline__drawer" data-b="drawer-3">
             <ul>
               <li>Delivered merchant, administration, fleet and delivery-agent applications supporting cross-border parcel operations across Singapore and APAC, equipping multiple operational teams with dedicated workflows.</li>
               <li>Developed TypeScript/gRPC microservices powering dispatch and route allocation during high-concurrency delivery peaks, supporting operational throughput and system scalability.</li>
               <li>Integrated external carrier APIs including UPS, enabling merchant shipping quotes, cross-border label generation and automated shipment-tracking updates.</li>
               <li>Supported reliable peak-season operations through Docker containerization and rolling Kubernetes deployments; standardized API contracts with distributed engineering teams.</li>
             </ul>
-            <div class="timeline__stack">
+            <div class="timeline__stack" data-b="stack-3">
               <span>TypeScript</span><span>Node.js</span><span>gRPC</span><span>Microservices</span><span>Docker</span><span>Kubernetes</span><span>Carrier APIs</span>
             </div>
           </div>
@@ -859,11 +859,11 @@ html.lenis, html.lenis body {
               <span class="accordion-chevron">&darr;</span>
             </div>
           </div>
-          <div class="timeline__drawer">
+          <div class="timeline__drawer" data-b="drawer-4">
             <ul>
               <li>Shipped responsive commercial websites and client portals for European customers, turning business requirements into working interfaces backed by PHP/MySQL APIs.</li>
             </ul>
-            <div class="timeline__stack">
+            <div class="timeline__stack" data-b="stack-4">
               <span>PHP</span><span>MySQL</span><span>JavaScript</span><span>HTML5</span><span>CSS3</span><span>Responsive Design</span>
             </div>
           </div>
@@ -885,11 +885,11 @@ html.lenis, html.lenis body {
               <span class="accordion-chevron">&darr;</span>
             </div>
           </div>
-          <div class="timeline__drawer">
+          <div class="timeline__drawer" data-b="drawer-5">
             <ul>
               <li>Contributed to delivery of 30+ client web projects, improving application responsiveness through MySQL query optimization and frontend troubleshooting while mentoring junior developers.</li>
             </ul>
-            <div class="timeline__stack">
+            <div class="timeline__stack" data-b="stack-5">
               <span>JavaScript</span><span>jQuery</span><span>PHP</span><span>MySQL</span><span>HTML5</span><span>CSS3</span><span>Database Optimization</span>
             </div>
           </div>
@@ -1555,16 +1555,37 @@ document.addEventListener('DOMContentLoaded', () => {
               expSec.querySelector('[data-b="timeline-5"]')
             ];
 
-            // 1. Header
+            // 1. Header in parallel
             if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
-            if (heading) await typeTextElement(heading, cursorDoms[1], 0.02, 14);
+            if (heading) typeTextElement(heading, cursorDoms[1], 0.02, 14);
 
-            // 2. Build timeline item cards ONE AT A TIME down the line
+            // 2. Build timeline item cards ONE AT A TIME down the line, including drawer & stack
             for (let i = 0; i < items.length; i++) {
               const item = items[i];
               if (!item) continue;
-              const agent = cursorDoms[i % cursorDoms.length];
-              await buildElement(item, agent, 0.03);
+              const idx = i + 1;
+              const agentItem = cursorDoms[(i * 3) % cursorDoms.length];
+              const agentDrawer = cursorDoms[(i * 3 + 1) % cursorDoms.length];
+              const agentStack = cursorDoms[(i * 3 + 2) % cursorDoms.length];
+
+              // Build outer timeline card header
+              await buildElement(item, agentItem, 0.02);
+
+              // Build drawer (bullet points) and stack (tech tags) one at a time if visible
+              const drawer = item.querySelector(`[data-b="drawer-${idx}"]`);
+              const stack = item.querySelector(`[data-b="stack-${idx}"]`);
+
+              if (drawer && (item.classList.contains('is-open') || window.getComputedStyle(drawer).display !== 'none')) {
+                await buildElement(drawer, agentDrawer, 0.02);
+              } else if (drawer) {
+                drawer.classList.add('built');
+              }
+
+              if (stack && (item.classList.contains('is-open') || window.getComputedStyle(stack).display !== 'none')) {
+                await buildElement(stack, agentStack, 0.02);
+              } else if (stack) {
+                stack.classList.add('built');
+              }
             }
 
             // Standby: park cursors hidden outside the frame
@@ -1639,6 +1660,9 @@ function toggleTimelineItem(triggerEl) {
   } else {
     item.classList.add('is-open');
     drawer.style.display = 'block';
+    drawer.classList.add('built');
+    const stack = drawer.querySelector('.timeline__stack');
+    if (stack) stack.classList.add('built');
     const targetHeight = drawer.scrollHeight;
 
     if (window.anime && drawer) {
