@@ -580,7 +580,7 @@ html.lenis, html.lenis body {
         <!-- PANE 0: DAGANGO -->
         <div class="terminal-pane is-active" id="pane-0">
           <div class="project-card" style="border:none; padding:0; background:none;">
-            <div class="project-card__top">
+            <div class="project-card__top" data-b="proj-top">
               <div>
                 <p class="project-card__eyebrow">Lead Architect &amp; Founder &mdash; Next.js + TypeScript + FastAPI</p>
                 <h3>Dagango <span>Multi-Tenant E-Commerce Platform</span></h3>
@@ -589,17 +589,17 @@ html.lenis, html.lenis body {
                 <i class="dot" aria-hidden="true"></i>LIVE
               </a>
             </div>
-            <p class="project-card__lede">Multi-tenant commerce platform with isolated storefronts on shared infrastructure, 20,000+-item catalog operations, sub-second query performance, and resilient payment workflows powered by Next.js, TypeScript, FastAPI, PostgreSQL, and Redis.</p>
+            <p class="project-card__lede" data-b="proj-lede">Multi-tenant commerce platform with isolated storefronts on shared infrastructure, 20,000+-item catalog operations, sub-second query performance, and resilient payment workflows powered by Next.js, TypeScript, FastAPI, PostgreSQL, and Redis.</p>
             <ul class="project-card__points">
-              <li>Delivered a multi-tenant e-commerce platform using Next.js, TypeScript, FastAPI, and PostgreSQL, enabling separate storefront experiences on shared infrastructure through host-based tenant isolation.</li>
-              <li>Improved the responsiveness of a 20,000+-item product catalog by optimizing PostgreSQL indexes and queries; reduced a measured lookup from 4.52 ms to 0.39 ms (11.6&times; faster).</li>
-              <li>Built reliable bulk-import and payment-reconciliation workflows with Redis-backed jobs, transaction safeguards, and idempotency controls, reducing the risk of partial catalog updates and duplicate payment processing.</li>
-              <li>Owned deployment, backup, and monitoring-oriented operations on self-hosted Linux infrastructure, supporting reported availability of 99.9%+ for the platform.</li>
+              <li data-b="proj-pt-0">Delivered a multi-tenant e-commerce platform using Next.js, TypeScript, FastAPI, and PostgreSQL, enabling separate storefront experiences on shared infrastructure through host-based tenant isolation.</li>
+              <li data-b="proj-pt-1">Improved the responsiveness of a 20,000+-item product catalog by optimizing PostgreSQL indexes and queries; reduced a measured lookup from 4.52 ms to 0.39 ms (11.6&times; faster).</li>
+              <li data-b="proj-pt-2">Built reliable bulk-import and payment-reconciliation workflows with Redis-backed jobs, transaction safeguards, and idempotency controls, reducing the risk of partial catalog updates and duplicate payment processing.</li>
+              <li data-b="proj-pt-3">Owned deployment, backup, and monitoring-oriented operations on self-hosted Linux infrastructure, supporting reported availability of 99.9%+ for the platform.</li>
             </ul>
-            <div class="project-card__stack">
-              <span>Next.js</span><span>TypeScript</span><span>FastAPI</span><span>Python</span><span>PostgreSQL</span><span>Redis</span><span>Docker</span><span>Tailwind CSS</span>
+            <div class="project-card__stack" data-b="proj-stack">
+              <span data-b="proj-st-0">Next.js</span><span data-b="proj-st-1">TypeScript</span><span data-b="proj-st-2">FastAPI</span><span data-b="proj-st-3">Python</span><span data-b="proj-st-4">PostgreSQL</span><span data-b="proj-st-5">Redis</span><span data-b="proj-st-6">Docker</span><span data-b="proj-st-7">Tailwind CSS</span>
             </div>
-            <div class="hero__actions" style="margin-top:24px;">
+            <div class="hero__actions" style="margin-top:24px;" data-b="proj-action">
               <a class="btn btn--stamp" href="https://dagango.com" target="_blank" rel="noopener noreferrer">Visit Dagango.com &rarr;</a>
             </div>
           </div>
@@ -1212,7 +1212,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Helper: Build a DOM Element using a Cursor with Box Draw + Snapping
-    function buildElement(targetEl, agentObj, delay = 0) {
+    function buildElement(targetEl, agentObj, delay = 0, speedMultiplier = 1) {
       return new Promise((resolve) => {
         if (!targetEl) return resolve();
         if (targetEl.classList.contains('built')) return resolve();
@@ -1249,6 +1249,9 @@ document.addEventListener('DOMContentLoaded', () => {
         wireframe.style.borderColor = agentObj.color || '#E8871E';
         swarmLayer.appendChild(wireframe);
 
+        const moveDur = Math.max(0.06, 0.28 * speedMultiplier);
+        const drawDur = Math.max(0.05, 0.22 * speedMultiplier);
+
         const tl = gsap.timeline({ delay });
 
         tl
@@ -1257,14 +1260,14 @@ document.addEventListener('DOMContentLoaded', () => {
             x: pageLeft,
             y: pageTop,
             opacity: 1,
-            duration: 0.32,
+            duration: moveDur,
             ease: 'power3.out'
           })
           // Draw bounding box diagonal down-right
           .to(cursor, {
             x: pageLeft + w,
             y: pageTop + h,
-            duration: 0.28,
+            duration: drawDur,
             ease: 'power2.inOut',
             onUpdate: function () {
               const curX = gsap.getProperty(cursor, "x");
@@ -1279,11 +1282,11 @@ document.addEventListener('DOMContentLoaded', () => {
             gsap.set(targetEl, { visibility: 'visible' });
             gsap.fromTo(targetEl, 
               { scale: 0.98, opacity: 0.7 },
-              { scale: 1, opacity: 1, duration: 0.2, ease: 'back.out(2)' }
+              { scale: 1, opacity: 1, duration: 0.15 * speedMultiplier, ease: 'back.out(2)' }
             );
           })
           // Remove wireframe box
-          .to(wireframe, { opacity: 0, duration: 0.1, onComplete: () => wireframe.remove() })
+          .to(wireframe, { opacity: 0, duration: 0.08 * speedMultiplier, onComplete: () => wireframe.remove() })
           .call(() => {
             // Immediately glide cursor outside viewport after finishing this element
             retireCursor(agentObj);
@@ -1573,16 +1576,70 @@ document.addEventListener('DOMContentLoaded', () => {
             if (heading) typeTextElement(heading, getAgent(1), 0.02, 14);
             if (terminal) await buildElement(terminal, getAgent(2), 0.05);
 
-            // 2. Reveal right spotlight stage
-            if (stage) buildElement(stage, getAgent(7), 0.05);
+            // 2. Reveal right spotlight stage & contents
+            if (stage) await buildElement(stage, getAgent(7), 0.05);
 
-            // 3. Build left rail tickets strictly ONE AT A TIME
-            for (let i = 0; i < tickets.length; i++) {
-              const t = tickets[i];
-              if (!t) continue;
-              const agent = getAgent(i + 3);
-              await buildElement(t, agent, 0.02);
+            // Active pane elements: top, lede, points (one-by-one), stack items (fast ~1s loop), and CTA
+            const projTop = projSec.querySelector('[data-b="proj-top"]');
+            const projLede = projSec.querySelector('[data-b="proj-lede"]');
+            const projPoints = [
+              projSec.querySelector('[data-b="proj-pt-0"]'),
+              projSec.querySelector('[data-b="proj-pt-1"]'),
+              projSec.querySelector('[data-b="proj-pt-2"]'),
+              projSec.querySelector('[data-b="proj-pt-3"]')
+            ];
+            const projStack = projSec.querySelector('[data-b="proj-stack"]');
+            const projStackItems = [
+              projSec.querySelector('[data-b="proj-st-0"]'),
+              projSec.querySelector('[data-b="proj-st-1"]'),
+              projSec.querySelector('[data-b="proj-st-2"]'),
+              projSec.querySelector('[data-b="proj-st-3"]'),
+              projSec.querySelector('[data-b="proj-st-4"]'),
+              projSec.querySelector('[data-b="proj-st-5"]'),
+              projSec.querySelector('[data-b="proj-st-6"]'),
+              projSec.querySelector('[data-b="proj-st-7"]')
+            ];
+            const projAction = projSec.querySelector('[data-b="proj-action"]');
+
+            if (projTop) buildElement(projTop, getAgent(0), 0);
+            if (projLede) buildElement(projLede, getAgent(1), 0.02);
+
+            // 3. Build left rail tickets strictly ONE AT A TIME in parallel with stage assembly
+            const ticketsPromise = (async () => {
+              for (let i = 0; i < tickets.length; i++) {
+                const t = tickets[i];
+                if (!t) continue;
+                const agent = getAgent(i + 3);
+                await buildElement(t, agent, 0.02);
+              }
+            })();
+
+            // 4. Draw project-card__points strictly ONE POINT AT A TIME
+            for (let i = 0; i < projPoints.length; i++) {
+              const pt = projPoints[i];
+              if (!pt) continue;
+              const agent = getAgent(i + 2);
+              await buildElement(pt, agent, 0.02);
             }
+
+            // 5. Draw project-card__stack wrapper & each stack pill strictly ONE AT A TIME with fast iteration (~1s total)
+            if (projStack) {
+              projStack.classList.add('built');
+              gsap.set(projStack, { visibility: 'visible' });
+            }
+            for (let i = 0; i < projStackItems.length; i++) {
+              const st = projStackItems[i];
+              if (!st) continue;
+              const agent = getAgent(i + 4);
+              // Snappy duration: ~0.11s per item (speedMultiplier: 0.3) so all 8 stacks finish within ~1 second
+              await buildElement(st, agent, 0, 0.3);
+            }
+
+            if (projAction) {
+              await buildElement(projAction, getAgent(0), 0.02);
+            }
+
+            await ticketsPromise;
 
             // Standby: park cursors hidden outside the frame
             parkCursors();
