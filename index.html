@@ -20,7 +20,8 @@
     }
     window.scrollTo(0, 0);
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.innerWidth <= 768;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || isTouch) return;
     document.documentElement.classList.add('anim');
     // Safety watchdog: restore visibility if scripts fail or take > 3s
     setTimeout(function () {
@@ -274,7 +275,7 @@ html.anim [data-b],
   height: 100%;
   pointer-events: none;
   z-index: 100;
-  overflow: visible;
+  overflow: hidden;
 }
 
 .swarm-cursor {
@@ -909,6 +910,7 @@ html.lenis, html.lenis body {
       <div class="seal" data-b="seal-1"><span>JavaScript</span><small>Course</small></div>
       <div class="seal" data-b="seal-2"><span>CSS</span><small>Fundamentals</small></div>
       <div class="seal" data-b="seal-3"><span>jQuery</span><small>Course</small></div>
+      <a class="seal seal--link" data-b="seal-4" href="https://academy.claude.com/verify/11a9a567bacfae3c1384062606376001" target="_blank" rel="noopener noreferrer" title="View Claude Academy AI Fluency Certificate"><span>Claude AI</span><small>Anthropic Cert</small></a>
     </div>
 
     <div class="lang-row reveal">
@@ -1121,12 +1123,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 6. Lenis Smooth Scrolling Integration
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if (!prefersReduced && window.Lenis && window.gsap) {
+  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.innerWidth <= 768;
+
+  // Only enable Lenis smooth scrolling on desktop/pointer screens to guarantee 120Hz native touch scroll on mobile
+  if (!prefersReduced && !isTouchDevice && window.Lenis && window.gsap) {
     const lenis = new Lenis({
       lerp: 0.09,
       smoothWheel: true,
-      wheelMultiplier: 1.0,
-      touchMultiplier: 1.2
+      wheelMultiplier: 1.0
     });
     window.__lenis = lenis;
     lenis.scrollTo(0, { immediate: true });
@@ -1145,6 +1149,8 @@ document.addEventListener('DOMContentLoaded', () => {
       }
       requestAnimationFrame(raf);
     }
+  } else if (window.ScrollTrigger && window.gsap) {
+    gsap.registerPlugin(ScrollTrigger);
   }
 
   // 7. Swarm Live Builder Engine (Fajar Style - 100% Clickable Real DOM)
@@ -1158,7 +1164,34 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // Create Swarm Container Overlay on Body
+    // On mobile / touch devices: use super-snappy native fade/reveal without cursor swarm overhead
+    if (isTouchDevice) {
+      document.documentElement.classList.remove('anim');
+      elementsToBuild.forEach(el => {
+        el.classList.add('built');
+        el.style.visibility = 'visible';
+      });
+
+      // Simple light scroll reveal for mobile
+      if (window.ScrollTrigger) {
+        document.querySelectorAll('.section').forEach(sec => {
+          gsap.from(sec, {
+            scrollTrigger: {
+              trigger: sec,
+              start: 'top 88%',
+              once: true
+            },
+            opacity: 0,
+            y: 16,
+            duration: 0.45,
+            ease: 'power2.out'
+          });
+        });
+      }
+      return;
+    }
+
+    // Create Swarm Container Overlay on Body (Desktop only)
     const swarmLayer = document.createElement('div');
     swarmLayer.className = 'swarm-overlay';
     swarmLayer.id = 'swarmOverlay';
@@ -1717,7 +1750,8 @@ document.addEventListener('DOMContentLoaded', () => {
             const seals = [
               certSec.querySelector('[data-b="seal-1"]'),
               certSec.querySelector('[data-b="seal-2"]'),
-              certSec.querySelector('[data-b="seal-3"]')
+              certSec.querySelector('[data-b="seal-3"]'),
+              certSec.querySelector('[data-b="seal-4"]')
             ];
             const langs = [
               certSec.querySelector('[data-b="lang-1"]'),

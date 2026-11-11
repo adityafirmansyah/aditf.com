@@ -25,7 +25,7 @@
 }
 
 *{box-sizing:border-box;}
-html{scroll-behavior:smooth;}
+html{scroll-behavior:smooth; overflow-x:clip;}
 @media (prefers-reduced-motion: reduce){
   html{scroll-behavior:auto;}
   *{animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important;}
@@ -33,6 +33,7 @@ html{scroll-behavior:smooth;}
 
 body{
   margin:0;
+  overflow-x:clip;
   background:var(--ink);
   color:var(--paper);
   font-family:var(--font-body);
@@ -375,7 +376,11 @@ h1,h2,h3{margin:0; font-family:var(--font-display);}
   border:2px dashed var(--kraft-line);
   display:flex; flex-direction:column; align-items:center; justify-content:center;
   text-align:center; padding:10px;
+  text-decoration:none;
+  transition:border-color .2s ease, transform .2s ease;
 }
+.seal--link{cursor:pointer; border-color:var(--amber);}
+.seal--link:hover{border-style:solid; transform:scale(1.04);}
 .seal span{
   font-family:var(--font-display); font-size:15px; text-transform:uppercase;
   color:var(--kraft); font-weight:600;
@@ -425,6 +430,8 @@ h1,h2,h3{margin:0; font-family:var(--font-display);}
 .contact-row__value{
   font-family:var(--font-mono); font-size:13.5px; color:var(--paper);
   text-align:right;
+  word-break:break-word;
+  overflow-wrap:break-word;
 }
 .contact-cta{margin-top:8px;}
 
