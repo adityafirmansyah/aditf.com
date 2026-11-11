@@ -20,7 +20,11 @@
     }
     window.scrollTo(0, 0);
 
-    const isTouch = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.innerWidth <= 768;
+    // Touchscreen / mobile detection: strictly check pointer coarse or mobile screen width
+    // Avoid false positives on touchscreen laptops (like Surface, Yoga, or monitors with maxTouchPoints > 0)
+    const isMobileScreen = window.innerWidth <= 768;
+    const isCoarseTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    const isTouch = (isCoarseTouch && ('ontouchstart' in window || navigator.maxTouchPoints > 0)) || isMobileScreen;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || isTouch) return;
     document.documentElement.classList.add('anim');
     // Safety watchdog: restore visibility if scripts fail or take > 3s
@@ -1317,7 +1321,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 6. Lenis Smooth Scrolling Integration
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const isTouchDevice = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || window.innerWidth <= 768;
+  // Touchscreen / mobile detection: strictly check pointer coarse or mobile screen width
+  // Avoid false positives on touchscreen laptops (like Surface, Yoga, ThinkPad touch) so desktop swarm stays active
+  const isMobileScreen = window.innerWidth <= 768;
+  const isCoarseTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+  const isTouchDevice = (isCoarseTouch && ('ontouchstart' in window || navigator.maxTouchPoints > 0)) || isMobileScreen;
 
   // Only enable Lenis smooth scrolling on desktop/pointer screens to guarantee 120Hz native touch scroll on mobile
   if (!prefersReduced && !isTouchDevice && window.Lenis && window.gsap) {
