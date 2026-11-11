@@ -746,10 +746,10 @@ html.lenis, html.lenis body {
     </div>
   </section>
   <!-- EXPERIENCE -->
-  <section class="section" id="experience">
+  <section class="section" id="experience" data-seq="experience">
     <div class="section__head">
-      <p class="eyebrow">Shipment History &mdash; Tracking Log</p>
-      <h2>Career Experience</h2>
+      <p class="eyebrow" data-b="eyebrow">Shipment History &mdash; Tracking Log</p>
+      <h2 data-b="heading">Career Experience</h2>
       <p style="color:var(--paper-dim); font-size:13.5px; font-family:var(--font-mono); margin-top:8px;">
         Interactive Tracking Manifest &mdash; Current role open by default; click any shipment to inspect full deliverables &amp; stack:
       </p>
@@ -758,7 +758,7 @@ html.lenis, html.lenis body {
     <ol class="timeline" id="experienceAccordion">
 
       <!-- ITEM 1: DAGANGO (EXPANDED BY DEFAULT) -->
-      <li class="timeline__item timeline__item--accordion is-open reveal">
+      <li class="timeline__item timeline__item--accordion is-open reveal" data-b="timeline-1">
         <div class="timeline__meta">
           <span class="timeline__date">Aug 2024 &ndash; Present</span>
           <span class="timeline__badge timeline__badge--transit">In Transit</span>
@@ -787,7 +787,7 @@ html.lenis, html.lenis body {
       </li>
 
       <!-- ITEM 2: GOSG CONSULTING (COLLAPSED) -->
-      <li class="timeline__item timeline__item--accordion reveal">
+      <li class="timeline__item timeline__item--accordion reveal" data-b="timeline-2">
         <div class="timeline__meta">
           <span class="timeline__date">Aug 2024 &ndash; Jul 2026</span>
           <span class="timeline__badge">Delivered</span>
@@ -816,7 +816,7 @@ html.lenis, html.lenis body {
       </li>
 
       <!-- ITEM 3: PICKUPP SINGAPORE (COLLAPSED) -->
-      <li class="timeline__item timeline__item--accordion reveal">
+      <li class="timeline__item timeline__item--accordion reveal" data-b="timeline-3">
         <div class="timeline__meta">
           <span class="timeline__date">Apr 2019 &ndash; Jul 2024</span>
           <span class="timeline__badge">Delivered</span>
@@ -845,7 +845,7 @@ html.lenis, html.lenis body {
       </li>
 
       <!-- ITEM 4: WEBDESIGNHAMBURG (COLLAPSED) -->
-      <li class="timeline__item timeline__item--accordion reveal">
+      <li class="timeline__item timeline__item--accordion reveal" data-b="timeline-4">
         <div class="timeline__meta">
           <span class="timeline__date">May 2018 &ndash; Apr 2019</span>
           <span class="timeline__badge">Delivered</span>
@@ -871,7 +871,7 @@ html.lenis, html.lenis body {
       </li>
 
       <!-- ITEM 5: INCUVIUS SENIOR (COLLAPSED) -->
-      <li class="timeline__item timeline__item--accordion reveal">
+      <li class="timeline__item timeline__item--accordion reveal" data-b="timeline-5">
         <div class="timeline__meta">
           <span class="timeline__date">2011 &ndash; May 2018</span>
           <span class="timeline__badge">Delivered</span>
@@ -1537,10 +1537,46 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
+      // Special Sequence for EXPERIENCE (timeline items) section
+      const expSec = document.getElementById('experience');
+      if (expSec) {
+        ScrollTrigger.create({
+          trigger: expSec,
+          start: 'top 75%',
+          once: true,
+          onEnter: async () => {
+            const eyebrow = expSec.querySelector('[data-b="eyebrow"]');
+            const heading = expSec.querySelector('[data-b="heading"]');
+            const items = [
+              expSec.querySelector('[data-b="timeline-1"]'),
+              expSec.querySelector('[data-b="timeline-2"]'),
+              expSec.querySelector('[data-b="timeline-3"]'),
+              expSec.querySelector('[data-b="timeline-4"]'),
+              expSec.querySelector('[data-b="timeline-5"]')
+            ];
+
+            // 1. Header
+            if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
+            if (heading) await typeTextElement(heading, cursorDoms[1], 0.02, 14);
+
+            // 2. Build timeline item cards ONE AT A TIME down the line
+            for (let i = 0; i < items.length; i++) {
+              const item = items[i];
+              if (!item) continue;
+              const agent = cursorDoms[i % cursorDoms.length];
+              await buildElement(item, agent, 0.03);
+            }
+
+            // Standby: park cursors hidden outside the frame
+            parkCursors();
+          }
+        });
+      }
+
       // Generic trigger for remaining sections
       const sections = document.querySelectorAll('[data-seq]');
       sections.forEach(sec => {
-        if (sec.dataset.seq === 'hero' || sec.id === 'about' || sec.id === 'skills' || sec.id === 'projects') return;
+        if (sec.dataset.seq === 'hero' || sec.id === 'about' || sec.id === 'skills' || sec.id === 'projects' || sec.id === 'experience') return;
 
         ScrollTrigger.create({
           trigger: sec,
