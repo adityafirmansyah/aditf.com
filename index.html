@@ -1375,20 +1375,23 @@ document.addEventListener('DOMContentLoaded', () => {
         el.style.visibility = 'visible';
       });
 
-      // Simple light scroll reveal for mobile
-      if (window.ScrollTrigger) {
-        document.querySelectorAll('.section').forEach(sec => {
-          gsap.from(sec, {
-            scrollTrigger: {
-              trigger: sec,
-              start: 'top 88%',
-              once: true
-            },
-            opacity: 0,
-            y: 16,
-            duration: 0.45,
-            ease: 'power2.out'
+      // Native lightweight IntersectionObserver for mobile scroll reveal (0 GSAP overhead on touch scroll)
+      if ('IntersectionObserver' in window) {
+        const mobIO = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              entry.target.style.opacity = '1';
+              entry.target.style.transform = 'translateY(0)';
+              mobIO.unobserve(entry.target);
+            }
           });
+        }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.section').forEach(sec => {
+          sec.style.transition = 'opacity 0.4s ease, transform 0.4s ease';
+          sec.style.opacity = '0';
+          sec.style.transform = 'translateY(16px)';
+          mobIO.observe(sec);
         });
       }
       return;
