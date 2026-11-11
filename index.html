@@ -533,35 +533,35 @@ html.lenis, html.lenis body {
       </p>
     </div>
 
-    <div class="proj-terminal">
+    <div class="proj-terminal" data-b="proj-terminal">
       <!-- Left Ticket Selector Rail -->
       <nav class="terminal-selector" id="termSelector" aria-label="Project Manifest">
-        <button class="terminal-ticket is-active" data-pane="0">
+        <button class="terminal-ticket is-active" data-pane="0" data-b="ticket-0">
           <div class="ticket-num">SHIPMENT 01 &bull; SAAS PLATFORM</div>
           <div class="ticket-title">Dagango</div>
           <div class="ticket-role">Multi-Tenant E-Commerce &bull; Next.js + FastAPI</div>
         </button>
-        <button class="terminal-ticket" data-pane="1">
+        <button class="terminal-ticket" data-pane="1" data-b="ticket-1">
           <div class="ticket-num">SHIPMENT 02 &bull; CAREER TECH</div>
           <div class="ticket-title">mycv.ai.id</div>
           <div class="ticket-role">ATS Resume Engine &bull; React + FastAPI</div>
         </button>
-        <button class="terminal-ticket" data-pane="2">
+        <button class="terminal-ticket" data-pane="2" data-b="ticket-2">
           <div class="ticket-num">SHIPMENT 03 &bull; CIVIC TRUST</div>
           <div class="ticket-title">Kas Transparan</div>
           <div class="ticket-role">Treasury Management &bull; FastAPI + React TS</div>
         </button>
-        <button class="terminal-ticket" data-pane="3">
+        <button class="terminal-ticket" data-pane="3" data-b="ticket-3">
           <div class="ticket-num">SHIPMENT 04 &bull; CIVIC UTILITY</div>
           <div class="ticket-title">TirtaDesa</div>
           <div class="ticket-role">Water Utility &amp; Billing &bull; FastAPI + React PWA</div>
         </button>
-        <button class="terminal-ticket" data-pane="4">
+        <button class="terminal-ticket" data-pane="4" data-b="ticket-4">
           <div class="ticket-num">SHIPMENT 05 &bull; GAMIFIED FITNESS</div>
           <div class="ticket-title">GainForge</div>
           <div class="ticket-role">Fitness RPG &bull; Full-Stack Rust WASM</div>
         </button>
-        <button class="terminal-ticket" data-pane="5">
+        <button class="terminal-ticket" data-pane="5" data-b="ticket-5">
           <div class="ticket-num">SHIPMENT 06 &bull; AI PROPOSAL TOOL</div>
           <div class="ticket-title">Cover Letter Gen</div>
           <div class="ticket-role">LLM Proposal Suite &bull; React + Node.js</div>
@@ -569,7 +569,7 @@ html.lenis, html.lenis body {
       </nav>
 
       <!-- Right Project Spotlight Stage -->
-      <div class="terminal-stage" id="termStage">
+      <div class="terminal-stage" id="termStage" data-b="terminal-stage">
 
         <!-- PANE 0: DAGANGO -->
         <div class="terminal-pane is-active" id="pane-0">
@@ -1483,10 +1483,50 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
+      // Special Sequence for PROJECTS (proj-terminal) section
+      const projSec = document.getElementById('projects');
+      if (projSec) {
+        ScrollTrigger.create({
+          trigger: projSec,
+          start: 'top 75%',
+          once: true,
+          onEnter: async () => {
+            const eyebrow = projSec.querySelector('[data-b="eyebrow"]');
+            const heading = projSec.querySelector('[data-b="heading"]');
+            const terminal = projSec.querySelector('[data-b="proj-terminal"]');
+            const stage = projSec.querySelector('[data-b="terminal-stage"]');
+            const tickets = [
+              projSec.querySelector('[data-b="ticket-0"]'),
+              projSec.querySelector('[data-b="ticket-1"]'),
+              projSec.querySelector('[data-b="ticket-2"]'),
+              projSec.querySelector('[data-b="ticket-3"]'),
+              projSec.querySelector('[data-b="ticket-4"]'),
+              projSec.querySelector('[data-b="ticket-5"]')
+            ];
+
+            // 1. Header & Terminal Container in parallel
+            if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
+            if (heading) typeTextElement(heading, cursorDoms[1], 0.02, 14);
+            if (terminal) await buildElement(terminal, cursorDoms[2], 0.05);
+
+            // 2. Parallel assembly: Build ticket buttons on left rail & spotlight stage on right
+            const ticketPromises = tickets.map((t, i) =>
+              t ? buildElement(t, cursorDoms[i % cursorDoms.length], i * 0.06) : Promise.resolve()
+            );
+            const stagePromise = stage ? buildElement(stage, cursorDoms[7], 0.08) : Promise.resolve();
+
+            await Promise.all([...ticketPromises, stagePromise]);
+
+            // Standby: park cursors hidden outside the frame
+            parkCursors();
+          }
+        });
+      }
+
       // Generic trigger for remaining sections
       const sections = document.querySelectorAll('[data-seq]');
       sections.forEach(sec => {
-        if (sec.dataset.seq === 'hero' || sec.id === 'about' || sec.id === 'skills') return;
+        if (sec.dataset.seq === 'hero' || sec.id === 'about' || sec.id === 'skills' || sec.id === 'projects') return;
 
         ScrollTrigger.create({
           trigger: sec,
