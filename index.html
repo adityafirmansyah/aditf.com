@@ -1184,9 +1184,19 @@ document.addEventListener('DOMContentLoaded', () => {
       return { el, color, busy: false };
     });
 
+    // Dynamic Agent Allocator: Never reuse a busy cursor to prevent concurrent animation hijacking
+    function getAgent(preferredIndex = 0) {
+      if (preferredIndex >= 0 && preferredIndex < cursorDoms.length && !cursorDoms[preferredIndex].busy) {
+        return cursorDoms[preferredIndex];
+      }
+      const idle = cursorDoms.find(c => !c.busy);
+      return idle || cursorDoms[preferredIndex % cursorDoms.length];
+    }
+
     // Helper: Move single cursor immediately off-screen after finishing its draw/type task
     function retireCursor(agentObj) {
       if (!agentObj || !agentObj.el) return;
+      agentObj.busy = false;
       const el = agentObj.el;
       const curX = gsap.getProperty(el, "x");
       const curY = gsap.getProperty(el, "y");
@@ -1197,8 +1207,7 @@ document.addEventListener('DOMContentLoaded', () => {
         y: curY + (Math.random() * 60 - 30),
         opacity: 0,
         duration: 0.45,
-        ease: 'power2.in',
-        overwrite: 'auto'
+        ease: 'power2.in'
       });
     }
 
@@ -1206,6 +1215,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function buildElement(targetEl, agentObj, delay = 0) {
       return new Promise((resolve) => {
         if (!targetEl) return resolve();
+        if (targetEl.classList.contains('built')) return resolve();
+
+        if (agentObj) agentObj.busy = true;
         const r = targetEl.getBoundingClientRect();
         const scrollX = window.scrollX || window.pageXOffset;
         const scrollY = window.scrollY || window.pageYOffset;
@@ -1215,11 +1227,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const h = r.height;
 
         if (w <= 0 || h <= 0) {
+          targetEl.classList.add('built');
+          gsap.set(targetEl, { visibility: 'visible' });
+          if (agentObj) agentObj.busy = false;
+          return resolve();
+        }
+
+        const cursor = agentObj ? agentObj.el : null;
+        if (!cursor) {
+          targetEl.classList.add('built');
           gsap.set(targetEl, { visibility: 'visible' });
           return resolve();
         }
 
-        const cursor = agentObj.el;
         const wireframe = document.createElement('div');
         wireframe.className = 'swarm-wireframe';
         wireframe.style.left = `${pageLeft}px`;
@@ -1276,14 +1296,18 @@ document.addEventListener('DOMContentLoaded', () => {
     function typeTextElement(targetEl, agentObj, delay = 0, charSpeed = 22) {
       return new Promise((resolve) => {
         if (!targetEl) return resolve();
+        if (targetEl.classList.contains('built')) return resolve();
 
         // Preserve raw text/HTML structure
         const originalHTML = targetEl.innerHTML;
         const rawText = targetEl.textContent.trim();
         if (!rawText) {
+          targetEl.classList.add('built');
           gsap.set(targetEl, { visibility: 'visible' });
           return resolve();
         }
+
+        if (agentObj) agentObj.busy = true;
 
         // Measure layout space so nothing shifts
         const r = targetEl.getBoundingClientRect();
@@ -1292,7 +1316,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const pageLeft = r.left + scrollX;
         const pageTop = r.top + scrollY;
 
-        const cursor = agentObj.el;
+        const cursor = agentObj ? agentObj.el : null;
+        if (!cursor) {
+          targetEl.classList.add('built');
+          gsap.set(targetEl, { visibility: 'visible' });
+          return resolve();
+        }
 
         // Clear content for typing, create blinking caret
         targetEl.innerHTML = '';
@@ -1305,6 +1334,24 @@ document.addEventListener('DOMContentLoaded', () => {
         targetEl.appendChild(textSpan);
         targetEl.appendChild(caret);
 
+        let finished = false;
+        const cleanupAndFinish = () => {
+          if (finished) return;
+          finished = true;
+          if (timer) clearInterval(timer);
+          caret.remove();
+          targetEl.classList.add('built');
+          targetEl.innerHTML = originalHTML;
+          retireCursor(agentObj);
+          resolve();
+        };
+
+        // Safety fallback watchdog: typing MUST NEVER hang indefinitely
+        const maxDuration = Math.max(1600, rawText.length * charSpeed * 2.5 + delay * 1000 + 800);
+        setTimeout(cleanupAndFinish, maxDuration);
+
+        let timer = null;
+
         // Move cursor directly to typing origin
         gsap.to(cursor, {
           x: pageLeft,
@@ -1315,7 +1362,8 @@ document.addEventListener('DOMContentLoaded', () => {
           ease: 'power3.out',
           onComplete: () => {
             let charIdx = 0;
-            const timer = setInterval(() => {
+            timer = setInterval(() => {
+              if (finished) return;
               if (charIdx < rawText.length) {
                 textSpan.textContent += rawText[charIdx];
                 charIdx++;
@@ -1329,15 +1377,7 @@ document.addEventListener('DOMContentLoaded', () => {
                   y: caretRect.top + curScrollY - 6
                 });
               } else {
-                clearInterval(timer);
-                setTimeout(() => {
-                  // Restore original HTML structure (links, accents, inner tags)
-                  targetEl.classList.add('built');
-                  targetEl.innerHTML = originalHTML;
-                  // Immediately glide cursor outside viewport after finishing typing
-                  retireCursor(agentObj);
-                  resolve();
-                }, 80);
+                cleanupAndFinish();
               }
             }, charSpeed);
           }
@@ -1345,21 +1385,10 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     }
 
-    // Hide all cursors outside viewport (standby mode)
+    // Hide only IDLE / NON-BUSY cursors outside viewport (standby mode)
     function parkCursors() {
-      cursorDoms.forEach((c, idx) => {
-        gsap.killTweensOf(c.el);
-        const offX = idx % 2 === 0 ? -250 : window.innerWidth + 250;
-        const curScrollY = window.scrollY || window.pageYOffset;
-        gsap.to(c.el, {
-          x: offX,
-          y: curScrollY + 200 + idx * 80,
-          opacity: 0,
-          duration: 0.5,
-          ease: 'power2.in',
-          overwrite: 'auto'
-        });
-      });
+      // No-op: Each cursor already retires itself immediately via retireCursor()
+      // Keeping all cursors protected so active typing/drawing is NEVER killed!
     }
 
     // Hero Sequence Builder
@@ -1438,21 +1467,21 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 1. Draw card boundary & header
             await Promise.all([
-              eyebrow ? buildElement(eyebrow, cursorDoms[0], 0) : Promise.resolve(),
-              heading ? typeTextElement(heading, cursorDoms[1], 0.05, 20) : Promise.resolve()
+              eyebrow ? buildElement(eyebrow, getAgent(0), 0) : Promise.resolve(),
+              heading ? typeTextElement(heading, getAgent(1), 0.05, 20) : Promise.resolve()
             ]);
-            if (aboutCard) await buildElement(aboutCard, cursorDoms[2], 0.05);
+            if (aboutCard) await buildElement(aboutCard, getAgent(2), 0.05);
 
             // 2. Type out the ABOUT paragraph with live caret (fast natural cadence)
             if (aboutText) {
-              await typeTextElement(aboutText, cursorDoms[0], 0.02, 4);
+              await typeTextElement(aboutText, getAgent(3), 0.02, 4);
             }
 
             // 3. Build each stat chip with animated counter (fast handoff)
             for (let i = 0; i < statChips.length; i++) {
               const chip = statChips[i];
               if (!chip) continue;
-              const agent = cursorDoms[i % cursorDoms.length];
+              const agent = getAgent(i + 4);
               await buildElement(chip, agent, 0.02);
 
               // Trigger odometer counter for this chip immediately upon build
@@ -1501,14 +1530,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
 
             // 1. Header
-            if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
-            if (heading) await typeTextElement(heading, cursorDoms[1], 0.02, 14);
+            if (eyebrow) buildElement(eyebrow, getAgent(0), 0);
+            if (heading) typeTextElement(heading, getAgent(1), 0.02, 14);
 
             // 2. Build crate-grid cards with dedicated cursors (snappy handoff)
             for (let i = 0; i < crates.length; i++) {
               const crate = crates[i];
               if (!crate) continue;
-              const agent = cursorDoms[i % cursorDoms.length];
+              const agent = getAgent(i + 2);
               await buildElement(crate, agent, 0.02);
             }
 
@@ -1540,18 +1569,18 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
 
             // 1. Header & Terminal Shell
-            if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
-            if (heading) typeTextElement(heading, cursorDoms[1], 0.02, 14);
-            if (terminal) await buildElement(terminal, cursorDoms[2], 0.05);
+            if (eyebrow) buildElement(eyebrow, getAgent(0), 0);
+            if (heading) typeTextElement(heading, getAgent(1), 0.02, 14);
+            if (terminal) await buildElement(terminal, getAgent(2), 0.05);
 
             // 2. Reveal right spotlight stage
-            if (stage) buildElement(stage, cursorDoms[7], 0.05);
+            if (stage) buildElement(stage, getAgent(7), 0.05);
 
             // 3. Build left rail tickets strictly ONE AT A TIME
             for (let i = 0; i < tickets.length; i++) {
               const t = tickets[i];
               if (!t) continue;
-              const agent = cursorDoms[i % cursorDoms.length];
+              const agent = getAgent(i + 3);
               await buildElement(t, agent, 0.02);
             }
 
@@ -1580,17 +1609,17 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
 
             // 1. Header in parallel
-            if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
-            if (heading) typeTextElement(heading, cursorDoms[1], 0.02, 14);
+            if (eyebrow) buildElement(eyebrow, getAgent(0), 0);
+            if (heading) typeTextElement(heading, getAgent(1), 0.02, 14);
 
             // 2. Build timeline item cards ONE AT A TIME down the line, including drawer & stack
             for (let i = 0; i < items.length; i++) {
               const item = items[i];
               if (!item) continue;
               const idx = i + 1;
-              const agentItem = cursorDoms[(i * 3) % cursorDoms.length];
-              const agentDrawer = cursorDoms[(i * 3 + 1) % cursorDoms.length];
-              const agentStack = cursorDoms[(i * 3 + 2) % cursorDoms.length];
+              const agentItem = getAgent(i * 3);
+              const agentDrawer = getAgent(i * 3 + 1);
+              const agentStack = getAgent(i * 3 + 2);
 
               // Build outer timeline card header
               await buildElement(item, agentItem, 0.02);
@@ -1639,14 +1668,14 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
 
             // 1. Header
-            if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
-            if (heading) typeTextElement(heading, cursorDoms[1], 0.02, 14);
+            if (eyebrow) buildElement(eyebrow, getAgent(0), 0);
+            if (heading) typeTextElement(heading, getAgent(1), 0.02, 14);
 
             // 2. Draw certification seals ONE AT A TIME
             for (let i = 0; i < seals.length; i++) {
               const seal = seals[i];
               if (!seal) continue;
-              const agent = cursorDoms[(i + 2) % cursorDoms.length];
+              const agent = getAgent(i + 2);
               await buildElement(seal, agent, 0.03);
             }
 
@@ -1654,7 +1683,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 0; i < langs.length; i++) {
               const lang = langs[i];
               if (!lang) continue;
-              const agent = cursorDoms[(i + 5) % cursorDoms.length];
+              const agent = getAgent(i + 5);
               await buildElement(lang, agent, 0.03);
             }
 
@@ -1691,15 +1720,15 @@ document.addEventListener('DOMContentLoaded', () => {
             ];
 
             // 1. Barcode & Header
-            if (barcode) buildElement(barcode, cursorDoms[0], 0);
-            if (eyebrow) buildElement(eyebrow, cursorDoms[1], 0);
-            if (heading) typeTextElement(heading, cursorDoms[2], 0.02, 14);
+            if (barcode) buildElement(barcode, getAgent(0), 0);
+            if (eyebrow) buildElement(eyebrow, getAgent(1), 0);
+            if (heading) typeTextElement(heading, getAgent(2), 0.02, 14);
 
             // 2. Draw contact details ONE AT A TIME
             for (let i = 0; i < contacts.length; i++) {
               const row = contacts[i];
               if (!row) continue;
-              const agent = cursorDoms[(i + 3) % cursorDoms.length];
+              const agent = getAgent(i + 3);
               await buildElement(row, agent, 0.025);
             }
 
@@ -1707,7 +1736,7 @@ document.addEventListener('DOMContentLoaded', () => {
             for (let i = 0; i < ctas.length; i++) {
               const btn = ctas[i];
               if (!btn) continue;
-              const agent = cursorDoms[(i + 9) % cursorDoms.length];
+              const agent = getAgent(i + 9);
               await buildElement(btn, agent, 0.025);
             }
 
