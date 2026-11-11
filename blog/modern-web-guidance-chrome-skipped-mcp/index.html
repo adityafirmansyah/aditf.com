@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern Web Guidance 1.0: Why Chrome Skipped MCP to Stop Agents Writing 2019 JavaScript — Field Notes</title>
+<meta name="description" content="Modern Web Guidance 1.0 ships 200+ browser-primitive guides as a 7MB offline CLI skill, and its rejection of MCP tells you more about AI coding agents than the guides do.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Modern Web Guidance 1.0: Why Chrome Skipped MCP to Stop Agents Writing 2019 JavaScript — Field Notes">
+<meta property="og:description" content="Modern Web Guidance 1.0 ships 200+ browser-primitive guides as a 7MB offline CLI skill, and its rejection of MCP tells you more about AI coding agents than the guides do.">
+<meta property="og:url" content="https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Modern Web Guidance 1.0: Why Chrome Skipped MCP to Stop Agents Writing 2019 JavaScript — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Modern Web Guidance 1.0: Why Chrome Skipped MCP to Stop Agents Writing 2019 JavaScript — Field Notes">
+<meta name="twitter:description" content="Modern Web Guidance 1.0 ships 200+ browser-primitive guides as a 7MB offline CLI skill, and its rejection of MCP tells you more about AI coding agents than the guides do.">
+<meta name="twitter:image" content="https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="modern web guidance, ai coding agents, browser primitives vs javascript, agent skills vs mcp, legacy-scan web modernization">
+<meta property="article:published_time" content="2026-11-11T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="web-development">
+<meta property="article:tag" content="javascript">
+<meta property="article:tag" content="devtools">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Modern Web Guidance 1.0: Why Chrome Skipped MCP to Stop Agents Writing 2019 JavaScript", "description": "Modern Web Guidance 1.0 ships 200+ browser-primitive guides as a 7MB offline CLI skill, and its rejection of MCP tells you more about AI coding agents than the guides do.", "datePublished": "2026-11-11T00:00:00+00:00", "dateModified": "2026-11-11T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/"}, "keywords": "modern web guidance, ai coding agents, browser primitives vs javascript, agent skills vs mcp, legacy-scan web modernization", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1203, "image": ["https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does the skill work without an agent?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The CLI searches and retrieves on its own, and the announcement notes developers already use the guides as a learning resource. Run `npx modern-web-guidance@latest search \"...\"` yourself and read what comes back."}}, {"@type": "Question", "name": "Will legacy-scan fix my code by itself?", "acceptedAnswer": {"@type": "Answer", "text": "No. It identifies candidates through static analysis and hands them to the agent. Since the rewrite is still an agent action, read the diff before you merge it."}}, {"@type": "Question", "name": "What happens with a feature that isn't Baseline yet?", "acceptedAnswer": {"@type": "Answer", "text": "Guides for origin trial and volatile single-engine features stay searchable but are gated on retrieve until you opt in via `.mwgrc`. That gate exists so an agent doesn't adopt an unstable API on your behalf."}}]}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>11 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Modern Web Guidance 1.0: Why Chrome Skipped MCP to Stop Agents Writing 2019 JavaScript</h1>
+    <div class="post__tags"><span>ai-agents</span><span>web-development</span><span>javascript</span><span>devtools</span></div>
+    <div class="post__content reveal is-visible">
+<p>Ask a coding agent for a modal dialog and you get the shape its training corpus rewards:</p>
+<ul>
+<li>a nested <code>&lt;div&gt;</code> stack with a hardcoded z-index ladder,</li>
+<li>a manual focus trap wired to <code>keydown</code>,</li>
+<li>and a scroll-lock hack that breaks on iOS.</li>
+</ul>
+<p>The browser has shipped <code>&lt;dialog&gt;</code> and <code>showModal()</code> for years. The agent knows the name. It almost never reaches for it.</p>
+<p>I see that modal in plenty of agent PRs landing in the Dagango.com repo. The diff is tidy and the tests pass. Wrong primitive.</p>
+<p>Modern Web Guidance 1.0, published on November 10, 2026 by Philip Walton on the Chrome for Developers blog, is the Chrome team's answer to exactly that failure. Firefox, Edge, and MDN steward it alongside Chrome. The guides are good. The packaging decision underneath them is better.</p>
+<h2>Why do coding agents still write 2019 JavaScript?</h2>
+<p>Because the corpus they trained on is mostly pre-2022 Stack Overflow. The modal answer that won the thread back then was a div overlay and a focus trap. Nothing in the model's objective rewards reaching for the platform first.</p>
+<p>So the code passes review. That's the trap. A bot sees a working modal and moves on. Nobody measures that the working modal is 50 lines of JavaScript the browser handles with a single element.</p>
+<p>Here is what the guides push instead:</p>
+<ul>
+<li><code>&lt;dialog&gt;</code> plus <code>showModal()</code> in place of an overlay div and manual inert handling,</li>
+<li><code>field-sizing: content</code> in place of a textarea resize listener,</li>
+<li>CSS anchor positioning in place of a <code>getBoundingClientRect()</code> loop on scroll,</li>
+<li>and scroll-snap in a navigation drawer instead of pointer-event drag maths.</li>
+</ul>
+<p>That last substitution is the one I'd underline. The <code>navigation-drawer</code> guide moves the swipe gesture into a scrolling container with two snap stops. Momentum, interruption, and velocity come from the browser.</p>
+<p>Read the list again as a whole. Each line answers the browser primitives vs JavaScript question the same way, and none needs a dependency.</p>
+<h2>Modern Web Guidance ships as a 7MB skill, not an MCP server</h2>
+<p>On the Hacker News thread, Paul Irish described the decision in one sentence. He spent nine months on "how to ship this as an agent skill + (Agentic RAG) CLI without blowing up your context window".</p>
+<p>The alternative on the table was a Model Context Protocol (MCP) server. An MCP server is always on. Its tool schemas sit in context on every turn, whether or not you touch a layout that day.</p>
+<p>What shipped instead:</p>
+<ul>
+<li>a 500MB native retrieval stack compressed into a roughly <strong>7MB pure-JS package</strong>,</li>
+<li>offline BM25 (a lexical ranking function) plus a local embedding model, answering in about <strong>10ms on CPU</strong> with no network calls and no API keys,</li>
+<li>and a skill description of roughly <strong>205 tokens</strong> that has to earn activation on a frontend task.</li>
+</ul>
+<p>The skill activates first. Then the agent runs <code>search "&lt;use case&gt;"</code>, and <code>retrieve &lt;guide-id&gt;</code> pulls exactly one guide into context. Nothing else rides along.</p>
+<p>This is the agent skills vs MCP argument in its cleanest form. Progressive disclosure wins because the scarce resource is attention, not bandwidth.</p>
+<p>Simon Willison suggested a grep-able markdown index on GitHub Pages as an alternative to installing anything. Irish agreed for occasional use and flagged that the index's own token cost is too high for daily work. Fine trade, honestly measured.</p>
+<h2>The receipts behind the 55% to 92% jump</h2>
+<p>Chrome ran Codex, Claude, and Antigravity against 200 tasks. Scoring used roughly 1,700 Playwright and abstract syntax tree (AST) assertions. Unguided agents passed 55%. With the skill installed, 92%.</p>
+<p>Partner numbers point the same way. note inc. ran a 180-pass evaluation on its production Next.js codebase, moving from 61% to 94% on modern web checks. Across 431 merged pull requests, correct Largest Contentful Paint (LCP) image prioritization rose 28%.</p>
+<p>MetaMask runs the guidance as a review bot on every pull request to its extension repo, configured with a three-line prompt. In five weeks the bot reviewed about 480 PRs and commented on 64. Engineers fixed 43 findings at a median of 15 minutes from comment to fix.</p>
+<p>Those findings clustered in accessibility, HTML semantics, and forms. That tracks with every linter I've wired into continuous integration (CI). The tool catches what has a rule, and the boring middle stays invisible.</p>
+<h2>legacy-scan is deterministic on purpose</h2>
+<p>The CLI ships a <code>legacy-scan</code> workflow trained on 30,000 GitHub repositories. Irish reports 92% average precision on held-out repos.</p>
+<p>The announcement is honest about scope. The scan is static analysis over HTML, CSS, JavaScript and <code>package.json</code>, checking a deliberately limited set of patterns. Narrow first, with agentic audits planned later.</p>
+<pre><code class="language-shell"># install into a project
+npx modern-web-guidance@latest install
+
+# scan an existing codebase for upgrade candidates
+npx modern-web-guidance@latest legacy-scan .
+</code></pre>
+<p>Determinism is the whole point of legacy-scan web modernization. An agent told to modernize a file rewrites the whole file. A scanner reports the file, the line and the matched pattern. That bounds the diff before the agent touches anything.</p>
+<h2>The Chrome-dominance objection is fair, and partly answered</h2>
+<p>HN user <code>advisedwang</code> raised the sharpest objection in that thread, warning the road ends at a dominant-browser web. Replies came fast. <code>super256</code> pointed at the contributor list. Philip Walton confirmed Firefox and Edge as contributors, then conceded Mozilla joined only in the last few weeks and hasn't had much influence yet.</p>
+<p>What actually limits the risk is Baseline, the cross-browser compatibility standard the guides build on. A non-Baseline feature has to come with documented fallback. Guides covering origin trial APIs stay hidden behind explicit opt-in through a <code>.mwgrc</code> file.</p>
+<p>That is a constraint on the recommendation engine. A promise would be cheaper to make and worth less.</p>
+<h2>What I'd do with this first</h2>
+<p>Install it with telemetry off, then run the scan read-only on a branch before any agent touches the output:</p>
+<pre><code class="language-shell">DISABLE_TELEMETRY=1 npx modern-web-guidance@latest install
+</code></pre>
+<p>Two rules for the first pass:</p>
+<ul>
+<li>treat <code>legacy-scan</code> hits as review candidates rather than tickets,</li>
+<li>and read the fallback section of any guide recommending something your Baseline targets don't cover.</li>
+</ul>
+<p>Then keep a human on the accessibility findings, which no linter was catching before.</p>
+<p>I run a daily fleet of AI coding agents on a Celeron host, and the thing I want from them is mostly restraint. A skill that activates on a layout task and stays quiet otherwise is worth more to me than a server that is always present and usually irrelevant.</p>
+<h2>FAQ</h2>
+<h3>Does the skill work without an agent?</h3>
+<p>Yes. The CLI searches and retrieves on its own, and the announcement notes developers already use the guides as a learning resource. Run <code>npx modern-web-guidance@latest search "..."</code> yourself and read what comes back.</p>
+<h3>Will legacy-scan fix my code by itself?</h3>
+<p>No. It identifies candidates through static analysis and hands them to the agent. Since the rewrite is still an agent action, read the diff before you merge it.</p>
+<h3>What happens with a feature that isn't Baseline yet?</h3>
+<p>Guides for origin trial and volatile single-engine features stay searchable but are gated on retrieve until you opt in via <code>.mwgrc</code>. That gate exists so an agent doesn't adopt an unstable API on your behalf.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
