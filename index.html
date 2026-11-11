@@ -899,67 +899,67 @@ html.lenis, html.lenis body {
     </ol>
   </section>
   <!-- CERTIFICATIONS -->
-  <section class="section" id="certifications">
+  <section class="section" id="certifications" data-seq="certifications">
     <div class="section__head">
-      <p class="eyebrow">Quality Control &mdash; Certified Seals</p>
-      <h2>Certifications &amp; Languages</h2>
+      <p class="eyebrow" data-b="eyebrow">Quality Control &mdash; Certified Seals</p>
+      <h2 data-b="heading">Certifications &amp; Languages</h2>
     </div>
 
     <div class="seal-row reveal">
-      <div class="seal"><span>JavaScript</span><small>Course</small></div>
-      <div class="seal"><span>CSS</span><small>Fundamentals</small></div>
-      <div class="seal"><span>jQuery</span><small>Course</small></div>
+      <div class="seal" data-b="seal-1"><span>JavaScript</span><small>Course</small></div>
+      <div class="seal" data-b="seal-2"><span>CSS</span><small>Fundamentals</small></div>
+      <div class="seal" data-b="seal-3"><span>jQuery</span><small>Course</small></div>
     </div>
 
     <div class="lang-row reveal">
-      <div class="lang-chip"><span class="lang-chip__name">Indonesian</span><span class="lang-chip__level">Native</span></div>
-      <div class="lang-chip"><span class="lang-chip__name">English</span><span class="lang-chip__level">Professional Working Proficiency</span></div>
+      <div class="lang-chip" data-b="lang-1"><span class="lang-chip__name">Indonesian</span><span class="lang-chip__level">Native</span></div>
+      <div class="lang-chip" data-b="lang-2"><span class="lang-chip__name">English</span><span class="lang-chip__level">Professional Working Proficiency</span></div>
     </div>
   </section>
 
   <!-- CONTACT -->
-  <section class="section section--contact" id="contact">
-    <div class="barcode-wrapper" aria-hidden="true">
+  <section class="section section--contact" id="contact" data-seq="contact">
+    <div class="barcode-wrapper" aria-hidden="true" data-b="barcode">
       <div class="barcode"></div>
       <div class="barcode-laser" id="barcodeLaser"></div>
     </div>
     <div class="section__head">
-      <p class="eyebrow">Consignee Details &mdash; Final Destination</p>
-      <h2>Let&rsquo;s ship something together.</h2>
+      <p class="eyebrow" data-b="eyebrow">Consignee Details &mdash; Final Destination</p>
+      <h2 data-b="heading">Let&rsquo;s ship something together.</h2>
     </div>
 
     <div class="contact-grid reveal">
-      <a class="contact-row" href="mailto:aditf.work@gmail.com">
+      <a class="contact-row" data-b="contact-1" href="mailto:aditf.work@gmail.com">
         <span class="contact-row__label">Email</span>
         <span class="contact-row__value">aditf.work@gmail.com</span>
       </a>
-      <a class="contact-row" href="tel:+628112017817">
+      <a class="contact-row" data-b="contact-2" href="tel:+628****7817">
         <span class="contact-row__label">Phone</span>
         <span class="contact-row__value">+62 811-201-7817</span>
       </a>
-      <div class="contact-row contact-row--static">
+      <div class="contact-row contact-row--static" data-b="contact-3">
         <span class="contact-row__label">Location</span>
         <span class="contact-row__value">Surakarta, Central Java, Indonesia</span>
       </div>
-      <a class="contact-row" href="https://linkedin.com/in/aditya-firmansyah-21940845" target="_blank" rel="noopener noreferrer">
+      <a class="contact-row" data-b="contact-4" href="https://linkedin.com/in/aditya-firmansyah-21940845" target="_blank" rel="noopener noreferrer">
         <span class="contact-row__label">LinkedIn</span>
         <span class="contact-row__value">/in/aditya-firmansyah-21940845</span>
       </a>
-      <a class="contact-row" href="https://github.com/adityafirmansyah" target="_blank" rel="noopener noreferrer">
+      <a class="contact-row" data-b="contact-5" href="https://github.com/adityafirmansyah" target="_blank" rel="noopener noreferrer">
         <span class="contact-row__label">GitHub</span>
         <span class="contact-row__value">/adityafirmansyah</span>
       </a>
-      <a class="contact-row" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">
+      <a class="contact-row" data-b="contact-6" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">
         <span class="contact-row__label">Sponsor</span>
         <span class="contact-row__value">github.com/sponsors/adityafirmansyah &hearts;</span>
       </a>
     </div>
 
     <div class="hero__actions contact-cta reveal">
-      <a class="btn btn--stamp" href="/consult/">Book Consultation &rarr;</a>
-      <a class="btn btn--ghost" href="assets/Aditya_Firmansyah_CV.pdf" download>Download CV</a>
-      <a class="btn btn--ghost" href="mailto:aditf.work@gmail.com">Email Me</a>
-      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--stamp" data-b="cta-1" href="/consult/">Book Consultation &rarr;</a>
+      <a class="btn btn--ghost" data-b="cta-2" href="assets/Aditya_Firmansyah_CV.pdf" download>Download CV</a>
+      <a class="btn btn--ghost" data-b="cta-3" href="mailto:aditf.work@gmail.com">Email Me</a>
+      <a class="btn btn--ghost" data-b="cta-4" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Sponsor on GitHub &hearts;</a>
     </div>
   </section>
 
@@ -1594,10 +1594,109 @@ document.addEventListener('DOMContentLoaded', () => {
         });
       }
 
+      // Special Sequence for CERTIFICATIONS
+      const certSec = document.getElementById('certifications');
+      if (certSec) {
+        ScrollTrigger.create({
+          trigger: certSec,
+          start: 'top 75%',
+          once: true,
+          onEnter: async () => {
+            const eyebrow = certSec.querySelector('[data-b="eyebrow"]');
+            const heading = certSec.querySelector('[data-b="heading"]');
+            const seals = [
+              certSec.querySelector('[data-b="seal-1"]'),
+              certSec.querySelector('[data-b="seal-2"]'),
+              certSec.querySelector('[data-b="seal-3"]')
+            ];
+            const langs = [
+              certSec.querySelector('[data-b="lang-1"]'),
+              certSec.querySelector('[data-b="lang-2"]')
+            ];
+
+            // 1. Header
+            if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
+            if (heading) typeTextElement(heading, cursorDoms[1], 0.02, 14);
+
+            // 2. Draw certification seals ONE AT A TIME
+            for (let i = 0; i < seals.length; i++) {
+              const seal = seals[i];
+              if (!seal) continue;
+              const agent = cursorDoms[(i + 2) % cursorDoms.length];
+              await buildElement(seal, agent, 0.03);
+            }
+
+            // 3. Draw language proficiency chips ONE AT A TIME
+            for (let i = 0; i < langs.length; i++) {
+              const lang = langs[i];
+              if (!lang) continue;
+              const agent = cursorDoms[(i + 5) % cursorDoms.length];
+              await buildElement(lang, agent, 0.03);
+            }
+
+            // Standby: park cursors hidden outside frame
+            parkCursors();
+          }
+        });
+      }
+
+      // Special Sequence for CONTACT
+      const contactSec = document.getElementById('contact');
+      if (contactSec) {
+        ScrollTrigger.create({
+          trigger: contactSec,
+          start: 'top 75%',
+          once: true,
+          onEnter: async () => {
+            const barcode = contactSec.querySelector('[data-b="barcode"]');
+            const eyebrow = contactSec.querySelector('[data-b="eyebrow"]');
+            const heading = contactSec.querySelector('[data-b="heading"]');
+            const contacts = [
+              contactSec.querySelector('[data-b="contact-1"]'),
+              contactSec.querySelector('[data-b="contact-2"]'),
+              contactSec.querySelector('[data-b="contact-3"]'),
+              contactSec.querySelector('[data-b="contact-4"]'),
+              contactSec.querySelector('[data-b="contact-5"]'),
+              contactSec.querySelector('[data-b="contact-6"]')
+            ];
+            const ctas = [
+              contactSec.querySelector('[data-b="cta-1"]'),
+              contactSec.querySelector('[data-b="cta-2"]'),
+              contactSec.querySelector('[data-b="cta-3"]'),
+              contactSec.querySelector('[data-b="cta-4"]')
+            ];
+
+            // 1. Barcode & Header
+            if (barcode) buildElement(barcode, cursorDoms[0], 0);
+            if (eyebrow) buildElement(eyebrow, cursorDoms[1], 0);
+            if (heading) typeTextElement(heading, cursorDoms[2], 0.02, 14);
+
+            // 2. Draw contact details ONE AT A TIME
+            for (let i = 0; i < contacts.length; i++) {
+              const row = contacts[i];
+              if (!row) continue;
+              const agent = cursorDoms[(i + 3) % cursorDoms.length];
+              await buildElement(row, agent, 0.025);
+            }
+
+            // 3. Draw CTA action buttons ONE AT A TIME
+            for (let i = 0; i < ctas.length; i++) {
+              const btn = ctas[i];
+              if (!btn) continue;
+              const agent = cursorDoms[(i + 9) % cursorDoms.length];
+              await buildElement(btn, agent, 0.025);
+            }
+
+            // Standby: park cursors hidden outside frame
+            parkCursors();
+          }
+        });
+      }
+
       // Generic trigger for remaining sections
       const sections = document.querySelectorAll('[data-seq]');
       sections.forEach(sec => {
-        if (sec.dataset.seq === 'hero' || sec.id === 'about' || sec.id === 'skills' || sec.id === 'projects' || sec.id === 'experience') return;
+        if (sec.dataset.seq === 'hero' || sec.id === 'about' || sec.id === 'skills' || sec.id === 'projects' || sec.id === 'experience' || sec.id === 'certifications' || sec.id === 'contact') return;
 
         ScrollTrigger.create({
           trigger: sec,
