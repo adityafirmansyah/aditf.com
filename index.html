@@ -435,9 +435,9 @@ html.lenis, html.lenis body {
         <span class="waybill__status"><i class="dot" aria-hidden="true"></i>STATUS: IN TRANSIT</span>
       </div>
 
-      <h1 class="hero__name" data-b="name">
-        <span>Aditya</span>
-        <span class="hero__name--accent">Firmansyah</span>
+      <h1 class="hero__name">
+        <span data-b="name-first">Aditya</span>
+        <span class="hero__name--accent" data-b="name-last">Firmansyah</span>
       </h1>
 
       <p class="hero__role" data-b="role">Senior Full-Stack Engineer &mdash; Customer-Facing Platforms &amp; Scalable APIs</p>
@@ -1350,7 +1350,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 2. Swarm cursor build elements in parallel
       const waybill = document.querySelector('[data-b="waybill"]');
-      const name = document.querySelector('[data-b="name"]');
+      const nameFirst = document.querySelector('[data-b="name-first"]');
+      const nameLast = document.querySelector('[data-b="name-last"]');
       const role = document.querySelector('[data-b="role"]');
       const route = document.querySelector('[data-b="route"]');
       const lede = document.querySelector('[data-b="lede"]');
@@ -1360,13 +1361,16 @@ document.addEventListener('DOMContentLoaded', () => {
         document.querySelector('[data-b="action-3"]')
       ];
 
-      // Wave 1: Draw Waybill & Route while typing Name
+      // Wave 1: Draw Waybill & Route while typing Name lines in parallel
       buildElement(waybill, cursorDoms[0], 0);
       buildElement(route, cursorDoms[2], 0.05);
-      await typeTextElement(name, cursorDoms[1], 0.05, 18);
+      await Promise.all([
+        typeTextElement(nameFirst, cursorDoms[1], 0.02, 14),
+        typeTextElement(nameLast, cursorDoms[3], 0.06, 14)
+      ]);
 
       // Wave 2: Type Role & build Action CTA buttons in parallel
-      const rolePromise = typeTextElement(role, cursorDoms[3], 0.02, 10);
+      const rolePromise = typeTextElement(role, cursorDoms[1], 0.02, 10);
       const actionPromises = actions.map((btn, i) =>
         buildElement(btn, cursorDoms[4 + i], 0.05 + i * 0.06)
       );
