@@ -460,7 +460,7 @@ html.lenis, html.lenis body {
 
     <div class="label-card reveal" data-b="about-card">
       <span class="label-card__tape" aria-hidden="true"></span>
-      <p>Senior full-stack engineer with 13+ years delivering customer-facing platforms, multi-tenant commerce solutions, and scalable APIs. Specializes in Next.js, TypeScript, Node.js and production system architecture, with additional FastAPI expertise. Built software supporting cross-border logistics across APAC, optimized catalog queries by 11.6&times;, and helped reduce reported regression defects by over 40% through engineering quality improvements. Combines hands-on delivery with platform reliability, payment integrations, and technical leadership.</p>
+      <p data-b="about-text">Senior full-stack engineer with 13+ years delivering customer-facing platforms, multi-tenant commerce solutions, and scalable APIs. Specializes in Next.js, TypeScript, Node.js and production system architecture, with additional FastAPI expertise. Built software supporting cross-border logistics across APAC, optimized catalog queries by 11.6&times;, and helped reduce reported regression defects by over 40% through engineering quality improvements. Combines hands-on delivery with platform reliability, payment integrations, and technical leadership.</p>
     </div>
 
     <div class="stat-row reveal" id="statRow" data-b="stat-row">
@@ -1374,9 +1374,42 @@ document.addEventListener('DOMContentLoaded', () => {
     function setupScrollBuilders() {
       if (!window.ScrollTrigger) return;
 
+      // Special Sequence for ABOUT section
+      const aboutSec = document.getElementById('about');
+      if (aboutSec) {
+        ScrollTrigger.create({
+          trigger: aboutSec,
+          start: 'top 75%',
+          once: true,
+          onEnter: async () => {
+            const eyebrow = aboutSec.querySelector('[data-b="eyebrow"]');
+            const heading = aboutSec.querySelector('[data-b="heading"]');
+            const aboutCard = aboutSec.querySelector('[data-b="about-card"]');
+            const aboutText = aboutSec.querySelector('[data-b="about-text"]');
+            const statRow = aboutSec.querySelector('[data-b="stat-row"]');
+
+            // 1. Draw card boundary & header
+            if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
+            if (heading) typeTextElement(heading, cursorDoms[1], 0.1, 24);
+            if (aboutCard) await buildElement(aboutCard, cursorDoms[2], 0.2);
+
+            // 2. Type out the ABOUT paragraph with live caret
+            if (aboutText) {
+              await typeTextElement(aboutText, cursorDoms[0], 0.1, 7);
+            }
+
+            // 3. Reveal stat chips row
+            if (statRow) {
+              buildElement(statRow, cursorDoms[3], 0.1);
+            }
+          }
+        });
+      }
+
+      // Generic trigger for remaining sections
       const sections = document.querySelectorAll('[data-seq]');
       sections.forEach(sec => {
-        if (sec.dataset.seq === 'hero') return;
+        if (sec.dataset.seq === 'hero' || sec.id === 'about') return;
 
         ScrollTrigger.create({
           trigger: sec,
@@ -1386,7 +1419,11 @@ document.addEventListener('DOMContentLoaded', () => {
             const targets = Array.from(sec.querySelectorAll('[data-b]'));
             targets.forEach((el, i) => {
               const agent = cursorDoms[i % cursorDoms.length];
-              buildElement(el, agent, i * 0.12);
+              if (el.dataset.b === 'heading' || el.tagName === 'P') {
+                typeTextElement(el, agent, i * 0.15, 18);
+              } else {
+                buildElement(el, agent, i * 0.12);
+              }
             });
           }
         });
