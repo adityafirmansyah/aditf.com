@@ -112,6 +112,7 @@
   text-align: left;
   transition: all .18s ease;
   position: relative;
+  width: 100%;
 }
 .terminal-ticket:hover {
   border-color: var(--amber);
@@ -121,6 +122,12 @@
   background: rgba(232, 135, 30, 0.09);
   border-color: var(--amber);
   border-left: 4px solid var(--amber);
+}
+.terminal-ticket__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
 }
 .ticket-num {
   font-family: var(--font-mono);
@@ -141,6 +148,46 @@
   font-family: var(--font-mono);
   font-size: 11px;
   color: var(--paper-dim);
+}
+.ticket-indicator {
+  display: none;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--paper-dim);
+  background: var(--ink-soft);
+  border: 1px solid var(--ink-line);
+  padding: 3px 8px;
+  border-radius: 2px;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  transition: all .2s ease;
+  margin-top: 2px;
+}
+.terminal-ticket:hover .ticket-indicator {
+  border-color: var(--amber);
+  color: var(--amber);
+}
+.terminal-ticket.is-open .ticket-indicator {
+  background: var(--amber);
+  color: var(--ink);
+  border-color: var(--amber);
+  font-weight: 600;
+}
+.ticket-chevron {
+  display: inline-block;
+  transition: transform .25s ease;
+  font-size: 10px;
+}
+.terminal-ticket.is-open .ticket-chevron {
+  transform: rotate(180deg);
+}
+.terminal-ticket-drawer {
+  display: none !important;
+  overflow: hidden;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--ink-line);
 }
 .terminal-stage {
   flex: 1;
@@ -392,9 +439,19 @@ html.lenis, html.lenis body {
   .terminal-selector {
     flex: auto;
     border-right: none;
-    border-bottom: 1px solid var(--ink-line);
+    border-bottom: none;
     padding-right: 0;
-    padding-bottom: 16px;
+    padding-bottom: 0;
+    gap: 12px;
+  }
+  .ticket-indicator {
+    display: flex;
+  }
+  .terminal-ticket.is-open .terminal-ticket-drawer {
+    display: block !important;
+  }
+  .terminal-stage {
+    display: none !important;
   }
   .cursor-layer {
     display: none; /* Disable multi-cursor on small mobile screens for clean touch */
@@ -544,34 +601,82 @@ html.lenis, html.lenis body {
       <!-- Left Ticket Selector Rail -->
       <nav class="terminal-selector" id="termSelector" aria-label="Project Manifest">
         <button class="terminal-ticket is-active" data-pane="0" data-b="ticket-0">
-          <div class="ticket-num">SHIPMENT 01 &bull; SAAS PLATFORM</div>
-          <div class="ticket-title">Dagango</div>
-          <div class="ticket-role">Multi-Tenant E-Commerce &bull; Next.js + FastAPI</div>
+          <div class="terminal-ticket__header">
+            <div>
+              <div class="ticket-num">SHIPMENT 01 &bull; SAAS PLATFORM</div>
+              <div class="ticket-title">Dagango</div>
+              <div class="ticket-role">Multi-Tenant E-Commerce &bull; Next.js + FastAPI</div>
+            </div>
+            <div class="ticket-indicator">
+              <span>Active</span>
+              <span class="ticket-chevron">&darr;</span>
+            </div>
+          </div>
         </button>
         <button class="terminal-ticket" data-pane="1" data-b="ticket-1">
-          <div class="ticket-num">SHIPMENT 02 &bull; CAREER TECH</div>
-          <div class="ticket-title">mycv.ai.id</div>
-          <div class="ticket-role">ATS Resume Engine &bull; React + FastAPI</div>
+          <div class="terminal-ticket__header">
+            <div>
+              <div class="ticket-num">SHIPMENT 02 &bull; CAREER TECH</div>
+              <div class="ticket-title">mycv.ai.id</div>
+              <div class="ticket-role">ATS Resume Engine &bull; React + FastAPI</div>
+            </div>
+            <div class="ticket-indicator">
+              <span>View Specs</span>
+              <span class="ticket-chevron">&darr;</span>
+            </div>
+          </div>
         </button>
         <button class="terminal-ticket" data-pane="2" data-b="ticket-2">
-          <div class="ticket-num">SHIPMENT 03 &bull; CIVIC TRUST</div>
-          <div class="ticket-title">Kas Transparan</div>
-          <div class="ticket-role">Treasury Management &bull; FastAPI + React TS</div>
+          <div class="terminal-ticket__header">
+            <div>
+              <div class="ticket-num">SHIPMENT 03 &bull; CIVIC TRUST</div>
+              <div class="ticket-title">Kas Transparan</div>
+              <div class="ticket-role">Treasury Management &bull; FastAPI + React TS</div>
+            </div>
+            <div class="ticket-indicator">
+              <span>View Specs</span>
+              <span class="ticket-chevron">&darr;</span>
+            </div>
+          </div>
         </button>
         <button class="terminal-ticket" data-pane="3" data-b="ticket-3">
-          <div class="ticket-num">SHIPMENT 04 &bull; CIVIC UTILITY</div>
-          <div class="ticket-title">TirtaDesa</div>
-          <div class="ticket-role">Water Utility &amp; Billing &bull; FastAPI + React PWA</div>
+          <div class="terminal-ticket__header">
+            <div>
+              <div class="ticket-num">SHIPMENT 04 &bull; CIVIC UTILITY</div>
+              <div class="ticket-title">TirtaDesa</div>
+              <div class="ticket-role">Water Utility &amp; Billing &bull; FastAPI + React PWA</div>
+            </div>
+            <div class="ticket-indicator">
+              <span>View Specs</span>
+              <span class="ticket-chevron">&darr;</span>
+            </div>
+          </div>
         </button>
         <button class="terminal-ticket" data-pane="4" data-b="ticket-4">
-          <div class="ticket-num">SHIPMENT 05 &bull; GAMIFIED FITNESS</div>
-          <div class="ticket-title">GainForge</div>
-          <div class="ticket-role">Fitness RPG &bull; Full-Stack Rust WASM</div>
+          <div class="terminal-ticket__header">
+            <div>
+              <div class="ticket-num">SHIPMENT 05 &bull; GAMIFIED FITNESS</div>
+              <div class="ticket-title">GainForge</div>
+              <div class="ticket-role">Fitness RPG &bull; Full-Stack Rust WASM</div>
+            </div>
+            <div class="ticket-indicator">
+              <span>View Specs</span>
+              <span class="ticket-chevron">&darr;</span>
+            </div>
+          </div>
         </button>
         <button class="terminal-ticket" data-pane="5" data-b="ticket-5">
-          <div class="ticket-num">SHIPMENT 06 &bull; AI PROPOSAL TOOL</div>
-          <div class="ticket-title">Cover Letter Gen</div>
-          <div class="ticket-role">LLM Proposal Suite &bull; React + Node.js</div>
+          <div class="terminal-ticket__header">
+            <div>
+              <div class="ticket-num">SHIPMENT 06 &bull; AI PROPOSAL TOOL</div>
+              <div class="ticket-title">Cover Letter Gen</div>
+              <div class="ticket-role">LLM Proposal Suite &bull; React + Node.js</div>
+            </div>
+            <div class="ticket-indicator">
+              <span>View Specs</span>
+              <span class="ticket-chevron">&darr;</span>
+            </div>
+          </div>
         </button>
       </nav>
 
@@ -979,14 +1084,103 @@ html.lenis, html.lenis body {
 <script src="assets/anime.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-  // 1. Projects: Cargo Dispatch Terminal
+  // 1. Projects: Cargo Dispatch Terminal (Desktop tab-switch + Mobile inline accordion)
   const tickets = Array.from(document.querySelectorAll('.terminal-ticket'));
   const panes = Array.from(document.querySelectorAll('.terminal-pane'));
   let activeIdx = 0;
   let isAnimating = false;
 
+  // Clone each project card content into ticket drawer for mobile accordion view
   tickets.forEach((ticket, idx) => {
-    ticket.addEventListener('click', () => {
+    const pane = panes[idx];
+    if (pane && !ticket.querySelector('.terminal-ticket-drawer')) {
+      const drawer = document.createElement('div');
+      drawer.className = 'terminal-ticket-drawer';
+      const cardClone = pane.querySelector('.project-card').cloneNode(true);
+      drawer.appendChild(cardClone);
+      ticket.appendChild(drawer);
+
+      // Expand first project item by default
+      if (idx === 0) {
+        ticket.classList.add('is-open');
+        drawer.style.display = 'block';
+        drawer.style.height = 'auto';
+        drawer.style.opacity = '1';
+        const ind = ticket.querySelector('.ticket-indicator');
+        if (ind) ind.innerHTML = `<span>Active</span><span class="ticket-chevron">&darr;</span>`;
+      }
+    }
+
+    ticket.addEventListener('click', (e) => {
+      // Prevent link clicks inside drawer from re-triggering ticket toggle
+      if (e.target.closest('a') || e.target.closest('button:not(.terminal-ticket)')) return;
+
+      const isMobileView = window.innerWidth <= 900;
+
+      if (isMobileView) {
+        // MOBILE BEHAVIOR: Accordion open/close right below the ticket
+        const drawer = ticket.querySelector('.terminal-ticket-drawer');
+        const chevron = ticket.querySelector('.ticket-chevron');
+        const indicatorText = ticket.querySelector('.ticket-indicator span');
+        const isOpen = ticket.classList.contains('is-open');
+
+        if (isOpen) {
+          if (window.anime && drawer) {
+            drawer.style.height = drawer.scrollHeight + 'px';
+            anime({
+              targets: drawer,
+              height: 0,
+              opacity: [1, 0],
+              duration: 250,
+              easing: 'easeInQuad',
+              complete: () => {
+                ticket.classList.remove('is-open');
+                drawer.style.display = 'none';
+                if (indicatorText) indicatorText.innerText = 'View Specs';
+              }
+            });
+          } else {
+            ticket.classList.remove('is-open');
+            if (drawer) drawer.style.display = 'none';
+            if (indicatorText) indicatorText.innerText = 'View Specs';
+          }
+        } else {
+          ticket.classList.add('is-open');
+          if (drawer) {
+            drawer.style.display = 'block';
+            const targetH = drawer.scrollHeight;
+            if (window.anime) {
+              drawer.style.height = '0px';
+              anime({
+                targets: drawer,
+                height: [0, targetH + 'px'],
+                opacity: [0, 1],
+                duration: 320,
+                easing: 'easeOutCubic',
+                complete: () => {
+                  drawer.style.height = 'auto';
+                  if (indicatorText) indicatorText.innerText = 'Close Specs';
+                }
+              });
+              anime({
+                targets: drawer.querySelectorAll('.project-card__top, .project-card__lede, .project-card__points li, .project-card__stack span, .hero__actions'),
+                opacity: [0, 1],
+                translateY: [6, 0],
+                delay: anime.stagger(18, { start: 30 }),
+                duration: 280,
+                easing: 'easeOutCubic'
+              });
+            } else {
+              drawer.style.height = 'auto';
+              drawer.style.opacity = '1';
+              if (indicatorText) indicatorText.innerText = 'Close Specs';
+            }
+          }
+        }
+        return;
+      }
+
+      // DESKTOP BEHAVIOR: Split screen pane switcher
       if (idx === activeIdx || isAnimating) return;
       isAnimating = true;
 
