@@ -469,21 +469,21 @@ html.lenis, html.lenis body {
 
 <div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
 
-<header class="nav" id="siteNav" data-b="nav">
-  <a href="#top" class="nav__mark" aria-label="Back to top">AF</a>
-  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+<header class="nav" id="siteNav">
+  <a href="#top" class="nav__mark" aria-label="Back to top" data-b="nav-mark">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation" data-b="nav-toggle">
     <span></span><span></span><span></span>
   </button>
   <nav class="nav__links" id="navLinks">
-    <a href="#about"><span class="idx">01</span>About</a>
-    <a href="#skills"><span class="idx">02</span>Skills</a>
-    <a href="#projects"><span class="idx">03</span>Projects</a>
-    <a href="#experience"><span class="idx">04</span>Experience</a>
-    <a href="#certifications"><span class="idx">05</span>Certs</a>
-    <a href="#contact"><span class="idx">06</span>Contact</a>
-    <a href="/blog/"><span class="idx">07</span>Blog</a>
-    <a href="/consult/"><span class="idx">08</span>Consult</a>
-    <a href="/services/"><span class="idx">09</span>Services</a>
+    <a href="#about" data-b="nav-1"><span class="idx">01</span>About</a>
+    <a href="#skills" data-b="nav-2"><span class="idx">02</span>Skills</a>
+    <a href="#projects" data-b="nav-3"><span class="idx">03</span>Projects</a>
+    <a href="#experience" data-b="nav-4"><span class="idx">04</span>Experience</a>
+    <a href="#certifications" data-b="nav-5"><span class="idx">05</span>Certs</a>
+    <a href="#contact" data-b="nav-6"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" data-b="nav-7"><span class="idx">07</span>Blog</a>
+    <a href="/consult/" data-b="nav-8"><span class="idx">08</span>Consult</a>
+    <a href="/services/" data-b="nav-9"><span class="idx">09</span>Services</a>
   </nav>
 </header>
 
@@ -1073,9 +1073,9 @@ html.lenis, html.lenis body {
 
 </main>
 
-<footer class="footer">
-  <span>&copy; 2026 Aditya Firmansyah</span>
-  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+<footer class="footer" id="siteFooter">
+  <span data-b="footer-copy">&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id" data-b="footer-manifest">MANIFEST REF. AF&middot;SWE&middot;2026</span>
 </footer>
 
 <script src="script.js"></script>
@@ -1631,17 +1631,38 @@ document.addEventListener('DOMContentLoaded', () => {
       // Keeping all cursors protected so active typing/drawing is NEVER killed!
     }
 
-    // Hero Sequence Builder
+    // Hero & Header Sequence Builder
     async function runHeroBuild() {
-      // 1. Reveal Nav first
-      const navEl = document.querySelector('[data-b="nav"]');
-      if (navEl) {
-        navEl.classList.add('built');
-        gsap.set(navEl, { visibility: 'visible', opacity: 0, y: -20 });
-        gsap.to(navEl, { opacity: 1, y: 0, duration: 0.6, ease: 'power3.out' });
-      }
+      // 1. Swarm cursor build header mark & menu items individually
+      const navMark = document.querySelector('[data-b="nav-mark"]');
+      const navToggle = document.querySelector('[data-b="nav-toggle"]');
+      const navLinks = [
+        document.querySelector('[data-b="nav-1"]'),
+        document.querySelector('[data-b="nav-2"]'),
+        document.querySelector('[data-b="nav-3"]'),
+        document.querySelector('[data-b="nav-4"]'),
+        document.querySelector('[data-b="nav-5"]'),
+        document.querySelector('[data-b="nav-6"]'),
+        document.querySelector('[data-b="nav-7"]'),
+        document.querySelector('[data-b="nav-8"]'),
+        document.querySelector('[data-b="nav-9"]')
+      ];
 
-      // 2. Swarm cursor build elements in parallel
+      // Draw AF mark & mobile toggle button
+      if (navMark) buildElement(navMark, getAgent(0), 0);
+      if (navToggle) buildElement(navToggle, getAgent(1), 0.02);
+
+      // Stagger-build each menu link item with cursors
+      const navLinksPromise = (async () => {
+        for (let i = 0; i < navLinks.length; i++) {
+          const link = navLinks[i];
+          if (!link) continue;
+          const agent = getAgent((i % 6) + 2);
+          await buildElement(link, agent, 0, 0.4);
+        }
+      })();
+
+      // 2. Swarm cursor build hero elements in parallel with header
       const waybill = document.querySelector('[data-b="waybill"]');
       const nameFirst = document.querySelector('[data-b="name-first"]');
       const nameLast = document.querySelector('[data-b="name-last"]');
@@ -1655,11 +1676,12 @@ document.addEventListener('DOMContentLoaded', () => {
       ];
 
       // Wave 1: Draw Waybill & Route while typing Name lines in parallel
-      buildElement(waybill, cursorDoms[0], 0);
-      buildElement(route, cursorDoms[2], 0.05);
+      buildElement(waybill, cursorDoms[0], 0.04);
+      buildElement(route, cursorDoms[2], 0.08);
       await Promise.all([
-        typeTextElement(nameFirst, cursorDoms[1], 0.02, 14),
-        typeTextElement(nameLast, cursorDoms[3], 0.06, 14)
+        navLinksPromise,
+        typeTextElement(nameFirst, cursorDoms[1], 0.04, 14),
+        typeTextElement(nameLast, cursorDoms[3], 0.08, 14)
       ]);
 
       // Wave 2: Type Role & build Action CTA buttons in parallel
@@ -2035,6 +2057,26 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // Standby: park cursors hidden outside frame
+            parkCursors();
+          }
+        });
+      }
+
+      // Special Sequence for FOOTER (Copyright & Manifest REF)
+      const footerEl = document.getElementById('siteFooter');
+      if (footerEl) {
+        ScrollTrigger.create({
+          trigger: footerEl,
+          start: 'top 95%',
+          once: true,
+          onEnter: async () => {
+            const copy = footerEl.querySelector('[data-b="footer-copy"]');
+            const manifest = footerEl.querySelector('[data-b="footer-manifest"]');
+
+            await Promise.all([
+              copy ? typeTextElement(copy, getAgent(0), 0, 16) : Promise.resolve(),
+              manifest ? buildElement(manifest, getAgent(2), 0.05, 0.5) : Promise.resolve()
+            ]);
             parkCursors();
           }
         });
