@@ -1504,18 +1504,21 @@ document.addEventListener('DOMContentLoaded', () => {
               projSec.querySelector('[data-b="ticket-5"]')
             ];
 
-            // 1. Header & Terminal Container in parallel
+            // 1. Header & Terminal Shell
             if (eyebrow) buildElement(eyebrow, cursorDoms[0], 0);
             if (heading) typeTextElement(heading, cursorDoms[1], 0.02, 14);
             if (terminal) await buildElement(terminal, cursorDoms[2], 0.05);
 
-            // 2. Parallel assembly: Build ticket buttons on left rail & spotlight stage on right
-            const ticketPromises = tickets.map((t, i) =>
-              t ? buildElement(t, cursorDoms[i % cursorDoms.length], i * 0.06) : Promise.resolve()
-            );
-            const stagePromise = stage ? buildElement(stage, cursorDoms[7], 0.08) : Promise.resolve();
+            // 2. Reveal right spotlight stage
+            if (stage) buildElement(stage, cursorDoms[7], 0.05);
 
-            await Promise.all([...ticketPromises, stagePromise]);
+            // 3. Build left rail tickets strictly ONE AT A TIME
+            for (let i = 0; i < tickets.length; i++) {
+              const t = tickets[i];
+              if (!t) continue;
+              const agent = cursorDoms[i % cursorDoms.length];
+              await buildElement(t, agent, 0.02);
+            }
 
             // Standby: park cursors hidden outside the frame
             parkCursors();
