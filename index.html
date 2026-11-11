@@ -20,12 +20,9 @@
     }
     window.scrollTo(0, 0);
 
-    // Touchscreen / mobile detection: strictly check pointer coarse or mobile screen width
-    // Avoid false positives on touchscreen laptops (like Surface, Yoga, or monitors with maxTouchPoints > 0)
-    const isMobileScreen = window.innerWidth <= 768;
-    const isCoarseTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-    const isTouch = (isCoarseTouch && ('ontouchstart' in window || navigator.maxTouchPoints > 0)) || isMobileScreen;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || isTouch) return;
+    // Strictly check if mobile screen (phone/small tablet)
+    const isMobileDevice = window.innerWidth <= 768;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || isMobileDevice) return;
     document.documentElement.classList.add('anim');
     // Safety watchdog: restore visibility if scripts fail or take > 3s
     setTimeout(function () {
@@ -1101,6 +1098,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const drawer = document.createElement('div');
       drawer.className = 'terminal-ticket-drawer';
       const cardClone = pane.querySelector('.project-card').cloneNode(true);
+      // Remove data-b attributes from clone so they don't hijack swarm builder targeting on desktop
+      cardClone.removeAttribute('data-b');
+      cardClone.querySelectorAll('[data-b]').forEach(el => {
+        el.removeAttribute('data-b');
+        el.classList.add('built');
+        el.style.visibility = 'visible';
+      });
       drawer.appendChild(cardClone);
       ticket.appendChild(drawer);
 
@@ -1321,14 +1325,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 6. Lenis Smooth Scrolling Integration
   const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  // Touchscreen / mobile detection: strictly check pointer coarse or mobile screen width
-  // Avoid false positives on touchscreen laptops (like Surface, Yoga, ThinkPad touch) so desktop swarm stays active
-  const isMobileScreen = window.innerWidth <= 768;
-  const isCoarseTouch = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
-  const isTouchDevice = (isCoarseTouch && ('ontouchstart' in window || navigator.maxTouchPoints > 0)) || isMobileScreen;
+  // Strictly check if mobile screen (phone / small tablet <= 768px)
+  const isMobileDevice = window.innerWidth <= 768;
 
-  // Only enable Lenis smooth scrolling on desktop/pointer screens to guarantee 120Hz native touch scroll on mobile
-  if (!prefersReduced && !isTouchDevice && window.Lenis && window.gsap) {
+  // Only enable Lenis smooth scrolling on desktop screens to guarantee 120Hz native touch scroll on mobile
+  if (!prefersReduced && !isMobileDevice && window.Lenis && window.gsap) {
     const lenis = new Lenis({
       lerp: 0.09,
       smoothWheel: true,
@@ -1366,8 +1367,8 @@ document.addEventListener('DOMContentLoaded', () => {
       return;
     }
 
-    // On mobile / touch devices: use super-snappy native fade/reveal without cursor swarm overhead
-    if (isTouchDevice) {
+    // On mobile screens (<= 768px): use super-snappy native fade/reveal without cursor swarm overhead
+    if (isMobileDevice) {
       document.documentElement.classList.remove('anim');
       elementsToBuild.forEach(el => {
         el.classList.add('built');
