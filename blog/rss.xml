@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>AWS Emulator: 438 API Models, Zero Human-Written Code</title>
+      <link>https://aditf.com/blog/aws-emulator-agent-fleet-harness/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/aws-emulator-agent-fleet-harness/</guid>
+      <pubDate>Thu, 12 Nov 2026 00:00:00 +0000</pubDate>
+      <description>AWS Emulator covers 438 AWS API models, and the commit log is all IssueFinderAgent and IssueFixerAgent. The harness did the work, not the model.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/aws-emulator-agent-fleet-harness/id/"/>
+    </item>
+    <item>
       <title>Modern Web Guidance 1.0: Why Chrome Skipped MCP to Stop Agents Writing 2019 JavaScript</title>
       <link>https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/</link>
       <guid isPermaLink="true">https://aditf.com/blog/modern-web-guidance-chrome-skipped-mcp/</guid>
@@ -176,15 +185,6 @@
       <description>Railway&#x27;s October 2026 breach exposed decrypted environment variables from a secrets database. The storage plane was the target, but the habit of storing credentials in env vars made the blast radius huge.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/railway-breach-systemd-credentials/id/"/>
-    </item>
-    <item>
-      <title>Cloudflare Ported TypeScript to Rust for Wasm, Not for Speed</title>
-      <link>https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/</guid>
-      <pubDate>Wed, 21 Oct 2026 00:00:00 +0000</pubDate>
-      <description>Cloudflare&#x27;s tsrs is up to 8x faster than TypeScript 7.0 with ~70% less memory. The benchmark is the side story. WebAssembly is why the port exists.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/tsrs-typescript-in-rust-wasm-agent-loops/id/"/>
     </item>
   </channel>
 </rss>

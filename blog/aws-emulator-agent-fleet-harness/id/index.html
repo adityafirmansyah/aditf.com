@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS Emulator: 438 API Model, Nol Baris Code Tulisan Manusia — Field Notes</title>
+<meta name="description" content="AWS Emulator menutup 438 API model AWS, dan log commit-nya isinya cuma IssueFinderAgent sama IssueFixerAgent. Yang bikin jalan justru desain harness-nya.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/aws-emulator-agent-fleet-harness/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS Emulator: 438 API Model, Nol Baris Code Tulisan Manusia — Field Notes">
+<meta property="og:description" content="AWS Emulator menutup 438 API model AWS, dan log commit-nya isinya cuma IssueFinderAgent sama IssueFixerAgent. Yang bikin jalan justru desain harness-nya.">
+<meta property="og:url" content="https://aditf.com/blog/aws-emulator-agent-fleet-harness/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/aws-emulator-agent-fleet-harness/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AWS Emulator: 438 API Model, Nol Baris Code Tulisan Manusia — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AWS Emulator: 438 API Model, Nol Baris Code Tulisan Manusia — Field Notes">
+<meta name="twitter:description" content="AWS Emulator menutup 438 API model AWS, dan log commit-nya isinya cuma IssueFinderAgent sama IssueFixerAgent. Yang bikin jalan justru desain harness-nya.">
+<meta name="twitter:image" content="https://aditf.com/blog/aws-emulator-agent-fleet-harness/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="aws emulator, autonomous ai agents, rust cargo workspace, localstack alternative, multi-agent coding fleet, smithy api modeling">
+<meta property="article:published_time" content="2026-11-12T00:00:00+00:00">
+<meta property="article:tag" content="ai agents">
+<meta property="article:tag" content="aws">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="cloud">
+<meta property="article:tag" content="software engineering">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "AWS Emulator: 438 API Model, Nol Baris Code Tulisan Manusia", "description": "AWS Emulator menutup 438 API model AWS, dan log commit-nya isinya cuma IssueFinderAgent sama IssueFixerAgent. Yang bikin jalan justru desain harness-nya.", "datePublished": "2026-11-12T00:00:00+00:00", "dateModified": "2026-11-12T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/aws-emulator-agent-fleet-harness/id/"}, "keywords": "aws emulator, autonomous ai agents, rust cargo workspace, localstack alternative, multi-agent coding fleet, smithy api modeling", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1360, "image": ["https://aditf.com/blog/aws-emulator-agent-fleet-harness/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/aws-emulator-agent-fleet-harness/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Perlu akun AWS untuk menjalankan AWS Emulator?", "acceptedAnswer": {"@type": "Answer", "text": "Nggak perlu. Jalankan binary-nya, lalu arahkan software development kit (SDK) lo ke `https://127.0.0.1:9297`, yang menyajikan sertifikat self-signed.\n\nRequest lo nggak pernah keluar dari mesin. AWS nggak memungut biaya emulator terpisah, dan README-nya tegas soal batas pemakaian: ini bukan untuk workload produksi dan bukan untuk menguji keamanan."}}, {"@type": "Question", "name": "Kenapa gue lihat 436 crate service padahal AWS bilang 438?", "acceptedAnswer": {"@type": "Answer", "text": "Angka 438 itu jumlah API model di pengumuman. Direktori `services/` saat ini berisi 436 direktori crate `service-*` plus satu crate `common` bersama.\n\nJadi workspace dan pengumuman menghitung unit yang berbeda."}}, {"@type": "Question", "name": "Bisa dipakai sebagai pengganti LocalStack langsung?", "acceptedAnswer": {"@type": "Answer", "text": "Cek skor fidelity yang dirilis bersama tiap versi sebelum lo mengunci pipeline CI ke situ. Repo-nya jujur soal celah.\n\nYang belum jalan ada di `issues/things-that-do-not-work/`, dan yang sudah beres dipindah ke `issues/things-that-now-work/`.\n\nUntuk test Rust embedded, AWS Emulator lebih jauh dari LocalStack. Emulator-nya dikompilasi ke dalam binary test lo, jadi nggak ada endpoint atau sertifikat yang perlu diatur."}}]}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/aws-emulator-agent-fleet-harness/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/aws-emulator-agent-fleet-harness/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/aws-emulator-agent-fleet-harness/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>12 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">7 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">AWS Emulator: 438 API Model, Nol Baris Code Tulisan Manusia</h1>
+    <div class="post__tags"><span>ai agents</span><span>aws</span><span>rust</span><span>cloud</span><span>software engineering</span></div>
+    <div class="post__content reveal is-visible">
+<p>Tanggal 11 November 2026 AWS merilis AWS Emulator ke GitHub dengan public dedication CC0. Isinya 438 API model AWS.</p>
+<p>Matthew Goldberg, Sr. Principal Engineer di AWS, bilang di postingan pengumuman bahwa timnya nggak menulis dan nggak me-review satu baris pun code di situ.</p>
+<p>Kalimat itu gampang dikutip dan susah dipercaya. Jadi gue baca repo-nya langsung, mulai dari <code>AGENTS.md</code>. File itu yang di-load setiap agent sebelum menyentuh tree, dan di situ desain aslinya kelihatan.</p>
+<h2>AWS Emulator jalan di antara spec dan oracle cloud asli</h2>
+<p>Titik awal Goldberg itu hasil riset Anthropic awal 2026. Kasih agent spec yang jelas plus reference implementation, dan agent itu bisa membangun sesuatu yang mengikuti spec-nya dengan setia.</p>
+<p>AWS sudah punya dua-duanya. AWS API Models jadi spec-nya, dan cloud AWS yang asli jadi reference implementation-nya.</p>
+<p>Tim autonomous AI agents yang pertama mengubah dua hal itu jadi test. Tiap test itu skenario AWS nyata, dan agent memverifikasinya ke AWS live sebelum test itu dikumpulkan.</p>
+<p>Setelah itu test bisa di-replay berkali-kali tanpa memanggil AWS lagi. Sekarang suite fidelity-nya berisi puluhan ribu skenario.</p>
+<p>Ini bagian yang paling sering dilewat kalau orang baru pasang fleet coding, padahal justru ini yang menentukan fleet-nya mengerucut atau melenceng.</p>
+<p>Eksperimen akhir pekan Goldberg jadi contoh paling pas buat ngegambarin loop itu. Goldberg kasih Kiro, tool coding agentic berbasis spec milik AWS, tiga instruksi:</p>
+<ul>
+<li>tulis test dari AWS Command Line Interface (CLI),</li>
+<li>iterasi sampai test-nya lolos ke AWS asli,</li>
+<li>bangun implementasi in-memory yang bikin test yang sama lolos.</li>
+</ul>
+<p>Lima belas menit kemudian Goldberg sudah punya Amazon Simple Queue Service (SQS) versi pertama yang lumayan.</p>
+<h2>Tiga tim agent, satu loop tertutup</h2>
+<p>Pembagian kerja per fungsi ini bukan soal rapi-rapian di diagram. Goldberg bilang agent lebih sering berhasil kalau tugasnya dibatasi.</p>
+<p>Yang lebih penting, pembagian itu bikin output satu peran bisa dicek peran berikutnya.</p>
+<ul>
+<li><strong>Test builder</strong> mengubah API model jadi skenario yang sudah diverifikasi ke cloud. Output-nya cuma lolos atau gagal, jadi sistem nggak perlu menilai opini siapa pun.</li>
+<li><strong>Issue finder</strong> me-replay suite itu secara lokal, mencari divergence, lalu melaporkan issue terstruktur.</li>
+<li><strong>Issue fixer</strong> mengambil tepat satu issue, checkout code-nya, dan mengedit sampai test yang gagal jadi hijau.</li>
+</ul>
+<p>Satu issue untuk satu fixer itu detail yang paling gue tiru duluan. Efek samping tiap edit jadi terbatas, dan kalau fix-nya salah, revert-nya murah.</p>
+<p>Issue finder juga diminta mengelompokkan kegagalan yang kemungkinan punya akar masalah sama, sebelum satu pun fixer mulai bekerja.</p>
+<h2>Isi workspace AWS Emulator sebenarnya seperti apa</h2>
+<p>Rust Cargo workspace di sini kasih satu crate per service. Ngubah satu service cuma mengompilasi satu crate, bukan seluruh emulator.</p>
+<p>Di situlah bedanya fleet yang jalan paralel dengan fleet yang antre.</p>
+<pre><code>aws-emulator/
+├── Cargo.toml                 # root workspace: agent nggak boleh sentuh
+├── services/service-&lt;name&gt;/   # satu crate per service
+│   ├── build.rs               # generate dari model Smithy
+│   ├── smithy-model/          # &lt;name&gt;.json, penentu wire protocol
+│   └── src/ops/               # satu file per operasi
+├── core/router/               # di-render ulang tiap ada service baru
+├── vendor/engine/             # immutable, satu engine dipakai bersama
+└── issues/                    # yang beres dan yang belum, berupa direktori
+</code></pre>
+<p>Saat gue cek, direktori <code>services/</code> berisi 436 crate <code>service-*</code> plus satu crate <code>common</code> bersama. Angka 438 di pengumuman itu hitungan API model.</p>
+<p>Jadi dua angka itu memang menghitung unit yang beda.</p>
+<p>Ada dua batas lain yang penting. <code>vendor/engine</code> di-vendor dan tertutup untuk agent, jadi engine in-memory cuma ada satu dan nggak ada yang mem-fork-nya.</p>
+<p>Root <code>Cargo.toml</code> read-only, dan router di-render ulang. Dua-duanya nggak diedit tangan.</p>
+<p>Soal biaya build, ini sisi yang nggak enak. Build debug penuh butuh minimal 100 GB disk kosong. Segitu memang ongkosnya kalau workspace-nya berbentuk begini.</p>
+<h2>Kenapa fleet versi lama sampai bikin interpreter Python sendiri?</h2>
+<p>Di versi lama sistem ini, agent-nya memutuskan menulis interpreter Python sendiri buat mendukung fungsi AWS Lambda.</p>
+<p>Nggak ada yang minta itu. Ini cerita kegagalan paling berguna di seluruh pengumuman, karena dari luar kelihatan seperti kreativitas dan dari dalam kelihatan seperti drift.</p>
+<p>Cara Goldberg menjelaskannya: agent butuh buku mewarnai. Area yang batasnya jelas, dengan jaminan gambar utuhnya tetap beres.</p>
+<p><code>AGENTS.md</code> yang sekarang isinya mirip daftar semua hal yang pernah salah sebelumnya. Tiga aturan di antaranya layak lo salin langsung ke fleet mana pun:</p>
+<ul>
+<li>Kredensial dibuat lewat credential store emulator. Agent nggak pernah menyusun access key atau secret sendiri, dan nggak pernah menulisnya ke log.</li>
+<li>URL yang nanti di-fetch pemanggil harus lewat signer emulator. Agent yang menyusun <code>X-Amz-Signature</code> sendiri menghasilkan URL yang menembak service asli atau gagal verifikasi.</li>
+<li>Endpoint resource diambil dari objek context emulator. Nggak ada yang dirakit dari <code>&lt;service&gt;.&lt;region&gt;.amazonaws.com</code>, karena itu artinya agent menembak produksi.</li>
+</ul>
+<p>Aturan ketiga yang paling menentukan di lapangan. Agent yang bisa mencapai endpoint cloud asli bisa membelanjakan uang asli.</p>
+<p>Prompt sopan yang meminta dia untuk nggak begitu nggak dihitung sebagai kontrol.</p>
+<h2>Merge gate-nya itu produk yang sebenarnya</h2>
+<p>Setiap perubahan dari fixer harus lolos gate sebelum masuk. Gate itu memblokir code yang nggak bisa dikompilasi.</p>
+<p>Ada juga agent yang me-review standar coding, memeriksa keamanan, dan memastikan fidelity nggak turun. Kalau ada yang gagal, perubahannya balik ke agent untuk dikerjakan ulang.</p>
+<p>AWS melaporkan ribuan issue beres per hari, dengan ratusan agent bekerja bersamaan di repo yang sama.</p>
+<p>Commit menumpuk di AWS CodeCommit, di-build dan di-test ulang, dan baru masuk ke GitHub di akhir proses rilis.</p>
+<p>Buka log commit-nya dan harness-nya kelihatan di kolom author. Entri terbaru bergantian antara <code>IssueFinderAgent</code> yang melaporkan issue dan <code>IssueFixerAgent</code> yang menutupnya.</p>
+<p>Nggak ada nama manusia di situ.</p>
+<h2>Jam manusia pindah ke mana</h2>
+<p>Menghasilkan code pakai large language model (LLM) sekarang murah. Yang nggak murah justru pekerjaan supaya code hasil generate itu bisa dipercaya.</p>
+<p>Dan pekerjaan itu nggak menyusut, cuma pindah tempat.</p>
+<p>Di AWS jam manusianya pindah ke beberapa titik:</p>
+<ul>
+<li>lapisan Smithy API modeling, tempat operasi tiap service didefinisikan sebelum ada code (Smithy itu interface definition language milik AWS),</li>
+<li>oracle cloud live yang jadi patokan penilaian seluruh fleet,</li>
+<li>batas crate yang mencegah agent saling tabrak,</li>
+<li>merge gate yang nggak bisa dilewati dengan argumen bagus.</li>
+</ul>
+<p>Gue juga menjalankan multi-agent coding fleet di monorepo kami, dan yang gue lihat cocok dengan ini.</p>
+<p>Kegagalannya hampir nggak pernah soal model bisa menulis Rust atau nggak. Yang sering terjadi: dua agent mengedit manifest root yang sama di waktu bersamaan.</p>
+<p>Atau satu agent diam-diam mengarang dependency yang sebenarnya nggak perlu, karena nggak ada yang memberi tahu apa yang sudah ada di repo kita.</p>
+<p>Interpreter Python tadi kegagalan yang sama, cuma tagihannya lebih besar.</p>
+<p>Semua investasi engineering di batas crate dan oracle live itu yang bikin hasil akhirnya cukup dipercaya buat dijalankan lokal.</p>
+<p>Kredibilitas itu juga yang bikin berita LocalStack jadi relevan di sini. LocalStack menghentikan Community edition-nya pada 23 Maret 2026, dan free tier yang tersisa nggak boleh dipakai komersial.</p>
+<p>Tim yang kehilangan emulator lokal tanpa auth sekarang mencari yang gratis.</p>
+<p>Rilisan CC0 dengan skor fidelity yang dipublikasikan jadi LocalStack alternative yang masuk akal untuk kerja continuous integration (CI), walaupun masih ada celah untuk service yang jarang dipakai.</p>
+<h2>FAQ</h2>
+<h3>Perlu akun AWS untuk menjalankan AWS Emulator?</h3>
+<p>Nggak perlu. Jalankan binary-nya, lalu arahkan software development kit (SDK) lo ke <code>https://127.0.0.1:9297</code>, yang menyajikan sertifikat self-signed.</p>
+<p>Request lo nggak pernah keluar dari mesin. AWS nggak memungut biaya emulator terpisah, dan README-nya tegas soal batas pemakaian: ini bukan untuk workload produksi dan bukan untuk menguji keamanan.</p>
+<h3>Kenapa gue lihat 436 crate service padahal AWS bilang 438?</h3>
+<p>Angka 438 itu jumlah API model di pengumuman. Direktori <code>services/</code> saat ini berisi 436 direktori crate <code>service-*</code> plus satu crate <code>common</code> bersama.</p>
+<p>Jadi workspace dan pengumuman menghitung unit yang berbeda.</p>
+<h3>Bisa dipakai sebagai pengganti LocalStack langsung?</h3>
+<p>Cek skor fidelity yang dirilis bersama tiap versi sebelum lo mengunci pipeline CI ke situ. Repo-nya jujur soal celah.</p>
+<p>Yang belum jalan ada di <code>issues/things-that-do-not-work/</code>, dan yang sudah beres dipindah ke <code>issues/things-that-now-work/</code>.</p>
+<p>Untuk test Rust embedded, AWS Emulator lebih jauh dari LocalStack. Emulator-nya dikompilasi ke dalam binary test lo, jadi nggak ada endpoint atau sertifikat yang perlu diatur.</p>
+<h2>Yang gue ambil dari sini</h2>
+<p>Lo nggak perlu 438 API model untuk dapat manfaat dari bentuknya. Mulai dari oracle yang bisa dipakai menilai fleet, terus potong workspace jadi unit kecil.</p>
+<p>Baru setelah itu pasang satu gate di depan branch bersama.</p>
+<p>Lewati oracle-nya dan lo dapat fleet yang cepat, percaya diri, dan salah.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/aws-emulator-agent-fleet-harness/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

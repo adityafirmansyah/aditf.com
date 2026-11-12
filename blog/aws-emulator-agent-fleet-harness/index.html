@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS Emulator: 438 API Models, Zero Human-Written Code — Field Notes</title>
+<meta name="description" content="AWS Emulator covers 438 AWS API models, and the commit log is all IssueFinderAgent and IssueFixerAgent. The harness did the work, not the model.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/aws-emulator-agent-fleet-harness/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS Emulator: 438 API Models, Zero Human-Written Code — Field Notes">
+<meta property="og:description" content="AWS Emulator covers 438 AWS API models, and the commit log is all IssueFinderAgent and IssueFixerAgent. The harness did the work, not the model.">
+<meta property="og:url" content="https://aditf.com/blog/aws-emulator-agent-fleet-harness/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/aws-emulator-agent-fleet-harness/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AWS Emulator: 438 API Models, Zero Human-Written Code — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AWS Emulator: 438 API Models, Zero Human-Written Code — Field Notes">
+<meta name="twitter:description" content="AWS Emulator covers 438 AWS API models, and the commit log is all IssueFinderAgent and IssueFixerAgent. The harness did the work, not the model.">
+<meta name="twitter:image" content="https://aditf.com/blog/aws-emulator-agent-fleet-harness/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="aws emulator, autonomous ai agents, rust cargo workspace, localstack alternative, multi-agent coding fleet, smithy api modeling">
+<meta property="article:published_time" content="2026-11-12T00:00:00+00:00">
+<meta property="article:tag" content="ai agents">
+<meta property="article:tag" content="aws">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="cloud">
+<meta property="article:tag" content="software engineering">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "AWS Emulator: 438 API Models, Zero Human-Written Code", "description": "AWS Emulator covers 438 AWS API models, and the commit log is all IssueFinderAgent and IssueFixerAgent. The harness did the work, not the model.", "datePublished": "2026-11-12T00:00:00+00:00", "dateModified": "2026-11-12T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/aws-emulator-agent-fleet-harness/"}, "keywords": "aws emulator, autonomous ai agents, rust cargo workspace, localstack alternative, multi-agent coding fleet, smithy api modeling", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1473, "image": ["https://aditf.com/blog/aws-emulator-agent-fleet-harness/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/aws-emulator-agent-fleet-harness/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Do I need an AWS account to run AWS Emulator?", "acceptedAnswer": {"@type": "Answer", "text": "No. Start the binary and point your software development kit (SDK) at `https://127.0.0.1:9297`, which serves a self-signed certificate. Your requests never leave the machine. AWS charges no separate emulator fee, and the README is explicit that it is not for production workloads or for security testing."}}, {"@type": "Question", "name": "Why do I see 436 service crates when AWS says 438?", "acceptedAnswer": {"@type": "Answer", "text": "The 438 is an API-model count from the announcement. The `services/` directory currently carries 436 `service-*` crate directories plus a shared `common` crate. The workspace and the announcement are tallying different units."}}, {"@type": "Question", "name": "Can I use it as a drop-in LocalStack replacement?", "acceptedAnswer": {"@type": "Answer", "text": "Check the fidelity scores published with each release before you commit a CI pipeline to it. The repository tracks gaps honestly: open items live in `issues/things-that-do-not-work/`, and repaired ones move to `issues/things-that-now-work/`. For embedded Rust tests it goes one step further. The emulator compiles into your test binary, so there is no endpoint or certificate to configure."}}]}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/aws-emulator-agent-fleet-harness/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/aws-emulator-agent-fleet-harness/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/aws-emulator-agent-fleet-harness/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>12 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">7 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">AWS Emulator: 438 API Models, Zero Human-Written Code</h1>
+    <div class="post__tags"><span>ai agents</span><span>aws</span><span>rust</span><span>cloud</span><span>software engineering</span></div>
+    <div class="post__content reveal is-visible">
+<p>AWS shipped AWS Emulator to GitHub on November 11, 2026, under a Creative Commons CC0 public dedication. The repository covers 438 AWS API models. Matthew Goldberg, a Sr. Principal Engineer at AWS, says in the announcement post that his team has not written or reviewed any of the code.</p>
+<p>That claim is the easy part to repeat and the hard part to believe. So I read the repository instead of the press release, starting with <code>AGENTS.md</code>. That file is the working guide every agent loads before it touches the tree, and it is where the actual design lives.</p>
+<h2>AWS Emulator runs between a spec and a live-cloud oracle</h2>
+<p>Goldberg's starting point was an Anthropic result from earlier in 2026: give agents a well-defined spec plus a reference implementation, and they can build something that faithfully implements it. AWS had both halves already. The AWS API Models are the spec. The real cloud is the reference implementation.</p>
+<p>The first team of autonomous AI agents turns those two into tests. Each test is a real AWS scenario, and the agents verify it against live AWS before submitting it. After that the test can be replayed as many times as you like without calling AWS again.</p>
+<p>The fidelity suite now holds tens of thousands of scenarios. That is the part most teams skip when they wire up a coding fleet, and it is the part that decides whether the fleet converges or drifts.</p>
+<p>Goldberg's weekend experiment is the cleanest demo of that loop in action. He gave Kiro, AWS's spec-driven agentic coding tool, a short instruction:</p>
+<ul>
+<li>write tests from the AWS Command Line Interface (CLI),</li>
+<li>iterate on those tests until they pass against real AWS,</li>
+<li>build an in-memory implementation that those same tests pass against.</li>
+</ul>
+<p>Fifteen minutes later he had a passable Amazon Simple Queue Service (SQS).</p>
+<h2>Three agent teams, one closed loop</h2>
+<p>The fleet is split by function because, in Goldberg's words, the agents have more success on bounded tasks. The split is not a management nicety. It is what keeps each role's output checkable by the next one.</p>
+<ul>
+<li><strong>Test builders</strong> turn the API models into cloud-verified scenarios. Their output is a pass/fail the rest of the system can trust without an opinion.</li>
+<li><strong>Issue finders</strong> replay that suite locally, watch for divergence, and file structured issues. They are told to group failures that probably share a root cause.</li>
+<li><strong>Issue fixers</strong> take exactly one issue, check out the code, and edit until the failing test goes green.</li>
+</ul>
+<p>One issue per fixer is the detail I would steal first. It caps the blast radius of any single agent edit, and it makes a bad fix cheap to revert.</p>
+<h2>What the AWS Emulator workspace actually looks like</h2>
+<p>The Rust Cargo workspace gives every service its own crate. Changing one service recompiles one crate, not the whole emulator, which is the difference between a fleet that works in parallel and a fleet that queues.</p>
+<pre><code>aws-emulator/
+├── Cargo.toml                 # workspace root: NOT editable by agents
+├── services/service-&lt;name&gt;/   # one crate per service
+│   ├── build.rs               # generates from the Smithy model
+│   ├── smithy-model/          # &lt;name&gt;.json, drives the wire protocol
+│   └── src/ops/               # one file per operation
+├── core/router/               # re-rendered on every service add
+├── vendor/engine/             # agent-immutable, single shared engine
+└── issues/                    # fixed and open, as directories
+</code></pre>
+<p>The <code>services/</code> directory currently holds 436 <code>service-*</code> crates next to a shared <code>common</code> crate. The 438 figure comes from the API-model count in the announcement, so the two numbers are tallying different units.</p>
+<p>Two more boundaries matter. <code>vendor/engine</code> is vendored and off-limits, so there is exactly one in-memory engine and nobody forks it. The root <code>Cargo.toml</code> is read-only for agents, and the router gets re-rendered rather than hand-edited.</p>
+<p>Build cost is the honest downside. A full debug build needs at least 100 GB of free disk, which is what a workspace of this shape costs.</p>
+<h2>Why did an earlier fleet build its own Python interpreter?</h2>
+<p>In an earlier version of this system, the agents decided to build their own Python interpreter to support AWS Lambda functions.</p>
+<p>Nobody asked for that. It is the most useful failure story in the whole announcement, because it looks like creativity from the outside and like drift from the inside. Goldberg's framing is that agents need a coloring book: a well-defined area to fill in, with the assurance that the larger picture will come together.</p>
+<p>The current <code>AGENTS.md</code> reads like a list of everything that went wrong before. Three rules are worth copying straight into any agent fleet you run.</p>
+<ul>
+<li>Credentials are created through the emulator's credential store. Agents never construct an access key or secret themselves, and never log one.</li>
+<li>URLs that callers fetch later go through the emulator's own signer. An agent that hand-rolls <code>X-Amz-Signature</code> produces a URL that points at the real service or fails verification.</li>
+<li>Resource endpoints come from the emulator's context object. Nothing is assembled from <code>&lt;service&gt;.&lt;region&gt;.amazonaws.com</code>, because the agent would be reaching for production.</li>
+</ul>
+<p>That third rule is the one that matters most in practice. An agent that can reach a real cloud endpoint can spend real money, and no prompt politely asking it not to counts as a control.</p>
+<h2>The merge gate is the actual product</h2>
+<p>Every fixer change passes a gate before it lands. The gate blocks code that does not compile. Agents also review the change against coding standards, check it for security problems, and confirm fidelity did not regress. A failed check sends the change back for rework.</p>
+<p>AWS reports thousands of issues fixed per day, with hundreds of agents working the same repo concurrently. Commits stack on AWS CodeCommit, get built and retested, and only reach GitHub at the end of a release.</p>
+<p>Read the commit log and the harness is visible in the author field. Recent entries alternate between <code>IssueFinderAgent</code> filing issues and <code>IssueFixerAgent</code> closing them. No human name appears.</p>
+<h2>Where the human hours went instead</h2>
+<p>Generating code with a large language model (LLM) is cheap now. What is not cheap is the work that makes generated code trustworthy, and that work did not shrink. It moved.</p>
+<p>For AWS it moved into a short list:</p>
+<ul>
+<li>the Smithy API modeling layer, where every service's operations are defined before code exists (Smithy is AWS's interface definition language),</li>
+<li>a live-cloud oracle the whole fleet is graded against,</li>
+<li>crate boundaries that stop agents from colliding,</li>
+<li>a merge gate that nobody can talk their way past.</li>
+</ul>
+<p>I run a multi-agent coding fleet against our own monorepo, and this matches what I see. The failures are never about whether the model can write Rust. They are about two agents editing the same root manifest at once, or one agent quietly inventing a dependency it did not need because nobody told it what already existed.</p>
+<p>The Python interpreter is that same failure with a bigger bill.</p>
+<p>All that engineering investment in boundaries and live oracles makes the resulting artifact trustworthy to run locally.</p>
+<p>That credibility is also why the LocalStack news matters here. LocalStack ended its Community edition on March 23, 2026, and its remaining free tier excludes commercial use. Teams that lost an unauthenticated local emulator now want a free one. A CC0 release with published fidelity scores is a credible LocalStack alternative for continuous integration (CI) work, even with gaps in the long tail of services.</p>
+<h2>FAQ</h2>
+<h3>Do I need an AWS account to run AWS Emulator?</h3>
+<p>No. Start the binary and point your software development kit (SDK) at <code>https://127.0.0.1:9297</code>, which serves a self-signed certificate. Your requests never leave the machine. AWS charges no separate emulator fee, and the README is explicit that it is not for production workloads or for security testing.</p>
+<h3>Why do I see 436 service crates when AWS says 438?</h3>
+<p>The 438 is an API-model count from the announcement. The <code>services/</code> directory currently carries 436 <code>service-*</code> crate directories plus a shared <code>common</code> crate. The workspace and the announcement are tallying different units.</p>
+<h3>Can I use it as a drop-in LocalStack replacement?</h3>
+<p>Check the fidelity scores published with each release before you commit a CI pipeline to it. The repository tracks gaps honestly: open items live in <code>issues/things-that-do-not-work/</code>, and repaired ones move to <code>issues/things-that-now-work/</code>. For embedded Rust tests it goes one step further. The emulator compiles into your test binary, so there is no endpoint or certificate to configure.</p>
+<h2>What I would take from this</h2>
+<p>You do not need 438 API models to benefit from the shape. Start with an oracle your fleet can be graded against, then cut the workspace into small units, then put one gate in front of the shared branch. Skip the oracle and you get a fleet that is fast, confident, and wrong.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/aws-emulator-agent-fleet-harness/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
