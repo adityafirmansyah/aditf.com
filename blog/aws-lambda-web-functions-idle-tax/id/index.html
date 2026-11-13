@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS Lambda Web Functions dan Jebakan Biaya Memori Idle 7 Menit — Field Notes</title>
+<meta name="description" content="AWS Lambda Web Functions menjanjikan argo CPU aktif, tapi durasi memori idle selama 7 menit menyumbang 88% biaya komputasi untuk arsitektur multi-tenant.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS Lambda Web Functions dan Jebakan Biaya Memori Idle 7 Menit — Field Notes">
+<meta property="og:description" content="AWS Lambda Web Functions menjanjikan argo CPU aktif, tapi durasi memori idle selama 7 menit menyumbang 88% biaya komputasi untuk arsitektur multi-tenant.">
+<meta property="og:url" content="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AWS Lambda Web Functions dan Jebakan Biaya Memori Idle 7 Menit — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AWS Lambda Web Functions dan Jebakan Biaya Memori Idle 7 Menit — Field Notes">
+<meta name="twitter:description" content="AWS Lambda Web Functions menjanjikan argo CPU aktif, tapi durasi memori idle selama 7 menit menyumbang 88% biaya komputasi untuk arsitektur multi-tenant.">
+<meta name="twitter:image" content="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="aws lambda web functions, serverless idle memory, multi-tenant monorepo, nextjs self hosting, lambda cost optimization">
+<meta property="article:published_time" content="2026-11-13T00:00:00+00:00">
+<meta property="article:tag" content="serverless">
+<meta property="article:tag" content="aws">
+<meta property="article:tag" content="nextjs">
+<meta property="article:tag" content="architecture">
+<meta property="article:tag" content="ecommerce">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "AWS Lambda Web Functions dan Jebakan Biaya Memori Idle 7 Menit", "description": "AWS Lambda Web Functions menjanjikan argo CPU aktif, tapi durasi memori idle selama 7 menit menyumbang 88% biaya komputasi untuk arsitektur multi-tenant.", "datePublished": "2026-11-13T00:00:00+00:00", "dateModified": "2026-11-13T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/aws-lambda-web-functions-idle-tax/id/"}, "keywords": "aws lambda web functions, serverless idle memory, multi-tenant monorepo, nextjs self hosting, lambda cost optimization", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1169, "image": ["https://aditf.com/blog/aws-lambda-web-functions-idle-tax/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/aws-lambda-web-functions-idle-tax/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Apakah provisioned concurrency bisa menghapus biaya memori idle di Lambda Web Functions?", "acceptedAnswer": {"@type": "Answer", "text": "Nggak bisa. Fitur provisioned concurrency memang menjaga container tetap hangat, tapi AWS menagih kapasitas yang disiapkan itu selama 100% waktu berjalan. Cara ini mencegah cold start, tapi malah bikin tagihan dasar lo melambung tinggi."}}, {"@type": "Question", "name": "Apakah penggunaan ulang container bisa menambal jebakan biaya di web bertraffic padat?", "acceptedAnswer": {"@type": "Answer", "text": "Bisa. Kalau aplikasi lo menerima aliran request konstan dengan jeda kurang dari lima menit, container bakal terus aktif melayani traffic tanpa terkena penalti idle. Masalah biaya 88% ini murni menghantam aplikasi dengan traffic sporadis dan jeda panjang."}}, {"@type": "Question", "name": "Bagaimana cara monorepo satu proses mencegah satu tenant menghabiskan seluruh resource?", "acceptedAnswer": {"@type": "Answer", "text": "Kita memasang pembatasan traffic per tenant langsung di layer reverse proxy Caddy dan middleware aplikasi. Pengelola proses seperti systemd bakal me-restart aplikasi secara otomatis kalau batas konsumsi memori terlewati."}}]}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>13 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">AWS Lambda Web Functions dan Jebakan Biaya Memori Idle 7 Menit</h1>
+    <div class="post__tags"><span>serverless</span><span>aws</span><span>nextjs</span><span>architecture</span><span>ecommerce</span></div>
+    <div class="post__content reveal is-visible">
+<p>Waktu AWS merilis AWS Lambda Web Functions pada Oktober 2026, janji manisnya terdengar seperti mimpi para developer web. Lo bisa menjalankan server Hypertext Transfer Protocol (HTTP) standar langsung di arsitektur serverless, cuma bayar Central Processing Unit (CPU) yang aktif memproses request, tanpa pusing urusan server.</p>
+<p>Buat aplikasi dengan traffic sporadis, fitur ini digadang-gadang bakal memangkas biaya kapasitas menganggur sampai habis.</p>
+<p>Kenyataannya jauh dari ekspektasi itu.</p>
+<p>Hasil benchmark independen dari tim Easel.sh pada 11 November 2026 membongkar jebakan argo yang cukup mahal. Walaupun AWS cuma menagih CPU saat ada request masuk, argo Random Access Memory (RAM) ternyata terus berjalan selama 313 sampai 411 detik setelah traffic berhenti.</p>
+<p>Untuk aplikasi dengan pola kunjungan loncat-loncat, jeda idle tanpa konfigurasi selama 5 sampai 7 menit ini menyedot sekitar 88% tagihan cloud lo. Uang lo habis cuma buat bayar kapasitas fiktif.</p>
+<h2>Jomplangnya Durasi 1.700× pada Serverless Idle Memory</h2>
+<p>Akar masalah arsitektur ini ada di disparitas waktu eksekusi yang luar biasa jomplang.</p>
+<p>Ketika seorang pengunjung membuka halaman toko, server web biasanya merespons dalam hitungan milidetik. Masalahnya, container di balik layar nggak langsung dimatikan begitu response terkirim.</p>
+<p>Berdasarkan pengujian Easel.sh pada enam environment di region us-east-1, AWS membiarkan instance tetap nongkrong di memori selama 5 sampai 7 menit buat menunggu request berikutnya.</p>
+<p>Begini dampaknya buat web app ringan berukuran 160 sampai 210 MB:</p>
+<ul>
+<li>Request yang masuk cuma butuh waktu komputasi aktif selama 200 milidetik.</li>
+<li>Setelah selesai, environment tetap menyala dalam status idle selama 345 detik.</li>
+<li>AWS menghitung argo memori selama total 345,2 detik penuh.</li>
+</ul>
+<p>Dalam skenario ini, durasi memori yang ditagih melebihi waktu komputasi aktif hingga 1.700 kali lipat.</p>
+<p>Bahkan dengan harga standar AWS, biaya siluman ini yang mendominasi invoice lo. Biaya CPU aktif dan hitungan request cuma jadi recehan kecil. Sisa 88% tagihan komputasi lo tersedot habis buat membayar serverless idle memory.</p>
+<p>Diskusi para software engineer di Hacker News (HN) langsung membenarkan hitungan ini lewat 29 komentar teknis. Kalau pola traffic aplikasi lo bukan aliran stabil tanpa jeda, tagihan memori serverless bakal berubah jadi jebakan argo berjalan.</p>
+<h2>Kenapa AWS Sengaja Menahan Container Tetap Nyala 7 Menit?</h2>
+<p>Untuk memahami alasan di balik keputusan ini, kita perlu melihat siklus hidup environment yang dirancang AWS.</p>
+<p>Dokumentasi resmi AWS membagi siklus hidup Web Function ke dalam tiga tahap:</p>
+<ul>
+<li>Initialization, ketika runtime container mulai boot dan mengunduh seluruh dependensi aplikasi.</li>
+<li>Ready, saat proses web siap mendengarkan port dan langsung memproses request HTTP.</li>
+<li>Shutdown, ketika AWS berhenti meneruskan request dan membersihkan container setelah masa tenang internal.</li>
+</ul>
+<p>AWS sengaja menahan container tetap menyala demi menghindari cold start. Kalau setiap request baru harus menunggu inisialisasi container dari nol, pengunjung web lo bakal kabur karena loading yang lelet.</p>
+<p>Sayangnya, AWS membebankan biaya penahan jeda ini langsung ke kantong pengguna.</p>
+<p>Bisa nggak kita memotong durasi ini secara paksa lewat kode sendiri? Para engineer sudah mencoba trik itu di production.</p>
+<p>Ketika developer sengaja memanggil <code>process.exit(0)</code> setelah 10 detik tanpa request, sistem AWS langsung menolaknya. Setiap proses yang mati secara sengaja dicatat AWS sebagai crash atau kegagalan runtime.</p>
+<p>Keputusan sistem ini langsung merusak seluruh metrik operasional kita:</p>
+<ul>
+<li>Notifikasi error di CloudWatch bakal terus berbunyi tanpa henti.</li>
+<li>Dashboard deployment langsung berubah warna jadi merah.</li>
+<li>Tim engineer lo bakal kesulitan membedakan mana proses shutdown normal dan mana bug aplikasi asli.</li>
+</ul>
+<p>Ujungnya, AWS sama sekali nggak menyediakan opsi lambda cost optimization untuk mengatur durasi idle ini. Pilihan lo cuma dua: ikhlas bayar denda 7 menit itu, atau rombak total arsitektur hosting lo.</p>
+<h2>Next.js Self Hosting Lebih Kencang dari Cold Start Serverless</h2>
+<p>Jebakan biaya tadi mungkin masih bisa dimaklumi kalau performa mentah AWS Lambda Web Functions terbukti luar biasa.</p>
+<p>Sayangnya performanya juga kalah telak.</p>
+<p>Easel.sh menguji aplikasi Next.js 16 identik secara langsung antara AWS Lambda Web Functions melawan server yang di-manage sendiri. Hasilnya, server mandiri menang mutlak di semua pengujian.</p>
+<p>Pada warm request, server mandiri merespons 1,5 sampai 3 kali lebih kencang:</p>
+<ul>
+<li>Rute JSON Application Programming Interface (API) selesai dalam 9,3ms di server mandiri dibanding 27,0ms di Lambda.</li>
+<li>Halaman Server-Side Rendering (SSR) tuntas dalam 12,2ms di server mandiri dibanding 26,0ms di Lambda.</li>
+</ul>
+<p>Ketika mengukur cold start, jurang performanya makin kelihatan jelas. Setelah 12 menit nggak ada traffic, server mandiri sanggup boot dan melayani request dalam 216 sampai 250 milidetik.</p>
+<p>Sementara itu, Lambda Web Functions butuh waktu antara 810 sampai 854 milidetik untuk menyelesaikan inisialisasi yang sama.</p>
+<p>Pelajaran teknisnya sangat gamblang. Lewat Next.js self hosting, lo nggak perlu keluar uang lebih mahal cuma buat dapat respons lambat dan cold start yang lamban.</p>
+<h2>Kenapa Multi-Tenant Monorepo Mengalahkan AWS Lambda Web Functions</h2>
+<p>Di Dagango.com, kita menjalankan platform e-commerce multi-tenant yang menampung ratusan website toko Usaha Mikro, Kecil, dan Menengah (UMKM).</p>
+<p>Pola traffic toko merchant lokal ini jadi skenario paling buruk buat arsitektur serverless:</p>
+<ul>
+<li>Tiap toko merchant menerima traffic sporadis dari sebaran link WhatsApp dan promosi Instagram.</li>
+<li>Pengunjung datang dalam lonjakan singkat, lalu toko sepi selama berjam-jam.</li>
+<li>Ratusan subdomain toko merchant duduk diam di sepanjang hari.</li>
+</ul>
+<p>Kalau kita memetakan tiap toko merchant ke fungsi serverless terpisah, kita bakal memicu ratusan argo memori idle 7 menit setiap harinya. Toko yang cuma dibuka lima kali dalam sejam bakal kena tagihan 35 menit RAM idle untuk satu detik komputasi riil.</p>
+<p>Bayangkan pemborosan itu kalau dikalikan ke ratusan tenant toko. Tagihan cloud kita bakal meledak tanpa memberikan nilai tambah apa pun buat pemilik toko.</p>
+<p>Karena itulah Dagango.com dibangun sebagai satu multi-tenant monorepo yang utuh. Kita menjalankan satu aplikasi gabungan Next.js dan FastAPI di balik reverse proxy Caddy pada satu Virtual Private Server (VPS) Linux dan server bare-metal, semuanya dikelola lewat systemd.</p>
+<p>Pilihan arsitektur ini memberi kita tiga keunggulan konkret:</p>
+<ul>
+<li>Pooling memori: Satu proses berjalan melayani seluruh domain merchant tanpa menduplikasi beban runtime.</li>
+<li>Bebas cold start: Aplikasi selalu aktif di memori dan langsung menyambar setiap request yang masuk.</li>
+<li>Biaya perangkat keras pasti: Total tagihan hosting kita tetap flat di kisaran $10 sampai $20 per bulan tanpa peduli sebaran traffic.</li>
+</ul>
+<p>Serverless memang masuk akal kalau lo punya satu endpoint dengan traffic raksasa yang nggak bisa diprediksi. Tapi untuk arsitektur multi-tenant dengan pola traffic yang panjang dan jarang (long-tail), serverless malah mengisolasi tiap tenant ke dalam siklus tagihan idle masing-masing.</p>
+<p>Monorepo terpadu menyatukan kapasitas memori di tempat serverless memecah belahnya.</p>
+<h2>FAQ Teknis</h2>
+<h3>Apakah provisioned concurrency bisa menghapus biaya memori idle di Lambda Web Functions?</h3>
+<p>Nggak bisa. Fitur provisioned concurrency memang menjaga container tetap hangat, tapi AWS menagih kapasitas yang disiapkan itu selama 100% waktu berjalan. Cara ini mencegah cold start, tapi malah bikin tagihan dasar lo melambung tinggi.</p>
+<h3>Apakah penggunaan ulang container bisa menambal jebakan biaya di web bertraffic padat?</h3>
+<p>Bisa. Kalau aplikasi lo menerima aliran request konstan dengan jeda kurang dari lima menit, container bakal terus aktif melayani traffic tanpa terkena penalti idle. Masalah biaya 88% ini murni menghantam aplikasi dengan traffic sporadis dan jeda panjang.</p>
+<h3>Bagaimana cara monorepo satu proses mencegah satu tenant menghabiskan seluruh resource?</h3>
+<p>Kita memasang pembatasan traffic per tenant langsung di layer reverse proxy Caddy dan middleware aplikasi. Pengelola proses seperti systemd bakal me-restart aplikasi secara otomatis kalau batas konsumsi memori terlewati.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

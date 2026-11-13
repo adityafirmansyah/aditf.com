@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AWS Lambda Web Functions and the 7-Minute Idle Memory Tax — Field Notes</title>
+<meta name="description" content="AWS Lambda Web Functions promised active CPU billing, but an unconfigurable 7-minute idle memory window drives 88% of compute costs for bursty, multi-tenant architectures.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AWS Lambda Web Functions and the 7-Minute Idle Memory Tax — Field Notes">
+<meta property="og:description" content="AWS Lambda Web Functions promised active CPU billing, but an unconfigurable 7-minute idle memory window drives 88% of compute costs for bursty, multi-tenant architectures.">
+<meta property="og:url" content="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AWS Lambda Web Functions and the 7-Minute Idle Memory Tax — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AWS Lambda Web Functions and the 7-Minute Idle Memory Tax — Field Notes">
+<meta name="twitter:description" content="AWS Lambda Web Functions promised active CPU billing, but an unconfigurable 7-minute idle memory window drives 88% of compute costs for bursty, multi-tenant architectures.">
+<meta name="twitter:image" content="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="aws lambda web functions, serverless idle memory, multi-tenant monorepo, nextjs self hosting, lambda cost optimization">
+<meta property="article:published_time" content="2026-11-13T00:00:00+00:00">
+<meta property="article:tag" content="serverless">
+<meta property="article:tag" content="aws">
+<meta property="article:tag" content="nextjs">
+<meta property="article:tag" content="architecture">
+<meta property="article:tag" content="ecommerce">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "AWS Lambda Web Functions and the 7-Minute Idle Memory Tax", "description": "AWS Lambda Web Functions promised active CPU billing, but an unconfigurable 7-minute idle memory window drives 88% of compute costs for bursty, multi-tenant architectures.", "datePublished": "2026-11-13T00:00:00+00:00", "dateModified": "2026-11-13T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/aws-lambda-web-functions-idle-tax/"}, "keywords": "aws lambda web functions, serverless idle memory, multi-tenant monorepo, nextjs self hosting, lambda cost optimization", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1084, "image": ["https://aditf.com/blog/aws-lambda-web-functions-idle-tax/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/aws-lambda-web-functions-idle-tax/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does provisioned concurrency eliminate the idle memory charge on Lambda Web Functions?", "acceptedAnswer": {"@type": "Answer", "text": "No. Provisioned concurrency keeps execution environments pre-warmed, but AWS bills for that allocated capacity 100% of the time. It prevents cold starts, but increases baseline spending."}}, {"@type": "Question", "name": "Can container reuse offset the idle memory penalty on high-traffic sites?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. If your application handles a steady stream of requests with less than five minutes between hits, containers remain warm and handle sustained load efficiently. The 88% penalty primarily strikes bursty, long-tail workloads."}}, {"@type": "Question", "name": "How does a shared-process monorepo prevent one tenant from consuming all resources?", "acceptedAnswer": {"@type": "Answer", "text": "We enforce per-tenant rate limits at the Caddy reverse proxy layer and manage compute quotas inside application middleware. Process managers like systemd restart instances automatically if memory thresholds are exceeded."}}]}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>13 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">AWS Lambda Web Functions and the 7-Minute Idle Memory Tax</h1>
+    <div class="post__tags"><span>serverless</span><span>aws</span><span>nextjs</span><span>architecture</span><span>ecommerce</span></div>
+    <div class="post__content reveal is-visible">
+<p>In October 2026, AWS introduced AWS Lambda Web Functions. The pitch sounded ideal for modern web applications. Developers could run standard Hypertext Transfer Protocol (HTTP) servers, pay only for active Central Processing Unit (CPU) cycles, and skip server management entirely.</p>
+<p>For developers running sporadic or long-tail web traffic, this sounded like the end of paying for idle capacity.</p>
+<p>It is not.</p>
+<p>Independent engineering benchmarks published by Easel.sh on November 11, 2026, revealed a costly hidden accounting mechanism. While AWS only bills CPU while handling requests, it keeps the Random Access Memory (RAM) meter running for 313 to 411 seconds after your traffic stops.</p>
+<p>For bursty web applications, that 5 to 7 minutes of unconfigurable idle time turns roughly 88% of your cloud bill into payments for phantom capacity.</p>
+<h2>The 1,700× Duration Mismatch in Serverless Idle Memory</h2>
+<p>The core flaw in the pricing model comes down to duration asymmetry.</p>
+<p>When a visitor visits a web page, the web server executes the request quickly. But the container environment does not shut down when the response finishes.</p>
+<p>According to the Easel.sh benchmarks across six execution environments in us-east-1, AWS retains the instance in memory for 5 to 7 minutes awaiting subsequent traffic.</p>
+<p>Consider what happens to a lightweight web app consuming 160 to 210 MB of memory:</p>
+<ul>
+<li>A single incoming request takes 200 milliseconds of active execution.</li>
+<li>The execution environment stays alive and idle for 345 seconds.</li>
+<li>AWS meters memory usage across the entire 345.2-second span.</li>
+</ul>
+<p>In this scenario, metered memory time exceeds active compute time by roughly 1,700×.</p>
+<p>Even at AWS list prices, that silent cost dominates the invoice. The active CPU and request invocations make up a negligible fraction of the bill. The remaining 88% of your compute charge goes entirely toward serverless idle memory.</p>
+<p>Practitioners on Hacker News (HN) quickly confirmed the math across 29 comments. If your application handles sporadic hits rather than steady, saturated streams, serverless memory billing becomes an invisible tax.</p>
+<h2>Why Does AWS Keep Lambda Web Functions Alive for 7 Minutes?</h2>
+<p>To understand why this happens, you have to look at the execution lifecycle documented by AWS.</p>
+<p>AWS breaks Web Function lifecycles into three phases:</p>
+<ul>
+<li>Initialization, where the runtime container boots and pulls application dependencies.</li>
+<li>Ready, where the web process listens on a socket and answers incoming HTTP requests.</li>
+<li>Shutdown, where AWS stops routing requests, sends SIGTERM, and reclaims the environment.</li>
+</ul>
+<p>AWS keeps containers alive to avoid cold starts. If every request forced a fresh container initialization, subsequent page loads would crawl.</p>
+<p>So AWS chose to absorb that standby buffer into the customer invoice.</p>
+<p>Can you bypass this behavior by forcing the container to shut down early? Engineers tested that exact workaround.</p>
+<p>When developers attempted to terminate idle instances after 10 seconds using <code>process.exit(0)</code>, the platform rejected the pattern. AWS recorded every voluntary process exit as an unexpected runtime crash.</p>
+<p>That design decision breaks operational metrics:</p>
+<ul>
+<li>Error alerts fire continuously in CloudWatch.</li>
+<li>Deployment dashboards turn red.</li>
+<li>Invocation metrics cannot distinguish between clean shutdowns and actual bugs.</li>
+</ul>
+<p>In practice, AWS leaves teams with zero knobs for lambda cost optimization on idle environments. You either accept the 7-minute idle bill or redesign your hosting layer.</p>
+<h2>Next.js Self Hosting Outperforms Serverless Cold Starts</h2>
+<p>The financial tax would be easier to forgive if AWS Lambda Web Functions delivered unmatched raw performance.</p>
+<p>They do not.</p>
+<p>Easel.sh ran head-to-head benchmarks on an identical Next.js 16 application between AWS Lambda Web Functions and self-operated compute. The self-hosted server outperformed serverless across every single metric.</p>
+<p>On warm requests, self-hosted compute delivered responses 1.5× to 3× faster:</p>
+<ul>
+<li>JSON Application Programming Interface (API) routes responded in 9.3ms on self-hosted instances versus 27.0ms on Lambda.</li>
+<li>Server-Side Rendering (SSR) pages completed in 12.2ms on self-hosted instances versus 26.0ms on Lambda.</li>
+</ul>
+<p>Cold starts showed an even wider performance gap. After 12 minutes of inactivity, self-operated instances booted and served requests in 216 to 250 milliseconds.</p>
+<p>Lambda Web Functions took 810 to 854 milliseconds to complete the same initialization.</p>
+<p>The takeaway is straightforward. With Next.js self hosting, you avoid paying a premium for slower response times and sluggish cold starts.</p>
+<h2>Why a Multi-Tenant Monorepo Beats AWS Lambda Web Functions</h2>
+<p>At Dagango.com, we run a multi-tenant e-commerce platform hosting hundreds of Indonesian small business storefronts (Usaha Mikro, Kecil, dan Menengah or UMKM).</p>
+<p>Our traffic pattern represents the exact nightmare scenario for serverless billing:</p>
+<ul>
+<li>Each merchant store receives sporadic bursts from WhatsApp orders and Instagram promotions.</li>
+<li>Traffic arrives in sharp spikes followed by hours of complete silence.</li>
+<li>Hundreds of independent store subdomains sit idle across the day.</li>
+</ul>
+<p>If we mapped each merchant store to serverless functions, we would trigger hundreds of separate 7-minute idle memory timers daily. A store getting five visits an hour would bill 35 minutes of idle RAM for one second of actual work.</p>
+<p>Multiply that waste across hundreds of tenant stores, and cloud bills explode without delivering any customer value.</p>
+<p>Instead, Dagango.com runs as a unified multi-tenant monorepo. We deploy a shared Next.js and FastAPI application behind Caddy on a single Linux Virtual Private Server (VPS) and bare-metal server, managed by systemd.</p>
+<p>This architectural model delivers three structural advantages:</p>
+<ul>
+<li>Memory pooling: A single running process serves every merchant domain without duplicating runtime overhead.</li>
+<li>Zero cold starts: The application stays resident in memory, answering incoming storefront visits immediately.</li>
+<li>Predictable hardware costs: Our entire hosting bill stays flat at $10 to $20 per month regardless of request distribution.</li>
+</ul>
+<p>Serverless architectures make sense when you have unpredictable traffic volume on a single monolithic endpoint. But for long-tail multi-tenancy, serverless isolates tenants into separate idle billing cycles.</p>
+<p>A shared monorepo pools resources where serverless fragments them.</p>
+<h2>FAQ</h2>
+<h3>Does provisioned concurrency eliminate the idle memory charge on Lambda Web Functions?</h3>
+<p>No. Provisioned concurrency keeps execution environments pre-warmed, but AWS bills for that allocated capacity 100% of the time. It prevents cold starts, but increases baseline spending.</p>
+<h3>Can container reuse offset the idle memory penalty on high-traffic sites?</h3>
+<p>Yes. If your application handles a steady stream of requests with less than five minutes between hits, containers remain warm and handle sustained load efficiently. The 88% penalty primarily strikes bursty, long-tail workloads.</p>
+<h3>How does a shared-process monorepo prevent one tenant from consuming all resources?</h3>
+<p>We enforce per-tenant rate limits at the Caddy reverse proxy layer and manage compute quotas inside application middleware. Process managers like systemd restart instances automatically if memory thresholds are exceeded.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

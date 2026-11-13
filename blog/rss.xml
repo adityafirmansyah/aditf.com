@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>AWS Lambda Web Functions and the 7-Minute Idle Memory Tax</title>
+      <link>https://aditf.com/blog/aws-lambda-web-functions-idle-tax/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/aws-lambda-web-functions-idle-tax/</guid>
+      <pubDate>Fri, 13 Nov 2026 00:00:00 +0000</pubDate>
+      <description>AWS Lambda Web Functions promised active CPU billing, but an unconfigurable 7-minute idle memory window drives 88% of compute costs for bursty, multi-tenant architectures.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/aws-lambda-web-functions-idle-tax/id/"/>
+    </item>
+    <item>
       <title>AWS Emulator: 438 API Models, Zero Human-Written Code</title>
       <link>https://aditf.com/blog/aws-emulator-agent-fleet-harness/</link>
       <guid isPermaLink="true">https://aditf.com/blog/aws-emulator-agent-fleet-harness/</guid>
@@ -176,15 +185,6 @@
       <description>OpenShell hides credentials behind a mediated proxy and gates policy changes with a Z3 solver. The sandbox is the easy half to copy. The per-sandbox model is the half that bites.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/id/"/>
-    </item>
-    <item>
-      <title>Railway&#x27;s Breach Was a Database. Your Env Vars Are Still the Wrong Vault.</title>
-      <link>https://aditf.com/blog/railway-breach-systemd-credentials/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/railway-breach-systemd-credentials/</guid>
-      <pubDate>Fri, 23 Oct 2026 00:00:00 +0000</pubDate>
-      <description>Railway&#x27;s October 2026 breach exposed decrypted environment variables from a secrets database. The storage plane was the target, but the habit of storing credentials in env vars made the blast radius huge.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/railway-breach-systemd-credentials/id/"/>
     </item>
   </channel>
 </rss>
