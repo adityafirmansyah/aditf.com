@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Rust 1.100 Release: Why Dependency Cooldowns and Never Types Matter in Production</title>
+      <link>https://aditf.com/blog/rust-1-100-cooldowns-never-types/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/rust-1-100-cooldowns-never-types/</guid>
+      <pubDate>Sat, 14 Nov 2026 00:00:00 +0000</pubDate>
+      <description>The Rust 1.100 release stabilizes Cargo dependency cooldowns, the canonical never type, and DropGuard. Here is what these operational upgrades mean for production backend reliability.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/rust-1-100-cooldowns-never-types/id/"/>
+    </item>
+    <item>
       <title>AWS Lambda Web Functions and the 7-Minute Idle Memory Tax</title>
       <link>https://aditf.com/blog/aws-lambda-web-functions-idle-tax/</link>
       <guid isPermaLink="true">https://aditf.com/blog/aws-lambda-web-functions-idle-tax/</guid>
@@ -176,15 +185,6 @@
       <description>Raft-replicated SQLite buys you failover and charges you milliseconds per write. Most production apps need WAL streaming to S3, not a cluster.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/distributed-sqlite-consensus-paradox/id/"/>
-    </item>
-    <item>
-      <title>Inside NVIDIA OpenShell: SMT Provers and Credential Proxies for Agent Fleets</title>
-      <link>https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/</guid>
-      <pubDate>Sat, 24 Oct 2026 00:00:00 +0000</pubDate>
-      <description>OpenShell hides credentials behind a mediated proxy and gates policy changes with a Z3 solver. The sandbox is the easy half to copy. The per-sandbox model is the half that bites.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/nvidia-openshell-agent-fleet-sandboxing/id/"/>
     </item>
   </channel>
 </rss>

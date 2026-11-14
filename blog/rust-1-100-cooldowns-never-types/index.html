@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rust 1.100 Release: Why Dependency Cooldowns and Never Types Matter in Production — Field Notes</title>
+<meta name="description" content="The Rust 1.100 release stabilizes Cargo dependency cooldowns, the canonical never type, and DropGuard. Here is what these operational upgrades mean for production backend reliability.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/rust-1-100-cooldowns-never-types/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Rust 1.100 Release: Why Dependency Cooldowns and Never Types Matter in Production — Field Notes">
+<meta property="og:description" content="The Rust 1.100 release stabilizes Cargo dependency cooldowns, the canonical never type, and DropGuard. Here is what these operational upgrades mean for production backend reliability.">
+<meta property="og:url" content="https://aditf.com/blog/rust-1-100-cooldowns-never-types/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/rust-1-100-cooldowns-never-types/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Rust 1.100 Release: Why Dependency Cooldowns and Never Types Matter in Production — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Rust 1.100 Release: Why Dependency Cooldowns and Never Types Matter in Production — Field Notes">
+<meta name="twitter:description" content="The Rust 1.100 release stabilizes Cargo dependency cooldowns, the canonical never type, and DropGuard. Here is what these operational upgrades mean for production backend reliability.">
+<meta name="twitter:image" content="https://aditf.com/blog/rust-1-100-cooldowns-never-types/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="rust 1.100 release, cargo dependency cooldowns, rust never type stable, cargo min publish age, core mem dropguard rust, rust supply chain security">
+<meta property="article:published_time" content="2026-11-14T00:00:00+00:00">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="devops">
+<meta property="article:tag" content="supply-chain">
+<meta property="article:tag" content="backend">
+<meta property="article:tag" content="systems-programming">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Rust 1.100 Release: Why Dependency Cooldowns and Never Types Matter in Production", "description": "The Rust 1.100 release stabilizes Cargo dependency cooldowns, the canonical never type, and DropGuard. Here is what these operational upgrades mean for production backend reliability.", "datePublished": "2026-11-14T00:00:00+00:00", "dateModified": "2026-11-14T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/rust-1-100-cooldowns-never-types/"}, "keywords": "rust 1.100 release, cargo dependency cooldowns, rust never type stable, cargo min publish age, core mem dropguard rust, rust supply chain security", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 959, "image": ["https://aditf.com/blog/rust-1-100-cooldowns-never-types/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/rust-1-100-cooldowns-never-types/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "How do emergency security hotfixes bypass the dependency cooldown?", "acceptedAnswer": {"@type": "Answer", "text": "You can bypass the global cooldown during an incident by explicitly updating the revision in your `Cargo.lock` file. The resolver respects versions already pinned in the lockfile regardless of publish age."}}, {"@type": "Question", "name": "Does the never type break existing code relying on Infallible?", "acceptedAnswer": {"@type": "Answer", "text": "No. The standard library now aliases `core::convert::Infallible` to the primitive `!` type. Existing code compiles without modification while gaining the ability to use refutable pattern matching."}}, {"@type": "Question", "name": "Can core::mem::DropGuard replace custom RAII wrappers in my codebase?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. For local staging, file swaps, and lock releases, `DropGuard` replaces hand-rolled cleanup structs with a single standard construct."}}]}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/rust-1-100-cooldowns-never-types/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/rust-1-100-cooldowns-never-types/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/rust-1-100-cooldowns-never-types/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>14 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Rust 1.100 Release: Why Dependency Cooldowns and Never Types Matter in Production</h1>
+    <div class="post__tags"><span>rust</span><span>devops</span><span>supply-chain</span><span>backend</span><span>systems-programming</span></div>
+    <div class="post__content reveal is-visible">
+<p>Reaching version 1.100.0 is a symbolic milestone for Rust. The official Rust 1.100 release arrived on November 12, 2026, marking eleven years of backward stability guarantees. Developer discussions reflected that weight immediately. The announcement earned 878 points and 314 comments on Hacker News, alongside 152 points on Lobsters.</p>
+<p>For backend engineers running production services, this milestone is not about version vanity. Two long-awaited capabilities alter our daily operational risk:</p>
+<ul>
+<li>Cargo dependency cooldowns that choke automated open-source supply-chain attacks.</li>
+<li>The stabilized never type that removes defensive panics from infallible code paths.</li>
+</ul>
+<p>Alongside these headline features, the release packages lockfiles into <code>cargo install</code> by default and introduces <code>core::mem::DropGuard</code>. Here is my operational assessment of what changes in our production infrastructure.</p>
+<h2>What the Rust 1.100 release changes for crate supply chains</h2>
+<p>Automated account takeovers represent the most persistent threat in modern package registries. An attacker compromises an author credential, pushes a malicious patch version, and relies on automated Continuous Integration and Continuous Deployment (CI/CD) pipelines to pull it immediately. Most malicious versions are detected and yanked within 24 to 72 hours. The window between publication and registry removal is where incidents occur.</p>
+<p>Under Request for Comments (RFC) 3923, Cargo stabilizes dependency quarantine periods through a dedicated setting:</p>
+<pre><code class="language-toml">[registry]
+global-min-publish-age = &quot;3 days&quot;
+</code></pre>
+<p>This configuration tells the resolver to ignore any crate published within the last three days unless it already exists in <code>Cargo.lock</code>. By enforcing this delay, dependency cooldowns in Cargo neutralize spray-and-pray attacks without manual intervention, hardening supply-chain security across staging fleets.</p>
+<p>However, operational mechanics introduce real friction during zero-day incidents. When an upstream library releases an emergency patch for a Common Vulnerabilities and Exposures (CVE) advisory, your build pipeline faces a barrier:</p>
+<ul>
+<li>Automated pipelines reject the hotfix because its publish timestamp is under the three-day limit.</li>
+<li>Security scanners fail the build due to the unpatched vulnerability.</li>
+<li>Engineers must manually pin the version or configure explicit registry bypass flags during an incident.</li>
+</ul>
+<p>Platform teams must define this emergency override protocol before an incident strikes.</p>
+<p>Determinism also improves for server tooling. Under Cargo Pull Request (PR) #17388, <code>cargo install</code> now respects the packaged <code>Cargo.lock</code> by default. Previously, installing a Command Line Interface (CLI) tool on a clean node could resolve newer transitive dependencies and break unexpectedly. Now, the build reproduces the author's tested dependency graph without requiring the <code>--locked</code> flag.</p>
+<h2>Why did the never type take ten years to stabilize?</h2>
+<p>The exclamation mark (<code>!</code>) primitive has existed in Rust lore since RFC 1216 in 2015. Yet stabilizing Rust's never type took ten years and five failed attempts.</p>
+<p>The delay was caused by type inference fallback regressions. When the compiler encountered an unconstrained type variable, it historically fell back to <code>()</code>. Changing that fallback from <code>()</code> to <code>!</code> broke existing production code in subtle ways, particularly around trait bounds and empty branches. Rust 1.100 finally resolves this deadlock by unifying fallback behavior across editions while aliasing <code>core::convert::Infallible</code> directly to <code>!</code>.</p>
+<p>In production Application Programming Interfaces (APIs), this eliminates dead weight. Infallible operations no longer require defensive unwrapping:</p>
+<pre><code class="language-rust">// Infallible task execution using the never type
+fn process_event(raw: &amp;[u8]) -&gt; Result&lt;Event, !&gt; {
+    Ok(parse_deterministic(raw))
+}
+
+// Previously:
+// let event = process_event(payload).unwrap();
+
+// In Rust 1.100:
+let Ok(event) = process_event(payload);
+</code></pre>
+<p>The compiler proves that the error variant is unconstructible. Because <code>let Ok(...)</code> is refutable-free, your compiled binary contains no panic branches, no unreachable formatting code, and no runtime assertion overhead.</p>
+<h2>Transactional rollbacks with DropGuard</h2>
+<p>When building multi-tenant infrastructure at Dagango.com, writing reliable state updates requires strict Resource Acquisition Is Initialization (RAII) patterns. Historically, ensuring clean cleanup during an early error required writing bespoke guard structs implementing the <code>Drop</code> trait.</p>
+<p>Rust 1.100 formalizes this with <code>core::mem::DropGuard</code>. It binds an asset and a rollback closure, providing an explicit <code>.dismiss()</code> method:</p>
+<pre><code class="language-rust">use core::mem::DropGuard;
+
+fn update_tenant_quota(tenant_id: u64, delta: i64) -&gt; Result&lt;(), StorageError&gt; {
+    stage_quota_change(tenant_id, delta)?;
+
+    // Guard executes compensation logic on early return
+    let guard = DropGuard::new(tenant_id, |id| {
+        rollback_quota_change(id);
+    });
+
+    write_audit_log(tenant_id, delta)?;
+    commit_transaction(tenant_id)?;
+
+    // Success: cancel the rollback
+    guard.dismiss();
+    Ok(())
+}
+</code></pre>
+<p>If <code>write_audit_log</code> fails, the function returns early. The guard drops, executing the compensation closure automatically. When execution succeeds, calling <code>.dismiss()</code> consumes the guard and skips the destructor. This provides clean all-or-nothing staging logic for distributed storage, background queues, and disk buffers.</p>
+<p>Beyond cleanup guards, low-level memory control gets another major anchor in this release. Rust 1.100 stabilizes the core <code>std::alloc::Allocator</code> trait on <code>Vec</code> and <code>Box</code>. This lays the foundation for pluggable arena allocators in latency-sensitive request loops without requiring nightly compiler flags.</p>
+<h2>Production takeaways for platform teams</h2>
+<p>Adopting these upgrades requires deliberate workflow updates:</p>
+<ol>
+<li><strong>Enforce minimum publish age in shared configurations.</strong> Add <code>global-min-publish-age = "3 days"</code> to team Cargo configs to isolate builds from automated supply-chain compromises.</li>
+<li><strong>Document the emergency hotfix protocol.</strong> Train teams to override cooldown limits when applying urgent CVE patches under incident conditions.</li>
+<li><strong>Audit infallible library types.</strong> Replace <code>Result&lt;T, Infallible&gt;</code> with <code>Result&lt;T, !&gt;</code> to remove panic bloat across core service libraries.</li>
+<li><strong>Standardize transactional rollbacks.</strong> Replace ad-hoc boolean cleanup flags in data ingestion paths with <code>DropGuard</code>.</li>
+</ol>
+<h2>FAQ</h2>
+<h3>How do emergency security hotfixes bypass the dependency cooldown?</h3>
+<p>You can bypass the global cooldown during an incident by explicitly updating the revision in your <code>Cargo.lock</code> file. The resolver respects versions already pinned in the lockfile regardless of publish age.</p>
+<h3>Does the never type break existing code relying on Infallible?</h3>
+<p>No. The standard library now aliases <code>core::convert::Infallible</code> to the primitive <code>!</code> type. Existing code compiles without modification while gaining the ability to use refutable pattern matching.</p>
+<h3>Can core::mem::DropGuard replace custom RAII wrappers in my codebase?</h3>
+<p>Yes. For local staging, file swaps, and lock releases, <code>DropGuard</code> replaces hand-rolled cleanup structs with a single standard construct.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/rust-1-100-cooldowns-never-types/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
