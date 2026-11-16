@@ -3,27 +3,45 @@
         xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
     <loc>https://aditf.com/</loc>
-    <lastmod>2026-11-14</lastmod>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
     <loc>https://aditf.com/consult/</loc>
-    <lastmod>2026-11-14</lastmod>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://aditf.com/services/</loc>
-    <lastmod>2026-11-14</lastmod>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
     <loc>https://aditf.com/blog/</loc>
-    <lastmod>2026-11-14</lastmod>
+    <lastmod>2026-11-16</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://aditf.com/blog/ai-generated-code-open-source/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aditf.com/blog/ai-generated-code-open-source/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://aditf.com/blog/ai-generated-code-open-source/id/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/ai-generated-code-open-source/"/>
+    <lastmod>2026-11-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://aditf.com/blog/ai-generated-code-open-source/id/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://aditf.com/blog/ai-generated-code-open-source/"/>
+    <xhtml:link rel="alternate" hreflang="id" href="https://aditf.com/blog/ai-generated-code-open-source/id/"/>
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/ai-generated-code-open-source/"/>
+    <lastmod>2026-11-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
   </url>
   <url>
     <loc>https://aditf.com/blog/rust-1-100-cooldowns-never-types/</loc>

@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>AI-Generated Code Open Source: What Should Teams Release?</title>
+      <link>https://aditf.com/blog/ai-generated-code-open-source/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/ai-generated-code-open-source/</guid>
+      <pubDate>Mon, 16 Nov 2026 00:00:00 +0000</pubDate>
+      <description>AI-generated code open source is a debate about authorship and licensing, but engineering teams still need to review behavior, test boundaries, and choose deliberately what they publish.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/ai-generated-code-open-source/id/"/>
+    </item>
+    <item>
       <title>Rust 1.100 Release: Why Dependency Cooldowns and Never Types Matter in Production</title>
       <link>https://aditf.com/blog/rust-1-100-cooldowns-never-types/</link>
       <guid isPermaLink="true">https://aditf.com/blog/rust-1-100-cooldowns-never-types/</guid>
@@ -176,15 +185,6 @@
       <description>The &quot;skills are worthless&quot; argument is aimed at prompt folklore. What runs on a 19-profile agent fleet is closer to operational code, and it carries a real context bill.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/agent-skills-environment-notes/id/"/>
-    </item>
-    <item>
-      <title>The Distributed SQLite Paradox: You Pay for Consensus, Then Queue Behind One Writer</title>
-      <link>https://aditf.com/blog/distributed-sqlite-consensus-paradox/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/distributed-sqlite-consensus-paradox/</guid>
-      <pubDate>Sun, 25 Oct 2026 00:00:00 +0000</pubDate>
-      <description>Raft-replicated SQLite buys you failover and charges you milliseconds per write. Most production apps need WAL streaming to S3, not a cluster.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/distributed-sqlite-consensus-paradox/id/"/>
     </item>
   </channel>
 </rss>

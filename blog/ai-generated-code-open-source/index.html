@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Generated Code Open Source: What Should Teams Release? — Field Notes</title>
+<meta name="description" content="AI-generated code open source is a debate about authorship and licensing, but engineering teams still need to review behavior, test boundaries, and choose deliberately what they publish.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/ai-generated-code-open-source/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI-Generated Code Open Source: What Should Teams Release? — Field Notes">
+<meta property="og:description" content="AI-generated code open source is a debate about authorship and licensing, but engineering teams still need to review behavior, test boundaries, and choose deliberately what they publish.">
+<meta property="og:url" content="https://aditf.com/blog/ai-generated-code-open-source/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/ai-generated-code-open-source/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI-Generated Code Open Source: What Should Teams Release? — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI-Generated Code Open Source: What Should Teams Release? — Field Notes">
+<meta name="twitter:description" content="AI-generated code open source is a debate about authorship and licensing, but engineering teams still need to review behavior, test boundaries, and choose deliberately what they publish.">
+<meta name="twitter:image" content="https://aditf.com/blog/ai-generated-code-open-source/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="AI-generated code open source, AI code copyright, human authorship AI, multi-tenant authorization testing, software engineering AI tools">
+<meta property="article:published_time" content="2026-11-16T00:00:00+00:00">
+<meta property="article:tag" content="ai-assisted-development">
+<meta property="article:tag" content="open-source">
+<meta property="article:tag" content="software-engineering">
+<meta property="article:tag" content="multi-tenant">
+<meta property="article:tag" content="code-review">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "AI-Generated Code Open Source: What Should Teams Release?", "description": "AI-generated code open source is a debate about authorship and licensing, but engineering teams still need to review behavior, test boundaries, and choose deliberately what they publish.", "datePublished": "2026-11-16T00:00:00+00:00", "dateModified": "2026-11-16T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/ai-generated-code-open-source/"}, "keywords": "AI-generated code open source, AI code copyright, human authorship AI, multi-tenant authorization testing, software engineering AI tools", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 945, "image": ["https://aditf.com/blog/ai-generated-code-open-source/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/ai-generated-code-open-source/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does AI assistance automatically mean a team should open-source the code?", "acceptedAnswer": {"@type": "Answer", "text": "No. AI assistance alone does not settle copyright, license obligations, or the product’s release policy. Make the decision based on the contribution, dependencies, and business context."}}, {"@type": "Question", "name": "Is a prompt enough to establish human authorship?", "acceptedAnswer": {"@type": "Answer", "text": "The U.S. Copyright Office’s 2025 summary says prompting alone is insufficient. Human control over expressive elements matters, and a particular case may require legal advice."}}, {"@type": "Question", "name": "What should a reviewer test in multi-tenant code?", "acceptedAnswer": {"@type": "Answer", "text": "Try requests that use another tenant’s identifiers and verify that reads and writes are denied. Also check that tenant scope is enforced beyond the user interface."}}]}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/ai-generated-code-open-source/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/ai-generated-code-open-source/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/ai-generated-code-open-source/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>16 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">AI-Generated Code Open Source: What Should Teams Release?</h1>
+    <div class="post__tags"><span>ai-assisted-development</span><span>open-source</span><span>software-engineering</span><span>multi-tenant</span><span>code-review</span></div>
+    <div class="post__content reveal is-visible">
+<p>Artificial intelligence (AI) can produce a checkout handler. It cannot decide whether one merchant may ever read another merchant’s orders. That boundary matters more to a commerce product than who typed each line, which is why the argument over AI-generated code open source needs to separate authorship from engineering responsibility.</p>
+<p>A November 15 post by Jakub Jankiewicz argues that AI-generated code should be open source. He points to AI models learning from open-source code and argues purely AI-generated work should not be copyrightable. The Hacker News discussion reached 1,126 points and 175 top-level comments in the retrieved item data. The thread is lively, but its central question is not a deployment policy.</p>
+<h2>AI-generated code open source is a release decision, not a default</h2>
+<p>Teams often compress several different questions into one: did a model help write this, who can claim copyright, and should the repository be public? Those questions interact, but none answers the others automatically.</p>
+<p>Open source describes software released under a license that grants defined permissions. It is not another name for public domain. A public repository can still carry license terms, and a no-copyright conclusion does not itself create an open-source license. The discussion around Jankiewicz’s post reflects this exact disagreement: some commenters see no copyright as leaving nothing to license, while others focus on the human engineering choices surrounding generated code.</p>
+<p>That distinction is practical, not semantic. A team can use AI assistance and keep a product private. It can also publish code that includes AI-assisted changes, subject to the rights and obligations that apply to the actual contribution and its dependencies. Neither choice should be made just by looking at the tool’s name.</p>
+<h2>What does the U.S. Copyright Office say about AI code copyright?</h2>
+<p>The U.S. Copyright Office’s 2025 summary does not announce a blanket rule for every program touched by a model. It says human-authored expression may be protected, while purely AI-generated material or material without sufficient human control is not. Prompting alone is not enough to establish human authorship.</p>
+<p>The Copyright Office’s Part 2 report makes the useful distinction between AI as an assisting instrument and AI determining expressive elements. That is a narrower point than “AI code has no copyright.” It also is not a legal review of a particular pull request. Teams should get qualified advice when a release decision depends on their rights position.</p>
+<p>For engineering, the key takeaway is to preserve the actual human work and the review trail. A prompt is not a substitute for documenting what a person designed, changed, selected, or verified. Nor does a green test suite establish who authored a line.</p>
+<h2>Why do tenant boundaries matter more than who typed the handler?</h2>
+<p>In a multi-tenant commerce system such as Dagango.com, generated implementation is only one layer of the change. The consequential decisions include how tenant identity enters a request, which records a merchant may access, and where authorization is enforced.</p>
+<p>A generated checkout handler might look ordinary while accepting an order identifier from a request without checking that the order belongs to the active merchant. The issue is not that a model wrote the code. The issue is that the behavior crosses a tenant boundary.</p>
+<p>Review the behavior directly. For a change touching tenant data, I want to see:</p>
+<ul>
+<li>tenant scope applied at the data-access boundary, not only in the interface;</li>
+<li>authorization checks for reads and writes, including indirect paths;</li>
+<li>tests that attempt cross-tenant access with another merchant’s identifiers;</li>
+<li>regression coverage for the normal checkout and order flows.</li>
+</ul>
+<p>These are engineering examples, not claims about a recent Dagango.com incident. The same bar applies whether an engineer wrote every line, a coding agent drafted the change, or both worked on it.</p>
+<h2>How should teams decide what to publish?</h2>
+<p>Treat generated code like any other contribution, then make the release decision explicitly. A compact team policy can ask reviewers to confirm four things:</p>
+<ol>
+<li>The diff is reviewable, and the team understands the behavior it adds.</li>
+<li>Authorization and regression tests cover the relevant boundaries.</li>
+<li>Third-party dependencies and their licenses have been tracked.</li>
+<li>Someone responsible has chosen whether the code belongs in a public repository.</li>
+</ol>
+<p>That checklist is my recommendation, not a rule supplied by the Copyright Office or the Hacker News thread. The sources establish a debate about authorship and release; the operational policy is for teams to define.</p>
+<p>Keeping these decision steps separate also keeps the training-data ethics question in its proper place. Whether model training should have involved particular open-source works is a serious issue. But that is distinct from whether a generated change is safe to deploy or whether a team should publish product code. Collapsing the two makes both discussions less useful.</p>
+<p>My working rule is simple: review the diff for behavior, test the boundaries that could expose another customer’s data, record dependencies, then decide what to release. Code is cheaper to produce than it used to be. Owning its production effects is still the team’s job.</p>
+<h2>FAQ</h2>
+<h3>Does AI assistance automatically mean a team should open-source the code?</h3>
+<p>No. AI assistance alone does not settle copyright, license obligations, or the product’s release policy. Make the decision based on the contribution, dependencies, and business context.</p>
+<h3>Is a prompt enough to establish human authorship?</h3>
+<p>The U.S. Copyright Office’s 2025 summary says prompting alone is insufficient. Human control over expressive elements matters, and a particular case may require legal advice.</p>
+<h3>What should a reviewer test in multi-tenant code?</h3>
+<p>Try requests that use another tenant’s identifiers and verify that reads and writes are denied. Also check that tenant scope is enforced beyond the user interface.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/ai-generated-code-open-source/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
