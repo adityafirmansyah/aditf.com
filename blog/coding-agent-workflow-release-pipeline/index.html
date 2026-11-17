@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Coding Agent Workflow: Build a Release Pipeline, Not a Better Prompt — Field Notes</title>
+<meta name="description" content="A reliable coding agent workflow runs tests, records evidence, and requires human approval at meaningful risk boundaries. Better prompts help, but they do not prove a release is safe.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/coding-agent-workflow-release-pipeline/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Coding Agent Workflow: Build a Release Pipeline, Not a Better Prompt — Field Notes">
+<meta property="og:description" content="A reliable coding agent workflow runs tests, records evidence, and requires human approval at meaningful risk boundaries. Better prompts help, but they do not prove a release is safe.">
+<meta property="og:url" content="https://aditf.com/blog/coding-agent-workflow-release-pipeline/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/coding-agent-workflow-release-pipeline/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Coding Agent Workflow: Build a Release Pipeline, Not a Better Prompt — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Coding Agent Workflow: Build a Release Pipeline, Not a Better Prompt — Field Notes">
+<meta name="twitter:description" content="A reliable coding agent workflow runs tests, records evidence, and requires human approval at meaningful risk boundaries. Better prompts help, but they do not prove a release is safe.">
+<meta name="twitter:image" content="https://aditf.com/blog/coding-agent-workflow-release-pipeline/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="coding agent workflow, AI coding agent human approval, repeatable software delivery, agent testing and code review, self-hosted coding agents">
+<meta property="article:published_time" content="2026-11-17T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="software-delivery">
+<meta property="article:tag" content="code-review">
+<meta property="article:tag" content="testing">
+<meta property="article:tag" content="self-hosting">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Coding Agent Workflow: Build a Release Pipeline, Not a Better Prompt", "description": "A reliable coding agent workflow runs tests, records evidence, and requires human approval at meaningful risk boundaries. Better prompts help, but they do not prove a release is safe.", "datePublished": "2026-11-17T00:00:00+00:00", "dateModified": "2026-11-17T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/coding-agent-workflow-release-pipeline/"}, "keywords": "coding agent workflow, AI coding agent human approval, repeatable software delivery, agent testing and code review, self-hosted coding agents", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1128, "image": ["https://aditf.com/blog/coding-agent-workflow-release-pipeline/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/coding-agent-workflow-release-pipeline/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does a separate review agent make a change safe to merge?", "acceptedAnswer": {"@type": "Answer", "text": "No. It adds another pass over the diff, but it may share assumptions with the implementation agent. Keep deterministic test output and human review for changes that cross meaningful risk boundaries."}}, {"@type": "Question", "name": "Should every agent action require human approval?", "acceptedAnswer": {"@type": "Answer", "text": "No. Put approval gates before consequential delivery or access changes. Routine, reversible steps can run automatically when permissions and checks are constrained."}}, {"@type": "Question", "name": "Is self-hosting enough to protect repository credentials?", "acceptedAnswer": {"@type": "Answer", "text": "No. Inspect credential scope, sandbox access, network reachability, and workflow triggers in the deployed configuration. The hosting location alone does not establish those boundaries."}}]}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/coding-agent-workflow-release-pipeline/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/coding-agent-workflow-release-pipeline/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/coding-agent-workflow-release-pipeline/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>17 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Coding Agent Workflow: Build a Release Pipeline, Not a Better Prompt</h1>
+    <div class="post__tags"><span>ai-agents</span><span>software-delivery</span><span>code-review</span><span>testing</span><span>self-hosting</span></div>
+    <div class="post__content reveal is-visible">
+<p>A coding agent workflow is not reliable because the prompt sounds precise. It is reliable when the workflow runs checks, records what happened, and pauses before risky changes ship without accountable review. An agent can say “tests passed” without showing what ran.</p>
+<p>That distinction matters as teams move from agent demos to agent-assisted delivery. On November 17, the GitHub Trending snapshot for artificial intelligence (AI) projects listed Tencent’s LoopForge at #3, with 1,020 stars gained that day. GitHub Trending described it as a self-hosted workflow for coding-agent delivery. That is a traction signal, not proof of production readiness.</p>
+<h2>Why does a coding agent workflow need deterministic release gates?</h2>
+<p>LoopForge’s useful idea is not another clever prompt. Its repository describes Standard Operating Procedure (SOP) workflow nodes, agent executors, deterministic script steps, and human approval gates. An independent technical analysis by Tessera Press also discusses its SOP model and deployment considerations.</p>
+<p>The design separates judgment from verification. An agent can inspect a change and explain why it seems correct. A shell command can run the test suite and return an exit code. When a result has a mechanical pass/fail check, use that command as evidence instead of asking a model to certify itself.</p>
+<p>A practical workflow can make each responsibility explicit:</p>
+<ul>
+<li>Plan: define the change and the behavior or files it should affect.</li>
+<li>Implement: let a coding agent work in an isolated workspace.</li>
+<li>Test: run repository-owned scripts and preserve their output.</li>
+<li>Review: have a separate reviewer inspect the diff and evidence.</li>
+<li>Approve: require a person to authorize delivery when the risk warrants it.</li>
+</ul>
+<p>These are responsibilities, not necessarily five separate products or agents. Each stage should leave an artifact the next one can inspect. If testing fails, the workflow should expose the failure and allow a controlled retry rather than burying it in a cheerful summary.</p>
+<h2>Separate authorship from review</h2>
+<p>People can miss assumptions they brought into a change. The same limitation applies when one agent both authors and certifies its own patch. Split planning and implementation from testing and review. That makes responsibility visible, even if the roles use the same underlying model.</p>
+<p>In my own multi-agent Hermes fleet, coding, quality assurance (QA), and pull request (PR) review have distinct responsibilities; Claude Code Command Line Interface (CLI) is one of the tools in that setup. The QA role should run checks and report raw outcomes. A reviewer inspects the diff, requirements, and test evidence. “The implementation agent says it’s fine” is not evidence.</p>
+<p>That separation does not make agent review infallible. Two agents can share a blind spot, especially when they receive identical context and assumptions. The goal is independent evidence and visible responsibility, not the fiction that another model call creates a security boundary.</p>
+<h2>Repeatable software delivery beats prompt archaeology</h2>
+<p>A clever prompt can help with a one-off task. It is a poor place to store a team’s release policy. If every run depends on someone remembering the right sequence from chat history, that is not repeatable software delivery. It is prompt archaeology.</p>
+<p>Encode stable practices as reusable stages and versioned scripts. Keep inputs and outputs legible. Record the essentials:</p>
+<ul>
+<li>The requested change and resulting patch.</li>
+<li>The command that ran and its exit status.</li>
+<li>The review decision.</li>
+</ul>
+<p>When a run fails, a teammate should be able to rerun the relevant step without reconstructing the conversation.</p>
+<p>This also makes failures easier to diagnose. A failed test should remain a failed test, not become “mostly done” because an agent summarized it confidently. Retries should be explicit, bounded, and recorded. Otherwise, repetition can turn a flaky check into a misleading green checkmark.</p>
+<p>The right workflow will differ across repositories. Start with one path that creates avoidable uncertainty, then automate its verifiable parts. Do not turn every engineering judgment into a script. Automate mechanical checks and leave ambiguous design decisions to people with the right context.</p>
+<h2>Put human approval at risk boundaries</h2>
+<p>Human approval is useful when it protects a meaningful boundary. Asking for approval on every keystroke turns review into a click-through exercise. A pause before a change can affect customer data or permissions has a purpose.</p>
+<p>For a multi-tenant commerce service such as Dagango.com, tests should make tenant and authorization boundaries concrete. A request scoped to one tenant must not return another tenant’s order. A user without the required permission must not gain access because an agent added a shortcut.</p>
+<p>Before delivery, I’d want evidence for the behavior that changed:</p>
+<ul>
+<li>A request scoped to one tenant cannot read another tenant’s records.</li>
+<li>Authorization checks reject a user without the required role.</li>
+<li>Tests cover the changed path, not only an unrelated happy path.</li>
+</ul>
+<p>These are engineering practices, not claims about LoopForge or Dagango.com’s current implementation. A human reviewer still has to assess intended behavior and decide whether the evidence is adequate. Tests clarify what needs deciding; they do not make that decision for us.</p>
+<h2>Self-hosted coding agents still need a security review</h2>
+<p>Running a platform on your own infrastructure does not make it safe by default. Tencent’s LoopForge repository describes sandbox and delivery features. The independent Tessera Press analysis raises deployment and security considerations. Inspect the actual configuration before granting access; neither source proves that a particular deployment is safe or unsafe.</p>
+<p>Check the boundaries that matter in your environment:</p>
+<ul>
+<li>What can the agent read or modify inside its sandbox?</li>
+<li>Which credentials can a run access, and for how long?</li>
+<li>Can the runner reach internal services or production-adjacent networks?</li>
+<li>What are the deployment defaults, and who can trigger a workflow?</li>
+</ul>
+<p>Treat a self-hosted coding-agent setup like any automation that can read repositories or use credentials. Minimize access, make network paths explicit, and test the sandbox boundary with the permissions you plan to grant.</p>
+<p>Start by moving one release check out of chat and into a repeatable command. Preserve its output, have a different role review the result, and place a human gate where customer impact or authorization risk begins. Better prompting can improve the work. It cannot prove what ran or replace a release process.</p>
+<h2>FAQ</h2>
+<h3>Does a separate review agent make a change safe to merge?</h3>
+<p>No. It adds another pass over the diff, but it may share assumptions with the implementation agent. Keep deterministic test output and human review for changes that cross meaningful risk boundaries.</p>
+<h3>Should every agent action require human approval?</h3>
+<p>No. Put approval gates before consequential delivery or access changes. Routine, reversible steps can run automatically when permissions and checks are constrained.</p>
+<h3>Is self-hosting enough to protect repository credentials?</h3>
+<p>No. Inspect credential scope, sandbox access, network reachability, and workflow triggers in the deployed configuration. The hosting location alone does not establish those boundaries.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/coding-agent-workflow-release-pipeline/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

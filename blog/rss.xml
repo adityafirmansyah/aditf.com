@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Coding Agent Workflow: Build a Release Pipeline, Not a Better Prompt</title>
+      <link>https://aditf.com/blog/coding-agent-workflow-release-pipeline/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/coding-agent-workflow-release-pipeline/</guid>
+      <pubDate>Tue, 17 Nov 2026 00:00:00 +0000</pubDate>
+      <description>A reliable coding agent workflow runs tests, records evidence, and requires human approval at meaningful risk boundaries. Better prompts help, but they do not prove a release is safe.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/coding-agent-workflow-release-pipeline/id/"/>
+    </item>
+    <item>
       <title>AI-Generated Code Open Source: What Should Teams Release?</title>
       <link>https://aditf.com/blog/ai-generated-code-open-source/</link>
       <guid isPermaLink="true">https://aditf.com/blog/ai-generated-code-open-source/</guid>
@@ -176,15 +185,6 @@
       <description>A flaw in PHP&#x27;s own request parser, present since 2012, hands unauthenticated attackers code execution on default configs. PHP runs roughly 70% of the web.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/id/"/>
-    </item>
-    <item>
-      <title>Agent Skills Are Environment Notes, Not Prompt Tricks</title>
-      <link>https://aditf.com/blog/agent-skills-environment-notes/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/agent-skills-environment-notes/</guid>
-      <pubDate>Mon, 26 Oct 2026 00:00:00 +0000</pubDate>
-      <description>The &quot;skills are worthless&quot; argument is aimed at prompt folklore. What runs on a 19-profile agent fleet is closer to operational code, and it carries a real context bill.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/agent-skills-environment-notes/id/"/>
     </item>
   </channel>
 </rss>
