@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>AI-Generated Code Maintenance Is the Real Test of a Rust curl Rewrite</title>
+      <link>https://aditf.com/blog/rust-curl-rewrite-maintenance/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/rust-curl-rewrite-maintenance/</guid>
+      <pubDate>Wed, 18 Nov 2026 00:00:00 +0000</pubDate>
+      <description>AI-generated code maintenance is the hard part of a Rust rewrite of curl. A convincing first build says little about compatibility, fixes, and releases a project must sustain.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/rust-curl-rewrite-maintenance/id/"/>
+    </item>
+    <item>
       <title>Coding Agent Workflow: Build a Release Pipeline, Not a Better Prompt</title>
       <link>https://aditf.com/blog/coding-agent-workflow-release-pipeline/</link>
       <guid isPermaLink="true">https://aditf.com/blog/coding-agent-workflow-release-pipeline/</guid>
@@ -176,15 +185,6 @@
       <description>CPython is removing its experimental copy-and-patch JIT ahead of Python 3.16. Here is why the compiler dream collapsed and what production teams actually do instead.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/why-pythons-jit-failed/id/"/>
-    </item>
-    <item>
-      <title>A 14-Year-Old Bug in PHP Just Shattered Pre-Auth Security for 70% of the Web</title>
-      <link>https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/</guid>
-      <pubDate>Tue, 27 Oct 2026 00:00:00 +0000</pubDate>
-      <description>A flaw in PHP&#x27;s own request parser, present since 2012, hands unauthenticated attackers code execution on default configs. PHP runs roughly 70% of the web.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/a-14-year-old-bug-in-php-shattered-pre-auth-security/id/"/>
     </item>
   </channel>
 </rss>

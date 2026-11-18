@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI-Generated Code Maintenance Is the Real Test of a Rust curl Rewrite — Field Notes</title>
+<meta name="description" content="AI-generated code maintenance is the hard part of a Rust rewrite of curl. A convincing first build says little about compatibility, fixes, and releases a project must sustain.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/rust-curl-rewrite-maintenance/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI-Generated Code Maintenance Is the Real Test of a Rust curl Rewrite — Field Notes">
+<meta property="og:description" content="AI-generated code maintenance is the hard part of a Rust rewrite of curl. A convincing first build says little about compatibility, fixes, and releases a project must sustain.">
+<meta property="og:url" content="https://aditf.com/blog/rust-curl-rewrite-maintenance/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/rust-curl-rewrite-maintenance/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI-Generated Code Maintenance Is the Real Test of a Rust curl Rewrite — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI-Generated Code Maintenance Is the Real Test of a Rust curl Rewrite — Field Notes">
+<meta name="twitter:description" content="AI-generated code maintenance is the hard part of a Rust rewrite of curl. A convincing first build says little about compatibility, fixes, and releases a project must sustain.">
+<meta name="twitter:image" content="https://aditf.com/blog/rust-curl-rewrite-maintenance/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="AI-generated code maintenance, Rust rewrite of curl, software rewrite risks, memory safety vs maintenance, agent-generated code review">
+<meta property="article:published_time" content="2026-11-18T00:00:00+00:00">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="ai agents">
+<meta property="article:tag" content="software maintenance">
+<meta property="article:tag" content="open source">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "AI-Generated Code Maintenance Is the Real Test of a Rust curl Rewrite", "description": "AI-generated code maintenance is the hard part of a Rust rewrite of curl. A convincing first build says little about compatibility, fixes, and releases a project must sustain.", "datePublished": "2026-11-18T00:00:00+00:00", "dateModified": "2026-11-18T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/rust-curl-rewrite-maintenance/"}, "keywords": "AI-generated code maintenance, Rust rewrite of curl, software rewrite risks, memory safety vs maintenance, agent-generated code review", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 950, "image": ["https://aditf.com/blog/rust-curl-rewrite-maintenance/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/rust-curl-rewrite-maintenance/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does passing the original test suite prove a rewrite is compatible?", "acceptedAnswer": {"@type": "Answer", "text": "No. It proves only that the implementation passes the tests included in that run. Teams still need coverage for real user behavior, supported platforms, and cases exposed by later bug reports."}}, {"@type": "Question", "name": "Does Rust prevent every vulnerability found in a C project?", "acceptedAnswer": {"@type": "Answer", "text": "No. Rust can help prevent memory-safety defects, but it does not automatically solve protocol mistakes, compatibility regressions, or failures in dependencies and operational response."}}, {"@type": "Question", "name": "What should a team ask before adopting an agent-generated replacement?", "acceptedAnswer": {"@type": "Answer", "text": "Ask who owns releases and security reports, how historical bugs are tested, and how the project will track compatibility over time. If those owners and processes are missing, the code is not yet a supported replacement."}}]}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/rust-curl-rewrite-maintenance/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/rust-curl-rewrite-maintenance/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/rust-curl-rewrite-maintenance/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>18 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">AI-Generated Code Maintenance Is the Real Test of a Rust curl Rewrite</h1>
+    <div class="post__tags"><span>rust</span><span>ai agents</span><span>software maintenance</span><span>open source</span></div>
+    <div class="post__content reveal is-visible">
+<p>A team of AI agents can translate a large C codebase into Rust and get tests to pass. That is a useful demonstration, but it is not evidence that the resulting project can take over curl’s job. AI-generated code maintenance is the real test: can the rewrite keep pace with bug reports, compatibility expectations, and releases after the initial build?</p>
+<p>Daniel Stenberg’s November 17 post about two Rust rewrites of curl makes that distinction concrete. I have built side projects in Rust, and after 13 years shipping software, I have learned to judge rewrites by the maintenance loop they can join. The language choice matters. The work after the language choice matters more.</p>
+<h2>What the curl rewrites demonstrate</h2>
+<p>Stenberg identifies two projects, <code>urlx</code> and <code>kov/curl</code>. The latter claimed an $8,600 spend. That is a claim associated with the project, not an independently verified cost audit, so I would not use it as a benchmark for what a rewrite should cost.</p>
+<p>Stenberg says agents translated 185,000 lines of C into 340,000 lines of Rust. In roughly the same three-plus weeks, curl merged more than 300 commits and landed a little over 200 bug fixes. Those figures describe different kinds of work: one produces a new snapshot, while the other keeps a mature project moving.</p>
+<p>The distinction is easy to miss when the first result looks impressive. A passing test suite shows that the implementation satisfies the tests that exist. It does not show that those tests cover every compatibility promise, platform, or newly discovered failure mode.</p>
+<h2>Why AI-generated code maintenance is the harder measure</h2>
+<p>An established project carries obligations beyond its source tree. Users depend on behavior that may be undocumented, maintainers have to investigate reports, and releases need to reach the platforms people actually use. A rewrite inherits those obligations only if its team deliberately takes them on.</p>
+<p>A useful test is not “How much code did the agents produce?” It is whether the project has a credible process for turning newly reported problems into reviewed fixes and dependable releases. That process needs named owners. Otherwise, a repository can look complete while its users are left to discover where the edges are.</p>
+<p>For a multi-agent setup like the Hermes fleet I operate, the same rule applies. Agents can produce changes quickly, but throughput does not replace tests or review gates. Teams still need issue triage and a human who owns the outcome. A green check is evidence about a particular check, not proof that production behavior is correct.</p>
+<h2>Does a Rust rewrite remove curl’s security risk?</h2>
+<p>No single language choice removes every class of defect. Stenberg reports 81 confirmed curl vulnerabilities in 2026, of which 14, or 17.3%, were likely related to memory safety. He argues that a Rust rewrite would not automatically eliminate the other 67.</p>
+<p>That is not an argument that Rust is pointless. Rust’s type system and ecosystem can make memory-safe designs easier to express, and some defects would not transfer unchanged in a rewrite. But protocol correctness, compatibility behavior, and error handling still require careful implementation and review.</p>
+<p>The useful distinction is memory safety versus maintenance, not C versus Rust as a team sport. A rewrite may reduce particular memory risks while creating new compatibility gaps or leaving the project without a sustainable security response. Engineers should evaluate those outcomes separately.</p>
+<h2>The source code is only part of the project</h2>
+<p>In the Hacker News discussion, one commenter reports curl has had 1,306 contributors and 99 versions. The commenter also reports about 17,000 closed pull requests and 5,700 closed issues. Those are the commenter’s figures, not numbers I have independently audited. They still point to the work that accumulates around a long-lived project.</p>
+<p>That history includes decisions, reports, fixes, and user expectations that are not captured by translating source files. The practical question for an organization is whether it can reproduce that support function, not just the current program’s output. For Dagango.com, an API-compatible implementation has limited value if it cannot keep pace with production behavior and support needs.</p>
+<h2>A checklist for evaluating an agent-generated rewrite</h2>
+<p>Before treating a rewrite as a replacement, I would ask for evidence in six areas:</p>
+<ul>
+<li><strong>Compatibility:</strong> Are there tests for the behaviors and protocols users rely on?</li>
+<li><strong>Historical failures:</strong> Can the team reproduce and prevent important bugs from the original project?</li>
+<li><strong>Release cadence:</strong> Who ships updates, and how quickly can users receive a fix?</li>
+<li><strong>Platform coverage:</strong> Which operating systems, architectures, and dependency combinations are maintained?</li>
+<li><strong>Security ownership:</strong> Who receives vulnerability reports and coordinates a response?</li>
+<li><strong>Parity over time:</strong> Is there a credible plan to track upstream changes and close behavior gaps?</li>
+</ul>
+<p>A demo can answer whether agents can create a substantial first implementation. These checks answer whether a team intends to support it. Keep the distinction visible in reviews: generated code is an input to engineering, not a substitute for owning the software.</p>
+<h2>FAQ</h2>
+<h3>Does passing the original test suite prove a rewrite is compatible?</h3>
+<p>No. It proves only that the implementation passes the tests included in that run. Teams still need coverage for real user behavior, supported platforms, and cases exposed by later bug reports.</p>
+<h3>Does Rust prevent every vulnerability found in a C project?</h3>
+<p>No. Rust can help prevent memory-safety defects, but it does not automatically solve protocol mistakes, compatibility regressions, or failures in dependencies and operational response.</p>
+<h3>What should a team ask before adopting an agent-generated replacement?</h3>
+<p>Ask who owns releases and security reports, how historical bugs are tested, and how the project will track compatibility over time. If those owners and processes are missing, the code is not yet a supported replacement.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/rust-curl-rewrite-maintenance/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

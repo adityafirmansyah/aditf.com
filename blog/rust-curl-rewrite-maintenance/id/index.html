@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Maintenance Kode AI Lebih Berat daripada Rewrite curl ke Rust — Field Notes</title>
+<meta name="description" content="Maintenance kode hasil AI jadi ujian sebenarnya untuk rewrite curl ke Rust. Build pertama yang lolos test belum membuktikan kompatibilitas, perbaikan bug, dan release bisa terus dijaga.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/rust-curl-rewrite-maintenance/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Maintenance Kode AI Lebih Berat daripada Rewrite curl ke Rust — Field Notes">
+<meta property="og:description" content="Maintenance kode hasil AI jadi ujian sebenarnya untuk rewrite curl ke Rust. Build pertama yang lolos test belum membuktikan kompatibilitas, perbaikan bug, dan release bisa terus dijaga.">
+<meta property="og:url" content="https://aditf.com/blog/rust-curl-rewrite-maintenance/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/rust-curl-rewrite-maintenance/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Maintenance Kode AI Lebih Berat daripada Rewrite curl ke Rust — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Maintenance Kode AI Lebih Berat daripada Rewrite curl ke Rust — Field Notes">
+<meta name="twitter:description" content="Maintenance kode hasil AI jadi ujian sebenarnya untuk rewrite curl ke Rust. Build pertama yang lolos test belum membuktikan kompatibilitas, perbaikan bug, dan release bisa terus dijaga.">
+<meta name="twitter:image" content="https://aditf.com/blog/rust-curl-rewrite-maintenance/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="AI-generated code maintenance, Rust rewrite of curl, software rewrite risks, memory safety vs maintenance, agent-generated code review">
+<meta property="article:published_time" content="2026-11-18T00:00:00+00:00">
+<meta property="article:tag" content="rust">
+<meta property="article:tag" content="ai agents">
+<meta property="article:tag" content="software maintenance">
+<meta property="article:tag" content="open source">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Maintenance Kode AI Lebih Berat daripada Rewrite curl ke Rust", "description": "Maintenance kode hasil AI jadi ujian sebenarnya untuk rewrite curl ke Rust. Build pertama yang lolos test belum membuktikan kompatibilitas, perbaikan bug, dan release bisa terus dijaga.", "datePublished": "2026-11-18T00:00:00+00:00", "dateModified": "2026-11-18T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/rust-curl-rewrite-maintenance/id/"}, "keywords": "AI-generated code maintenance, Rust rewrite of curl, software rewrite risks, memory safety vs maintenance, agent-generated code review", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 892, "image": ["https://aditf.com/blog/rust-curl-rewrite-maintenance/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/rust-curl-rewrite-maintenance/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Apakah lolos test suite asli membuktikan rewrite kompatibel?", "acceptedAnswer": {"@type": "Answer", "text": "Belum. Itu hanya membuktikan implementasi lolos test yang dijalankan. Tim tetap perlu menguji perilaku yang benar-benar dipakai user, platform yang didukung, dan kasus yang muncul dari bug report berikutnya."}}, {"@type": "Question", "name": "Apa Rust mencegah semua vulnerability di project C?", "acceptedAnswer": {"@type": "Answer", "text": "Nggak. Rust bisa membantu mencegah bug memory safety, tetapi tidak otomatis menyelesaikan kesalahan protokol, regresi kompatibilitas, atau masalah di dependency dan proses respons operasional."}}, {"@type": "Question", "name": "Apa yang perlu ditanyakan sebelum memakai pengganti buatan agent?", "acceptedAnswer": {"@type": "Answer", "text": "Tanya siapa yang memegang release dan laporan keamanan. Pastikan juga ada cara menguji bug historis serta rencana menjaga kompatibilitas. Kalau owner dan prosesnya belum jelas, code itu belum jadi pengganti yang benar-benar didukung."}}]}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/rust-curl-rewrite-maintenance/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/rust-curl-rewrite-maintenance/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/rust-curl-rewrite-maintenance/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>18 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">4 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Maintenance Kode AI Lebih Berat daripada Rewrite curl ke Rust</h1>
+    <div class="post__tags"><span>rust</span><span>ai agents</span><span>software maintenance</span><span>open source</span></div>
+    <div class="post__content reveal is-visible">
+<p>Agent bisa menerjemahkan codebase C yang besar ke Rust lalu bikin test-nya hijau. Keren buat demo. Tapi itu belum cukup buat bilang project hasil rewrite siap menggantikan curl. Ujian sebenarnya justru maintenance kode hasil AI: setelah build pertama, apakah timnya sanggup menangani bug report, menjaga kompatibilitas, dan rutin merilis perbaikan?</p>
+<p>Daniel Stenberg menulis tentang dua rewrite curl ke Rust pada 17 November. Gue pernah bikin side project dengan Rust, dan setelah 13 tahun ikut shipping software, gue melihat rewrite dari satu sudut: apakah project baru ini bisa ikut masuk ke siklus maintenance yang sudah berjalan? Pilihan bahasa tetap penting. Tapi kerja setelah implementasi awal biasanya jauh lebih menentukan.</p>
+<h2>Yang ditunjukkan oleh rewrite curl</h2>
+<p>Stenberg menyebut dua project: <code>urlx</code> dan <code>kov/curl</code>. Project kedua mengklaim biaya sekitar $8.600. Itu klaim yang dikaitkan dengan project tersebut, bukan audit biaya independen. Jadi, angka itu jangan dipakai sebagai patokan ongkos rewrite.</p>
+<p>Menurut Stenberg, agent menerjemahkan 185.000 baris C menjadi 340.000 baris Rust. Dalam rentang sekitar tiga minggu lebih yang sama, curl merge lebih dari 300 commit dan menyelesaikan sedikit di atas 200 bug fix. Angka-angka ini menggambarkan jenis kerja yang berbeda: membangun snapshot baru versus terus merawat software yang sudah dipakai banyak orang.</p>
+<p>Hasil awal yang kelihatan meyakinkan gampang bikin kita lupa bedanya. Test suite yang lolos cuma membuktikan implementasi memenuhi test yang tersedia. Belum tentu semua kontrak kompatibilitas, platform, atau bug yang baru ditemukan sudah terwakili di sana.</p>
+<h2>Kenapa maintenance kode hasil AI lebih susah diukur?</h2>
+<p>Project yang sudah lama dipakai punya tanggung jawab di luar source code. User mengandalkan perilaku tertentu, maintainer perlu menyelidiki laporan, dan release harus sampai ke platform yang dipakai orang. Rewrite baru baru mewarisi tanggung jawab itu kalau ada tim yang memang mengambil alih.</p>
+<p>Gue nggak terlalu tertarik pada pertanyaan “berapa banyak code yang agent hasilkan?” Yang lebih penting: ada nggak proses yang bisa mengubah laporan masalah menjadi fix yang direview dan release yang bisa diandalkan? Proses itu perlu owner yang jelas. Tanpa owner, repo bisa tampak selesai sementara user sendiri yang harus menemukan batas-batasnya.</p>
+<p>Aturan yang sama berlaku di multi-agent setup seperti fleet Hermes yang gue operasikan. Agent bisa menghasilkan perubahan dengan cepat. Tapi throughput tinggi nggak menggantikan test, review gate, triage issue, atau manusia yang bertanggung jawab atas hasil akhirnya. Check hijau hanya bukti bahwa satu check tertentu lolos, bukan garansi perilaku production sudah benar.</p>
+<h2>Apakah rewrite Rust menghapus risiko keamanan curl?</h2>
+<p>Nggak. Memilih satu bahasa saja nggak menghilangkan semua jenis bug. Stenberg melaporkan ada 81 kerentanan curl yang terkonfirmasi pada 2026. Dari jumlah itu, 14 atau 17,3% kemungkinan terkait memory safety.</p>
+<p>Menurut argumennya, rewrite ke Rust tidak otomatis menghapus 67 kerentanan lainnya.</p>
+<p>Ini bukan alasan untuk menganggap Rust percuma. Type system dan ekosistem Rust bisa membantu developer membuat desain yang memory-safe, dan sebagian bug mungkin tidak akan muncul dengan bentuk yang sama setelah rewrite. Tapi ketepatan implementasi protokol, kompatibilitas, dan penanganan error tetap perlu dikerjakan dengan serius.</p>
+<p>Bedakan manfaat memory safety dari pekerjaan maintenance; jangan jadikan diskusi ini perang C lawan Rust. Rewrite mungkin mengurangi risiko memory tertentu, tetapi juga bisa membawa celah kompatibilitas baru. Project itu pun bisa kehilangan proses security response yang berkelanjutan. Dampak-dampak ini perlu dinilai satu per satu.</p>
+<h2>Source code bukan keseluruhan project</h2>
+<p>Dalam diskusi Hacker News, seorang commenter menyebut curl punya 1.306 kontributor dan 99 versi. Ia juga melaporkan sekitar 17.000 pull request yang ditutup serta 5.700 issue yang ditutup.</p>
+<p>Itu angka dari commenter tersebut, bukan hasil audit independen dari gue. Meski begitu, laporan itu mengingatkan kita pada banyaknya kerja yang menumpuk di sekitar project lama.</p>
+<p>Riwayat itu mencakup keputusan, laporan, fix, dan ekspektasi user. Semua itu nggak ikut pindah hanya karena file source diterjemahkan. Buat organisasi, pertanyaannya: sanggup nggak fungsi support itu dibangun kembali, bukan cuma menyalin output program saat ini? Buat Dagango.com, implementasi yang kompatibel dengan API tetap kurang berguna kalau nggak bisa mengikuti perilaku production dan kebutuhan support.</p>
+<h2>Checklist untuk menilai rewrite buatan agent</h2>
+<p>Sebelum menganggap rewrite sebagai pengganti, gue bakal minta bukti untuk enam hal:</p>
+<ul>
+<li><strong>Kompatibilitas:</strong> Ada test untuk perilaku dan protokol yang diandalkan user?</li>
+<li><strong>Bug lama:</strong> Tim bisa mereproduksi dan mencegah bug penting dari project asal?</li>
+<li><strong>Jadwal release:</strong> Siapa yang merilis update, dan seberapa cepat fix sampai ke user?</li>
+<li><strong>Dukungan platform:</strong> OS, arsitektur, dan kombinasi dependency mana yang dirawat?</li>
+<li><strong>Owner keamanan:</strong> Siapa menerima laporan vulnerability dan mengoordinasikan respons?</li>
+<li><strong>Paritas jangka panjang:</strong> Ada rencana realistis buat mengikuti perubahan upstream dan menutup gap perilaku?</li>
+</ul>
+<p>Demo bisa menjawab apakah agent mampu membuat implementasi awal yang besar. Checklist ini menjawab apakah tim sungguh berniat merawatnya. Dalam review, taruh batasnya dengan jelas: code hasil agent itu bahan kerja engineering, bukan pengganti tanggung jawab atas software.</p>
+<h2>FAQ Teknis</h2>
+<h3>Apakah lolos test suite asli membuktikan rewrite kompatibel?</h3>
+<p>Belum. Itu hanya membuktikan implementasi lolos test yang dijalankan. Tim tetap perlu menguji perilaku yang benar-benar dipakai user, platform yang didukung, dan kasus yang muncul dari bug report berikutnya.</p>
+<h3>Apa Rust mencegah semua vulnerability di project C?</h3>
+<p>Nggak. Rust bisa membantu mencegah bug memory safety, tetapi tidak otomatis menyelesaikan kesalahan protokol, regresi kompatibilitas, atau masalah di dependency dan proses respons operasional.</p>
+<h3>Apa yang perlu ditanyakan sebelum memakai pengganti buatan agent?</h3>
+<p>Tanya siapa yang memegang release dan laporan keamanan. Pastikan juga ada cara menguji bug historis serta rencana menjaga kompatibilitas. Kalau owner dan prosesnya belum jelas, code itu belum jadi pengganti yang benar-benar didukung.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/rust-curl-rewrite-maintenance/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
