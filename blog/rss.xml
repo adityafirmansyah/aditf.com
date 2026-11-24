@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>GitHub Actions YAML Parser: When the Runner and Linter Disagree</title>
+      <link>https://aditf.com/blog/github-actions-yaml-parser-mismatch/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/github-actions-yaml-parser-mismatch/</guid>
+      <pubDate>Tue, 24 Nov 2026 00:00:00 +0000</pubDate>
+      <description>GitHub Actions YAML parser behavior can leave a security scan unable to read a workflow the runner accepts. Make parser compatibility and audit completion explicit CI gates.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/github-actions-yaml-parser-mismatch/id/"/>
+    </item>
+    <item>
       <title>AI-Generated Code Maintenance Is the Real Test of a Rust curl Rewrite</title>
       <link>https://aditf.com/blog/rust-curl-rewrite-maintenance/</link>
       <guid isPermaLink="true">https://aditf.com/blog/rust-curl-rewrite-maintenance/</guid>
@@ -176,15 +185,6 @@
       <description>An OpenTelemetry audit revealed Claude Code spent nearly 20% of its API requests generating three-word terminal status lines. Polling frontier models for UI progress is an architectural leak every agent harness must fix.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/claude-code-status-line-token-burn/id/"/>
-    </item>
-    <item>
-      <title>Why Python&#x27;s JIT Failed: What Backend Engineers Actually Do for Performance</title>
-      <link>https://aditf.com/blog/why-pythons-jit-failed/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/why-pythons-jit-failed/</guid>
-      <pubDate>Wed, 28 Oct 2026 00:00:00 +0000</pubDate>
-      <description>CPython is removing its experimental copy-and-patch JIT ahead of Python 3.16. Here is why the compiler dream collapsed and what production teams actually do instead.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/why-pythons-jit-failed/id/"/>
     </item>
   </channel>
 </rss>
