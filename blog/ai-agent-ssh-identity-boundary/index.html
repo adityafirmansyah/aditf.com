@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Coding Agent SSH Security Needs an Identity Boundary — Field Notes</title>
+<meta name="description" content="AI coding agent SSH security depends on more than hiding private keys. Separate the agent’s identity and permissions from yours, then add key-use controls that fit the risk.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/ai-agent-ssh-identity-boundary/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="AI Coding Agent SSH Security Needs an Identity Boundary — Field Notes">
+<meta property="og:description" content="AI coding agent SSH security depends on more than hiding private keys. Separate the agent’s identity and permissions from yours, then add key-use controls that fit the risk.">
+<meta property="og:url" content="https://aditf.com/blog/ai-agent-ssh-identity-boundary/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/ai-agent-ssh-identity-boundary/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="AI Coding Agent SSH Security Needs an Identity Boundary — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Coding Agent SSH Security Needs an Identity Boundary — Field Notes">
+<meta name="twitter:description" content="AI coding agent SSH security depends on more than hiding private keys. Separate the agent’s identity and permissions from yours, then add key-use controls that fit the risk.">
+<meta name="twitter:image" content="https://aditf.com/blog/ai-agent-ssh-identity-boundary/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="AI coding agent SSH security, SSH agent key constraints, least privilege for coding agents, separate Linux user for AI agents, short-lived SSH certificates">
+<meta property="article:published_time" content="2026-11-25T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="ssh">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="developer-tools">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "AI Coding Agent SSH Security Needs an Identity Boundary", "description": "AI coding agent SSH security depends on more than hiding private keys. Separate the agent’s identity and permissions from yours, then add key-use controls that fit the risk.", "datePublished": "2026-11-25T00:00:00+00:00", "dateModified": "2026-11-25T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/ai-agent-ssh-identity-boundary/"}, "keywords": "AI coding agent SSH security, SSH agent key constraints, least privilege for coding agents, separate Linux user for AI agents, short-lived SSH certificates", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1104, "image": ["https://aditf.com/blog/ai-agent-ssh-identity-boundary/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/ai-agent-ssh-identity-boundary/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does removing SSH keys from disk stop an agent from authenticating as me?", "acceptedAnswer": {"@type": "Answer", "text": "No. It reduces exposure to direct key-file theft, but a process with access to an SSH agent may still request authentication operations. Confirmation and destination constraints can narrow that path."}}, {"@type": "Question", "name": "Do SSH agent constraints sandbox a coding agent?", "acceptedAnswer": {"@type": "Answer", "text": "No. They govern key use, such as lifetime, approval, or destination. Use operating-system permissions and repository scope to control broader process access."}}, {"@type": "Question", "name": "When are short-lived SSH certificates useful?", "acceptedAnswer": {"@type": "Answer", "text": "They are useful when your infrastructure can issue and validate them and when reducing credential lifetime helps your threat model. They still need appropriate identity separation and permissions."}}]}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/ai-agent-ssh-identity-boundary/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/ai-agent-ssh-identity-boundary/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/ai-agent-ssh-identity-boundary/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>25 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">AI Coding Agent SSH Security Needs an Identity Boundary</h1>
+    <div class="post__tags"><span>ai-agents</span><span>ssh</span><span>security</span><span>linux</span><span>developer-tools</span></div>
+    <div class="post__content reveal is-visible">
+<p>I can remove every Secure Shell (SSH) private-key file from disk and still let an artificial intelligence (AI) coding agent act with my identity. That is why AI coding agent SSH security starts with a harder question: which identity and permissions does the running process actually have?</p>
+<p>Key storage matters. But moving a key behind an agent socket addresses one part of the problem, not the authority available to the process using it. If your agent can read your repositories, use your credentials, and reach your SSH agent, it may act through those access paths even without copying a private-key file.</p>
+<h2>AI coding agent SSH security starts with identity</h2>
+<p>Johanna Larsson’s November 23 post, “You Can’t Afford SSH Keys on Disk,” describes moving SSH clients to Bitwarden’s SSH agent and removing local key copies. It also describes setting the approval interval to match a four-hour vault-lock interval. That is a reasonable credential-handling choice. It is not, by itself, a process-containment policy.</p>
+<p>The distinction matters because the agent and the key have different security boundaries. An SSH agent holds keys and offers signing or authentication operations to clients. A process that can access the agent may be able to request those operations, depending on its setup and any required confirmation. Preventing key-file scraping does not automatically prevent a process from using an available authentication interface.</p>
+<p>The OpenSSH agent protocol makes this boundary explicit. Request for Comments (RFC) 9987 says the design aims to prevent an unprivileged attacker from obtaining a copy of loaded keys. It also warns that this may not prevent theft of their use when keys are loaded without confirmation. Those are different outcomes: copying secret material versus requesting authentication through an agent that remains available.</p>
+<p>That difference is central for coding agents. If you start one as your normal user, assume it can exercise the permissions granted to that user unless you have tested a control that blocks a particular path. A prompt asking the model to be careful is not an operating-system boundary.</p>
+<h2>What SSH agent key constraints can and cannot do</h2>
+<p>OpenSSH provides useful controls for limiting how a loaded key is used. The <code>ssh-add</code> manual documents options for lifetime limits, confirmation, and destination constraints. Each can reduce exposure, but none should be mistaken for a general sandbox around an agent process.</p>
+<ul>
+<li>A lifetime limit removes a key from the agent after a chosen interval.</li>
+<li>Confirmation requires approval for authentication requests.</li>
+<li>Destination constraints restrict the destinations for which a key may be used.</li>
+</ul>
+<p>These controls add friction to credential use. They do not by themselves decide which directories a process can read, whether it can access a developer’s Git credentials, or whether it can modify files outside a project. Treat them as layers around authentication, not substitutes for access control.</p>
+<p>The Hacker News discussion on Larsson’s post had 163 points and 107 nested comments when checked on November 25. One recurring concern was straightforward: an agent running as the developer may inherit the developer’s access. Several commenters pointed toward a separate user with minimal permissions, which also makes actions easier to attribute.</p>
+<h2>Build least privilege for coding agents in layers</h2>
+<p>For a Linux-based agent workflow, I start by asking what the agent needs to do, then grant only that access. A separate Linux user for AI agents is a useful starting boundary because it separates process ownership and home-directory credentials from the human account.</p>
+<p>I operate a Linux-based Hermes agent fleet, so I treat process identity and repository scope as separate decisions. A concrete review starts by checking which OS account launches an agent and testing which repositories that account can write. The brief here is a design recommendation, not a claim about a measured permission layout across my fleet.</p>
+<p>A practical checklist:</p>
+<ul>
+<li><strong>Separate service identity.</strong> Run the agent under its own OS account instead of your interactive account.</li>
+<li><strong>Narrow repository scope.</strong> Give it access only to the working tree or repositories it needs.</li>
+<li><strong>Limit credentials.</strong> Use narrowly scoped tokens and avoid passing credentials the task does not require.</li>
+<li><strong>Disable unnecessary forwarding.</strong> Do not expose an SSH agent to remote hosts or processes that do not need it.</li>
+<li><strong>Keep attribution.</strong> Make logs distinguish agent activity from actions taken directly by a human.</li>
+</ul>
+<p>This is a design checklist, not a claim that one specific fleet configuration has been benchmarked. The boundary is useful only if you can test it: confirm which files the service account can read, which repositories it can write, and whether the agent can reach your personal SSH socket.</p>
+<p>Credential choice can then scale with the threat model. A passphrase-protected key with a timed <code>ssh-agent</code> may be enough for a developer using a local agent for low-risk tasks. Add confirmation or destination constraints when an approval step or narrower destination access is worth the friction. Hardware-backed keys or short-lived SSH certificates can make sense when infrastructure supports them and the operational cost is acceptable.</p>
+<p>Short-lived credentials are not magic either. They reduce the window in which a credential remains useful, but they do not stop an authorized agent from acting during that window. Scope and identity still matter.</p>
+<h2>Make the boundary testable before making it clever</h2>
+<p>Isolation adds setup and workflow friction. Separate accounts need deliberate repository permissions, credential provisioning, and a clean way to review changes. A strict boundary that nobody can maintain will eventually be bypassed for convenience.</p>
+<p>I would begin with one testable change: run the agent as a dedicated user and verify its filesystem and credential access before expanding the workflow. Then add key constraints or shorter-lived credentials where the threat model warrants them. Keep the human account out of the agent’s environment unless a task requires a specific capability.</p>
+<p>That gives the team an auditable starting point. It also makes later exceptions visible instead of turning “the agent needs access” into an unexamined grant of the developer’s entire identity.</p>
+<h2>FAQ</h2>
+<h3>Does removing SSH keys from disk stop an agent from authenticating as me?</h3>
+<p>No. It reduces exposure to direct key-file theft, but a process with access to an SSH agent may still request authentication operations. Confirmation and destination constraints can narrow that path.</p>
+<h3>Do SSH agent constraints sandbox a coding agent?</h3>
+<p>No. They govern key use, such as lifetime, approval, or destination. Use operating-system permissions and repository scope to control broader process access.</p>
+<h3>When are short-lived SSH certificates useful?</h3>
+<p>They are useful when your infrastructure can issue and validate them and when reducing credential lifetime helps your threat model. They still need appropriate identity separation and permissions.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/ai-agent-ssh-identity-boundary/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Keamanan SSH AI Coding Agent Butuh Batas Identitas — Field Notes</title>
+<meta name="description" content="AI coding agent SSH security bukan cuma soal menyimpan private key dengan aman. Pisahkan identitas agent dari akun lo, lalu batasi akses repo dan credential sesuai kebutuhan.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/ai-agent-ssh-identity-boundary/id/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Keamanan SSH AI Coding Agent Butuh Batas Identitas — Field Notes">
+<meta property="og:description" content="AI coding agent SSH security bukan cuma soal menyimpan private key dengan aman. Pisahkan identitas agent dari akun lo, lalu batasi akses repo dan credential sesuai kebutuhan.">
+<meta property="og:url" content="https://aditf.com/blog/ai-agent-ssh-identity-boundary/id/">
+<meta property="og:locale" content="id_ID">
+<meta property="og:image" content="https://aditf.com/blog/ai-agent-ssh-identity-boundary/og.id.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Keamanan SSH AI Coding Agent Butuh Batas Identitas — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Keamanan SSH AI Coding Agent Butuh Batas Identitas — Field Notes">
+<meta name="twitter:description" content="AI coding agent SSH security bukan cuma soal menyimpan private key dengan aman. Pisahkan identitas agent dari akun lo, lalu batasi akses repo dan credential sesuai kebutuhan.">
+<meta name="twitter:image" content="https://aditf.com/blog/ai-agent-ssh-identity-boundary/og.id.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="AI coding agent SSH security, SSH agent key constraints, least privilege for coding agents, separate Linux user for AI agents, short-lived SSH certificates">
+<meta property="article:published_time" content="2026-11-25T00:00:00+00:00">
+<meta property="article:tag" content="ai-agents">
+<meta property="article:tag" content="ssh">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="developer-tools">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Keamanan SSH AI Coding Agent Butuh Batas Identitas", "description": "AI coding agent SSH security bukan cuma soal menyimpan private key dengan aman. Pisahkan identitas agent dari akun lo, lalu batasi akses repo dan credential sesuai kebutuhan.", "datePublished": "2026-11-25T00:00:00+00:00", "dateModified": "2026-11-25T00:00:00+00:00", "inLanguage": "id-ID", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/ai-agent-ssh-identity-boundary/id/"}, "keywords": "AI coding agent SSH security, SSH agent key constraints, least privilege for coding agents, separate Linux user for AI agents, short-lived SSH certificates", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1020, "image": ["https://aditf.com/blog/ai-agent-ssh-identity-boundary/og.id.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/ai-agent-ssh-identity-boundary/", "inLanguage": "en-US"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Kalau private key dihapus dari disk, apakah agent masih bisa autentikasi sebagai gue?", "acceptedAnswer": {"@type": "Answer", "text": "Bisa. Menghapus file key mengurangi risiko key dicuri langsung dari disk. Tapi proses yang bisa mengakses SSH agent mungkin tetap meminta operasi autentikasi. Confirmation dan destination constraints bisa mempersempit jalurnya."}}, {"@type": "Question", "name": "Apakah SSH agent key constraints mengisolasi coding agent?", "acceptedAnswer": {"@type": "Answer", "text": "Nggak. Batas itu mengatur penggunaan key, misalnya masa berlaku, persetujuan, atau tujuan. Permission sistem operasi dan scope repository tetap dibutuhkan untuk membatasi akses proses lainnya."}}, {"@type": "Question", "name": "Kapan short-lived SSH certificate berguna?", "acceptedAnswer": {"@type": "Answer", "text": "Pakai kalau infra lo bisa menerbitkan dan memvalidasinya, serta masa berlaku pendek memang membantu threat model. Identitas agent dan hak aksesnya tetap perlu dipisahkan."}}]}</script>
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/ai-agent-ssh-identity-boundary/">
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/ai-agent-ssh-identity-boundary/id/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/ai-agent-ssh-identity-boundary/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>25 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">5 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>ID</span>
+    </div>
+    <h1 class="post__title">Keamanan SSH AI Coding Agent Butuh Batas Identitas</h1>
+    <div class="post__tags"><span>ai-agents</span><span>ssh</span><span>security</span><span>linux</span><span>developer-tools</span></div>
+    <div class="post__content reveal is-visible">
+<p>Gue bisa menghapus semua file private key Secure Shell (SSH) dari disk, tapi coding agent berbasis kecerdasan buatan (AI) tetap bisa bertindak memakai identitas gue. Jadi, AI coding agent SSH security bukan berhenti di pertanyaan “key-nya disimpan di mana?” Yang lebih menentukan: proses agent jalan sebagai siapa, dan hak akses apa yang dia pegang?</p>
+<p>Diskusi Hacker News tentang post Larsson sampai 163 points dan 107 komentar bertingkat saat dicek pada 25 November. Banyak perhatian tertuju ke risiko agent yang jalan sebagai developer lalu mewarisi akses developer itu. Itu juga titik awal gue: jangan samakan key yang aman disimpan dengan proses yang aman dijalankan.</p>
+<p>Kalau agent berjalan sebagai user harian gue, dia bisa punya jalur ke file, token, atau SSH agent yang sama. Key nggak perlu disalin dulu supaya aksesnya bisa dipakai.</p>
+<h2>AI coding agent SSH security perlu memisahkan identitas</h2>
+<p>Di post 23 November berjudul “You Can’t Afford SSH Keys on Disk,” Johanna Larsson cerita pindah memakai SSH agent dari Bitwarden dan menghapus salinan key lokal. Interval approval-nya disamakan dengan vault yang terkunci setelah empat jam. Pilihan itu mengurangi key yang tersimpan di disk. Batas akses prosesnya tetap perlu dirancang terpisah.</p>
+<p>SSH agent menyimpan key dan menyediakan operasi signing atau autentikasi untuk client. Kalau sebuah proses bisa mengakses socket agent, proses itu mungkin bisa meminta autentikasi, bergantung pada konfigurasi dan approval yang aktif. Jadi, mencegah pencurian file key belum tentu mencegah pemakaian key yang sedang tersedia.</p>
+<p>Request for Comments (RFC) 9987 menjelaskan batas ini. Tujuan desain protokol SSH agent ialah mencegah penyerang tanpa hak istimewa mengambil salinan key yang sudah di-load. RFC yang sama mengingatkan bahwa pemakaian key tetap bisa dicuri kalau key tersedia tanpa konfirmasi.</p>
+<p>Bedanya praktis: satu skenario mengambil rahasia, satu lagi meminta autentikasi lewat agent yang masih bisa diakses. Kalau agent lo jalan sebagai user biasa, anggap dia bisa menggunakan hak akses user itu sampai ada kontrol yang sudah lo uji. Instruksi prompt supaya agent “hati-hati” bukan pembatas di level sistem operasi.</p>
+<h2>Kontrol apa yang diberikan SSH agent key constraints?</h2>
+<p>Manual <code>ssh-add</code> OpenSSH mencatat beberapa opsi untuk membatasi penggunaan key. Tiga kontrol yang relevan:</p>
+<ul>
+<li><strong>Lifetime</strong> mengeluarkan key dari agent setelah waktu tertentu.</li>
+<li><strong>Confirmation</strong> meminta persetujuan saat ada permintaan autentikasi.</li>
+<li><strong>Destination constraints</strong> membatasi tujuan yang boleh memakai key.</li>
+</ul>
+<p>Kontrol itu mempersempit jalur autentikasi. Tapi cakupannya bukan sandbox untuk seluruh proses. Opsi tersebut nggak otomatis membatasi direktori yang bisa dibaca agent, akses ke credential Git, atau file di luar project yang bisa dia ubah.</p>
+<p>Thread Hacker News untuk post Larsson tercatat punya 163 points dan 107 komentar bertingkat saat dicek pada 25 November. Salah satu kekhawatiran yang muncul: agent yang jalan sebagai developer bisa mewarisi akses developer itu. Sejumlah komentar menyarankan akun user terpisah dengan permission minimum, yang juga membantu membedakan aksi agent dari aksi manusia.</p>
+<h2>Terapkan least privilege untuk coding agents di Linux</h2>
+<p>Di tim yang menjalankan banyak agent Linux seperti fleet Hermes yang gue operasikan, gue pisahkan dua pertanyaan: agent berjalan dengan identitas OS apa, dan repo mana yang boleh dia tulis? Saat mereview batasnya, cek user yang menjalankan proses lalu tes akses tulis akun itu ke tiap repo yang dibutuhkan. Ini rekomendasi desain, bukan klaim bahwa semua permission di fleet gue sudah diukur atau seragam.</p>
+<p>Agent yang cuma mengubah satu repo nggak perlu otomatis membaca semua direktori home atau memakai seluruh credential developer.</p>
+<p>Checklist awalnya:</p>
+<ul>
+<li><strong>Identitas service terpisah.</strong> Jalankan agent memakai akun OS sendiri, bukan akun interaktif lo.</li>
+<li><strong>Akses repo secukupnya.</strong> Batasi ke working tree atau repository yang memang perlu disentuh.</li>
+<li><strong>Token dengan scope sempit.</strong> Jangan berikan credential yang nggak dibutuhkan tugasnya.</li>
+<li><strong>Hindari forwarding yang nggak perlu.</strong> Jangan buka akses SSH agent ke host atau proses lain tanpa alasan.</li>
+<li><strong>Log yang bisa diaudit.</strong> Bedakan aktivitas agent dari perubahan yang dilakukan manusia.</li>
+</ul>
+<p>Ini rekomendasi desain, bukan klaim bahwa satu konfigurasi fleet tertentu sudah diuji dengan benchmark. Batasnya baru berarti kalau bisa diperiksa. Cek file apa yang bisa dibaca akun service, repo mana yang bisa ditulis, dan apakah agent bisa menjangkau socket SSH pribadi lo. Kalau ada akses yang nggak bisa dijelaskan oleh kebutuhan tugasnya, cabut dulu sebelum agent dipakai untuk kerja rutin.</p>
+<p>Setelah itu, pilih credential sesuai risiko dan kemampuan infra. Untuk tugas lokal berisiko rendah, passphrase dengan <code>ssh-agent</code> yang punya batas waktu bisa cukup. Tambahkan confirmation atau destination constraints kalau approval tambahan dan pembatasan tujuan sepadan dengan friksinya. Hardware-backed key atau short-lived SSH certificate masuk akal kalau infrastruktur mendukungnya dan biaya operasionalnya bisa diterima.</p>
+<p>Credential berumur pendek juga bukan tombol ajaib. Masa berlaku yang pendek mengecilkan jendela pemakaian, tapi agent yang berwenang tetap bisa bertindak selama credential itu aktif. Scope dan identitas tetap harus dibatasi.</p>
+<h2>Bikin batas akses yang bisa diuji dulu</h2>
+<p>Isolasi menambah pekerjaan setup. Akun terpisah butuh pengaturan permission repo, cara menyediakan credential, dan alur review perubahan. Kalau batasnya terlalu merepotkan untuk dirawat, orang akan mencari jalan pintas.</p>
+<p>Gue akan mulai dari satu perubahan yang gampang diverifikasi: jalankan agent dengan user khusus, lalu tes akses file dan credential-nya sebelum workflow diperluas. Setelah itu, pasang key constraints atau credential berumur pendek kalau threat model memang membutuhkannya. Jangan biarkan akun manusia masuk ke environment agent kecuali ada kemampuan tertentu yang memang harus diberikan.</p>
+<p>Dengan begitu, tim punya titik awal yang bisa diaudit. Pengecualian akses juga terlihat jelas, bukan berubah jadi izin tak terbatas hanya karena kalimat “agent butuh akses.” Sebelum dipakai rutin, jalankan satu task percobaan lalu periksa log dan perubahan file-nya. Kalau agent menyentuh sesuatu di luar repo yang disetujui, batasnya belum benar.</p>
+<h2>FAQ Teknis</h2>
+<h3>Kalau private key dihapus dari disk, apakah agent masih bisa autentikasi sebagai gue?</h3>
+<p>Bisa. Menghapus file key mengurangi risiko key dicuri langsung dari disk. Tapi proses yang bisa mengakses SSH agent mungkin tetap meminta operasi autentikasi. Confirmation dan destination constraints bisa mempersempit jalurnya.</p>
+<h3>Apakah SSH agent key constraints mengisolasi coding agent?</h3>
+<p>Nggak. Batas itu mengatur penggunaan key, misalnya masa berlaku, persetujuan, atau tujuan. Permission sistem operasi dan scope repository tetap dibutuhkan untuk membatasi akses proses lainnya.</p>
+<h3>Kapan short-lived SSH certificate berguna?</h3>
+<p>Pakai kalau infra lo bisa menerbitkan dan memvalidasinya, serta masa berlaku pendek memang membantu threat model. Identitas agent dan hak aksesnya tetap perlu dipisahkan.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Suka artikel ini? Dukung via GitHub Sponsors &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/ai-agent-ssh-identity-boundary/">Read in English</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>

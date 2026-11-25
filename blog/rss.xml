@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>AI Coding Agent SSH Security Needs an Identity Boundary</title>
+      <link>https://aditf.com/blog/ai-agent-ssh-identity-boundary/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/ai-agent-ssh-identity-boundary/</guid>
+      <pubDate>Wed, 25 Nov 2026 00:00:00 +0000</pubDate>
+      <description>AI coding agent SSH security depends on more than hiding private keys. Separate the agent’s identity and permissions from yours, then add key-use controls that fit the risk.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/ai-agent-ssh-identity-boundary/id/"/>
+    </item>
+    <item>
       <title>GitHub Actions YAML Parser: When the Runner and Linter Disagree</title>
       <link>https://aditf.com/blog/github-actions-yaml-parser-mismatch/</link>
       <guid isPermaLink="true">https://aditf.com/blog/github-actions-yaml-parser-mismatch/</guid>
@@ -176,15 +185,6 @@
       <description>Martin Fowler warned that LLM drafts trap writers in an uncanny valley you cannot edit out. Here is why the fix is architectural separation, not abandoning AI tools.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/id/"/>
-    </item>
-    <item>
-      <title>Why Claude Code Burned 20% of API Requests on Status Lines</title>
-      <link>https://aditf.com/blog/claude-code-status-line-token-burn/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/claude-code-status-line-token-burn/</guid>
-      <pubDate>Thu, 29 Oct 2026 00:00:00 +0000</pubDate>
-      <description>An OpenTelemetry audit revealed Claude Code spent nearly 20% of its API requests generating three-word terminal status lines. Polling frontier models for UI progress is an architectural leak every agent harness must fix.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/claude-code-status-line-token-burn/id/"/>
     </item>
   </channel>
 </rss>
