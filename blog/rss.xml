@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>Secure CI/CD Pipeline Design: From GitHub Access to Production Data</title>
+      <link>https://aditf.com/blog/secure-cicd-github-production-data/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/secure-cicd-github-production-data/</guid>
+      <pubDate>Fri, 27 Nov 2026 00:00:00 +0000</pubDate>
+      <description>A secure CI/CD pipeline must separate repository access from production authority. Here is how to reduce the blast radius when a developer account is compromised.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/secure-cicd-github-production-data/id/"/>
+    </item>
+    <item>
       <title>AI Coding Agent SSH Security Needs an Identity Boundary</title>
       <link>https://aditf.com/blog/ai-agent-ssh-identity-boundary/</link>
       <guid isPermaLink="true">https://aditf.com/blog/ai-agent-ssh-identity-boundary/</guid>
@@ -176,15 +185,6 @@
       <description>An 11-hour breach of Cursor&#x27;s marketplace proxy injected a reverse SSH backdoor into Claude Code. Developer tools cannot safely share an unsandboxed runtime with workstation credentials.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/id/"/>
-    </item>
-    <item>
-      <title>Martin Fowler on LLM Voice: Why Senior Engineers Refuse AI Drafts</title>
-      <link>https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/</guid>
-      <pubDate>Fri, 30 Oct 2026 00:00:00 +0000</pubDate>
-      <description>Martin Fowler warned that LLM drafts trap writers in an uncanny valley you cannot edit out. Here is why the fix is architectural separation, not abandoning AI tools.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/why-senior-engineers-refuse-llm-drafts/id/"/>
     </item>
   </channel>
 </rss>

@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Secure CI/CD Pipeline Design: From GitHub Access to Production Data — Field Notes</title>
+<meta name="description" content="A secure CI/CD pipeline must separate repository access from production authority. Here is how to reduce the blast radius when a developer account is compromised.">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<link rel="stylesheet" href="/blog/blog.css">
+<link rel="alternate" type="application/rss+xml" title="Aditya Firmansyah — Field Notes" href="https://aditf.com/blog/rss.xml">
+<link rel="describedby" href="https://aditf.com/llms.txt">
+<link rel="llms-txt" href="https://aditf.com/llms.txt">
+<script>document.documentElement.classList.add('js');</script>
+
+<link rel="canonical" href="https://aditf.com/blog/secure-cicd-github-production-data/">
+<meta property="og:site_name" content="Field Notes — Aditya Firmansyah">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Secure CI/CD Pipeline Design: From GitHub Access to Production Data — Field Notes">
+<meta property="og:description" content="A secure CI/CD pipeline must separate repository access from production authority. Here is how to reduce the blast radius when a developer account is compromised.">
+<meta property="og:url" content="https://aditf.com/blog/secure-cicd-github-production-data/">
+<meta property="og:locale" content="en_US">
+<meta property="og:image" content="https://aditf.com/blog/secure-cicd-github-production-data/og.en.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Secure CI/CD Pipeline Design: From GitHub Access to Production Data — Field Notes">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Secure CI/CD Pipeline Design: From GitHub Access to Production Data — Field Notes">
+<meta name="twitter:description" content="A secure CI/CD pipeline must separate repository access from production authority. Here is how to reduce the blast radius when a developer account is compromised.">
+<meta name="twitter:image" content="https://aditf.com/blog/secure-cicd-github-production-data/og.en.png">
+<meta name="author" content="Aditya Firmansyah">
+<meta name="theme-color" content="#14181B">
+<meta name="keywords" content="secure CI/CD pipeline, GitHub account compromise, least privilege GitHub Actions, production deployment approvals, software build provenance">
+<meta property="article:published_time" content="2026-11-27T00:00:00+00:00">
+<meta property="article:tag" content="security">
+<meta property="article:tag" content="ci-cd">
+<meta property="article:tag" content="github">
+<meta property="article:tag" content="supply-chain">
+<meta property="article:tag" content="software-engineering">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BlogPosting", "headline": "Secure CI/CD Pipeline Design: From GitHub Access to Production Data", "description": "A secure CI/CD pipeline must separate repository access from production authority. Here is how to reduce the blast radius when a developer account is compromised.", "datePublished": "2026-11-27T00:00:00+00:00", "dateModified": "2026-11-27T00:00:00+00:00", "inLanguage": "en-US", "mainEntityOfPage": {"@type": "WebPage", "@id": "https://aditf.com/blog/secure-cicd-github-production-data/"}, "keywords": "secure CI/CD pipeline, GitHub account compromise, least privilege GitHub Actions, production deployment approvals, software build provenance", "author": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/", "jobTitle": "Senior Software Engineer — Scalable Platforms & AI Workflows"}, "publisher": {"@type": "Person", "name": "Aditya Firmansyah", "url": "https://aditf.com/"}, "articleSection": "Software Engineering", "wordCount": 1218, "image": ["https://aditf.com/blog/secure-cicd-github-production-data/og.en.png"], "hasTranslation": {"@type": "BlogPosting", "url": "https://aditf.com/blog/secure-cicd-github-production-data/id/", "inLanguage": "id-ID"}}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does a secure CI/CD pipeline mean repository access can never lead to a production incident?", "acceptedAnswer": {"@type": "Answer", "text": "No. These controls reduce the chance that one compromised account can make an unattended change. They do not eliminate malicious code, stolen credentials, mistakes, or the need for monitoring and incident response."}}, {"@type": "Question", "name": "Is OIDC always safer than a stored secret?", "acceptedAnswer": {"@type": "Answer", "text": "Not automatically. OIDC can avoid long-lived cloud credentials, but the trust policy must restrict which repository and workflow can assume the cloud identity. A broad trust rule can recreate the same excessive access in a different form."}}, {"@type": "Question", "name": "Does build provenance prove that an artifact is safe?", "acceptedAnswer": {"@type": "Answer", "text": "No. Provenance records how an artifact was produced; it does not prove that the source code is benign. Teams need release policy and verification to decide whether that origin is acceptable."}}]}</script>
+<link rel="alternate" hreflang="id" href="https://aditf.com/blog/secure-cicd-github-production-data/id/">
+<link rel="alternate" hreflang="en" href="https://aditf.com/blog/secure-cicd-github-production-data/">
+<link rel="alternate" hreflang="x-default" href="https://aditf.com/blog/secure-cicd-github-production-data/">
+</head>
+<body>
+<div class="route-progress" aria-hidden="true"><span id="routeFill"></span></div>
+
+<header class="nav" id="siteNav">
+  <a href="/" class="nav__mark" aria-label="Home">AF</a>
+  <button class="nav__toggle" id="navToggle" aria-expanded="false" aria-controls="navLinks" aria-label="Toggle navigation">
+    <span></span><span></span><span></span>
+  </button>
+  <nav class="nav__links" id="navLinks">
+    <a href="/#about"><span class="idx">01</span>About</a>
+    <a href="/#skills"><span class="idx">02</span>Skills</a>
+    <a href="/#projects"><span class="idx">03</span>Projects</a>
+    <a href="/#experience"><span class="idx">04</span>Experience</a>
+    <a href="/#certifications"><span class="idx">05</span>Certs</a>
+    <a href="/#contact"><span class="idx">06</span>Contact</a>
+    <a href="/blog/" class="is-current"><span class="idx">07</span>Blog</a>
+    <a href="/consult/"><span class="idx">08</span>Consult</a>
+    <a href="/services/"><span class="idx">09</span>Services</a>
+  </nav>
+</header>
+<main id="top">
+  <article class="section post">
+    <div class="post__waybill">
+      <span class="waybill__field">FILED <b>27 Nov 2026</b></span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__field">6 MIN READ</span>
+      <span class="waybill__divider" aria-hidden="true">&middot;</span>
+      <span class="waybill__status"><i class="dot" aria-hidden="true"></i>EN</span>
+    </div>
+    <h1 class="post__title">Secure CI/CD Pipeline Design: From GitHub Access to Production Data</h1>
+    <div class="post__tags"><span>security</span><span>ci-cd</span><span>github</span><span>supply-chain</span><span>software-engineering</span></div>
+    <div class="post__content reveal is-visible">
+<p>A secure CI/CD pipeline is not defined by whether someone can read production data after a breach. It is defined by how many independent steps separate a compromised developer account from a change that can reach production. The November 25 incident disclosure from 1Password is a useful reminder: account encryption and the systems that ship backend code are different security boundaries.</p>
+<p>I build and operate software systems, including Dagango.com. My practical takeaway is straightforward: repository write access should never quietly imply production authority. That does not mean assuming a particular CI product caused this incident. It means tracing the identity and permissions at every hop, then making the dangerous transitions deliberate.</p>
+<h2>What did 1Password report, and what does it not establish?</h2>
+<p>1Password says its investigation began on November 19 after signs of access to an employee’s corporate GitHub account. According to the company’s account, the attacker accessed source code and pushed malicious code to backend services that downloaded administrative customer data. The disclosure also says private-repository source code was copied and CI/CD containing infrastructure-related secrets was accessed.</p>
+<p>Those are the company’s reported facts. They do not establish which continuous integration and continuous delivery/deployment (CI/CD) product or workflow was involved, nor do they show that any single control would have stopped the chain. Good incident analysis keeps those limits visible instead of filling the gaps with guesses.</p>
+<p>The company said the downloaded records for a subset of customers included:</p>
+<ul>
+<li>Names, email addresses, identifiers, and timestamps.</li>
+<li>Public keys and Secure Remote Password (SRP) parameters.</li>
+<li>Certain invitation, provisioning, and recovery-link tokens.</li>
+<li>Other account metadata that 1Password described as non-secret.</li>
+</ul>
+<p>1Password says vault contents and the keys protecting them were not accessed. That distinction matters. Exposure of account records is serious, but it is not the same claim as vault compromise. Don’t collapse the two when explaining risk to customers or planning a response.</p>
+<p>1Password also says it took several containment steps:</p>
+<ul>
+<li>Disabled the affected account and revoked tokens.</li>
+<li>Restored clean service versions.</li>
+<li>Rotated potentially exposed credentials.</li>
+<li>Tightened GitHub, CI/CD, and endpoint controls.</li>
+</ul>
+<p>These are the company’s stated steps, not an independent audit of its recovery. The useful engineering exercise is to map our own equivalent path before an incident forces us to do it under pressure.</p>
+<h2>How does a secure CI/CD pipeline keep GitHub access from becoming production authority?</h2>
+<p>Start by drawing the actual path, not the idealized architecture diagram. A developer identity may edit a repository; a workflow may build an artifact; another identity may publish or deploy it; and the running service may hold access to customer data. If one credential spans several of those steps, the blast radius is already larger than the workflow needs.</p>
+<p>For each hop, record its principal and permissions. Note how long its credential lasts and which resources it can reach. Include human and automation accounts. Also include workflow tokens, cloud roles, and service identities.</p>
+<p>Then ask a blunt question: if this identity is stolen, what can the attacker change or read without another person or system noticing?</p>
+<p>A practical first pass looks like this:</p>
+<ul>
+<li>Separate human GitHub accounts from automation identities. Avoid sharing a personal or employee token with a build job.</li>
+<li>Give each workflow only the repository permissions it needs. GitHub’s Actions security guidance recommends least privilege for <code>GITHUB_TOKEN</code> permissions.</li>
+<li>Prefer short-lived OpenID Connect (OIDC) authentication to cloud providers where supported, rather than storing long-lived cloud credentials in repository secrets.</li>
+<li>Keep test jobs away from production credentials. A job that runs untrusted code should not receive a secret simply because another job needs it.</li>
+</ul>
+<p>GitHub documents permission scoping and OIDC in its <a href="https://docs.github.com/en/actions/reference/security/secure-use">secure use guidance</a>. The point is not to bolt on a cloud feature because it sounds modern. It is to make credentials temporary and narrowly bound to the workload that needs them.</p>
+<p>Next, protect the mechanism that decides what gets built and deployed. Branch protection should require review and status checks on critical branches. Use <code>CODEOWNERS</code> to route changes to workflow definitions to people who understand their security impact. For sensitive deployment environments, require an approval that is independent of the person or automation proposing the change.</p>
+<p>OWASP’s GitHub Actions Security Cheat Sheet covers controls such as branch protection, required reviews, deployment approvals, and short-lived authentication. These gates do not make a compromised account harmless. They make it harder for a single compromised identity or an untrusted workflow edit to turn into an unattended production release.</p>
+<p>There is a trade-off. If every small documentation change waits on a manual security board, the team will route around the process. Apply stronger gates where a change can alter deployment behavior, access secrets, or affect customer data. Make the approval owner clear, and make the normal path easy to follow.</p>
+<h2>What should a small team verify at deploy time?</h2>
+<p>A deployment is more than a green checkmark. The team needs a way to connect the running artifact to the source and build process it trusts. Supply-chain Levels for Software Artifacts (SLSA) build provenance describes verifiable information about where, when, and how an artifact was produced.</p>
+<p>Provenance does not certify that source code is safe. It gives a verifier evidence to compare against expectations: the source repository, revision, and build process should match what the release policy allows. This narrows uncertainty when an artifact appears in production, especially if teams retain the record and actually check it.</p>
+<p>For a small team, avoid starting with a platform migration. Make a one-page map of the route from a developer account to a production service. Mark every credential, workflow file, approval, and data boundary along the way. Then pick the highest-value independent gate, such as separating deployment credentials from test jobs or requiring another reviewer for workflow changes.</p>
+<p>After that, test the controls. Try a pull request that changes a workflow, a job that requests an unexpected permission, and a deployment without the required approval. Confirm the system blocks each case and that the alert reaches a human who owns the response. A control that nobody has exercised is a policy statement, not much of a safety boundary.</p>
+<p>My recommendation is to run this review whenever the deployment path changes, not just after a security headline. Start with identities and credentials; then harden the workflows and approvals that can turn code into production behavior. A clear map makes the next improvement obvious, and it gives responders somewhere concrete to start if an account is compromised.</p>
+<h2>FAQ</h2>
+<h3>Does a secure CI/CD pipeline mean repository access can never lead to a production incident?</h3>
+<p>No. These controls reduce the chance that one compromised account can make an unattended change. They do not eliminate malicious code, stolen credentials, mistakes, or the need for monitoring and incident response.</p>
+<h3>Is OIDC always safer than a stored secret?</h3>
+<p>Not automatically. OIDC can avoid long-lived cloud credentials, but the trust policy must restrict which repository and workflow can assume the cloud identity. A broad trust rule can recreate the same excessive access in a different form.</p>
+<h3>Does build provenance prove that an artifact is safe?</h3>
+<p>No. Provenance records how an artifact was produced; it does not prove that the source code is benign. Teams need release policy and verification to decide whether that origin is acceptable.</p>
+    </div>
+    <div class="hero__actions post__footer-actions">
+      <a class="btn btn--stamp" href="/blog/">&larr; All field notes</a>
+      <a class="btn btn--ghost" href="https://github.com/sponsors/adityafirmansyah" target="_blank" rel="noopener noreferrer">Enjoyed this? Sponsor on GitHub &hearts;</a>
+      <a class="btn btn--ghost post-lang-switch" href="https://aditf.com/blog/secure-cicd-github-production-data/id/">Baca dalam Bahasa Indonesia</a>
+    </div>
+  </article>
+</main>
+<footer class="footer">
+  <span>&copy; 2026 Aditya Firmansyah</span>
+  <span class="footer__id">MANIFEST REF. AF&middot;SWE&middot;2026</span>
+</footer>
+<script src="/script.js"></script>
+</body>
+</html>
