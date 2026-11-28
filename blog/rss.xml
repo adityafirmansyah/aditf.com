@@ -7,6 +7,15 @@
     <language>en</language>
     <atom:link href="https://aditf.com/blog/rss.xml" rel="self" type="application/rss+xml"/>
     <item>
+      <title>AI Agents for Self-Hosting: Faster Setup, Same Responsibility</title>
+      <link>https://aditf.com/blog/ai-agents-self-hosting/</link>
+      <guid isPermaLink="true">https://aditf.com/blog/ai-agents-self-hosting/</guid>
+      <pubDate>Sat, 28 Nov 2026 00:00:00 +0000</pubDate>
+      <description>AI agents for self-hosting can shrink setup time and make routine changes easier. They do not take responsibility for updates, exposed services, backups, or recovery away from the operator.</description>
+      <enclosure url="" length="0" type="text/html"/>
+      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/ai-agents-self-hosting/id/"/>
+    </item>
+    <item>
       <title>Secure CI/CD Pipeline Design: From GitHub Access to Production Data</title>
       <link>https://aditf.com/blog/secure-cicd-github-production-data/</link>
       <guid isPermaLink="true">https://aditf.com/blog/secure-cicd-github-production-data/</guid>
@@ -176,15 +185,6 @@
       <description>Go 1.24 enabled Multipath TCP by default on Linux listeners, turning a subtle kernel Use-After-Free flaw into a remote root risk across unpatched servers.</description>
       <enclosure url="" length="0" type="text/html"/>
       <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/go-mptcp-cve-2026-98432/id/"/>
-    </item>
-    <item>
-      <title>Backdooring Claude Code on Cursor: Why IDE Extensions Must Be Sandboxed</title>
-      <link>https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/</link>
-      <guid isPermaLink="true">https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/</guid>
-      <pubDate>Sat, 31 Oct 2026 00:00:00 +0000</pubDate>
-      <description>An 11-hour breach of Cursor&#x27;s marketplace proxy injected a reverse SSH backdoor into Claude Code. Developer tools cannot safely share an unsandboxed runtime with workstation credentials.</description>
-      <enclosure url="" length="0" type="text/html"/>
-      <atom:link rel="alternate" type="text/html" hreflang="id" href="https://aditf.com/blog/claude-code-cursor-backdoor-ide-sandboxing/id/"/>
     </item>
   </channel>
 </rss>
